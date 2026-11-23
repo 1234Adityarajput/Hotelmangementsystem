@@ -13,10 +13,27 @@ import {
   Coffee,
   ShoppingBag,
   Layers,
+  LayoutGrid,
+  Table as TableIcon,
+  Clock,
+  Calendar,
+  Building2,
+  CheckCircle2,
+  AlertCircle,
+  Eye,
+  DollarSign,
+  TrendingUp,
+  Receipt,
+  Bed,
+  Shirt,
+  Car,
+  Sparkles,
+  HelpCircle,
+  ArrowRight,
 } from "lucide-react";
 import { itemsService } from "@/services/items.service";
 import { bookingsService } from "@/services/bookings.service";
-import { Item, ItemCategory, Booking } from "@/types";
+import { Item, ItemCategory, Booking, GuestItemRecord } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,31 +49,51 @@ import {
 } from "@/components/ui/dialog";
 
 export default function ItemsPage() {
+  const [activeTab, setActiveTab] = useState<"catalog" | "guest-records" | "categories">("catalog");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [loading, setLoading] = useState(true);
+
+  // Catalog items & categories
   const [items, setItems] = useState<Item[]>([]);
   const [categories, setCategories] = useState<ItemCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
 
-  // Modals
+  // Guest Item Records
+  const [guestRecords, setGuestRecords] = useState<GuestItemRecord[]>([]);
+  const [guestRecordsTotal, setGuestRecordsTotal] = useState(0);
+  const [guestRecordsRevenue, setGuestRecordsRevenue] = useState(0);
+  const [guestSearch, setGuestSearch] = useState("");
+  const [guestDateFilter, setGuestDateFilter] = useState("");
+
+  // Active in-house stays for posting charges
+  const [activeStays, setActiveStays] = useState<Booking[]>([]);
+
+  // Item Modals
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [itemForm, setItemForm] = useState({
     name: "",
     categoryId: "",
-    unitPrice: 150,
+    unitPrice: 200,
     description: "",
   });
 
+  // Quick Price Update Modal
+  const [priceModalOpen, setPriceModalOpen] = useState(false);
+  const [itemToUpdatePrice, setItemToUpdatePrice] = useState<Item | null>(null);
+  const [newPrice, setNewPrice] = useState<number>(0);
+
+  // Category Modal
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<ItemCategory | null>(null);
   const [categoryForm, setCategoryForm] = useState({
     name: "",
     description: "",
   });
 
-  // Room order modal
+  // Post Purchase to Guest Stay Modal
   const [orderModalOpen, setOrderModalOpen] = useState(false);
-  const [activeStays, setActiveStays] = useState<Booking[]>([]);
   const [orderForm, setOrderForm] = useState({
     bookingId: "",
     itemId: "",
@@ -66,22 +103,38 @@ export default function ItemsPage() {
     notes: "",
   });
 
+  // Delete Confirmation Modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
+
   const [submitting, setSubmitting] = useState(false);
 
+  // Fetch all data
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [iRes, cRes] = await Promise.all([
+      const [iRes, cRes, gRes, staysRes] = await Promise.all([
         itemsService.findAllItems(
           selectedCategory !== "ALL" ? selectedCategory : undefined,
-          search || undefined,
+          search || undefined
         ),
         itemsService.findAllCategories(),
+        itemsService.findAllGuestItemRecords({
+          search: guestSearch || undefined,
+          date: guestDateFilter || undefined,
+          limit: 100,
+        }),
+        bookingsService.getActiveStays(),
       ]);
-      setItems(iRes);
-      setCategories(cRes);
+
+      setItems(iRes || []);
+      setCategories(cRes || []);
+      setGuestRecords(gRes?.items || []);
+      setGuestRecordsTotal(gRes?.total || 0);
+      setGuestRecordsRevenue(gRes?.totalAmountSum || 0);
+      setActiveStays(staysRes || []);
     } catch (err) {
-      toast.error("Failed to load catalog items");
+      toast.error("Failed to load catalog items and guest records");
     } finally {
       setLoading(false);
     }
@@ -89,19 +142,21 @@ export default function ItemsPage() {
 
   useEffect(() => {
     fetchData();
-  }, [selectedCategory, search]);
+  }, [selectedCategory, search, guestSearch, guestDateFilter]);
 
+  // Open Add Item Modal
   const handleOpenAddItem = () => {
     setEditingItem(null);
     setItemForm({
       name: "",
       categoryId: categories[0]?.id || "",
-      unitPrice: 150,
+      unitPrice: 200,
       description: "",
     });
     setItemModalOpen(true);
   };
 
+  // Open Edit Item Modal
   const handleOpenEditItem = (it: Item) => {
     setEditingItem(it);
     setItemForm({
@@ -113,29 +168,101 @@ export default function ItemsPage() {
     setItemModalOpen(true);
   };
 
+  // Save Item (Create or Update)
   const handleSaveItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!itemForm.name.trim() || !itemForm.categoryId) {
-      toast.error("Name and Category are required");
+      toast.error("Item Name and Category are required");
       return;
     }
 
     try {
       setSubmitting(true);
       if (editingItem) {
-        await itemsService.updateItem(editingItem.id, itemForm);
-        toast.success("Item updated successfully");
+        await itemsService.updateItem(editingItem.id, {
+          name: itemForm.name.trim(),
+          categoryId: itemForm.categoryId,
+          unitPrice: Number(itemForm.unitPrice),
+          description: itemForm.description.trim() || undefined,
+        });
+        toast.success(`Item "${itemForm.name}" updated successfully.`);
       } else {
-        await itemsService.createItem(itemForm);
-        toast.success("Item added to catalog");
+        await itemsService.createItem({
+          name: itemForm.name.trim(),
+          categoryId: itemForm.categoryId,
+          unitPrice: Number(itemForm.unitPrice),
+          description: itemForm.description.trim() || undefined,
+        });
+        toast.success(`New item "${itemForm.name}" added to catalog.`);
       }
       setItemModalOpen(false);
       fetchData();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to save item");
+      toast.error(err.response?.data?.message || "Failed to save catalog item");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Quick Price Setter
+  const handleOpenPriceModal = (it: Item) => {
+    setItemToUpdatePrice(it);
+    setNewPrice(Number(it.unitPrice));
+    setPriceModalOpen(true);
+  };
+
+  const handleSavePrice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!itemToUpdatePrice) return;
+    if (newPrice < 0) {
+      toast.error("Price cannot be negative");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await itemsService.updatePrice(itemToUpdatePrice.id, Number(newPrice));
+      toast.success(`Price for "${itemToUpdatePrice.name}" updated to ₹${newPrice}.`);
+      setPriceModalOpen(false);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to update price");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Delete Item
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      setSubmitting(true);
+      const res = await itemsService.deleteItem(itemToDelete.id);
+      toast.success(res.message || "Item removed from catalog.");
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to delete item");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Category Actions
+  const handleOpenAddCategory = () => {
+    setEditingCategory(null);
+    setCategoryForm({ name: "", description: "" });
+    setCategoryModalOpen(true);
+  };
+
+  const handleOpenEditCategory = (cat: ItemCategory) => {
+    setEditingCategory(cat);
+    setCategoryForm({
+      name: cat.name,
+      description: cat.description || "",
+    });
+    setCategoryModalOpen(true);
   };
 
   const handleSaveCategory = async (e: React.FormEvent) => {
@@ -147,212 +274,738 @@ export default function ItemsPage() {
 
     try {
       setSubmitting(true);
-      await itemsService.createCategory(categoryForm);
-      toast.success("Item category created");
+      if (editingCategory) {
+        await itemsService.updateCategory(editingCategory.id, categoryForm);
+        toast.success(`Category "${categoryForm.name}" updated.`);
+      } else {
+        await itemsService.createCategory(categoryForm);
+        toast.success(`Category "${categoryForm.name}" created.`);
+      }
       setCategoryModalOpen(false);
-      setCategoryForm({ name: "", description: "" });
       fetchData();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to create category");
+      toast.error(err.response?.data?.message || "Failed to save category");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleOpenOrder = async (item: Item) => {
+  const handleDeleteCategory = async (cat: ItemCategory) => {
+    if (!confirm(`Are you sure you want to delete category "${cat.name}"?`)) return;
     try {
-      const stays = await bookingsService.getActiveStays();
-      setActiveStays(stays);
-      if (stays.length === 0) {
-        toast.error("No active checked-in guests to charge items to.");
-        return;
-      }
-      setOrderForm({
-        bookingId: stays[0].id,
-        itemId: item.id,
-        itemName: item.name,
-        unitPrice: Number(item.unitPrice),
-        quantity: 1,
-        notes: "",
-      });
-      setOrderModalOpen(true);
-    } catch (err) {
-      toast.error("Could not load active stays");
+      await itemsService.deleteCategory(cat.id);
+      toast.success("Category deleted successfully.");
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to delete category");
     }
+  };
+
+  // Post Purchase to Guest Stay
+  const handleOpenOrderModal = (item?: Item) => {
+    if (activeStays.length === 0) {
+      toast.error("No active checked-in guests currently in hotel.");
+      return;
+    }
+
+    const defaultItem = item || items[0];
+    setOrderForm({
+      bookingId: activeStays[0].id,
+      itemId: defaultItem ? defaultItem.id : "",
+      itemName: defaultItem ? defaultItem.name : "",
+      unitPrice: defaultItem ? Number(defaultItem.unitPrice) : 250,
+      quantity: 1,
+      notes: "",
+    });
+    setOrderModalOpen(true);
   };
 
   const handleConfirmOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!orderForm.bookingId) return;
+    if (!orderForm.bookingId) {
+      toast.error("Please select an in-house guest stay");
+      return;
+    }
+    if (!orderForm.itemName.trim()) {
+      toast.error("Please enter an item or service name");
+      return;
+    }
 
     try {
       setSubmitting(true);
-      await itemsService.addBookingItem(orderForm);
-      toast.success(`Ordered ${orderForm.quantity}x ${orderForm.itemName} to room charge.`);
+      await itemsService.addBookingItem({
+        bookingId: orderForm.bookingId,
+        itemId: orderForm.itemId || undefined,
+        itemName: orderForm.itemName.trim(),
+        unitPrice: Number(orderForm.unitPrice),
+        quantity: Number(orderForm.quantity),
+        notes: orderForm.notes.trim() || undefined,
+      });
+
+      toast.success(
+        `Charged ${orderForm.quantity}x "${orderForm.itemName}" to guest stay. Final bill updated automatically!`
+      );
       setOrderModalOpen(false);
+      fetchData();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to place room order");
+      toast.error(err.response?.data?.message || "Failed to post item charge");
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Void / Remove a Guest Purchase Record
+  const handleVoidGuestRecord = async (record: GuestItemRecord) => {
+    if (
+      !confirm(
+        `Are you sure you want to remove "${record.itemName}" (₹${record.totalAmount}) from Room ${record.roomNumber}? This will automatically adjust the guest's final bill.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await itemsService.deleteBookingItem(record.id);
+      toast.success("Guest purchase removed and billing folio automatically adjusted.");
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to remove purchase record");
+    }
+  };
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
-            Hotel Items & Services Catalog
-          </h2>
-          <p className="text-xs text-[#79695B] mt-0.5">
-            Manage food, beverage, laundry, room service menus, and post charges directly to active guest rooms.
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 text-[11px] font-semibold bg-[#EEE7DA] text-[#362A22] rounded-full border border-[#E3D9CA] tracking-wide uppercase">
+              Module 8 • Operations
+            </span>
+            <span className="flex items-center gap-1 text-[11px] text-[#32765B] font-medium bg-[#E7F1E9] px-2 py-0.5 rounded-full border border-[#C5DFD0]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#32765B] animate-pulse"></span>
+              Live Stay Linking Active
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#362A22] mt-1.5 tracking-tight">
+            Hotel Items & Services Management
+          </h1>
+          <p className="text-xs sm:text-sm text-[#79695B] mt-1 max-w-3xl">
+            Maintain the hotel&apos;s complete catalog of items, dining menus, and guest services. Set prices, organize categories, and link all purchases directly to guest stays.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex items-center gap-2 flex-wrap">
           <Button
             variant="outline"
-            size="sm"
-            onClick={() => setCategoryModalOpen(true)}
-            className="text-xs"
+            onClick={() => handleOpenAddCategory()}
+            className="border-[#E3D9CA] bg-white hover:bg-[#F7F4EE] text-[#362A22] text-xs h-9 px-3"
           >
-            <Plus className="w-3.5 h-3.5 mr-1" /> Add Category
+            <Layers className="w-3.5 h-3.5 mr-1.5 text-[#B08A60]" />
+            Manage Categories
           </Button>
+
           <Button
-            size="sm"
-            onClick={handleOpenAddItem}
-            className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs shadow-sm"
+            onClick={() => handleOpenOrderModal()}
+            className="bg-[#B08A60] hover:bg-[#97734E] text-white text-xs h-9 px-3.5 shadow-sm"
           >
-            <Plus className="w-4 h-4 mr-1" /> Add New Item
+            <ShoppingBag className="w-3.5 h-3.5 mr-1.5" />
+            Post Purchase to Guest
+          </Button>
+
+          <Button
+            onClick={handleOpenAddItem}
+            className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9 px-3.5 shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            Add New Item
           </Button>
         </div>
       </div>
 
-      {/* Category Pills & Search */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <button
-            onClick={() => setSelectedCategory("ALL")}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-              selectedCategory === "ALL"
-                ? "bg-slate-900 text-white font-semibold"
-                : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
-            }`}
-          >
-            All Items
-          </button>
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setSelectedCategory(c.id)}
-              className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                selectedCategory === c.id
-                  ? "bg-slate-900 text-white font-semibold"
-                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
-              }`}
-            >
-              {c.name}
-            </button>
-          ))}
-        </div>
+      {/* KPI Overview Strip */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="border-[#E3D9CA] bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between text-xs text-[#79695B] mb-1">
+            <span>Total Catalog Items</span>
+            <UtensilsCrossed className="w-3.5 h-3.5 text-[#B08A60]" />
+          </div>
+          <div className="text-xl font-bold font-serif text-[#362A22]">{items.length}</div>
+          <p className="text-[10px] text-[#948779] mt-0.5">Active items & services</p>
+        </Card>
 
-        <div className="relative w-64">
-          <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
-          <Input
-            type="text"
-            placeholder="Search items..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-8 h-8 text-xs"
-          />
-        </div>
+        <Card className="border-[#E3D9CA] bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between text-xs text-[#79695B] mb-1">
+            <span>Item Categories</span>
+            <Layers className="w-3.5 h-3.5 text-[#B08A60]" />
+          </div>
+          <div className="text-xl font-bold font-serif text-[#362A22]">{categories.length}</div>
+          <p className="text-[10px] text-[#948779] mt-0.5">F&B, laundry, transport, etc.</p>
+        </Card>
+
+        <Card className="border-[#E3D9CA] bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between text-xs text-[#79695B] mb-1">
+            <span>Guest Purchases Logged</span>
+            <ShoppingBag className="w-3.5 h-3.5 text-[#32765B]" />
+          </div>
+          <div className="text-xl font-bold font-mono text-[#362A22]">{guestRecordsTotal}</div>
+          <p className="text-[10px] text-[#948779] mt-0.5">Stay purchase orders</p>
+        </Card>
+
+        <Card className="border-[#E3D9CA] bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between text-xs text-[#79695B] mb-1">
+            <span>Purchases Revenue</span>
+            <DollarSign className="w-3.5 h-3.5 text-[#32765B]" />
+          </div>
+          <div className="text-xl font-bold font-mono text-[#32765B]">
+            ₹{guestRecordsRevenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+          </div>
+          <p className="text-[10px] text-[#948779] mt-0.5">Billed to guest stays</p>
+        </Card>
       </div>
 
-      {/* Items Grid */}
-      {loading ? (
-        <div className="p-12 flex justify-center items-center">
-          <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
-        </div>
-      ) : items.length === 0 ? (
-        <div className="p-12 text-center text-xs text-[#948779] bg-white rounded-xl border border-[#E3D9CA]">
-          No items found in this category. Click &quot;Add New Item&quot; to populate the menu.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {items.map((it) => (
-            <Card key={it.id} className="border-[#E3D9CA] shadow-sm hover:shadow transition-all flex flex-col justify-between">
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <span className="font-semibold text-sm text-[#362A22] block">{it.name}</span>
-                    <Badge variant="outline" className="text-[10px] mt-1 bg-[#F7F4EE]">
-                      {it.category?.name || "Service"}
-                    </Badge>
-                  </div>
-                  <span className="text-sm font-bold text-[#362A22] font-mono">
-                    ₹{Number(it.unitPrice).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
+      {/* Tabs Navigation */}
+      <div className="flex border-b border-[#E3D9CA] gap-4 text-xs font-medium">
+        <button
+          onClick={() => setActiveTab("catalog")}
+          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
+            activeTab === "catalog"
+              ? "border-[#362A22] text-[#362A22] font-semibold"
+              : "border-transparent text-[#79695B] hover:text-[#362A22]"
+          }`}
+        >
+          <UtensilsCrossed className="w-3.5 h-3.5" />
+          <span>Items & Services Catalog ({items.length})</span>
+        </button>
 
-                {it.description && (
-                  <p className="text-xs text-[#79695B] line-clamp-2">{it.description}</p>
-                )}
+        <button
+          onClick={() => setActiveTab("guest-records")}
+          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
+            activeTab === "guest-records"
+              ? "border-[#362A22] text-[#362A22] font-semibold"
+              : "border-transparent text-[#79695B] hover:text-[#362A22]"
+          }`}
+        >
+          <Receipt className="w-3.5 h-3.5" />
+          <span>Guest Item Records ({guestRecordsTotal})</span>
+        </button>
 
-                <div className="pt-3 border-t border-[#EAE3D8] flex items-center justify-between gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleOpenOrder(it)}
-                    className="h-7 text-xs bg-[#FAF6F0] text-[#362A22] hover:bg-[#FAF6F0] border-[#E3D9CA] flex-1"
-                  >
-                    <ShoppingBag className="w-3 h-3 mr-1" /> Order to Room
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleOpenEditItem(it)}
-                    className="h-7 w-7 p-0 text-[#79695B] hover:text-[#362A22]"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              </CardContent>
+        <button
+          onClick={() => setActiveTab("categories")}
+          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
+            activeTab === "categories"
+              ? "border-[#362A22] text-[#362A22] font-semibold"
+              : "border-transparent text-[#79695B] hover:text-[#362A22]"
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>Manage Item Categories ({categories.length})</span>
+        </button>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* TAB 1: ITEMS & SERVICES CATALOG */}
+      {/* ========================================================================= */}
+      {activeTab === "catalog" && (
+        <div className="space-y-4">
+          {/* Category Filter Pills & Search */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                onClick={() => setSelectedCategory("ALL")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  selectedCategory === "ALL"
+                    ? "bg-[#362A22] text-white font-semibold"
+                    : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
+                }`}
+              >
+                All Items ({items.length})
+              </button>
+              {categories.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedCategory(c.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    selectedCategory === c.id
+                      ? "bg-[#362A22] text-white font-semibold"
+                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
+                  }`}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="relative w-60">
+                <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
+                <Input
+                  type="text"
+                  placeholder="Search item name..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-8 h-8 text-xs border-[#E3D9CA]"
+                />
+              </div>
+
+              {/* View toggle */}
+              <div className="flex items-center border border-[#E3D9CA] rounded-lg bg-white overflow-hidden p-0.5">
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`p-1.5 rounded ${viewMode === "grid" ? "bg-[#362A22] text-white" : "text-[#79695B]"}`}
+                  title="Grid View"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`p-1.5 rounded ${viewMode === "table" ? "bg-[#362A22] text-white" : "text-[#79695B]"}`}
+                  title="Table View"
+                >
+                  <TableIcon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="p-16 flex justify-center items-center">
+              <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
+            </div>
+          ) : items.length === 0 ? (
+            <Card className="border-[#E3D9CA] p-12 text-center text-xs text-[#79695B] bg-white">
+              <UtensilsCrossed className="w-8 h-8 mx-auto text-[#B08A60]/40 mb-2" />
+              <p className="font-semibold text-[#362A22] text-sm">No Catalog Items Found</p>
+              <p className="text-[#948779] mt-1">
+                Click &quot;Add New Item&quot; to add food, beverages, laundry, or hotel services.
+              </p>
             </Card>
-          ))}
+          ) : viewMode === "grid" ? (
+            /* Grid View */
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {items.map((it) => (
+                <Card
+                  key={it.id}
+                  className="border-[#E3D9CA] bg-white shadow-sm hover:border-[#B08A60] transition-colors flex flex-col justify-between"
+                >
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className="font-bold text-sm text-[#362A22] block leading-tight">
+                          {it.name}
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] mt-1 bg-[#F7F4EE] border-[#E3D9CA] text-[#79695B]"
+                        >
+                          {it.category?.name || "Service"}
+                        </Badge>
+                      </div>
+
+                      {/* Price Badge with quick edit */}
+                      <button
+                        onClick={() => handleOpenPriceModal(it)}
+                        className="group flex items-center gap-1 text-sm font-bold text-[#362A22] font-mono hover:text-[#B08A60] transition-colors"
+                        title="Click to update price"
+                      >
+                        <span>₹{Number(it.unitPrice).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                        <Edit2 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity text-[#B08A60]" />
+                      </button>
+                    </div>
+
+                    {it.description ? (
+                      <p className="text-xs text-[#79695B] line-clamp-2 min-h-[32px]">
+                        {it.description}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-[#948779] italic min-h-[32px]">
+                        No description specified
+                      </p>
+                    )}
+
+                    <div className="pt-3 border-t border-[#EAE3D8] flex items-center justify-between gap-1.5">
+                      <Button
+                        size="sm"
+                        onClick={() => handleOpenOrderModal(it)}
+                        className="h-7 text-xs bg-[#EEE7DA] hover:bg-[#E3D9CA] text-[#362A22] border border-[#E3D9CA] flex-1 font-medium"
+                      >
+                        <ShoppingBag className="w-3 h-3 mr-1" />
+                        Charge to Room
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOpenPriceModal(it)}
+                        className="h-7 px-2 text-[#B08A60] hover:bg-[#F7F4EE] text-xs"
+                        title="Set Price"
+                      >
+                        <Tag className="w-3.5 h-3.5" />
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOpenEditItem(it)}
+                        className="h-7 px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#F7F4EE]"
+                        title="Edit Item"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setItemToDelete(it);
+                          setDeleteModalOpen(true);
+                        }}
+                        className="h-7 px-2 text-[#B54C44] hover:bg-[#F8E8E5]"
+                        title="Delete Item"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            /* Table View */
+            <Card className="border-[#E3D9CA] bg-white shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[10px] font-semibold border-b border-[#E3D9CA]">
+                    <tr>
+                      <th className="px-4 py-3">Item Name</th>
+                      <th className="px-4 py-3">Category</th>
+                      <th className="px-4 py-3">Description</th>
+                      <th className="px-4 py-3 font-mono">Price</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#EAE3D8]">
+                    {items.map((it) => (
+                      <tr key={it.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                        <td className="px-4 py-3 font-semibold text-[#362A22]">{it.name}</td>
+                        <td className="px-4 py-3">
+                          <Badge variant="outline" className="text-[10px] border-[#E3D9CA] bg-[#F7F4EE] text-[#79695B]">
+                            {it.category?.name || "Service"}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-[#79695B] max-w-xs truncate">
+                          {it.description || "—"}
+                        </td>
+                        <td className="px-4 py-3 font-mono font-bold text-[#362A22]">
+                          ₹{Number(it.unitPrice).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleOpenOrderModal(it)}
+                              className="h-7 text-[11px] border-[#E3D9CA] text-[#362A22] hover:bg-[#F7F4EE]"
+                            >
+                              <ShoppingBag className="w-3 h-3 mr-1" />
+                              Charge
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleOpenPriceModal(it)}
+                              className="h-7 px-2 text-[#B08A60]"
+                              title="Set Price"
+                            >
+                              <Tag className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleOpenEditItem(it)}
+                              className="h-7 px-2 text-[#79695B]"
+                              title="Edit"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setItemToDelete(it);
+                                setDeleteModalOpen(true);
+                              }}
+                              className="h-7 px-2 text-[#B54C44]"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )}
         </div>
       )}
 
-      {/* Add / Edit Item Modal */}
+      {/* ========================================================================= */}
+      {/* TAB 2: GUEST ITEM RECORDS (PURCHASES LINKED TO STAYS) */}
+      {/* ========================================================================= */}
+      {activeTab === "guest-records" && (
+        <div className="space-y-4">
+          {/* Header Card */}
+          <div className="bg-white p-4 rounded-xl border border-[#E3D9CA] shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h3 className="font-serif font-bold text-base text-[#362A22]">
+                Guest Item & Service Purchase Records
+              </h3>
+              <p className="text-xs text-[#79695B] mt-0.5">
+                Every purchase is linked to the guest&apos;s stay duration and automatically factored into their final billing folio.
+              </p>
+            </div>
+            <Button
+              onClick={() => handleOpenOrderModal()}
+              className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9 px-3.5 shadow-sm"
+            >
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Post New Guest Purchase
+            </Button>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="relative w-64">
+                <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
+                <Input
+                  type="text"
+                  placeholder="Search guest name, room # or item..."
+                  value={guestSearch}
+                  onChange={(e) => setGuestSearch(e.target.value)}
+                  className="pl-8 h-8 text-xs border-[#E3D9CA]"
+                />
+              </div>
+
+              <div className="flex items-center gap-1.5 text-xs text-[#79695B]">
+                <Calendar className="w-3.5 h-3.5 text-[#B08A60]" />
+                <Input
+                  type="date"
+                  value={guestDateFilter}
+                  onChange={(e) => setGuestDateFilter(e.target.value)}
+                  className="h-8 text-xs w-36 border-[#E3D9CA]"
+                />
+                {guestDateFilter && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setGuestDateFilter("")}
+                    className="h-8 text-[11px] px-2 text-[#B54C44]"
+                  >
+                    Clear Date
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="text-xs text-[#79695B]">
+              Total Records: <span className="font-semibold text-[#362A22]">{guestRecords.length}</span> • Revenue:{" "}
+              <span className="font-mono font-bold text-[#32765B]">
+                ₹{guestRecordsRevenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+          </div>
+
+          {/* Guest Records Table */}
+          <Card className="border-[#E3D9CA] bg-white shadow-sm overflow-hidden">
+            <CardContent className="p-0">
+              {guestRecords.length === 0 ? (
+                <div className="p-12 text-center text-xs text-[#948779]">
+                  No guest item records logged yet. Click &quot;Post New Guest Purchase&quot; to charge an item to a guest stay.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[10px] font-semibold border-b border-[#E3D9CA]">
+                      <tr>
+                        <th className="px-4 py-3">Guest Name</th>
+                        <th className="px-4 py-3">Room #</th>
+                        <th className="px-4 py-3">Item or Service Name</th>
+                        <th className="px-4 py-3 text-center">Quantity</th>
+                        <th className="px-4 py-3 font-mono">Price (₹)</th>
+                        <th className="px-4 py-3 font-mono">Total Amount (₹)</th>
+                        <th className="px-4 py-3">Purchase Date</th>
+                        <th className="px-4 py-3">Purchase Time</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#EAE3D8]">
+                      {guestRecords.map((rec) => (
+                        <tr key={rec.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                          <td className="px-4 py-3 font-semibold text-[#362A22]">
+                            <div>{rec.guestName}</div>
+                            {rec.guestMobile && (
+                              <div className="text-[10px] text-[#948779] font-normal">
+                                {rec.guestMobile}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="px-2 py-0.5 rounded font-mono font-bold bg-[#EEE7DA] text-[#362A22] border border-[#E3D9CA]">
+                              Room {rec.roomNumber}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">
+                            <div>{rec.itemName}</div>
+                            {rec.notes && (
+                              <div className="text-[10px] text-[#948779] italic">{rec.notes}</div>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-center font-mono font-semibold">
+                            {rec.quantity}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-[#79695B]">
+                            ₹{rec.price.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#32765B]">
+                            ₹{rec.totalAmount.toFixed(2)}
+                          </td>
+                          <td className="px-4 py-3 text-[#79695B] font-mono text-[11px]">
+                            {rec.purchaseDate}
+                          </td>
+                          <td className="px-4 py-3 text-[#79695B] font-mono text-[11px]">
+                            {rec.purchaseTime || "—"}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleVoidGuestRecord(rec)}
+                              className="h-7 px-2 text-[#B54C44] hover:bg-[#F8E8E5] text-xs"
+                              title="Void / Remove Charge from Stay"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 mr-1" />
+                              Remove
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 3: MANAGE ITEM CATEGORIES */}
+      {/* ========================================================================= */}
+      {activeTab === "categories" && (
+        <div className="space-y-4">
+          <div className="bg-white p-4 rounded-xl border border-[#E3D9CA] shadow-sm flex items-center justify-between">
+            <div>
+              <h3 className="font-serif font-bold text-base text-[#362A22]">
+                Hotel Item & Service Categories
+              </h3>
+              <p className="text-xs text-[#79695B] mt-0.5">
+                Organize menu items, laundry, room service, extra beds, and hotel services into clean operational categories.
+              </p>
+            </div>
+            <Button
+              onClick={handleOpenAddCategory}
+              className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9 px-3.5 shadow-sm"
+            >
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Add Category
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {categories.map((cat) => (
+              <Card key={cat.id} className="border-[#E3D9CA] bg-white shadow-sm flex flex-col justify-between">
+                <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-sm font-bold text-[#362A22] flex items-center gap-1.5">
+                      <Layers className="w-4 h-4 text-[#B08A60]" />
+                      <span>{cat.name}</span>
+                    </CardTitle>
+                    <Badge variant="outline" className="text-[10px] bg-[#F7F4EE] border-[#E3D9CA]">
+                      {cat._count?.items ?? items.filter((i) => i.categoryId === cat.id).length} items
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-xs text-[#79695B] mt-1">
+                    {cat.description || "Administrative category"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-3 flex items-center justify-between">
+                  <span className="text-[11px] text-[#948779]">
+                    Status: <span className="text-[#32765B] font-semibold">Active</span>
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleOpenEditCategory(cat)}
+                      className="h-7 px-2 text-[#79695B] hover:text-[#362A22]"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteCategory(cat)}
+                      className="h-7 px-2 text-[#B54C44] hover:bg-[#F8E8E5]"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 1: ADD / EDIT CATALOG ITEM */}
+      {/* ========================================================================= */}
       <Dialog open={itemModalOpen} onOpenChange={setItemModalOpen}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-white border-[#E3D9CA]">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-[#362A22]">
-              {editingItem ? "Edit Catalog Item" : "Add New Item"}
+            <DialogTitle className="font-serif text-lg text-[#362A22]">
+              {editingItem ? "Update Item Details" : "Add New Item / Service"}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#79695B]">
-              Set menu pricing and category for guest billing.
+              Configure item name, category, pricing, and description for hotel offerings.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSaveItem} className="space-y-3 pt-2 text-xs">
+          <form onSubmit={handleSaveItem} className="space-y-4 pt-2 text-xs">
+            {/* Item Name */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Item Name *</label>
+              <label className="font-semibold text-[#362A22]">Item Name *</label>
               <Input
                 required
                 value={itemForm.name}
                 onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })}
-                placeholder="e.g. Masala Tea, Laundry Express, Mineral Water"
-                className="h-8 text-xs"
+                placeholder="e.g. Continental Breakfast, 2-Piece Suit Dry Clean, Extra Bed"
+                className="h-9 text-xs border-[#E3D9CA]"
               />
             </div>
 
+            {/* Category */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Category *</label>
+              <label className="font-semibold text-[#362A22]">Category *</label>
               <select
                 required
                 value={itemForm.categoryId}
                 onChange={(e) => setItemForm({ ...itemForm, categoryId: e.target.value })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
+                className="w-full h-9 rounded-md border border-[#E3D9CA] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -362,107 +1015,185 @@ export default function ItemsPage() {
               </select>
             </div>
 
+            {/* Price */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Unit Price (₹) *</label>
+              <label className="font-semibold text-[#362A22]">Price (₹) *</label>
               <Input
                 type="number"
                 required
                 min="0"
-                step="5"
+                step="0.01"
                 value={itemForm.unitPrice}
                 onChange={(e) => setItemForm({ ...itemForm, unitPrice: Number(e.target.value) })}
-                className="h-8 text-xs font-mono"
+                className="h-9 text-xs font-mono font-bold text-[#362A22] border-[#E3D9CA]"
               />
             </div>
 
+            {/* Description */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Description</label>
+              <label className="font-semibold text-[#79695B]">Description</label>
               <Input
                 value={itemForm.description}
                 onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
-                placeholder="Portion size, details..."
-                className="h-8 text-xs"
+                placeholder="Portion size, preparation details, service turnaround..."
+                className="h-9 text-xs border-[#E3D9CA]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
-              <Button type="button" variant="outline" size="sm" onClick={() => setItemModalOpen(false)}>
+            <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setItemModalOpen(false)}
+                className="border-[#E3D9CA] text-xs h-9"
+              >
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
-                {submitting ? "Saving..." : editingItem ? "Save Changes" : "Create Item"}
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9"
+              >
+                {submitting ? "Saving..." : editingItem ? "Update Item" : "Create Item"}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Add Category Modal */}
-      <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen}>
-        <DialogContent className="max-w-md bg-white">
+      {/* ========================================================================= */}
+      {/* MODAL 2: QUICK SET ITEM / SERVICE PRICE */}
+      {/* ========================================================================= */}
+      <Dialog open={priceModalOpen} onOpenChange={setPriceModalOpen}>
+        <DialogContent className="max-w-sm bg-white border-[#E3D9CA]">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-[#362A22]">
-              New Item Category
+            <DialogTitle className="font-serif text-lg text-[#362A22]">
+              Set Item / Service Price
             </DialogTitle>
             <DialogDescription className="text-xs text-[#79695B]">
-              Create an administrative category for catalog organization.
+              Quickly update pricing for <span className="font-semibold text-[#B08A60]">{itemToUpdatePrice?.name}</span>.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSaveCategory} className="space-y-3 pt-2 text-xs">
+          <form onSubmit={handleSavePrice} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Category Name *</label>
+              <label className="font-semibold text-[#362A22]">New Tariff / Price (₹) *</label>
+              <Input
+                type="number"
+                min="0"
+                step="0.01"
+                value={newPrice}
+                onChange={(e) => setNewPrice(Number(e.target.value))}
+                className="h-9 text-base font-mono font-bold text-[#32765B] border-[#E3D9CA]"
+                required
+                autoFocus
+              />
+              <span className="text-[10px] text-[#948779] block">
+                Current Price: ₹{itemToUpdatePrice ? Number(itemToUpdatePrice.unitPrice).toFixed(2) : "0.00"}
+              </span>
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setPriceModalOpen(false)}
+                className="border-[#E3D9CA] text-xs h-9"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="bg-[#32765B] hover:bg-[#286049] text-white text-xs h-9"
+              >
+                {submitting ? "Updating..." : "Update Price"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* MODAL 3: ADD / EDIT CATEGORY */}
+      {/* ========================================================================= */}
+      <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen}>
+        <DialogContent className="max-w-md bg-white border-[#E3D9CA]">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-lg text-[#362A22]">
+              {editingCategory ? "Edit Category" : "New Item Category"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#79695B]">
+              Administrative group for organizing hotel food, drinks, services, and inventory.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveCategory} className="space-y-4 pt-2 text-xs">
+            <div className="space-y-1">
+              <label className="font-semibold text-[#362A22]">Category Name *</label>
               <Input
                 required
                 value={categoryForm.name}
                 onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
-                placeholder="e.g. Minibar, Room Dining, Dry Cleaning"
-                className="h-8 text-xs"
+                placeholder="e.g. Minibar, Room Service, Spa, Transport"
+                className="h-9 text-xs border-[#E3D9CA]"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Description</label>
+              <label className="font-semibold text-[#79695B]">Description</label>
               <Input
                 value={categoryForm.description}
                 onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
-                placeholder="Category notes..."
-                className="h-8 text-xs"
+                placeholder="Category operational scope..."
+                className="h-9 text-xs border-[#E3D9CA]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
-              <Button type="button" variant="outline" size="sm" onClick={() => setCategoryModalOpen(false)}>
+            <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setCategoryModalOpen(false)}
+                className="border-[#E3D9CA] text-xs h-9"
+              >
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
-                {submitting ? "Saving..." : "Create Category"}
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9"
+              >
+                {submitting ? "Saving..." : editingCategory ? "Update Category" : "Create Category"}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Order to Room Modal */}
+      {/* ========================================================================= */}
+      {/* MODAL 4: POST PURCHASE TO GUEST STAY */}
+      {/* ========================================================================= */}
       <Dialog open={orderModalOpen} onOpenChange={setOrderModalOpen}>
-        <DialogContent className="max-w-md bg-white">
+        <DialogContent className="max-w-md bg-white border-[#E3D9CA]">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-[#362A22]">
-              Post Item Charge to Room
+            <DialogTitle className="font-serif text-lg text-[#362A22]">
+              Post Purchase to Guest Stay
             </DialogTitle>
             <DialogDescription className="text-xs text-[#79695B]">
-              Adding <span className="font-semibold text-[#B08A60]">{orderForm.itemName}</span> to guest room invoice.
+              Charges will be immediately linked to the guest&apos;s room stay and reflected on their final checkout bill.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleConfirmOrder} className="space-y-3 pt-2 text-xs">
+          <form onSubmit={handleConfirmOrder} className="space-y-4 pt-2 text-xs">
+            {/* Select Stay */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Select In-House Room / Guest *</label>
+              <label className="font-semibold text-[#362A22]">Select In-House Room / Guest *</label>
               <select
                 required
                 value={orderForm.bookingId}
                 onChange={(e) => setOrderForm({ ...orderForm, bookingId: e.target.value })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
+                className="w-full h-9 rounded-md border border-[#E3D9CA] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
               >
                 {activeStays.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -472,56 +1203,148 @@ export default function ItemsPage() {
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Quantity</label>
-                <Input
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={orderForm.quantity}
-                  onChange={(e) => setOrderForm({ ...orderForm, quantity: Number(e.target.value) })}
-                  className="h-8 text-xs"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Unit Price Snapshot (₹)</label>
-                <Input
-                  type="number"
-                  disabled
-                  value={orderForm.unitPrice}
-                  className="h-8 text-xs font-mono bg-[#F7F4EE]"
-                />
-              </div>
-            </div>
-
-            <div className="p-3 bg-[#FAF6F0] border border-[#E3D9CA] rounded-xl flex items-center justify-between">
-              <span className="font-medium text-indigo-900">Total Charge:</span>
-              <span className="font-bold text-base text-indigo-900 font-mono">
-                ₹{(orderForm.quantity * orderForm.unitPrice).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-
+            {/* Select from catalog */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Delivery Notes</label>
+              <label className="font-semibold text-[#79695B]">Select Item from Catalog (Optional)</label>
+              <select
+                value={orderForm.itemId}
+                onChange={(e) => {
+                  const it = items.find((i) => i.id === e.target.value);
+                  if (it) {
+                    setOrderForm({
+                      ...orderForm,
+                      itemId: it.id,
+                      itemName: it.name,
+                      unitPrice: Number(it.unitPrice),
+                    });
+                  }
+                }}
+                className="w-full h-9 rounded-md border border-[#E3D9CA] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
+              >
+                <option value="">-- Or enter custom service below --</option>
+                {items.map((it) => (
+                  <option key={it.id} value={it.id}>
+                    {it.name} (₹{Number(it.unitPrice).toFixed(2)})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Item Name */}
+            <div className="space-y-1">
+              <label className="font-semibold text-[#362A22]">Item or Service Name *</label>
               <Input
-                value={orderForm.notes}
-                onChange={(e) => setOrderForm({ ...orderForm, notes: e.target.value })}
-                placeholder="Delivered at 2:30 PM..."
-                className="h-8 text-xs"
+                required
+                value={orderForm.itemName}
+                onChange={(e) => setOrderForm({ ...orderForm, itemName: e.target.value })}
+                placeholder="e.g. Club Sandwich & Coffee, Laundry Wash & Press"
+                className="h-9 text-xs border-[#E3D9CA]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
-              <Button type="button" variant="outline" size="sm" onClick={() => setOrderModalOpen(false)}>
+            {/* Quantity and Price */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="font-semibold text-[#362A22]">Quantity *</label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="100"
+                  required
+                  value={orderForm.quantity}
+                  onChange={(e) => setOrderForm({ ...orderForm, quantity: Number(e.target.value) })}
+                  className="h-9 text-xs font-mono border-[#E3D9CA]"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-[#362A22]">Price (₹) *</label>
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  required
+                  value={orderForm.unitPrice}
+                  onChange={(e) => setOrderForm({ ...orderForm, unitPrice: Number(e.target.value) })}
+                  className="h-9 text-xs font-mono font-bold border-[#E3D9CA]"
+                />
+              </div>
+            </div>
+
+            {/* Total Amount Preview */}
+            <div className="p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] flex items-center justify-between text-xs">
+              <span className="text-[#79695B] font-medium">Total Amount to Charge:</span>
+              <span className="font-mono font-bold text-base text-[#32765B]">
+                ₹{(Number(orderForm.quantity) * Number(orderForm.unitPrice)).toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-1">
+              <label className="font-semibold text-[#79695B]">Special Notes / Instructions</label>
+              <Input
+                value={orderForm.notes}
+                onChange={(e) => setOrderForm({ ...orderForm, notes: e.target.value })}
+                placeholder="e.g. In-room dining delivered at 4:15 PM"
+                className="h-9 text-xs border-[#E3D9CA]"
+              />
+            </div>
+
+            <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOrderModalOpen(false)}
+                className="border-[#E3D9CA] text-xs h-9"
+              >
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
-                {submitting ? "Posting..." : "Charge to Room"}
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9"
+              >
+                {submitting ? "Posting..." : "Charge to Guest Stay"}
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* MODAL 5: DELETE ITEM CONFIRMATION */}
+      {/* ========================================================================= */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent className="max-w-sm bg-white border-[#E3D9CA]">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-lg text-[#362A22]">
+              Delete Catalog Item
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#79695B]">
+              Are you sure you want to remove <span className="font-bold text-[#B54C44]">{itemToDelete?.name}</span>? If it has historical guest purchase records, it will be safely deactivated to preserve financial integrity.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteModalOpen(false)}
+              className="border-[#E3D9CA] text-xs h-9"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={submitting}
+              onClick={handleConfirmDelete}
+              className="bg-[#B54C44] hover:bg-[#973E37] text-white text-xs h-9"
+            >
+              {submitting ? "Deleting..." : "Confirm Delete"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

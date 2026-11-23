@@ -28,6 +28,12 @@ export class ItemsController {
     return this.itemsService.createItem(dto);
   }
 
+  @Patch(':id/price')
+  @ApiOperation({ summary: 'Quick set or update item/service price' })
+  async updatePrice(@Param('id') id: string, @Body('price') price: number) {
+    return this.itemsService.updatePrice(id, Number(price));
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update catalog item' })
   async update(@Param('id') id: string, @Body() dto: UpdateItemDto) {

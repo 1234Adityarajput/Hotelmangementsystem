@@ -139,12 +139,122 @@ export class ItemsService {
     });
   }
 
-  async deleteItem(id: string) {
-    await this.prisma.item.update({
+  async updatePrice(id: string, price: number) {
+    const existing = await this.prisma.item.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Item with ID ${id} not found`);
+    }
+
+    return this.prisma.item.update({
       where: { id },
-      data: { isActive: false },
+      data: { unitPrice: price },
+      include: { category: true },
     });
-    return { success: true, message: 'Item deactivated successfully' };
+  }
+
+  async deleteItem(id: string) {
+    const existing = await this.prisma.item.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Item with ID ${id} not found`);
+    }
+
+    const orderCount = await this.prisma.bookingItem.count({ where: { itemId: id } });
+    if (orderCount === 0) {
+      await this.prisma.item.delete({ where: { id } });
+      return { success: true, message: 'Item permanently deleted from catalog.' };
+    } else {
+      await this.prisma.item.update({
+        where: { id },
+        data: { isActive: false },
+      });
+      return {
+        success: true,
+        message: `Item deactivated (preserved for ${orderCount} existing guest stay records).`,
+      };
+    }
+  }
+
+  // ==========================================================================
+  // GUEST ITEM RECORDS (PURCHASES & ORDERS ACROSS HOTEL)
+  // ==========================================================================
+  async findAllGuestItemRecords(query?: {
+    search?: string;
+    bookingId?: string;
+    date?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const page = query?.page || 1;
+    const limit = query?.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (query?.bookingId) {
+      where.bookingId = query.bookingId;
+    }
+    if (query?.date) {
+      where.purchaseDate = new Date(query.date);
+    }
+    if (query?.search && query.search.trim()) {
+      const term = query.search.trim();
+      where.OR = [
+        { itemNameSnapshot: { contains: term, mode: 'insensitive' } },
+        { booking: { primaryGuest: { fullName: { contains: term, mode: 'insensitive' } } } },
+        { booking: { primaryGuest: { mobileNumber: { contains: term } } } },
+        { booking: { room: { roomNumber: { contains: term, mode: 'insensitive' } } } },
+        { notes: { contains: term, mode: 'insensitive' } },
+      ];
+    }
+
+    const [items, total] = await Promise.all([
+      this.prisma.bookingItem.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          booking: {
+            include: {
+              primaryGuest: true,
+              room: true,
+            },
+          },
+          item: {
+            include: { category: true },
+          },
+        },
+      }),
+      this.prisma.bookingItem.count({ where }),
+    ]);
+
+    const mapped = items.map((bi) => ({
+      id: bi.id,
+      bookingId: bi.bookingId,
+      guestName: bi.booking?.primaryGuest?.fullName || 'Guest',
+      guestMobile: bi.booking?.primaryGuest?.mobileNumber || '',
+      roomNumber: bi.booking?.room?.roomNumber || 'N/A',
+      bookingNumber: bi.booking?.bookingNumber || '',
+      itemName: bi.itemNameSnapshot,
+      categoryName: bi.item?.category?.name || 'Hotel Service',
+      quantity: bi.quantity,
+      price: Number(bi.unitPrice),
+      totalAmount: Number(bi.totalAmount),
+      purchaseDate: bi.purchaseDate ? new Date(bi.purchaseDate).toISOString().split('T')[0] : '',
+      purchaseTime: bi.purchaseTime || '',
+      notes: bi.notes || '',
+      createdAt: bi.createdAt.toISOString(),
+    }));
+
+    const totalAmountSum = mapped.reduce((sum, item) => sum + item.totalAmount, 0);
+
+    return {
+      items: mapped,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      totalAmountSum: Math.round(totalAmountSum * 100) / 100,
+    };
   }
 
   // ==========================================================================

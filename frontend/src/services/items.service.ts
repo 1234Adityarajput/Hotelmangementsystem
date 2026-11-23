@@ -41,12 +41,35 @@ export const itemsService = {
     return res.data.data;
   },
 
+  async updatePrice(id: string, price: number): Promise<Item> {
+    const res = await apiClient.patch<ApiResponse<Item>>(`/items/${id}/price`, { price });
+    return res.data.data;
+  },
+
   async deleteItem(id: string): Promise<any> {
     const res = await apiClient.delete<ApiResponse<any>>(`/items/${id}`);
     return res.data.data;
   },
 
-  // Booking Items
+  // Booking Items & Guest Item Records
+  async findAllGuestItemRecords(params?: {
+    search?: string;
+    bookingId?: string;
+    date?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    items: any[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalAmountSum: number;
+  }> {
+    const res = await apiClient.get<ApiResponse<any>>("/booking-items", { params });
+    return res.data.data;
+  },
+
   async findBookingItems(bookingId: string): Promise<BookingItem[]> {
     const res = await apiClient.get<ApiResponse<BookingItem[]>>(`/booking-items/booking/${bookingId}`);
     return res.data.data;

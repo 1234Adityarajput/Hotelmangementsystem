@@ -45,6 +45,9 @@ async function verify() {
     '/api/v1/rooms/available',
     '/api/v1/guests?limit=10',
     '/api/v1/invoices/active-folios',
+    '/api/v1/items',
+    '/api/v1/item-categories',
+    '/api/v1/booking-items',
   ];
 
   for (const ep of endpoints) {

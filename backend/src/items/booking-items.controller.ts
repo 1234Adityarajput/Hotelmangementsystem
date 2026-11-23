@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ItemsService } from './items.service';
 import { CreateBookingItemDto } from './dto/create-booking-item.dto';
@@ -8,6 +8,24 @@ import { CreateBookingItemDto } from './dto/create-booking-item.dto';
 @Controller('booking-items')
 export class BookingItemsController {
   constructor(private readonly itemsService: ItemsService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'List all guest item purchase records with guest name, room number, item, price and date' })
+  async findAllGuestItemRecords(
+    @Query('search') search?: string,
+    @Query('bookingId') bookingId?: string,
+    @Query('date') date?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.itemsService.findAllGuestItemRecords({
+      search,
+      bookingId,
+      date,
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 20,
+    });
+  }
 
   @Get('booking/:bookingId')
   @ApiOperation({ summary: 'List all items and services ordered for a booking' })

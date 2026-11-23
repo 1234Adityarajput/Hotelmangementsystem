@@ -325,6 +325,24 @@ export interface Item {
   category?: ItemCategory;
 }
 
+export interface GuestItemRecord {
+  id: string;
+  bookingId: string;
+  guestName: string;
+  guestMobile: string;
+  roomNumber: string;
+  bookingNumber: string;
+  itemName: string;
+  categoryName: string;
+  quantity: number;
+  price: number;
+  totalAmount: number;
+  purchaseDate: string;
+  purchaseTime: string;
+  notes?: string;
+  createdAt: string;
+}
+
 export interface BookingItem {
   id: string;
   bookingId: string;
