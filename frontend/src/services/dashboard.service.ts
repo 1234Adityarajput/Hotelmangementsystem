@@ -1,9 +1,20 @@
 import { apiClient } from "@/lib/api-client";
-import { ApiResponse, DashboardStats, RecentBookingItem, RecentActivityItem } from "@/types";
+import {
+  ApiResponse,
+  DashboardStats,
+  DashboardAnalytics,
+  RecentBookingItem,
+  RecentActivityItem,
+} from "@/types";
 
 export const dashboardService = {
   async getStats(): Promise<DashboardStats> {
     const res = await apiClient.get<ApiResponse<DashboardStats>>("/dashboard/stats");
+    return res.data.data;
+  },
+
+  async getAnalytics(): Promise<DashboardAnalytics> {
+    const res = await apiClient.get<ApiResponse<DashboardAnalytics>>("/dashboard/analytics");
     return res.data.data;
   },
 

@@ -15,10 +15,17 @@ export class DashboardController {
     return this.dashboardService.getStats();
   }
 
+  @Get('analytics')
+  @ApiOperation({ summary: 'Get comprehensive operational & business analytics breakdowns' })
+  @ApiResponse({ status: 200, description: 'Live dashboard analytics' })
+  async getAnalytics() {
+    return this.dashboardService.getAnalytics();
+  }
+
   @Get('recent-bookings')
   @ApiOperation({ summary: 'Get list of most recent bookings' })
   async getRecentBookings(@Query('limit') limit?: number) {
-    return this.dashboardService.getRecentBookings(limit ? Number(limit) : 5);
+    return this.dashboardService.getRecentBookings(limit ? Number(limit) : 6);
   }
 
   @Get('recent-activities')

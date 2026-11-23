@@ -50,15 +50,87 @@ export interface DashboardStats {
     todayCheckIns: number;
     todayCheckOuts: number;
     activeBookings: number;
+    currentlyStayingGuests: number;
   };
   guests: {
     total: number;
+    currentlyStaying: number;
+    withDocuments: number;
   };
   revenue: {
     today: number;
     monthly: number;
     pendingBalance: number;
     currency: string;
+  };
+  expenses: {
+    today: number;
+    monthly: number;
+    total: number;
+  };
+  staff: {
+    total: number;
+    todayAttendance: {
+      present: number;
+      absent: number;
+      halfDay: number;
+      leave: number;
+      totalMarked: number;
+      attendanceRate: number;
+    };
+  };
+  payroll: {
+    monthlyNetSalary: number;
+    monthlyDisbursed: number;
+    pendingBalance: number;
+  };
+}
+
+export interface DashboardAnalytics {
+  dailyRevenue: Array<{
+    date: string;
+    day: string;
+    revenue: number;
+    transactions: number;
+  }>;
+  monthlyRevenue: Array<{
+    month: string;
+    revenue: number;
+    expenses: number;
+    netProfit: number;
+  }>;
+  roomOccupancy: Array<{
+    roomTypeId: string;
+    roomTypeName: string;
+    capacity: number;
+    total: number;
+    occupied: number;
+    available: number;
+    maintenance: number;
+    occupancyRate: number;
+  }>;
+  guestStats: {
+    totalGuests: number;
+    currentlyStaying: number;
+    withDocuments: number;
+    newThisMonth: number;
+  };
+  incomeExpenseAnalysis: {
+    revenue: number;
+    expenses: number;
+    payroll: number;
+    totalOutflow: number;
+    netCashFlow: number;
+    operatingMargin: number;
+  };
+  staffAttendanceSummary: {
+    activeStaff: number;
+    present: number;
+    absent: number;
+    halfDay: number;
+    leave: number;
+    unmarked: number;
+    presentPercentage: number;
   };
 }
 
