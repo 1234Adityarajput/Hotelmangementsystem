@@ -147,6 +147,12 @@ export default function StaysPage() {
         guestsService.findAll({ limit: 100 }),
         roomsService.findAvailable(),
       ]);
+      if (gRes.items.length === 0) {
+        toast.info("No registered guests found. Please add a guest in the Guest Directory first.");
+      }
+      if (rRes.length === 0) {
+        toast.warning("All rooms are currently occupied or under maintenance. No rooms available.");
+      }
       setAllGuests(gRes.items);
       setAllAvailableRooms(rRes);
       if (rRes.length > 0) {
@@ -158,8 +164,9 @@ export default function StaysPage() {
         }));
       }
       setWalkInModalOpen(true);
-    } catch (err) {
-      toast.error("Failed to prepare walk-in check-in");
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || "Failed to prepare walk-in check-in";
+      toast.error(msg);
     }
   };
 
