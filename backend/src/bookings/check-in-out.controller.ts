@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckInCheckOutService } from './check-in-out.service';
 import { RelocateRoomDto } from './dto/relocate-room.dto';
+import { PerformCheckInDto } from './dto/check-in.dto';
+import { PerformCheckOutDto } from './dto/check-out.dto';
 
 @ApiTags('Check-In & Check-Out Stays')
 @ApiBearerAuth('JWT-auth')
@@ -22,21 +24,37 @@ export class CheckInCheckOutController {
   }
 
   @Get('active')
-  @ApiOperation({ summary: 'Get all currently active checked-in stays' })
+  @ApiOperation({ summary: 'Get all currently active in-house checked-in stays' })
   async getActiveStays() {
     return this.staysService.getActiveStays();
   }
 
+  @Get('completed')
+  @ApiOperation({ summary: 'Get digital archive of all completed and checked-out stays' })
+  async getCompletedStays(
+    @Query('search') search?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.staysService.getCompletedStays({ search, page, limit });
+  }
+
+  @Get(':id/checkout-summary')
+  @ApiOperation({ summary: 'Calculate and preview checkout bill folio breakdown before settlement' })
+  async getCheckoutSummary(@Param('id') id: string) {
+    return this.staysService.getCheckoutSummary(id);
+  }
+
   @Post(':id/check-in')
-  @ApiOperation({ summary: 'Perform check-in action (marks booking CHECKED_IN, room OCCUPIED)' })
-  async performCheckIn(@Param('id') id: string) {
-    return this.staysService.performCheckIn(id);
+  @ApiOperation({ summary: 'Perform check-in action with check-in time and optional advance payment' })
+  async performCheckIn(@Param('id') id: string, @Body() dto?: PerformCheckInDto) {
+    return this.staysService.performCheckIn(id, dto);
   }
 
   @Post(':id/check-out')
-  @ApiOperation({ summary: 'Perform check-out action (marks booking CHECKED_OUT, room AVAILABLE)' })
-  async performCheckOut(@Param('id') id: string) {
-    return this.staysService.performCheckOut(id);
+  @ApiOperation({ summary: 'Perform digital check-out, record settlement payment and finalize invoice' })
+  async performCheckOut(@Param('id') id: string, @Body() dto?: PerformCheckOutDto) {
+    return this.staysService.performCheckOut(id, dto);
   }
 
   @Post(':id/relocate')

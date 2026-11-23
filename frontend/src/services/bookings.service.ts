@@ -49,13 +49,32 @@ export const bookingsService = {
     return res.data.data;
   },
 
-  async checkIn(id: string): Promise<Booking> {
-    const res = await apiClient.post<ApiResponse<Booking>>(`/stays/${id}/check-in`);
+  async getCompletedStays(params?: { search?: string; page?: number; limit?: number }): Promise<{
+    items: Booking[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    const res = await apiClient.get<ApiResponse<any>>("/stays/completed", { params });
     return res.data.data;
   },
 
-  async checkOut(id: string): Promise<Booking> {
-    const res = await apiClient.post<ApiResponse<Booking>>(`/stays/${id}/check-out`);
+  async getCheckoutSummary(id: string): Promise<any> {
+    const res = await apiClient.get<ApiResponse<any>>(`/stays/${id}/checkout-summary`);
+    return res.data.data;
+  },
+
+  async checkIn(
+    id: string,
+    data?: { checkInTime?: string; advanceAmount?: number; advancePaymentMethod?: string }
+  ): Promise<Booking> {
+    const res = await apiClient.post<ApiResponse<Booking>>(`/stays/${id}/check-in`, data || {});
+    return res.data.data;
+  },
+
+  async checkOut(id: string, data?: any): Promise<{ booking: Booking; invoice: any; checkoutFolio: any }> {
+    const res = await apiClient.post<ApiResponse<any>>(`/stays/${id}/check-out`, data || {});
     return res.data.data;
   },
 

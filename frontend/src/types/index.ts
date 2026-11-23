@@ -234,6 +234,44 @@ export interface Room {
   bookings?: any[];
 }
 
+export interface CheckoutSummary {
+  bookingId: string;
+  bookingNumber: string;
+  guestDetails: {
+    id: string;
+    fullName: string;
+    mobileNumber: string;
+    email?: string | null;
+    address?: string | null;
+    city?: string | null;
+  };
+  roomNumber: string;
+  roomType: string;
+  checkInDate: string;
+  checkInTime: string;
+  expectedCheckOutDate: string;
+  expectedCheckOutTime: string;
+  numberOfNights: number;
+  roomPricePerNight: number;
+  advancePayment: number;
+
+  actualCheckOutDate: string;
+  actualCheckOutTime: string;
+  totalNumberOfNights: number;
+  roomCharges: number;
+  additionalItemCharges: number;
+  additionalItems: any[];
+  serviceCharges: number;
+  discount: number;
+  taxPercentage: number;
+  taxAmount: number;
+  totalBillAmount: number;
+  additionalPayments: number;
+  totalPaid: number;
+  remainingPayment: number;
+  existingInvoice?: any;
+}
+
 export interface BookingGuest {
   id: string;
   bookingId: string;
