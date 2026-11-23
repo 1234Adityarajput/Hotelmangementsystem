@@ -106,13 +106,13 @@ export default function AuditLogsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <ShieldAlert className="w-6 h-6 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-[#362A22] flex items-center gap-2">
+            <ShieldAlert className="w-6 h-6 text-[#B08A60]" />
             Audit Logs & System Activity
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-[#79695B] mt-1">
             Immutable tracking of state mutations, user transactions, and security audit events.
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function AuditLogsPage() {
         <CardContent className="p-4 space-y-3">
           <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-3 text-[#948779]" />
               <Input
                 placeholder="Search entity ID or notes..."
                 value={search}
@@ -150,7 +150,7 @@ export default function AuditLogsPage() {
                   setEntityType(e.target.value);
                   setPage(1);
                 }}
-                className="w-full h-10 px-3 rounded-md border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full h-10 px-3 rounded-md border border-[#E3D9CA] text-sm focus:outline-none focus:ring-2 focus:ring-[#B08A60]"
               >
                 <option value="">All Entity Types</option>
                 <option value="GUEST">GUEST</option>
@@ -174,7 +174,7 @@ export default function AuditLogsPage() {
                   setAction(e.target.value);
                   setPage(1);
                 }}
-                className="w-full h-10 px-3 rounded-md border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full h-10 px-3 rounded-md border border-[#E3D9CA] text-sm focus:outline-none focus:ring-2 focus:ring-[#B08A60]"
               >
                 <option value="">All Actions</option>
                 <option value="CREATE">CREATE</option>
@@ -229,13 +229,13 @@ export default function AuditLogsPage() {
               <LoadingSpinner />
             </div>
           ) : logs.length === 0 ? (
-            <div className="py-16 text-center text-slate-500 text-sm">
+            <div className="py-16 text-center text-[#79695B] text-sm">
               No audit logs found matching the filter criteria.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 text-slate-600 font-medium text-xs border-y border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] font-medium text-xs border-y border-[#E3D9CA]">
                   <tr>
                     <th className="py-3 px-4">Timestamp</th>
                     <th className="py-3 px-4">Action</th>
@@ -245,10 +245,10 @@ export default function AuditLogsPage() {
                     <th className="py-3 px-4 text-right">Details</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {logs.map((log) => (
-                    <tr key={log.id} className="hover:bg-slate-50/60 transition-colors">
-                      <td className="py-3 px-4 whitespace-nowrap text-xs text-slate-600">
+                    <tr key={log.id} className="hover:bg-[#F7F4EE] transition-colors">
+                      <td className="py-3 px-4 whitespace-nowrap text-xs text-[#79695B]">
                         {log.changedAt
                           ? format(new Date(log.changedAt), "dd MMM yyyy, hh:mm:ss a")
                           : "—"}
@@ -256,15 +256,15 @@ export default function AuditLogsPage() {
                       <td className="py-3 px-4 whitespace-nowrap">
                         {getActionBadge(log.action)}
                       </td>
-                      <td className="py-3 px-4 whitespace-nowrap font-medium text-slate-800">
+                      <td className="py-3 px-4 whitespace-nowrap font-medium text-[#362A22]">
                         <span className="font-mono text-xs bg-slate-100 px-2 py-0.5 rounded">
                           {log.entityType}
                         </span>
                       </td>
-                      <td className="py-3 px-4 whitespace-nowrap text-xs text-slate-500 font-mono">
+                      <td className="py-3 px-4 whitespace-nowrap text-xs text-[#79695B] font-mono">
                         {log.entityId ? log.entityId.slice(0, 10) + "..." : "—"}
                       </td>
-                      <td className="py-3 px-4 text-xs text-slate-600 max-w-xs truncate">
+                      <td className="py-3 px-4 text-xs text-[#79695B] max-w-xs truncate">
                         {log.description || "—"}
                       </td>
                       <td className="py-3 px-4 text-right">
@@ -274,7 +274,7 @@ export default function AuditLogsPage() {
                           onClick={() => setSelectedLog(log)}
                           className="h-8 w-8 p-0"
                         >
-                          <Eye className="w-4 h-4 text-slate-600" />
+                          <Eye className="w-4 h-4 text-[#79695B]" />
                         </Button>
                       </td>
                     </tr>
@@ -285,7 +285,7 @@ export default function AuditLogsPage() {
           )}
 
           {/* Pagination */}
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <div className="p-4 border-t border-[#EAE3D8] flex items-center justify-between text-xs text-[#79695B]">
             <span>
               Page {page} of {totalPages} ({total} total records)
             </span>
@@ -319,41 +319,41 @@ export default function AuditLogsPage() {
       {selectedLog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] flex flex-col">
-            <div className="p-5 border-b border-slate-200 flex justify-between items-center">
+            <div className="p-5 border-b border-[#E3D9CA] flex justify-between items-center">
               <div>
-                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                <h3 className="font-bold text-[#362A22] text-lg flex items-center gap-2">
                   {getActionBadge(selectedLog.action)}
                   <span>{selectedLog.entityType} Audit Record</span>
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">ID: {selectedLog.id}</p>
+                <p className="text-xs text-[#79695B] mt-1">ID: {selectedLog.id}</p>
               </div>
               <button
                 onClick={() => setSelectedLog(null)}
-                className="text-slate-400 hover:text-slate-600 font-bold text-xl px-2"
+                className="text-[#948779] hover:text-[#79695B] font-bold text-xl px-2"
               >
                 ✕
               </button>
             </div>
 
             <div className="p-5 overflow-y-auto space-y-4 text-sm flex-1">
-              <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded-lg text-xs">
+              <div className="grid grid-cols-2 gap-4 bg-[#F7F4EE] p-3 rounded-lg text-xs">
                 <div>
-                  <span className="text-slate-400">Timestamp:</span>
-                  <p className="font-medium text-slate-800">
+                  <span className="text-[#948779]">Timestamp:</span>
+                  <p className="font-medium text-[#362A22]">
                     {selectedLog.changedAt
                       ? format(new Date(selectedLog.changedAt), "dd MMMM yyyy, hh:mm:ss a")
                       : "—"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Target Entity ID:</span>
-                  <p className="font-medium font-mono text-slate-800 break-all">
+                  <span className="text-[#948779]">Target Entity ID:</span>
+                  <p className="font-medium font-mono text-[#362A22] break-all">
                     {selectedLog.entityId || "N/A"}
                   </p>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-slate-400">Description / Note:</span>
-                  <p className="font-medium text-slate-800">
+                  <span className="text-[#948779]">Description / Note:</span>
+                  <p className="font-medium text-[#362A22]">
                     {selectedLog.description || "System audit event"}
                   </p>
                 </div>
@@ -361,13 +361,13 @@ export default function AuditLogsPage() {
 
               {/* State Changes Diff */}
               <div className="space-y-2">
-                <h4 className="font-semibold text-slate-800 text-xs uppercase tracking-wider">
+                <h4 className="font-semibold text-[#362A22] text-xs uppercase tracking-wider">
                   State Mutation Payloads
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <span className="text-xs font-medium text-slate-600 block mb-1">Previous State</span>
+                    <span className="text-xs font-medium text-[#79695B] block mb-1">Previous State</span>
                     <pre className="bg-slate-900 text-slate-100 p-3 rounded-md text-xs font-mono overflow-x-auto max-h-60">
                       {selectedLog.previousValues
                         ? JSON.stringify(selectedLog.previousValues, null, 2)
@@ -375,7 +375,7 @@ export default function AuditLogsPage() {
                     </pre>
                   </div>
                   <div>
-                    <span className="text-xs font-medium text-slate-600 block mb-1">New State</span>
+                    <span className="text-xs font-medium text-[#79695B] block mb-1">New State</span>
                     <pre className="bg-slate-900 text-slate-100 p-3 rounded-md text-xs font-mono overflow-x-auto max-h-60">
                       {selectedLog.newValues
                         ? JSON.stringify(selectedLog.newValues, null, 2)
@@ -386,7 +386,7 @@ export default function AuditLogsPage() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-slate-200 flex justify-end">
+            <div className="p-4 border-t border-[#E3D9CA] flex justify-end">
               <Button variant="outline" size="sm" onClick={() => setSelectedLog(null)}>
                 Close
               </Button>

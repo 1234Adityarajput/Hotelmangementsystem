@@ -202,12 +202,12 @@ export default function RoomsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Room Inventory & Categories
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Configure room numbers, floors, nightly rates, live statuses, and room categories.
           </p>
         </div>
@@ -215,7 +215,7 @@ export default function RoomsPage() {
           {activeTab === "rooms" ? (
             <Button
               onClick={handleOpenAddRoom}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 shadow-sm"
+              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm"
             >
               <Plus className="w-4 h-4" />
               <span>Add Room</span>
@@ -223,7 +223,7 @@ export default function RoomsPage() {
           ) : (
             <Button
               onClick={handleOpenAddType}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 shadow-sm"
+              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm"
             >
               <Plus className="w-4 h-4" />
               <span>Add Room Type</span>
@@ -233,13 +233,13 @@ export default function RoomsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <div className="flex items-center gap-2 border-b border-[#E3D9CA] pb-2">
         <button
           onClick={() => setActiveTab("rooms")}
           className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
             activeTab === "rooms"
-              ? "bg-indigo-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100"
+              ? "bg-[#362A22] text-white shadow-sm"
+              : "text-[#79695B] hover:bg-slate-100"
           }`}
         >
           <BedDouble className="w-3.5 h-3.5" />
@@ -249,8 +249,8 @@ export default function RoomsPage() {
           onClick={() => setActiveTab("types")}
           className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
             activeTab === "types"
-              ? "bg-indigo-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100"
+              ? "bg-[#362A22] text-white shadow-sm"
+              : "text-[#79695B] hover:bg-slate-100"
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
@@ -261,9 +261,9 @@ export default function RoomsPage() {
       {activeTab === "rooms" && (
         <>
           {/* Filter Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold text-slate-500 mr-1">Status:</span>
+              <span className="text-xs font-semibold text-[#79695B] mr-1">Status:</span>
               {["ALL", "AVAILABLE", "OCCUPIED", "MAINTENANCE"].map((st) => (
                 <button
                   key={st}
@@ -271,7 +271,7 @@ export default function RoomsPage() {
                   className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                     statusFilter === st
                       ? "bg-slate-900 text-white font-semibold"
-                      : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
                   }`}
                 >
                   {st}
@@ -283,7 +283,7 @@ export default function RoomsPage() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-700"
+                className="h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#5D493D]"
               >
                 <option value="ALL">All Categories</option>
                 {roomTypes.map((t) => (
@@ -294,7 +294,7 @@ export default function RoomsPage() {
               </select>
 
               <div className="relative w-48">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
                 <Input
                   type="text"
                   placeholder="Search room..."
@@ -309,10 +309,10 @@ export default function RoomsPage() {
           {/* Room Inventory Grid */}
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
             </div>
           ) : rooms.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-400 bg-white rounded-xl border border-slate-200">
+            <div className="p-12 text-center text-xs text-[#948779] bg-white rounded-xl border border-[#E3D9CA]">
               No rooms matching the criteria. Click &quot;Add Room&quot; to create one.
             </div>
           ) : (
@@ -331,8 +331,8 @@ export default function RoomsPage() {
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-lg font-bold text-slate-900">Room {r.roomNumber}</span>
-                        <span className="text-[11px] text-slate-500 block">Floor {r.floor}</span>
+                        <span className="text-lg font-bold text-[#362A22]">Room {r.roomNumber}</span>
+                        <span className="text-[11px] text-[#79695B] block">Floor {r.floor}</span>
                       </div>
                       <Badge
                         variant="outline"
@@ -349,34 +349,34 @@ export default function RoomsPage() {
                     </div>
 
                     <div className="space-y-1 text-xs">
-                      <div className="flex justify-between text-slate-600">
-                        <span className="text-slate-400">Category:</span>
-                        <span className="font-semibold text-slate-800">{r.roomType?.name}</span>
+                      <div className="flex justify-between text-[#79695B]">
+                        <span className="text-[#948779]">Category:</span>
+                        <span className="font-semibold text-[#362A22]">{r.roomType?.name}</span>
                       </div>
-                      <div className="flex justify-between text-slate-600">
-                        <span className="text-slate-400">Nightly Rate:</span>
-                        <span className="font-bold text-slate-900">
+                      <div className="flex justify-between text-[#79695B]">
+                        <span className="text-[#948779]">Nightly Rate:</span>
+                        <span className="font-bold text-[#362A22]">
                           ₹{Number(r.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                       {r.currentBooking && (
-                        <div className="p-2 bg-white rounded border border-slate-200 text-[11px] text-slate-600 mt-2">
-                          <span className="font-semibold text-slate-800 block truncate">
+                        <div className="p-2 bg-white rounded border border-[#E3D9CA] text-[11px] text-[#79695B] mt-2">
+                          <span className="font-semibold text-[#362A22] block truncate">
                             {r.currentBooking.primaryGuest?.fullName}
                           </span>
-                          <span className="text-[10px] text-slate-400">
+                          <span className="text-[10px] text-[#948779]">
                             {r.currentBooking.bookingStatus}
                           </span>
                         </div>
                       )}
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <div className="pt-2 border-t border-[#EAE3D8] flex items-center justify-between gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleOpenEditRoom(r)}
-                        className="h-7 text-xs flex-1 text-slate-700"
+                        className="h-7 text-xs flex-1 text-[#5D493D]"
                       >
                         <Edit2 className="w-3 h-3 mr-1" /> Edit
                       </Button>
@@ -410,10 +410,10 @@ export default function RoomsPage() {
       )}
 
       {activeTab === "types" && (
-        <Card className="border-slate-200 shadow-sm">
+        <Card className="border-[#E3D9CA] shadow-sm">
           <CardContent className="p-0">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+              <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                 <tr>
                   <th className="px-4 py-3">Category Name</th>
                   <th className="px-4 py-3">Capacity</th>
@@ -422,15 +422,15 @@ export default function RoomsPage() {
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#EAE3D8]">
                 {roomTypes.map((t) => (
-                  <tr key={t.id} className="hover:bg-slate-50/70">
-                    <td className="px-4 py-3 font-semibold text-slate-900">
+                  <tr key={t.id} className="hover:bg-[#F7F4EE]/70">
+                    <td className="px-4 py-3 font-semibold text-[#362A22]">
                       <div>{t.name}</div>
-                      <div className="text-[11px] text-slate-400 font-normal">{t.description || "—"}</div>
+                      <div className="text-[11px] text-[#948779] font-normal">{t.description || "—"}</div>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{t.capacity} Guests</td>
-                    <td className="px-4 py-3 font-bold text-slate-900">
+                    <td className="px-4 py-3 text-[#79695B]">{t.capacity} Guests</td>
+                    <td className="px-4 py-3 font-bold text-[#362A22]">
                       ₹{Number(t.defaultPricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-4 py-3">
@@ -443,7 +443,7 @@ export default function RoomsPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenEditType(t)}
-                        className="h-7 px-2 text-slate-600 hover:text-indigo-600"
+                        className="h-7 px-2 text-[#79695B] hover:text-[#B08A60]"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </Button>
@@ -460,17 +460,17 @@ export default function RoomsPage() {
       <Dialog open={roomModalOpen} onOpenChange={setRoomModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               {editingRoom ? `Edit Room ${editingRoom.roomNumber}` : "Add New Room"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Configure room inventory parameters.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveRoom} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Room Number *</label>
+              <label className="font-semibold text-[#5D493D]">Room Number *</label>
               <Input
                 required
                 value={roomForm.roomNumber}
@@ -481,7 +481,7 @@ export default function RoomsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Room Category *</label>
+              <label className="font-semibold text-[#5D493D]">Room Category *</label>
               <select
                 required
                 value={roomForm.roomTypeId}
@@ -493,7 +493,7 @@ export default function RoomsPage() {
                     pricePerNight: sel ? Number(sel.defaultPricePerNight) : roomForm.pricePerNight,
                   });
                 }}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
               >
                 {roomTypes.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -505,7 +505,7 @@ export default function RoomsPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Floor</label>
+                <label className="font-semibold text-[#5D493D]">Floor</label>
                 <Input
                   type="number"
                   min="0"
@@ -517,7 +517,7 @@ export default function RoomsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Nightly Rate (₹) *</label>
+                <label className="font-semibold text-[#5D493D]">Nightly Rate (₹) *</label>
                 <Input
                   type="number"
                   required
@@ -531,22 +531,22 @@ export default function RoomsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Initial Status</label>
+              <label className="font-semibold text-[#5D493D]">Initial Status</label>
               <select
                 value={roomForm.roomStatus}
                 onChange={(e) => setRoomForm({ ...roomForm, roomStatus: e.target.value as any })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
               >
                 <option value="AVAILABLE">AVAILABLE</option>
                 <option value="MAINTENANCE">MAINTENANCE</option>
               </select>
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setRoomModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving..." : editingRoom ? "Save Changes" : "Create Room"}
               </Button>
             </DialogFooter>
@@ -558,17 +558,17 @@ export default function RoomsPage() {
       <Dialog open={typeModalOpen} onOpenChange={setTypeModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               {editingType ? `Edit Room Type` : "New Room Type"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Manage category pricing and guest capacity.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveType} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Category Name *</label>
+              <label className="font-semibold text-[#5D493D]">Category Name *</label>
               <Input
                 required
                 value={typeForm.name}
@@ -580,7 +580,7 @@ export default function RoomsPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Guest Capacity</label>
+                <label className="font-semibold text-[#5D493D]">Guest Capacity</label>
                 <Input
                   type="number"
                   min="1"
@@ -592,7 +592,7 @@ export default function RoomsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Default Rate (₹)</label>
+                <label className="font-semibold text-[#5D493D]">Default Rate (₹)</label>
                 <Input
                   type="number"
                   min="0"
@@ -605,7 +605,7 @@ export default function RoomsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Description</label>
+              <label className="font-semibold text-[#5D493D]">Description</label>
               <Input
                 value={typeForm.description}
                 onChange={(e) => setTypeForm({ ...typeForm, description: e.target.value })}
@@ -614,11 +614,11 @@ export default function RoomsPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setTypeModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving..." : editingType ? "Update Type" : "Create Type"}
               </Button>
             </DialogFooter>

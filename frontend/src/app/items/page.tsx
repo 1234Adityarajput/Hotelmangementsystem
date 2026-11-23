@@ -200,12 +200,12 @@ export default function ItemsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Hotel Items & Services Catalog
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Manage food, beverage, laundry, room service menus, and post charges directly to active guest rooms.
           </p>
         </div>
@@ -221,7 +221,7 @@ export default function ItemsPage() {
           <Button
             size="sm"
             onClick={handleOpenAddItem}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs shadow-sm"
+            className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs shadow-sm"
           >
             <Plus className="w-4 h-4 mr-1" /> Add New Item
           </Button>
@@ -229,14 +229,14 @@ export default function ItemsPage() {
       </div>
 
       {/* Category Pills & Search */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div className="flex items-center gap-1.5 flex-wrap">
           <button
             onClick={() => setSelectedCategory("ALL")}
             className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
               selectedCategory === "ALL"
                 ? "bg-slate-900 text-white font-semibold"
-                : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
             }`}
           >
             All Items
@@ -248,7 +248,7 @@ export default function ItemsPage() {
               className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                 selectedCategory === c.id
                   ? "bg-slate-900 text-white font-semibold"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
               }`}
             >
               {c.name}
@@ -257,7 +257,7 @@ export default function ItemsPage() {
         </div>
 
         <div className="relative w-64">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
           <Input
             type="text"
             placeholder="Search items..."
@@ -271,39 +271,39 @@ export default function ItemsPage() {
       {/* Items Grid */}
       {loading ? (
         <div className="p-12 flex justify-center items-center">
-          <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+          <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
         </div>
       ) : items.length === 0 ? (
-        <div className="p-12 text-center text-xs text-slate-400 bg-white rounded-xl border border-slate-200">
+        <div className="p-12 text-center text-xs text-[#948779] bg-white rounded-xl border border-[#E3D9CA]">
           No items found in this category. Click &quot;Add New Item&quot; to populate the menu.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {items.map((it) => (
-            <Card key={it.id} className="border-slate-200 shadow-sm hover:shadow transition-all flex flex-col justify-between">
+            <Card key={it.id} className="border-[#E3D9CA] shadow-sm hover:shadow transition-all flex flex-col justify-between">
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="font-semibold text-sm text-slate-900 block">{it.name}</span>
-                    <Badge variant="outline" className="text-[10px] mt-1 bg-slate-50">
+                    <span className="font-semibold text-sm text-[#362A22] block">{it.name}</span>
+                    <Badge variant="outline" className="text-[10px] mt-1 bg-[#F7F4EE]">
                       {it.category?.name || "Service"}
                     </Badge>
                   </div>
-                  <span className="text-sm font-bold text-slate-900 font-mono">
+                  <span className="text-sm font-bold text-[#362A22] font-mono">
                     ₹{Number(it.unitPrice).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
 
                 {it.description && (
-                  <p className="text-xs text-slate-500 line-clamp-2">{it.description}</p>
+                  <p className="text-xs text-[#79695B] line-clamp-2">{it.description}</p>
                 )}
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-[#EAE3D8] flex items-center justify-between gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleOpenOrder(it)}
-                    className="h-7 text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-indigo-200 flex-1"
+                    className="h-7 text-xs bg-[#FAF6F0] text-[#362A22] hover:bg-[#FAF6F0] border-[#E3D9CA] flex-1"
                   >
                     <ShoppingBag className="w-3 h-3 mr-1" /> Order to Room
                   </Button>
@@ -311,7 +311,7 @@ export default function ItemsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleOpenEditItem(it)}
-                    className="h-7 w-7 p-0 text-slate-500 hover:text-slate-800"
+                    className="h-7 w-7 p-0 text-[#79695B] hover:text-[#362A22]"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </Button>
@@ -326,17 +326,17 @@ export default function ItemsPage() {
       <Dialog open={itemModalOpen} onOpenChange={setItemModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               {editingItem ? "Edit Catalog Item" : "Add New Item"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Set menu pricing and category for guest billing.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveItem} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Item Name *</label>
+              <label className="font-semibold text-[#5D493D]">Item Name *</label>
               <Input
                 required
                 value={itemForm.name}
@@ -347,12 +347,12 @@ export default function ItemsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Category *</label>
+              <label className="font-semibold text-[#5D493D]">Category *</label>
               <select
                 required
                 value={itemForm.categoryId}
                 onChange={(e) => setItemForm({ ...itemForm, categoryId: e.target.value })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -363,7 +363,7 @@ export default function ItemsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Unit Price (₹) *</label>
+              <label className="font-semibold text-[#5D493D]">Unit Price (₹) *</label>
               <Input
                 type="number"
                 required
@@ -376,7 +376,7 @@ export default function ItemsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Description</label>
+              <label className="font-semibold text-[#5D493D]">Description</label>
               <Input
                 value={itemForm.description}
                 onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
@@ -385,11 +385,11 @@ export default function ItemsPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setItemModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving..." : editingItem ? "Save Changes" : "Create Item"}
               </Button>
             </DialogFooter>
@@ -401,17 +401,17 @@ export default function ItemsPage() {
       <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               New Item Category
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Create an administrative category for catalog organization.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveCategory} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Category Name *</label>
+              <label className="font-semibold text-[#5D493D]">Category Name *</label>
               <Input
                 required
                 value={categoryForm.name}
@@ -422,7 +422,7 @@ export default function ItemsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Description</label>
+              <label className="font-semibold text-[#5D493D]">Description</label>
               <Input
                 value={categoryForm.description}
                 onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
@@ -431,11 +431,11 @@ export default function ItemsPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setCategoryModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving..." : "Create Category"}
               </Button>
             </DialogFooter>
@@ -447,22 +447,22 @@ export default function ItemsPage() {
       <Dialog open={orderModalOpen} onOpenChange={setOrderModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Post Item Charge to Room
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
-              Adding <span className="font-semibold text-indigo-600">{orderForm.itemName}</span> to guest room invoice.
+            <DialogDescription className="text-xs text-[#79695B]">
+              Adding <span className="font-semibold text-[#B08A60]">{orderForm.itemName}</span> to guest room invoice.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleConfirmOrder} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Select In-House Room / Guest *</label>
+              <label className="font-semibold text-[#5D493D]">Select In-House Room / Guest *</label>
               <select
                 required
                 value={orderForm.bookingId}
                 onChange={(e) => setOrderForm({ ...orderForm, bookingId: e.target.value })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
               >
                 {activeStays.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -474,7 +474,7 @@ export default function ItemsPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Quantity</label>
+                <label className="font-semibold text-[#5D493D]">Quantity</label>
                 <Input
                   type="number"
                   min="1"
@@ -486,17 +486,17 @@ export default function ItemsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Unit Price Snapshot (₹)</label>
+                <label className="font-semibold text-[#5D493D]">Unit Price Snapshot (₹)</label>
                 <Input
                   type="number"
                   disabled
                   value={orderForm.unitPrice}
-                  className="h-8 text-xs font-mono bg-slate-50"
+                  className="h-8 text-xs font-mono bg-[#F7F4EE]"
                 />
               </div>
             </div>
 
-            <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between">
+            <div className="p-3 bg-[#FAF6F0] border border-[#E3D9CA] rounded-xl flex items-center justify-between">
               <span className="font-medium text-indigo-900">Total Charge:</span>
               <span className="font-bold text-base text-indigo-900 font-mono">
                 ₹{(orderForm.quantity * orderForm.unitPrice).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
@@ -504,7 +504,7 @@ export default function ItemsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Delivery Notes</label>
+              <label className="font-semibold text-[#5D493D]">Delivery Notes</label>
               <Input
                 value={orderForm.notes}
                 onChange={(e) => setOrderForm({ ...orderForm, notes: e.target.value })}
@@ -513,11 +513,11 @@ export default function ItemsPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setOrderModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Posting..." : "Charge to Room"}
               </Button>
             </DialogFooter>

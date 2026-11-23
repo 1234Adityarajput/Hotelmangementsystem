@@ -131,12 +131,12 @@ export default function StaysPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Check-In & Check-Out Operations
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Real-time front desk workflow: process arrivals, manage in-house guest stays, room relocations, and departures.
           </p>
         </div>
@@ -146,13 +146,13 @@ export default function StaysPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <div className="flex items-center gap-2 border-b border-[#E3D9CA] pb-2">
         <button
           onClick={() => setActiveTab("inhouse")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
             activeTab === "inhouse"
-              ? "bg-indigo-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100"
+              ? "bg-[#362A22] text-white shadow-sm"
+              : "text-[#79695B] hover:bg-slate-100"
           }`}
         >
           <BedDouble className="w-4 h-4" />
@@ -163,8 +163,8 @@ export default function StaysPage() {
           onClick={() => setActiveTab("arrivals")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
             activeTab === "arrivals"
-              ? "bg-indigo-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100"
+              ? "bg-[#362A22] text-white shadow-sm"
+              : "text-[#79695B] hover:bg-slate-100"
           }`}
         >
           <DoorOpen className="w-4 h-4" />
@@ -175,8 +175,8 @@ export default function StaysPage() {
           onClick={() => setActiveTab("departures")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
             activeTab === "departures"
-              ? "bg-indigo-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-slate-100"
+              ? "bg-[#362A22] text-white shadow-sm"
+              : "text-[#79695B] hover:bg-slate-100"
           }`}
         >
           <LogOut className="w-4 h-4" />
@@ -186,19 +186,19 @@ export default function StaysPage() {
 
       {/* In-House Guests Table */}
       {activeTab === "inhouse" && (
-        <Card className="border-slate-200 shadow-sm overflow-hidden">
+        <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
           <CardContent className="p-0">
             {loading ? (
               <div className="p-12 flex justify-center items-center">
-                <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+                <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
               </div>
             ) : inHouse.length === 0 ? (
-              <div className="p-12 text-center text-xs text-slate-400">
+              <div className="p-12 text-center text-xs text-[#948779]">
                 No guests currently in-house. Check in an arrival from the Arrivals tab.
               </div>
             ) : (
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     <th className="px-4 py-3">Room</th>
                     <th className="px-4 py-3">Guest Information</th>
@@ -208,27 +208,27 @@ export default function StaysPage() {
                     <th className="px-4 py-3 text-right">Operations</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {inHouse.map((b) => (
-                    <tr key={b.id} className="hover:bg-slate-50/70">
-                      <td className="px-4 py-3 font-semibold text-slate-900">
-                        <div className="text-base text-indigo-700">Room {b.room?.roomNumber}</div>
-                        <div className="text-[10px] text-slate-400">{b.room?.roomType?.name}</div>
+                    <tr key={b.id} className="hover:bg-[#F7F4EE]/70">
+                      <td className="px-4 py-3 font-semibold text-[#362A22]">
+                        <div className="text-base text-[#362A22]">Room {b.room?.roomNumber}</div>
+                        <div className="text-[10px] text-[#948779]">{b.room?.roomType?.name}</div>
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-900">
+                      <td className="px-4 py-3 font-medium text-[#362A22]">
                         <div>{b.primaryGuest?.fullName}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                        <div className="text-[11px] text-[#948779] font-mono">
                           {b.primaryGuest?.mobileNumber}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-[#79695B]">
                         {b.actualCheckInAt ? new Date(b.actualCheckInAt).toLocaleString() : "—"}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-[#79695B]">
                         <div>{new Date(b.expectedCheckOutDate).toLocaleDateString()}</div>
-                        <div className="text-[10px] text-slate-400">{b.expectedCheckOutTime}</div>
+                        <div className="text-[10px] text-[#948779]">{b.expectedCheckOutTime}</div>
                       </td>
-                      <td className="px-4 py-3 font-semibold text-slate-700">
+                      <td className="px-4 py-3 font-semibold text-[#5D493D]">
                         {b.numberOfNights} Nights
                       </td>
                       <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
@@ -236,7 +236,7 @@ export default function StaysPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleOpenRelocate(b)}
-                          className="h-7 text-xs text-slate-700 hover:text-indigo-600"
+                          className="h-7 text-xs text-[#5D493D] hover:text-[#B08A60]"
                           title="Relocate to another room"
                         >
                           <ArrowRightLeft className="w-3.5 h-3.5 mr-1" /> Relocate
@@ -245,7 +245,7 @@ export default function StaysPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="h-7 text-xs text-slate-700 hover:text-amber-600"
+                            className="h-7 text-xs text-[#5D493D] hover:text-amber-600"
                             title="Generate final invoice"
                           >
                             <Receipt className="w-3.5 h-3.5 mr-1" /> Bill
@@ -270,15 +270,15 @@ export default function StaysPage() {
 
       {/* Today's Expected Arrivals */}
       {activeTab === "arrivals" && (
-        <Card className="border-slate-200 shadow-sm overflow-hidden">
+        <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
           <CardContent className="p-0">
             {arrivals.length === 0 ? (
-              <div className="p-12 text-center text-xs text-slate-400">
+              <div className="p-12 text-center text-xs text-[#948779]">
                 No arrivals scheduled for today.
               </div>
             ) : (
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     <th className="px-4 py-3">Booking #</th>
                     <th className="px-4 py-3">Guest</th>
@@ -288,23 +288,23 @@ export default function StaysPage() {
                     <th className="px-4 py-3 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {arrivals.map((b) => (
-                    <tr key={b.id} className="hover:bg-slate-50/70">
-                      <td className="px-4 py-3 font-mono font-medium text-indigo-600">
+                    <tr key={b.id} className="hover:bg-[#F7F4EE]/70">
+                      <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">
                         {b.bookingNumber}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-900">
+                      <td className="px-4 py-3 font-medium text-[#362A22]">
                         <div>{b.primaryGuest?.fullName}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                        <div className="text-[11px] text-[#948779] font-mono">
                           {b.primaryGuest?.mobileNumber}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="font-semibold text-slate-800">Room {b.room?.roomNumber}</span>
-                        <span className="text-[10px] text-slate-400 block">{b.room?.roomType?.name}</span>
+                        <span className="font-semibold text-[#362A22]">Room {b.room?.roomNumber}</span>
+                        <span className="text-[10px] text-[#948779] block">{b.room?.roomType?.name}</span>
                       </td>
-                      <td className="px-4 py-3 text-slate-600 font-medium">
+                      <td className="px-4 py-3 text-[#79695B] font-medium">
                         {b.checkInTime || "12:00 PM"}
                       </td>
                       <td className="px-4 py-3">
@@ -336,15 +336,15 @@ export default function StaysPage() {
 
       {/* Today's Expected Departures */}
       {activeTab === "departures" && (
-        <Card className="border-slate-200 shadow-sm overflow-hidden">
+        <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
           <CardContent className="p-0">
             {departures.length === 0 ? (
-              <div className="p-12 text-center text-xs text-slate-400">
+              <div className="p-12 text-center text-xs text-[#948779]">
                 No departures scheduled for today.
               </div>
             ) : (
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     <th className="px-4 py-3">Room</th>
                     <th className="px-4 py-3">Guest</th>
@@ -353,16 +353,16 @@ export default function StaysPage() {
                     <th className="px-4 py-3 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {departures.map((b) => (
-                    <tr key={b.id} className="hover:bg-slate-50/70">
-                      <td className="px-4 py-3 font-semibold text-slate-900">
+                    <tr key={b.id} className="hover:bg-[#F7F4EE]/70">
+                      <td className="px-4 py-3 font-semibold text-[#362A22]">
                         Room {b.room?.roomNumber}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-900">
+                      <td className="px-4 py-3 font-medium text-[#362A22]">
                         {b.primaryGuest?.fullName}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-[#79695B]">
                         {b.expectedCheckOutTime || "11:00 AM"}
                       </td>
                       <td className="px-4 py-3">
@@ -380,7 +380,7 @@ export default function StaysPage() {
                             <LogOut className="w-3.5 h-3.5 mr-1" /> Process Checkout
                           </Button>
                         ) : (
-                          <span className="text-[11px] text-slate-400">Departed</span>
+                          <span className="text-[11px] text-[#948779]">Departed</span>
                         )}
                       </td>
                     </tr>
@@ -396,17 +396,17 @@ export default function StaysPage() {
       <Dialog open={relocateModalOpen} onOpenChange={setRelocateModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Relocate Room
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Change allocated room for booking {selectedBooking?.bookingNumber}. Current Room: {selectedBooking?.room?.roomNumber}.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleConfirmRelocate} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Select New Room *</label>
+              <label className="font-semibold text-[#5D493D]">Select New Room *</label>
               {availableRooms.length === 0 ? (
                 <div className="p-3 bg-amber-50 text-amber-800 rounded border border-amber-200 text-xs">
                   No other rooms are available during this stay period.
@@ -416,7 +416,7 @@ export default function StaysPage() {
                   required
                   value={newRoomId}
                   onChange={(e) => setNewRoomId(e.target.value)}
-                  className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white font-mono"
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white font-mono"
                 >
                   {availableRooms.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -428,7 +428,7 @@ export default function StaysPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Reason for Relocation</label>
+              <label className="font-semibold text-[#5D493D]">Reason for Relocation</label>
               <Input
                 value={relocateReason}
                 onChange={(e) => setRelocateReason(e.target.value)}
@@ -437,7 +437,7 @@ export default function StaysPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setRelocateModalOpen(false)}>
                 Cancel
               </Button>
@@ -445,7 +445,7 @@ export default function StaysPage() {
                 type="submit"
                 size="sm"
                 disabled={submitting || availableRooms.length === 0}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white"
+                className="bg-[#362A22] hover:bg-[#43352B] text-white"
               >
                 {submitting ? "Relocating..." : "Confirm Relocation"}
               </Button>

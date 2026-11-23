@@ -215,12 +215,12 @@ export default function ExpensesPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Hotel Expense Management
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Record operational overheads, utility bills, maintenance expenses, and track category-wise cash outflow.
           </p>
         </div>
@@ -236,7 +236,7 @@ export default function ExpensesPage() {
           </Button>
           <Button
             onClick={handleOpenAdd}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 shadow-sm text-xs"
+            className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm text-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Record New Expense</span>
@@ -246,24 +246,24 @@ export default function ExpensesPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Today&apos;s Expenses
             </CardTitle>
-            <Receipt className="w-4 h-4 text-indigo-600" />
+            <Receipt className="w-4 h-4 text-[#B08A60]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 font-mono">
+            <div className="text-2xl font-bold text-[#362A22] font-mono">
               ₹{(stats?.todayAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">{stats?.todayCount || 0} disbursements recorded today</p>
+            <p className="text-[11px] text-[#948779] mt-1">{stats?.todayCount || 0} disbursements recorded today</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               This Month&apos;s Expenses
             </CardTitle>
             <Calendar className="w-4 h-4 text-emerald-600" />
@@ -272,52 +272,52 @@ export default function ExpensesPage() {
             <div className="text-2xl font-bold text-emerald-600 font-mono">
               ₹{(stats?.monthAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">{stats?.monthCount || 0} transactions this month</p>
+            <p className="text-[11px] text-[#948779] mt-1">{stats?.monthCount || 0} transactions this month</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Year-to-Date Expenses
             </CardTitle>
             <TrendingDown className="w-4 h-4 text-rose-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 font-mono">
+            <div className="text-2xl font-bold text-[#362A22] font-mono">
               ₹{(stats?.yearAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Total operating outflows this year</p>
+            <p className="text-[11px] text-[#948779] mt-1">Total operating outflows this year</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Active Categories
             </CardTitle>
             <Building className="w-4 h-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-2xl font-bold text-[#362A22]">
               {categories.length}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Expense classification heads</p>
+            <p className="text-[11px] text-[#948779] mt-1">Expense classification heads</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-slate-500">Category:</span>
+          <span className="text-xs font-semibold text-[#79695B]">Category:</span>
           <select
             value={categoryId}
             onChange={(e) => {
               setCategoryId(e.target.value);
               setPage(1);
             }}
-            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 text-slate-700"
+            className="text-xs border border-[#E3D9CA] rounded-lg px-2.5 py-1.5 bg-[#F7F4EE] text-[#5D493D]"
           >
             <option value="ALL">All Categories</option>
             {categories.map((c) => (
@@ -327,7 +327,7 @@ export default function ExpensesPage() {
             ))}
           </select>
 
-          <span className="text-xs font-semibold text-slate-500 ml-2">Channel:</span>
+          <span className="text-xs font-semibold text-[#79695B] ml-2">Channel:</span>
           {["ALL", "CASH", "UPI", "BANK_TRANSFER"].map((ch) => (
             <button
               key={ch}
@@ -338,7 +338,7 @@ export default function ExpensesPage() {
               className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 paymentMethod === ch
                   ? "bg-slate-900 text-white font-semibold"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
               }`}
             >
               {ch}
@@ -347,7 +347,7 @@ export default function ExpensesPage() {
         </div>
 
         <div className="relative w-64">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
           <Input
             type="text"
             placeholder="Search description, reference..."
@@ -362,20 +362,20 @@ export default function ExpensesPage() {
       </div>
 
       {/* Expenses Table */}
-      <Card className="border-slate-200 shadow-sm overflow-hidden">
+      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
             </div>
           ) : expenses.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-400">
+            <div className="p-12 text-center text-xs text-[#948779]">
               No expenses recorded matching the criteria. Click &quot;Record New Expense&quot; to log an expense.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     <th className="px-4 py-3">Expense Ref</th>
                     <th className="px-4 py-3">Date</th>
@@ -386,30 +386,30 @@ export default function ExpensesPage() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {expenses.map((exp) => (
-                    <tr key={exp.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="px-4 py-3 font-mono font-medium text-indigo-600">
+                    <tr key={exp.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
+                      <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">
                         {exp.expenseReference}
                       </td>
-                      <td className="px-4 py-3 text-slate-600 whitespace-nowrap">
+                      <td className="px-4 py-3 text-[#79695B] whitespace-nowrap">
                         {new Date(exp.paymentDate).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-700 border-slate-200">
+                        <Badge variant="outline" className="text-[10px] bg-[#F7F4EE] text-[#5D493D] border-[#E3D9CA]">
                           {exp.category?.name || "Uncategorized"}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-900 max-w-xs truncate">
+                      <td className="px-4 py-3 font-medium text-[#362A22] max-w-xs truncate">
                         <div>{exp.description}</div>
                         {exp.transactionReference && (
-                          <div className="text-[10px] text-slate-400 font-mono">Ref: {exp.transactionReference}</div>
+                          <div className="text-[10px] text-[#948779] font-mono">Ref: {exp.transactionReference}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-600 font-medium">
+                      <td className="px-4 py-3 text-[#79695B] font-medium">
                         {exp.paymentMethod}
                       </td>
-                      <td className="px-4 py-3 font-mono font-bold text-slate-900">
+                      <td className="px-4 py-3 font-mono font-bold text-[#362A22]">
                         ₹{Number(exp.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-3 text-right space-x-1 whitespace-nowrap">
@@ -417,7 +417,7 @@ export default function ExpensesPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenDetails(exp)}
-                          className="h-7 px-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50"
+                          className="h-7 px-2 text-[#79695B] hover:text-[#B08A60] hover:bg-[#F2EADF]"
                           title="View Details"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -426,7 +426,7 @@ export default function ExpensesPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenEdit(exp)}
-                          className="h-7 px-2 text-slate-600 hover:text-amber-600 hover:bg-amber-50"
+                          className="h-7 px-2 text-[#79695B] hover:text-amber-600 hover:bg-amber-50"
                           title="Edit Expense"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -454,22 +454,22 @@ export default function ExpensesPage() {
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Record Operational Expense
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Log an outflow payment under the appropriate hotel operational category.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateExpense} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Expense Category *</label>
+              <label className="font-semibold text-[#5D493D]">Expense Category *</label>
               <select
                 required
                 value={formData.expenseCategoryId}
                 onChange={(e) => setFormData({ ...formData, expenseCategoryId: e.target.value })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -480,7 +480,7 @@ export default function ExpensesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Description *</label>
+              <label className="font-semibold text-[#5D493D]">Description *</label>
               <Input
                 required
                 value={formData.description}
@@ -492,7 +492,7 @@ export default function ExpensesPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Amount (₹) *</label>
+                <label className="font-semibold text-[#5D493D]">Amount (₹) *</label>
                 <Input
                   type="number"
                   min="0.01"
@@ -505,7 +505,7 @@ export default function ExpensesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Payment Date *</label>
+                <label className="font-semibold text-[#5D493D]">Payment Date *</label>
                 <Input
                   type="date"
                   required
@@ -518,11 +518,11 @@ export default function ExpensesPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Payment Channel *</label>
+                <label className="font-semibold text-[#5D493D]">Payment Channel *</label>
                 <select
                   value={formData.paymentMethod}
                   onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
                 >
                   <option value="CASH">CASH</option>
                   <option value="UPI">UPI / QR</option>
@@ -532,7 +532,7 @@ export default function ExpensesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Bill / Ref #</label>
+                <label className="font-semibold text-[#5D493D]">Bill / Ref #</label>
                 <Input
                   value={formData.transactionReference}
                   onChange={(e) => setFormData({ ...formData, transactionReference: e.target.value })}
@@ -543,7 +543,7 @@ export default function ExpensesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Notes / Remarks</label>
+              <label className="font-semibold text-[#5D493D]">Notes / Remarks</label>
               <Input
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -552,11 +552,11 @@ export default function ExpensesPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setAddModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving..." : "Record Expense"}
               </Button>
             </DialogFooter>
@@ -568,17 +568,17 @@ export default function ExpensesPage() {
       <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Create Expense Category
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Add a new budget head for categorizing hotel operating expenses.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateCategory} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Category Name *</label>
+              <label className="font-semibold text-[#5D493D]">Category Name *</label>
               <Input
                 required
                 value={catName}
@@ -589,7 +589,7 @@ export default function ExpensesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Description</label>
+              <label className="font-semibold text-[#5D493D]">Description</label>
               <Input
                 value={catDesc}
                 onChange={(e) => setCatDesc(e.target.value)}
@@ -598,11 +598,11 @@ export default function ExpensesPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setCategoryModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Creating..." : "Create Category"}
               </Button>
             </DialogFooter>
@@ -614,17 +614,17 @@ export default function ExpensesPage() {
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Edit Expense Record
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 font-mono">
+            <DialogDescription className="text-xs text-[#79695B] font-mono">
               Ref: {selectedExpense?.expenseReference}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleUpdateExpense} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Description *</label>
+              <label className="font-semibold text-[#5D493D]">Description *</label>
               <Input
                 required
                 value={formData.description}
@@ -635,7 +635,7 @@ export default function ExpensesPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Amount (₹) *</label>
+                <label className="font-semibold text-[#5D493D]">Amount (₹) *</label>
                 <Input
                   type="number"
                   min="0.01"
@@ -648,7 +648,7 @@ export default function ExpensesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Payment Date *</label>
+                <label className="font-semibold text-[#5D493D]">Payment Date *</label>
                 <Input
                   type="date"
                   required
@@ -660,7 +660,7 @@ export default function ExpensesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Notes / Remarks</label>
+              <label className="font-semibold text-[#5D493D]">Notes / Remarks</label>
               <Input
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -668,11 +668,11 @@ export default function ExpensesPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setEditModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
@@ -684,37 +684,37 @@ export default function ExpensesPage() {
       <Dialog open={detailsModalOpen} onOpenChange={setDetailsModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900 font-mono">
+            <DialogTitle className="text-base font-bold text-[#362A22] font-mono">
               {selectedExpense?.expenseReference}
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Paid on {selectedExpense ? new Date(selectedExpense.paymentDate).toLocaleDateString() : ""}
             </DialogDescription>
           </DialogHeader>
 
           {selectedExpense && (
             <div className="space-y-3 pt-2 text-xs">
-              <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Category</span>
-                <span className="font-semibold text-slate-900 block text-sm">{selectedExpense.category?.name}</span>
-                <p className="text-slate-600 text-xs mt-1">{selectedExpense.description}</p>
+              <div className="p-3 bg-[#F7F4EE] rounded-xl space-y-1">
+                <span className="text-[10px] uppercase font-bold text-[#948779] block">Category</span>
+                <span className="font-semibold text-[#362A22] block text-sm">{selectedExpense.category?.name}</span>
+                <p className="text-[#79695B] text-xs mt-1">{selectedExpense.description}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-[#F7F4EE] rounded-xl">
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase block font-semibold">Amount Paid</span>
-                  <span className="font-mono font-bold text-slate-900 text-sm">
+                  <span className="text-[#948779] text-[10px] uppercase block font-semibold">Amount Paid</span>
+                  <span className="font-mono font-bold text-[#362A22] text-sm">
                     ₹{Number(selectedExpense.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase block font-semibold">Channel</span>
-                  <span className="font-semibold text-slate-800">{selectedExpense.paymentMethod}</span>
+                  <span className="text-[#948779] text-[10px] uppercase block font-semibold">Channel</span>
+                  <span className="font-semibold text-[#362A22]">{selectedExpense.paymentMethod}</span>
                 </div>
                 {selectedExpense.transactionReference && (
                   <div className="col-span-2">
-                    <span className="text-slate-400 text-[10px] uppercase block font-semibold">Bill / Reference</span>
-                    <span className="font-mono text-slate-800">{selectedExpense.transactionReference}</span>
+                    <span className="text-[#948779] text-[10px] uppercase block font-semibold">Bill / Reference</span>
+                    <span className="font-mono text-[#362A22]">{selectedExpense.transactionReference}</span>
                   </div>
                 )}
               </div>
@@ -728,7 +728,7 @@ export default function ExpensesPage() {
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t border-slate-100">
+          <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
             <Button variant="outline" size="sm" onClick={() => setDetailsModalOpen(false)}>
               Close
             </Button>
@@ -740,15 +740,15 @@ export default function ExpensesPage() {
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Confirm Delete Expense
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Are you sure you want to delete expense record {selectedExpense?.expenseReference} (₹{selectedExpense?.amount})?
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="pt-3 border-t border-slate-100">
+          <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
             <Button variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
               Cancel
             </Button>

@@ -171,18 +171,18 @@ export default function AdvancesPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Staff Advance & Loan Ledger
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Track employee salary advances, disbursement references, recoveries, and linked monthly payroll balances.
           </p>
         </div>
         <Button
           onClick={handleOpenIssue}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 shadow-sm"
+          className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>Disburse New Advance</span>
@@ -191,24 +191,24 @@ export default function AdvancesPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Total Advances Disbursed
             </CardTitle>
-            <CreditCard className="w-4 h-4 text-indigo-600" />
+            <CreditCard className="w-4 h-4 text-[#B08A60]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 font-mono">
+            <div className="text-2xl font-bold text-[#362A22] font-mono">
               ₹{(stats?.totalIssued || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Cumulative principal issued</p>
+            <p className="text-[11px] text-[#948779] mt-1">Cumulative principal issued</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Total Recovered
             </CardTitle>
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -217,13 +217,13 @@ export default function AdvancesPage() {
             <div className="text-2xl font-bold text-emerald-600 font-mono">
               ₹{(stats?.totalRecovered || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Direct cash & payroll deductions</p>
+            <p className="text-[11px] text-[#948779] mt-1">Direct cash & payroll deductions</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Outstanding Balance
             </CardTitle>
             <TrendingDown className="w-4 h-4 text-amber-500" />
@@ -232,22 +232,22 @@ export default function AdvancesPage() {
             <div className="text-2xl font-bold text-amber-600 font-mono">
               ₹{(stats?.totalOutstanding || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Remaining to be recovered</p>
+            <p className="text-[11px] text-[#948779] mt-1">Remaining to be recovered</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Pending Ledgers
             </CardTitle>
             <Clock className="w-4 h-4 text-rose-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-2xl font-bold text-[#362A22]">
               {(stats?.statusCounts?.PENDING || 0) + (stats?.statusCounts?.PARTIALLY_REPAID || 0)}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-[11px] text-[#948779] mt-1">
               {stats?.statusCounts?.PARTIALLY_REPAID || 0} Partial • {stats?.statusCounts?.REPAID || 0} Repaid
             </p>
           </CardContent>
@@ -255,9 +255,9 @@ export default function AdvancesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-slate-500 mr-1">Status:</span>
+          <span className="text-xs font-semibold text-[#79695B] mr-1">Status:</span>
           {["ALL", "PENDING", "PARTIALLY_REPAID", "REPAID"].map((st) => (
             <button
               key={st}
@@ -268,7 +268,7 @@ export default function AdvancesPage() {
               className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 statusFilter === st
                   ? "bg-slate-900 text-white font-semibold"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
               }`}
             >
               {st}
@@ -277,14 +277,14 @@ export default function AdvancesPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500">Employee:</span>
+          <span className="text-xs font-semibold text-[#79695B]">Employee:</span>
           <select
             value={selectedStaffFilter}
             onChange={(e) => {
               setSelectedStaffFilter(e.target.value);
               setPage(1);
             }}
-            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 text-slate-700"
+            className="text-xs border border-[#E3D9CA] rounded-lg px-2.5 py-1.5 bg-[#F7F4EE] text-[#5D493D]"
           >
             <option value="ALL">All Staff Members</option>
             {staffList.map((s) => (
@@ -297,20 +297,20 @@ export default function AdvancesPage() {
       </div>
 
       {/* Advances Table */}
-      <Card className="border-slate-200 shadow-sm overflow-hidden">
+      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
             </div>
           ) : advances.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-400">
+            <div className="p-12 text-center text-xs text-[#948779]">
               No staff advance records found. Click &quot;Disburse New Advance&quot; to issue an advance.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     <th className="px-4 py-3">Reference</th>
                     <th className="px-4 py-3">Employee</th>
@@ -322,23 +322,23 @@ export default function AdvancesPage() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {advances.map((adv) => (
-                    <tr key={adv.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="px-4 py-3 font-mono font-medium text-indigo-600">
+                    <tr key={adv.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
+                      <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">
                         {adv.advanceReference}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-900">
+                      <td className="px-4 py-3 font-medium text-[#362A22]">
                         <div>{adv.staff?.fullName}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                        <div className="text-[11px] text-[#948779] font-mono">
                           {adv.staff?.employeeCode} • {adv.staff?.department}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-[#79695B]">
                         <div>{new Date(adv.advanceDate).toLocaleDateString()}</div>
-                        <div className="text-[10px] text-slate-400">{adv.paymentMethod}</div>
+                        <div className="text-[10px] text-[#948779]">{adv.paymentMethod}</div>
                       </td>
-                      <td className="px-4 py-3 font-mono font-semibold text-slate-900">
+                      <td className="px-4 py-3 font-mono font-semibold text-[#362A22]">
                         ₹{Number(adv.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-3 font-mono text-emerald-600 font-medium">
@@ -376,7 +376,7 @@ export default function AdvancesPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenDetails(adv)}
-                          className="h-7 px-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50"
+                          className="h-7 px-2 text-[#79695B] hover:text-[#B08A60] hover:bg-[#F2EADF]"
                           title="View Ledger Details"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -395,22 +395,22 @@ export default function AdvancesPage() {
       <Dialog open={issueModalOpen} onOpenChange={setIssueModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Disburse Salary Advance
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Issue an advance payment to a staff member. This will be tracked in the ledger and can be deducted during payroll.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleIssueSubmit} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Select Employee *</label>
+              <label className="font-semibold text-[#5D493D]">Select Employee *</label>
               <select
                 required
                 value={issueForm.staffId}
                 onChange={(e) => setIssueForm({ ...issueForm, staffId: e.target.value })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
               >
                 {staffList.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -422,7 +422,7 @@ export default function AdvancesPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Advance Amount (₹) *</label>
+                <label className="font-semibold text-[#5D493D]">Advance Amount (₹) *</label>
                 <Input
                   type="number"
                   min="1"
@@ -435,7 +435,7 @@ export default function AdvancesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Disbursement Date *</label>
+                <label className="font-semibold text-[#5D493D]">Disbursement Date *</label>
                 <Input
                   type="date"
                   required
@@ -447,11 +447,11 @@ export default function AdvancesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Payment Method *</label>
+              <label className="font-semibold text-[#5D493D]">Payment Method *</label>
               <select
                 value={issueForm.paymentMethod}
                 onChange={(e) => setIssueForm({ ...issueForm, paymentMethod: e.target.value as any })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
               >
                 <option value="CASH">CASH</option>
                 <option value="UPI">UPI / QR CODE</option>
@@ -461,7 +461,7 @@ export default function AdvancesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Reason / Notes</label>
+              <label className="font-semibold text-[#5D493D]">Reason / Notes</label>
               <Input
                 value={issueForm.notes}
                 onChange={(e) => setIssueForm({ ...issueForm, notes: e.target.value })}
@@ -470,11 +470,11 @@ export default function AdvancesPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setIssueModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Disbursing..." : "Confirm & Disburse Advance"}
               </Button>
             </DialogFooter>
@@ -486,32 +486,32 @@ export default function AdvancesPage() {
       <Dialog open={repayModalOpen} onOpenChange={setRepayModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Record Advance Repayment
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 font-mono">
+            <DialogDescription className="text-xs text-[#79695B] font-mono">
               Ref: {selectedAdvance?.advanceReference} • Employee: {selectedAdvance?.staff?.fullName}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleRepaySubmit} className="space-y-3 pt-2 text-xs">
-            <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-              <div className="flex justify-between text-slate-600">
+            <div className="p-3 bg-[#F7F4EE] rounded-xl space-y-1">
+              <div className="flex justify-between text-[#79695B]">
                 <span>Original Advance Amount:</span>
                 <span className="font-mono font-semibold">₹{Number(selectedAdvance?.amount || 0)}</span>
               </div>
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-[#79695B]">
                 <span>Total Already Recovered:</span>
                 <span className="font-mono text-emerald-600 font-semibold">₹{Number(selectedAdvance?.recoveredAmount || 0)}</span>
               </div>
-              <div className="flex justify-between font-bold text-slate-900 border-t border-slate-200 pt-1 mt-1">
+              <div className="flex justify-between font-bold text-[#362A22] border-t border-[#E3D9CA] pt-1 mt-1">
                 <span>Max Outstanding Balance:</span>
                 <span className="font-mono text-amber-600">₹{Number(selectedAdvance?.balanceAmount || 0)}</span>
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Repayment Amount (₹) *</label>
+              <label className="font-semibold text-[#5D493D]">Repayment Amount (₹) *</label>
               <Input
                 type="number"
                 min="1"
@@ -525,7 +525,7 @@ export default function AdvancesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Recovery Notes</label>
+              <label className="font-semibold text-[#5D493D]">Recovery Notes</label>
               <Input
                 value={repayForm.notes}
                 onChange={(e) => setRepayForm({ ...repayForm, notes: e.target.value })}
@@ -534,7 +534,7 @@ export default function AdvancesPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setRepayModalOpen(false)}>
                 Cancel
               </Button>
@@ -550,39 +550,39 @@ export default function AdvancesPage() {
       <Dialog open={detailsModalOpen} onOpenChange={setDetailsModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900 font-mono">
+            <DialogTitle className="text-base font-bold text-[#362A22] font-mono">
               {selectedAdvance?.advanceReference}
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Disbursed on {selectedAdvance ? new Date(selectedAdvance.advanceDate).toLocaleDateString() : ""}
             </DialogDescription>
           </DialogHeader>
 
           {selectedAdvance && (
             <div className="space-y-3 pt-2 text-xs">
-              <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 block">Employee Information</span>
-                <span className="font-semibold text-slate-900 block text-sm">{selectedAdvance.staff?.fullName}</span>
-                <span className="text-slate-500 block font-mono">{selectedAdvance.staff?.employeeCode} • {selectedAdvance.staff?.department}</span>
+              <div className="p-3 bg-[#F7F4EE] rounded-xl space-y-1">
+                <span className="text-[10px] uppercase font-bold text-[#948779] block">Employee Information</span>
+                <span className="font-semibold text-[#362A22] block text-sm">{selectedAdvance.staff?.fullName}</span>
+                <span className="text-[#79695B] block font-mono">{selectedAdvance.staff?.employeeCode} • {selectedAdvance.staff?.department}</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-[#F7F4EE] rounded-xl">
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase block font-semibold">Principal Amount</span>
-                  <span className="font-mono font-semibold text-slate-900 text-sm">₹{Number(selectedAdvance.amount)}</span>
+                  <span className="text-[#948779] text-[10px] uppercase block font-semibold">Principal Amount</span>
+                  <span className="font-mono font-semibold text-[#362A22] text-sm">₹{Number(selectedAdvance.amount)}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase block font-semibold">Status</span>
+                  <span className="text-[#948779] text-[10px] uppercase block font-semibold">Status</span>
                   <Badge variant="outline" className="text-[10px] font-semibold mt-0.5">
                     {selectedAdvance.repaymentStatus}
                   </Badge>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase block font-semibold">Recovered Amount</span>
+                  <span className="text-[#948779] text-[10px] uppercase block font-semibold">Recovered Amount</span>
                   <span className="font-mono font-semibold text-emerald-600">₹{Number(selectedAdvance.recoveredAmount)}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] uppercase block font-semibold">Balance Pending</span>
+                  <span className="text-[#948779] text-[10px] uppercase block font-semibold">Balance Pending</span>
                   <span className="font-mono font-bold text-amber-600">₹{Number(selectedAdvance.balanceAmount)}</span>
                 </div>
               </div>
@@ -596,7 +596,7 @@ export default function AdvancesPage() {
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t border-slate-100">
+          <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
             <Button variant="outline" size="sm" onClick={() => setDetailsModalOpen(false)}>
               Close
             </Button>

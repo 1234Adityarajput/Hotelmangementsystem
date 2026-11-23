@@ -159,12 +159,12 @@ export default function AttendancePage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Staff Attendance Register
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Daily check-in and check-out tracking, shift working hours, overtime records, and leave management.
           </p>
         </div>
@@ -188,10 +188,10 @@ export default function AttendancePage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardContent className="p-3 text-center">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Staff</span>
-            <span className="text-2xl font-bold text-slate-900">{data?.stats.totalStaff || 0}</span>
+            <span className="text-[10px] uppercase font-bold text-[#948779] block">Total Staff</span>
+            <span className="text-2xl font-bold text-[#362A22]">{data?.stats.totalStaff || 0}</span>
           </CardContent>
         </Card>
 
@@ -218,27 +218,27 @@ export default function AttendancePage() {
 
         <Card className="border-blue-200 shadow-sm bg-blue-50/50">
           <CardContent className="p-3 text-center">
-            <span className="text-[10px] uppercase font-bold text-blue-600 block">Leave</span>
+            <span className="text-[10px] uppercase font-bold text-[#B08A60] block">Leave</span>
             <span className="text-2xl font-bold text-blue-700">{data?.stats.leave || 0}</span>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-slate-50">
+        <Card className="border-[#E3D9CA] shadow-sm bg-[#F7F4EE]">
           <CardContent className="p-3 text-center">
-            <span className="text-[10px] uppercase font-bold text-slate-500 block">Unmarked</span>
-            <span className="text-2xl font-bold text-slate-700">{data?.stats.unmarked || 0}</span>
+            <span className="text-[10px] uppercase font-bold text-[#79695B] block">Unmarked</span>
+            <span className="text-2xl font-bold text-[#5D493D]">{data?.stats.unmarked || 0}</span>
           </CardContent>
         </Card>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500">Department:</span>
+          <span className="text-xs font-semibold text-[#79695B]">Department:</span>
           <select
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="text-xs border border-[#E3D9CA] rounded-lg px-2.5 py-1.5 bg-[#F7F4EE] text-[#5D493D] focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
           >
             <option value="ALL">All Departments</option>
             <option value="Front Office">Front Office</option>
@@ -252,7 +252,7 @@ export default function AttendancePage() {
         </div>
 
         <div className="relative w-64">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
           <Input
             type="text"
             placeholder="Search employee name or code..."
@@ -264,20 +264,20 @@ export default function AttendancePage() {
       </div>
 
       {/* Daily Register Table */}
-      <Card className="border-slate-200 shadow-sm overflow-hidden">
+      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
             </div>
           ) : filteredRegister.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-400">
+            <div className="p-12 text-center text-xs text-[#948779]">
               No staff members found for the selected department.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     <th className="px-4 py-3">Employee</th>
                     <th className="px-4 py-3">Department</th>
@@ -288,22 +288,22 @@ export default function AttendancePage() {
                     <th className="px-4 py-3 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {filteredRegister.map((item) => {
                     const att = item.attendance;
                     const cfg = att ? STATUS_CONFIG[att.attendanceStatus] : null;
 
                     return (
-                      <tr key={item.staff.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="px-4 py-3 font-medium text-slate-900">
+                      <tr key={item.staff.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
+                        <td className="px-4 py-3 font-medium text-[#362A22]">
                           <div>{item.staff.fullName}</div>
-                          <div className="text-[11px] text-indigo-600 font-mono">
+                          <div className="text-[11px] text-[#B08A60] font-mono">
                             {item.staff.employeeCode}
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="font-semibold text-slate-800">{item.staff.designation}</div>
-                          <div className="text-[11px] text-slate-400">{item.staff.department}</div>
+                          <div className="font-semibold text-[#362A22]">{item.staff.designation}</div>
+                          <div className="text-[11px] text-[#948779]">{item.staff.department}</div>
                         </td>
                         <td className="px-4 py-3">
                           {cfg ? (
@@ -311,7 +311,7 @@ export default function AttendancePage() {
                               {cfg.label}
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-[10px] text-slate-400 bg-slate-50 border-slate-200">
+                            <Badge variant="outline" className="text-[10px] text-[#948779] bg-[#F7F4EE] border-[#E3D9CA]">
                               PENDING
                             </Badge>
                           )}
@@ -325,8 +325,8 @@ export default function AttendancePage() {
                                 onClick={() => handleQuickStatus(item.staff, st)}
                                 className={`px-2 py-1 rounded text-[10px] font-bold border transition-colors ${
                                   isCurrent
-                                    ? "bg-indigo-600 text-white border-indigo-600 shadow-xs"
-                                    : "bg-white hover:bg-slate-100 text-slate-600 border-slate-200"
+                                    ? "bg-[#362A22] text-white border-[#B08A60] shadow-xs"
+                                    : "bg-white hover:bg-slate-100 text-[#79695B] border-[#E3D9CA]"
                                 }`}
                                 title={`Mark as ${STATUS_CONFIG[st].label}`}
                               >
@@ -346,16 +346,16 @@ export default function AttendancePage() {
                               )}
                             </span>
                           ) : (
-                            <span className="text-slate-400">-</span>
+                            <span className="text-[#948779]">-</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-slate-600 text-[11px]">
+                        <td className="px-4 py-3 text-[#79695B] text-[11px]">
                           {att && att.checkInTime ? (
                             <span>
                               {att.checkInTime} → {att.checkOutTime || "Pending"}
                             </span>
                           ) : (
-                            <span className="text-slate-400">Not recorded</span>
+                            <span className="text-[#948779]">Not recorded</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -363,7 +363,7 @@ export default function AttendancePage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleOpenDetailedModal(item.staff, att)}
-                            className="h-7 px-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50"
+                            className="h-7 px-2 text-[#79695B] hover:text-[#B08A60] hover:bg-[#F2EADF]"
                             title="Edit Details, Timings & Overtime"
                           >
                             <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
@@ -383,21 +383,21 @@ export default function AttendancePage() {
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Attendance Record ({activeStaff?.fullName})
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 font-mono">
+            <DialogDescription className="text-xs text-[#79695B] font-mono">
               {activeStaff?.employeeCode} • Date: {selectedDate}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveDetailed} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Attendance Status *</label>
+              <label className="font-semibold text-[#5D493D]">Attendance Status *</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value as any })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
               >
                 <option value="PRESENT">PRESENT</option>
                 <option value="ABSENT">ABSENT</option>
@@ -411,7 +411,7 @@ export default function AttendancePage() {
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="font-semibold text-slate-700">Check-In Time</label>
+                    <label className="font-semibold text-[#5D493D]">Check-In Time</label>
                     <Input
                       value={form.checkInTime}
                       onChange={(e) => setForm({ ...form, checkInTime: e.target.value })}
@@ -420,7 +420,7 @@ export default function AttendancePage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="font-semibold text-slate-700">Check-Out Time</label>
+                    <label className="font-semibold text-[#5D493D]">Check-Out Time</label>
                     <Input
                       value={form.checkOutTime}
                       onChange={(e) => setForm({ ...form, checkOutTime: e.target.value })}
@@ -432,7 +432,7 @@ export default function AttendancePage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="font-semibold text-slate-700">Working Hours</label>
+                    <label className="font-semibold text-[#5D493D]">Working Hours</label>
                     <Input
                       type="number"
                       step="0.5"
@@ -444,7 +444,7 @@ export default function AttendancePage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="font-semibold text-slate-700">Overtime Hours</label>
+                    <label className="font-semibold text-[#5D493D]">Overtime Hours</label>
                     <Input
                       type="number"
                       step="0.5"
@@ -460,7 +460,7 @@ export default function AttendancePage() {
             )}
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Remarks / Reason</label>
+              <label className="font-semibold text-[#5D493D]">Remarks / Reason</label>
               <Input
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
@@ -469,11 +469,11 @@ export default function AttendancePage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setEditModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving..." : "Save Attendance"}
               </Button>
             </DialogFooter>

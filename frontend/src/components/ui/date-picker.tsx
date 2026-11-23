@@ -29,7 +29,7 @@ export function DatePicker({
         variant="outline"
         className={cn(
           "w-full justify-start text-left font-normal",
-          !date && "text-slate-500",
+          !date && "text-[#79695B]",
         )}
         onClick={() => setIsOpen(!isOpen)}
       >

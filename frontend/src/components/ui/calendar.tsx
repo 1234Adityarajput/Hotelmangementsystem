@@ -34,30 +34,30 @@ export function Calendar({ selected, onSelect, className }: CalendarProps) {
   const days = eachDayOfInterval({ start: startDate, end: endDate });
 
   return (
-    <div className={cn("p-3 bg-white rounded-md border border-slate-200", className)}>
-      <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+    <div className={cn("p-3 bg-white rounded-md border border-[#E3D9CA]", className)}>
+      <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#EAE3D8]">
         <button
           type="button"
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-          className="p-1 rounded hover:bg-slate-100 text-slate-600"
+          className="p-1 rounded hover:bg-slate-100 text-[#79695B]"
           aria-label="Previous month"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <span className="text-sm font-semibold text-slate-800">
+        <span className="text-sm font-semibold text-[#362A22]">
           {format(currentMonth, "MMMM yyyy")}
         </span>
         <button
           type="button"
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          className="p-1 rounded hover:bg-slate-100 text-slate-600"
+          className="p-1 rounded hover:bg-slate-100 text-[#79695B]"
           aria-label="Next month"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-400 mb-1">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-[#948779] mb-1">
         {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
           <div key={day} className="py-1">
             {day}
@@ -79,7 +79,7 @@ export function Calendar({ selected, onSelect, className }: CalendarProps) {
               className={cn(
                 "h-8 w-8 rounded text-center text-sm transition-colors mx-auto flex items-center justify-center",
                 !isCurrentMonth && "text-slate-300",
-                isCurrentMonth && !isSelected && "text-slate-700 hover:bg-slate-100",
+                isCurrentMonth && !isSelected && "text-[#5D493D] hover:bg-slate-100",
                 currentDay && !isSelected && "border border-slate-300 font-semibold",
                 isSelected && "bg-slate-900 text-white font-medium hover:bg-slate-800",
               )}

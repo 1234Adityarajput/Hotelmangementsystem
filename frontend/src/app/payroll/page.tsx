@@ -202,19 +202,19 @@ export default function PayrollPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Payroll & Salary Management
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Process monthly payroll, attendance-based salary calculations, advance deductions, and disbursements.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={handleOpenGenerate}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 shadow-sm text-xs"
+            className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm text-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Generate Salary Slip</span>
@@ -224,24 +224,24 @@ export default function PayrollPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Total Net Payable ({MONTHS[selectedMonth - 1]})
             </CardTitle>
-            <Banknote className="w-4 h-4 text-indigo-600" />
+            <Banknote className="w-4 h-4 text-[#B08A60]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 font-mono">
+            <div className="text-2xl font-bold text-[#362A22] font-mono">
               ₹{(stats?.totalNetPayable || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Total approved salary obligations</p>
+            <p className="text-[11px] text-[#948779] mt-1">Total approved salary obligations</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Total Salary Disbursed
             </CardTitle>
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -250,13 +250,13 @@ export default function PayrollPage() {
             <div className="text-2xl font-bold text-emerald-600 font-mono">
               ₹{(stats?.totalPaid || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Disbursed via bank / cash</p>
+            <p className="text-[11px] text-[#948779] mt-1">Disbursed via bank / cash</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Remaining Balance
             </CardTitle>
             <TrendingDown className="w-4 h-4 text-amber-500" />
@@ -265,22 +265,22 @@ export default function PayrollPage() {
             <div className="text-2xl font-bold text-amber-600 font-mono">
               ₹{(stats?.totalBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Outstanding salary payable</p>
+            <p className="text-[11px] text-[#948779] mt-1">Outstanding salary payable</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Slip Settlement
             </CardTitle>
             <Clock className="w-4 h-4 text-rose-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-2xl font-bold text-[#362A22]">
               {stats?.statusCounts?.PAID || 0} / {records.length}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-[11px] text-[#948779] mt-1">
               {stats?.statusCounts?.FINALIZED || 0} Pending Payment
             </p>
           </CardContent>
@@ -288,13 +288,13 @@ export default function PayrollPage() {
       </div>
 
       {/* Period Selector & Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-slate-500">Period:</span>
+          <span className="text-xs font-semibold text-[#79695B]">Period:</span>
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 text-slate-700"
+            className="text-xs border border-[#E3D9CA] rounded-lg px-2.5 py-1.5 bg-[#F7F4EE] text-[#5D493D]"
           >
             {MONTHS.map((m, idx) => (
               <option key={m} value={idx + 1}>
@@ -306,7 +306,7 @@ export default function PayrollPage() {
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 text-slate-700"
+            className="text-xs border border-[#E3D9CA] rounded-lg px-2.5 py-1.5 bg-[#F7F4EE] text-[#5D493D]"
           >
             {[2024, 2025, 2026, 2027].map((y) => (
               <option key={y} value={y}>
@@ -315,7 +315,7 @@ export default function PayrollPage() {
             ))}
           </select>
 
-          <span className="text-xs font-semibold text-slate-500 ml-2">Status:</span>
+          <span className="text-xs font-semibold text-[#79695B] ml-2">Status:</span>
           {["ALL", "FINALIZED", "PAID"].map((st) => (
             <button
               key={st}
@@ -323,7 +323,7 @@ export default function PayrollPage() {
               className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 statusFilter === st
                   ? "bg-slate-900 text-white font-semibold"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
               }`}
             >
               {st}
@@ -333,20 +333,20 @@ export default function PayrollPage() {
       </div>
 
       {/* Salary Records Table */}
-      <Card className="border-slate-200 shadow-sm overflow-hidden">
+      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
             </div>
           ) : records.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-400">
+            <div className="p-12 text-center text-xs text-[#948779]">
               No salary records found for {MONTHS[selectedMonth - 1]} {selectedYear}. Click &quot;Generate Salary Slip&quot; to calculate salary.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     <th className="px-4 py-3">Employee</th>
                     <th className="px-4 py-3">Department</th>
@@ -359,18 +359,18 @@ export default function PayrollPage() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {records.map((rec) => (
-                    <tr key={rec.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="px-4 py-3 font-medium text-slate-900">
+                    <tr key={rec.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
+                      <td className="px-4 py-3 font-medium text-[#362A22]">
                         <div>{rec.staff?.fullName}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                        <div className="text-[11px] text-[#948779] font-mono">
                           {rec.staff?.employeeCode}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-semibold text-slate-800">{rec.staff?.designation}</div>
-                        <div className="text-[11px] text-slate-400">{rec.staff?.department}</div>
+                        <div className="font-semibold text-[#362A22]">{rec.staff?.designation}</div>
+                        <div className="text-[11px] text-[#948779]">{rec.staff?.department}</div>
                       </td>
                       <td className="px-4 py-3 font-mono font-medium">
                         {Number(rec.payableDays)} / {rec.configuredSalaryDays}d
@@ -380,18 +380,18 @@ export default function PayrollPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-mono font-semibold text-slate-800">
+                      <td className="px-4 py-3 font-mono font-semibold text-[#362A22]">
                         ₹{Number(rec.grossSalary).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-3 font-mono text-rose-600">
                         ₹{(Number(rec.deductions) + Number(rec.advanceDeductions)).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         {Number(rec.advanceDeductions) > 0 && (
-                          <span className="text-[10px] text-slate-400 block">
+                          <span className="text-[10px] text-[#948779] block">
                             (Adv: ₹{Number(rec.advanceDeductions)})
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 font-mono font-bold text-indigo-700">
+                      <td className="px-4 py-3 font-mono font-bold text-[#362A22]">
                         ₹{Number(rec.netSalary).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-3 font-mono font-bold text-amber-600">
@@ -424,7 +424,7 @@ export default function PayrollPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenSlip(rec.id)}
-                          className="h-7 px-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50"
+                          className="h-7 px-2 text-[#79695B] hover:text-[#B08A60] hover:bg-[#F2EADF]"
                           title="View Salary Slip & Print"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -443,22 +443,22 @@ export default function PayrollPage() {
       <Dialog open={generateModalOpen} onOpenChange={setGenerateModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Generate Monthly Salary Slip
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Calculates salary based on attendance records, overtime hours, and allows advance deduction.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleGenerateSubmit} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Select Employee *</label>
+              <label className="font-semibold text-[#5D493D]">Select Employee *</label>
               <select
                 required
                 value={genForm.staffId}
                 onChange={(e) => setGenForm({ ...genForm, staffId: e.target.value })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
               >
                 {staffList.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -470,11 +470,11 @@ export default function PayrollPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Month</label>
+                <label className="font-semibold text-[#5D493D]">Month</label>
                 <select
                   value={genForm.payrollMonth}
                   onChange={(e) => setGenForm({ ...genForm, payrollMonth: Number(e.target.value) })}
-                  className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
                 >
                   {MONTHS.map((m, idx) => (
                     <option key={m} value={idx + 1}>
@@ -485,7 +485,7 @@ export default function PayrollPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Year</label>
+                <label className="font-semibold text-[#5D493D]">Year</label>
                 <Input
                   type="number"
                   value={genForm.payrollYear}
@@ -497,7 +497,7 @@ export default function PayrollPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Configured Days</label>
+                <label className="font-semibold text-[#5D493D]">Configured Days</label>
                 <Input
                   type="number"
                   min="20"
@@ -509,7 +509,7 @@ export default function PayrollPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Payable Days</label>
+                <label className="font-semibold text-[#5D493D]">Payable Days</label>
                 <Input
                   type="number"
                   step="0.5"
@@ -524,7 +524,7 @@ export default function PayrollPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Other Deductions (₹)</label>
+                <label className="font-semibold text-[#5D493D]">Other Deductions (₹)</label>
                 <Input
                   type="number"
                   min="0"
@@ -536,7 +536,7 @@ export default function PayrollPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Advance Recovery (₹)</label>
+                <label className="font-semibold text-[#5D493D]">Advance Recovery (₹)</label>
                 <Input
                   type="number"
                   min="0"
@@ -548,11 +548,11 @@ export default function PayrollPage() {
               </div>
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setGenerateModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Calculating..." : "Generate Slip"}
               </Button>
             </DialogFooter>
@@ -564,25 +564,25 @@ export default function PayrollPage() {
       <Dialog open={disburseModalOpen} onOpenChange={setDisburseModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Disburse Salary Payment
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Employee: {selectedRecord?.staff?.fullName} • Period: {selectedRecord ? `${MONTHS[selectedRecord.payrollMonth - 1]} ${selectedRecord.payrollYear}` : ""}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleDisburseSubmit} className="space-y-3 pt-2 text-xs">
-            <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-              <div className="flex justify-between text-slate-600">
+            <div className="p-3 bg-[#F7F4EE] rounded-xl space-y-1">
+              <div className="flex justify-between text-[#79695B]">
                 <span>Net Salary Payable:</span>
                 <span className="font-mono font-semibold">₹{Number(selectedRecord?.netSalary || 0)}</span>
               </div>
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-[#79695B]">
                 <span>Already Disbursed:</span>
                 <span className="font-mono text-emerald-600 font-semibold">₹{Number(selectedRecord?.totalPaid || 0)}</span>
               </div>
-              <div className="flex justify-between font-bold text-slate-900 border-t border-slate-200 pt-1 mt-1">
+              <div className="flex justify-between font-bold text-[#362A22] border-t border-[#E3D9CA] pt-1 mt-1">
                 <span>Current Outstanding Balance:</span>
                 <span className="font-mono text-amber-600">₹{Number(selectedRecord?.balanceAmount || 0)}</span>
               </div>
@@ -590,7 +590,7 @@ export default function PayrollPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Disbursement Amount (₹) *</label>
+                <label className="font-semibold text-[#5D493D]">Disbursement Amount (₹) *</label>
                 <Input
                   type="number"
                   min="1"
@@ -604,7 +604,7 @@ export default function PayrollPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Disbursement Date *</label>
+                <label className="font-semibold text-[#5D493D]">Disbursement Date *</label>
                 <Input
                   type="date"
                   required
@@ -616,11 +616,11 @@ export default function PayrollPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Payment Channel *</label>
+              <label className="font-semibold text-[#5D493D]">Payment Channel *</label>
               <select
                 value={disburseForm.paymentMethod}
                 onChange={(e) => setDisburseForm({ ...disburseForm, paymentMethod: e.target.value as any })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
               >
                 <option value="BANK_TRANSFER">BANK TRANSFER / NEFT</option>
                 <option value="CASH">CASH</option>
@@ -630,7 +630,7 @@ export default function PayrollPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Transaction Reference</label>
+              <label className="font-semibold text-[#5D493D]">Transaction Reference</label>
               <Input
                 value={disburseForm.transactionReference}
                 onChange={(e) => setDisburseForm({ ...disburseForm, transactionReference: e.target.value })}
@@ -639,7 +639,7 @@ export default function PayrollPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setDisburseModalOpen(false)}>
                 Cancel
               </Button>
@@ -656,7 +656,7 @@ export default function PayrollPage() {
         <DialogContent className="max-w-2xl bg-white max-h-[90vh] overflow-y-auto print:p-0 print:border-none print:shadow-none">
           <DialogHeader className="print:hidden">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-base font-bold text-slate-900">
+              <DialogTitle className="text-base font-bold text-[#362A22]">
                 Salary Payslip Preview
               </DialogTitle>
               <Button variant="outline" size="sm" onClick={handlePrint} className="h-8 text-xs flex items-center gap-1.5">
@@ -666,75 +666,75 @@ export default function PayrollPage() {
           </DialogHeader>
 
           {selectedRecord && (
-            <div className="p-4 border border-slate-200 rounded-xl space-y-4 text-xs font-sans bg-white print:border-none">
+            <div className="p-4 border border-[#E3D9CA] rounded-xl space-y-4 text-xs font-sans bg-white print:border-none">
               {/* Slip Header */}
-              <div className="text-center pb-3 border-b border-slate-200">
-                <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide">
+              <div className="text-center pb-3 border-b border-[#E3D9CA]">
+                <h3 className="text-base font-bold text-[#362A22] uppercase tracking-wide">
                   Grand Horizon Hotel & Suites
                 </h3>
-                <p className="text-[11px] text-slate-500">100 Beach Road, Civil Lines • hotel@grandhorizon.com</p>
-                <h4 className="text-xs font-bold text-indigo-700 mt-2 uppercase tracking-wider">
+                <p className="text-[11px] text-[#79695B]">100 Beach Road, Civil Lines • hotel@grandhorizon.com</p>
+                <h4 className="text-xs font-bold text-[#362A22] mt-2 uppercase tracking-wider">
                   Payslip for {MONTHS[selectedRecord.payrollMonth - 1]} {selectedRecord.payrollYear}
                 </h4>
               </div>
 
               {/* Employee Information */}
-              <div className="grid grid-cols-2 gap-4 p-3 bg-slate-50 rounded-lg">
+              <div className="grid grid-cols-2 gap-4 p-3 bg-[#F7F4EE] rounded-lg">
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Employee Name</span>
-                  <span className="font-bold text-slate-900 text-sm">{selectedRecord.staff?.fullName}</span>
-                  <span className="text-slate-500 block font-mono text-[11px]">Code: {selectedRecord.staff?.employeeCode}</span>
+                  <span className="text-[10px] text-[#948779] uppercase font-semibold block">Employee Name</span>
+                  <span className="font-bold text-[#362A22] text-sm">{selectedRecord.staff?.fullName}</span>
+                  <span className="text-[#79695B] block font-mono text-[11px]">Code: {selectedRecord.staff?.employeeCode}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Designation & Department</span>
-                  <span className="font-bold text-slate-900">{selectedRecord.staff?.designation}</span>
-                  <span className="text-slate-500 block text-[11px]">{selectedRecord.staff?.department}</span>
+                  <span className="text-[10px] text-[#948779] uppercase font-semibold block">Designation & Department</span>
+                  <span className="font-bold text-[#362A22]">{selectedRecord.staff?.designation}</span>
+                  <span className="text-[#79695B] block text-[11px]">{selectedRecord.staff?.department}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Bank Account Number</span>
-                  <span className="font-mono text-slate-800">{selectedRecord.staff?.bankAccountNumber || "N/A"}</span>
+                  <span className="text-[10px] text-[#948779] uppercase font-semibold block">Bank Account Number</span>
+                  <span className="font-mono text-[#362A22]">{selectedRecord.staff?.bankAccountNumber || "N/A"}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Payable Days</span>
-                  <span className="font-mono font-bold text-slate-900">
+                  <span className="text-[10px] text-[#948779] uppercase font-semibold block">Payable Days</span>
+                  <span className="font-mono font-bold text-[#362A22]">
                     {Number(selectedRecord.payableDays)} Days (out of {selectedRecord.configuredSalaryDays})
                   </span>
                 </div>
               </div>
 
               {/* Earnings & Deductions Table */}
-              <div className="grid grid-cols-2 gap-4 border border-slate-200 rounded-lg overflow-hidden">
-                <div className="p-3 border-r border-slate-200 space-y-2">
-                  <span className="font-bold text-slate-900 uppercase text-[11px] block border-b border-slate-100 pb-1">Earnings</span>
+              <div className="grid grid-cols-2 gap-4 border border-[#E3D9CA] rounded-lg overflow-hidden">
+                <div className="p-3 border-r border-[#E3D9CA] space-y-2">
+                  <span className="font-bold text-[#362A22] uppercase text-[11px] block border-b border-[#EAE3D8] pb-1">Earnings</span>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Basic Monthly Wage:</span>
+                    <span className="text-[#79695B]">Basic Monthly Wage:</span>
                     <span className="font-mono">₹{Number(selectedRecord.monthlyBasicSalary).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Earned Basic Salary:</span>
+                    <span className="text-[#79695B]">Earned Basic Salary:</span>
                     <span className="font-mono font-medium">₹{(Number(selectedRecord.monthlyBasicSalary) / selectedRecord.configuredSalaryDays * Number(selectedRecord.payableDays)).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Overtime Earnings ({Number(selectedRecord.overtimeHours)}h):</span>
+                    <span className="text-[#79695B]">Overtime Earnings ({Number(selectedRecord.overtimeHours)}h):</span>
                     <span className="font-mono font-medium text-emerald-600">₹{Number(selectedRecord.overtimeAmount).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between font-bold border-t border-slate-200 pt-1 text-slate-900">
+                  <div className="flex justify-between font-bold border-t border-[#E3D9CA] pt-1 text-[#362A22]">
                     <span>Total Gross Earnings:</span>
                     <span className="font-mono">₹{Number(selectedRecord.grossSalary).toFixed(2)}</span>
                   </div>
                 </div>
 
                 <div className="p-3 space-y-2">
-                  <span className="font-bold text-slate-900 uppercase text-[11px] block border-b border-slate-100 pb-1">Deductions</span>
+                  <span className="font-bold text-[#362A22] uppercase text-[11px] block border-b border-[#EAE3D8] pb-1">Deductions</span>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Statutory / Other Deductions:</span>
+                    <span className="text-[#79695B]">Statutory / Other Deductions:</span>
                     <span className="font-mono">₹{Number(selectedRecord.deductions).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Salary Advance Recovery:</span>
+                    <span className="text-[#79695B]">Salary Advance Recovery:</span>
                     <span className="font-mono text-rose-600">₹{Number(selectedRecord.advanceDeductions).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between font-bold border-t border-slate-200 pt-1 text-slate-900">
+                  <div className="flex justify-between font-bold border-t border-[#E3D9CA] pt-1 text-[#362A22]">
                     <span>Total Deductions:</span>
                     <span className="font-mono text-rose-600">₹{(Number(selectedRecord.deductions) + Number(selectedRecord.advanceDeductions)).toFixed(2)}</span>
                   </div>
@@ -742,10 +742,10 @@ export default function PayrollPage() {
               </div>
 
               {/* Net Pay & Settlement */}
-              <div className="p-3 bg-indigo-50/70 border border-indigo-200 rounded-lg flex items-center justify-between">
+              <div className="p-3 bg-[#FAF6F0]/70 border border-[#E3D9CA] rounded-lg flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-indigo-700 block">Net Salary Payable</span>
-                  <span className="text-xs text-slate-500">Total earnings after all deductions</span>
+                  <span className="text-[10px] uppercase font-bold text-[#362A22] block">Net Salary Payable</span>
+                  <span className="text-xs text-[#79695B]">Total earnings after all deductions</span>
                 </div>
                 <div className="text-right">
                   <span className="text-xl font-bold font-mono text-indigo-900">
@@ -757,13 +757,13 @@ export default function PayrollPage() {
               {/* Disbursement History */}
               {selectedRecord.salaryPayments && selectedRecord.salaryPayments.length > 0 && (
                 <div className="space-y-1 pt-1">
-                  <span className="font-bold text-slate-800 text-[11px] block">Disbursement History</span>
-                  <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden">
+                  <span className="font-bold text-[#362A22] text-[11px] block">Disbursement History</span>
+                  <div className="divide-y divide-[#EAE3D8] border border-[#E3D9CA] rounded-lg overflow-hidden">
                     {selectedRecord.salaryPayments.map((p) => (
                       <div key={p.id} className="p-2 flex justify-between items-center text-[11px]">
                         <div>
-                          <span className="font-mono font-medium text-slate-900">{p.paymentReference}</span>
-                          <span className="text-slate-400 ml-2">({p.paymentMethod} • {new Date(p.paymentDate).toLocaleDateString()})</span>
+                          <span className="font-mono font-medium text-[#362A22]">{p.paymentReference}</span>
+                          <span className="text-[#948779] ml-2">({p.paymentMethod} • {new Date(p.paymentDate).toLocaleDateString()})</span>
                         </div>
                         <span className="font-mono font-semibold text-emerald-600">
                           ₹{Number(p.paymentAmount).toFixed(2)}
@@ -776,7 +776,7 @@ export default function PayrollPage() {
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t border-slate-100 print:hidden">
+          <DialogFooter className="pt-3 border-t border-[#EAE3D8] print:hidden">
             <Button variant="outline" size="sm" onClick={() => setSlipModalOpen(false)}>
               Close
             </Button>

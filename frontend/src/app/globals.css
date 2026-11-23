@@ -1,77 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+    /* Ivory & Espresso Luxury Theme Tokens */
+    --background: 40 30% 95%;      /* #F7F4EE Ivory background */
+    --foreground: 24 23% 17%;      /* #362A22 Espresso text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;             /* #FFFFFF Pure White surface */
+    --card-foreground: 24 23% 17%; /* #362A22 Espresso */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 24 23% 17%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 24 23% 17%;         /* #362A22 Espresso primary */
+    --primary-foreground: 39 33% 89%; /* #EEE7DA Warm Ivory */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 35 37% 91%;       /* #F2EADF Hover Ivory */
+    --secondary-foreground: 24 23% 17%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 39 33% 89%;          /* #EEE7DA Warm Ivory */
+    --muted-foreground: 28 14% 42%;/* #79695B Mocha */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 32 34% 53%;         /* #B08A60 Antique Gold */
+    --accent-foreground: 0 0% 100%;/* Pure White */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 4 47% 49%;      /* #B54C44 Semantic Danger */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 36 29% 84%;         /* #E3D9CA Warm Border */
+    --input: 36 29% 84%;
+    --ring: 32 34% 53%;           /* #B08A60 Antique Gold Focus Ring */
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 222.2 84% 4.9%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 217.2 91.2% 59.8%;
+    /* Sidebar - Espresso #362A22 with Antique Gold & Warm Ivory */
+    --sidebar-background: 24 23% 17%;       /* #362A22 Espresso */
+    --sidebar-foreground: 39 33% 89%;       /* #EEE7DA Warm Ivory */
+    --sidebar-primary: 32 34% 53%;          /* #B08A60 Antique Gold */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 24 22% 22%;           /* #43352B Deep Espresso */
+    --sidebar-accent-foreground: 39 33% 89%;
+    --sidebar-border: 24 22% 22%;
+    --sidebar-ring: 32 34% 53%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --background: 24 23% 17%;
+    --foreground: 39 33% 89%;
+    --card: 24 22% 22%;
+    --card-foreground: 39 33% 89%;
+    --popover: 24 22% 22%;
+    --popover-foreground: 39 33% 89%;
+    --primary: 32 34% 53%;
+    --primary-foreground: 24 23% 17%;
+    --secondary: 24 20% 25%;
+    --secondary-foreground: 39 33% 89%;
+    --muted: 24 20% 25%;
+    --muted-foreground: 28 14% 65%;
+    --accent: 32 34% 53%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 4 47% 49%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 24 22% 25%;
+    --input: 24 22% 25%;
+    --ring: 32 34% 53%;
   }
 }
 
@@ -80,6 +76,26 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#F7F4EE] text-[#362A22] font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+  h1, h2, h3, .font-serif, .font-heading {
+    font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+  }
+}
+
+/* Subtle luxury scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F7F4EE;
+}
+::-webkit-scrollbar-thumb {
+  background: #DDD4CE;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B08A60;
 }

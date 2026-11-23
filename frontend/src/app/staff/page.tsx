@@ -217,18 +217,18 @@ export default function StaffPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Staff & Employee Management
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Manage hotel workforce, employment profiles, designations, salary rates, and banking records.
           </p>
         </div>
         <Button
           onClick={handleOpenAdd}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 shadow-sm"
+          className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Employee</span>
@@ -237,76 +237,76 @@ export default function StaffPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Total Workforce
             </CardTitle>
-            <Users className="w-4 h-4 text-indigo-600" />
+            <Users className="w-4 h-4 text-[#B08A60]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{stats?.total || 0}</div>
-            <p className="text-[11px] text-slate-400 mt-1">Across all hotel departments</p>
+            <div className="text-2xl font-bold text-[#362A22]">{stats?.total || 0}</div>
+            <p className="text-[11px] text-[#948779] mt-1">Across all hotel departments</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Active Staff
             </CardTitle>
             <UserCheck className="w-4 h-4 text-emerald-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">{stats?.active || 0}</div>
-            <p className="text-[11px] text-slate-400 mt-1">Currently on active duty</p>
+            <p className="text-[11px] text-[#948779] mt-1">Currently on active duty</p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Inactive / Terminated
             </CardTitle>
             <UserX className="w-4 h-4 text-rose-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-700">
+            <div className="text-2xl font-bold text-[#5D493D]">
               {(stats?.inactive || 0) + (stats?.terminated || 0) + (stats?.resigned || 0)}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-[11px] text-[#948779] mt-1">
               {stats?.terminated || 0} Terminated • {stats?.resigned || 0} Resigned
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm bg-white">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-slate-500 uppercase">
+            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase">
               Active Departments
             </CardTitle>
             <Building className="w-4 h-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-2xl font-bold text-[#362A22]">
               {stats?.departments?.length || 0}
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">Operational divisions</p>
+            <p className="text-[11px] text-[#948779] mt-1">Operational divisions</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filters and Search Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-slate-500 mr-1">Department:</span>
+          <span className="text-xs font-semibold text-[#79695B] mr-1">Department:</span>
           <select
             value={department}
             onChange={(e) => {
               setDepartment(e.target.value);
               setPage(1);
             }}
-            className="text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="text-xs border border-[#E3D9CA] rounded-lg px-2.5 py-1.5 bg-[#F7F4EE] text-[#5D493D] focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
           >
             {DEPARTMENTS.map((dept) => (
               <option key={dept} value={dept}>
@@ -315,7 +315,7 @@ export default function StaffPage() {
             ))}
           </select>
 
-          <span className="text-xs font-semibold text-slate-500 ml-2 mr-1">Status:</span>
+          <span className="text-xs font-semibold text-[#79695B] ml-2 mr-1">Status:</span>
           {["ALL", "ACTIVE", "INACTIVE", "TERMINATED", "RESIGNED"].map((st) => (
             <button
               key={st}
@@ -326,7 +326,7 @@ export default function StaffPage() {
               className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 statusFilter === st
                   ? "bg-slate-900 text-white font-semibold"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
               }`}
             >
               {st}
@@ -335,7 +335,7 @@ export default function StaffPage() {
         </div>
 
         <div className="relative w-64">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
           <Input
             type="text"
             placeholder="Search code, name, mobile..."
@@ -350,20 +350,20 @@ export default function StaffPage() {
       </div>
 
       {/* Staff Table */}
-      <Card className="border-slate-200 shadow-sm overflow-hidden">
+      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
             </div>
           ) : staffList.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-400">
+            <div className="p-12 text-center text-xs text-[#948779]">
               No employees found matching the criteria. Click &quot;Add New Employee&quot; to register staff.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     <th className="px-4 py-3">Emp Code</th>
                     <th className="px-4 py-3">Employee Name</th>
@@ -374,25 +374,25 @@ export default function StaffPage() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {staffList.map((s) => (
-                    <tr key={s.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="px-4 py-3 font-mono font-medium text-indigo-600">
+                    <tr key={s.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
+                      <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">
                         {s.employeeCode}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-900">
+                      <td className="px-4 py-3 font-medium text-[#362A22]">
                         <div>{s.fullName}</div>
-                        <div className="text-[11px] text-slate-400">Joined {new Date(s.joiningDate).toLocaleDateString()}</div>
+                        <div className="text-[11px] text-[#948779]">Joined {new Date(s.joiningDate).toLocaleDateString()}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-semibold text-slate-800">{s.designation}</div>
-                        <div className="text-[11px] text-slate-500">{s.department}</div>
+                        <div className="font-semibold text-[#362A22]">{s.designation}</div>
+                        <div className="text-[11px] text-[#79695B]">{s.department}</div>
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-[#79695B]">
                         <div className="font-mono">{s.mobileNumber}</div>
-                        {s.email && <div className="text-[11px] text-slate-400 truncate max-w-[140px]">{s.email}</div>}
+                        {s.email && <div className="text-[11px] text-[#948779] truncate max-w-[140px]">{s.email}</div>}
                       </td>
-                      <td className="px-4 py-3 font-mono font-semibold text-slate-800">
+                      <td className="px-4 py-3 font-mono font-semibold text-[#362A22]">
                         ₹{Number(s.monthlySalary).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-4 py-3">
@@ -414,7 +414,7 @@ export default function StaffPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenDetails(s.id)}
-                          className="h-7 px-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50"
+                          className="h-7 px-2 text-[#79695B] hover:text-[#B08A60] hover:bg-[#F2EADF]"
                           title="View Profile Details"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -423,7 +423,7 @@ export default function StaffPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenEdit(s)}
-                          className="h-7 px-2 text-slate-600 hover:text-amber-600 hover:bg-amber-50"
+                          className="h-7 px-2 text-[#79695B] hover:text-amber-600 hover:bg-amber-50"
                           title="Edit Profile"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -447,7 +447,7 @@ export default function StaffPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="p-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <div className="p-3 border-t border-[#EAE3D8] flex items-center justify-between text-xs text-[#79695B]">
               <span>Showing {staffList.length} of {total} employees</span>
               <div className="flex items-center gap-1">
                 <Button
@@ -459,7 +459,7 @@ export default function StaffPage() {
                 >
                   Previous
                 </Button>
-                <span className="px-2 font-medium text-slate-700">
+                <span className="px-2 font-medium text-[#5D493D]">
                   Page {page} of {totalPages}
                 </span>
                 <Button
@@ -481,10 +481,10 @@ export default function StaffPage() {
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
         <DialogContent className="max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Register New Employee
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Enter employee personal, contact, salary, and banking details to add them to hotel workforce.
             </DialogDescription>
           </DialogHeader>
@@ -492,7 +492,7 @@ export default function StaffPage() {
           <form onSubmit={handleCreate} className="space-y-4 pt-2 text-xs">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Full Name *</label>
+                <label className="font-semibold text-[#5D493D]">Full Name *</label>
                 <Input
                   required
                   value={formData.fullName}
@@ -503,7 +503,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Mobile Number *</label>
+                <label className="font-semibold text-[#5D493D]">Mobile Number *</label>
                 <Input
                   required
                   value={formData.mobileNumber}
@@ -514,7 +514,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Alternate Contact</label>
+                <label className="font-semibold text-[#5D493D]">Alternate Contact</label>
                 <Input
                   value={formData.alternateMobileNumber}
                   onChange={(e) => setFormData({ ...formData, alternateMobileNumber: e.target.value })}
@@ -524,7 +524,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Email Address</label>
+                <label className="font-semibold text-[#5D493D]">Email Address</label>
                 <Input
                   type="email"
                   value={formData.email}
@@ -535,12 +535,12 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Department *</label>
+                <label className="font-semibold text-[#5D493D]">Department *</label>
                 <select
                   required
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
                 >
                   {DEPARTMENTS.filter((d) => d !== "ALL").map((d) => (
                     <option key={d} value={d}>
@@ -551,7 +551,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Designation *</label>
+                <label className="font-semibold text-[#5D493D]">Designation *</label>
                 <Input
                   required
                   value={formData.designation}
@@ -562,7 +562,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Joining Date *</label>
+                <label className="font-semibold text-[#5D493D]">Joining Date *</label>
                 <Input
                   type="date"
                   required
@@ -573,7 +573,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Monthly Basic Salary (₹) *</label>
+                <label className="font-semibold text-[#5D493D]">Monthly Basic Salary (₹) *</label>
                 <Input
                   type="number"
                   min="0"
@@ -586,11 +586,11 @@ export default function StaffPage() {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-xl space-y-3 border border-slate-100">
-              <span className="font-bold text-slate-800 block text-xs">Banking & Recovery Details</span>
+            <div className="p-3 bg-[#F7F4EE] rounded-xl space-y-3 border border-[#EAE3D8]">
+              <span className="font-bold text-[#362A22] block text-xs">Banking & Recovery Details</span>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-600">Account Holder Name</label>
+                  <label className="text-[11px] text-[#79695B]">Account Holder Name</label>
                   <Input
                     value={formData.bankAccountHolder}
                     onChange={(e) => setFormData({ ...formData, bankAccountHolder: e.target.value })}
@@ -599,7 +599,7 @@ export default function StaffPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-600">Account Number</label>
+                  <label className="text-[11px] text-[#79695B]">Account Number</label>
                   <Input
                     value={formData.bankAccountNumber}
                     onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
@@ -608,7 +608,7 @@ export default function StaffPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-600">IFSC Code</label>
+                  <label className="text-[11px] text-[#79695B]">IFSC Code</label>
                   <Input
                     value={formData.bankIfscCode}
                     onChange={(e) => setFormData({ ...formData, bankIfscCode: e.target.value })}
@@ -621,7 +621,7 @@ export default function StaffPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Emergency Contact</label>
+                <label className="font-semibold text-[#5D493D]">Emergency Contact</label>
                 <Input
                   value={formData.emergencyContact}
                   onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
@@ -630,7 +630,7 @@ export default function StaffPage() {
                 />
               </div>
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Date of Birth</label>
+                <label className="font-semibold text-[#5D493D]">Date of Birth</label>
                 <Input
                   type="date"
                   value={formData.dateOfBirth}
@@ -641,7 +641,7 @@ export default function StaffPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Residential Address</label>
+              <label className="font-semibold text-[#5D493D]">Residential Address</label>
               <Input
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -651,7 +651,7 @@ export default function StaffPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Internal Remarks / Notes</label>
+              <label className="font-semibold text-[#5D493D]">Internal Remarks / Notes</label>
               <Input
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -660,11 +660,11 @@ export default function StaffPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setAddModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Registering..." : "Register Employee"}
               </Button>
             </DialogFooter>
@@ -676,10 +676,10 @@ export default function StaffPage() {
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
         <DialogContent className="max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Edit Employee Profile ({selectedStaff?.employeeCode})
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Update personal information, salary rates, or employment status.
             </DialogDescription>
           </DialogHeader>
@@ -687,7 +687,7 @@ export default function StaffPage() {
           <form onSubmit={handleUpdate} className="space-y-4 pt-2 text-xs">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Full Name *</label>
+                <label className="font-semibold text-[#5D493D]">Full Name *</label>
                 <Input
                   required
                   value={formData.fullName}
@@ -697,11 +697,11 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Employment Status *</label>
+                <label className="font-semibold text-[#5D493D]">Employment Status *</label>
                 <select
                   value={formData.employmentStatus}
                   onChange={(e) => setFormData({ ...formData, employmentStatus: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
                 >
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="INACTIVE">INACTIVE</option>
@@ -711,7 +711,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Mobile Number *</label>
+                <label className="font-semibold text-[#5D493D]">Mobile Number *</label>
                 <Input
                   required
                   value={formData.mobileNumber}
@@ -721,12 +721,12 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Department *</label>
+                <label className="font-semibold text-[#5D493D]">Department *</label>
                 <select
                   required
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white text-slate-800"
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
                 >
                   {DEPARTMENTS.filter((d) => d !== "ALL").map((d) => (
                     <option key={d} value={d}>
@@ -737,7 +737,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Designation *</label>
+                <label className="font-semibold text-[#5D493D]">Designation *</label>
                 <Input
                   required
                   value={formData.designation}
@@ -747,7 +747,7 @@ export default function StaffPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Monthly Salary (₹) *</label>
+                <label className="font-semibold text-[#5D493D]">Monthly Salary (₹) *</label>
                 <Input
                   type="number"
                   min="0"
@@ -760,11 +760,11 @@ export default function StaffPage() {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-xl space-y-3 border border-slate-100">
-              <span className="font-bold text-slate-800 block text-xs">Bank Details</span>
+            <div className="p-3 bg-[#F7F4EE] rounded-xl space-y-3 border border-[#EAE3D8]">
+              <span className="font-bold text-[#362A22] block text-xs">Bank Details</span>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-600">Account Holder</label>
+                  <label className="text-[11px] text-[#79695B]">Account Holder</label>
                   <Input
                     value={formData.bankAccountHolder}
                     onChange={(e) => setFormData({ ...formData, bankAccountHolder: e.target.value })}
@@ -772,7 +772,7 @@ export default function StaffPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-600">Account Number</label>
+                  <label className="text-[11px] text-[#79695B]">Account Number</label>
                   <Input
                     value={formData.bankAccountNumber}
                     onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
@@ -780,7 +780,7 @@ export default function StaffPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] text-slate-600">IFSC Code</label>
+                  <label className="text-[11px] text-[#79695B]">IFSC Code</label>
                   <Input
                     value={formData.bankIfscCode}
                     onChange={(e) => setFormData({ ...formData, bankIfscCode: e.target.value })}
@@ -791,7 +791,7 @@ export default function StaffPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Notes & Remarks</label>
+              <label className="font-semibold text-[#5D493D]">Notes & Remarks</label>
               <Input
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -799,11 +799,11 @@ export default function StaffPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setEditModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving Changes..." : "Save Changes"}
               </Button>
             </DialogFooter>
@@ -817,10 +817,10 @@ export default function StaffPage() {
           <DialogHeader>
             <div className="flex items-center justify-between">
               <div>
-                <DialogTitle className="text-base font-bold text-slate-900">
+                <DialogTitle className="text-base font-bold text-[#362A22]">
                   {selectedStaff?.fullName}
                 </DialogTitle>
-                <DialogDescription className="text-xs text-slate-500 font-mono">
+                <DialogDescription className="text-xs text-[#79695B] font-mono">
                   {selectedStaff?.employeeCode} • {selectedStaff?.designation}
                 </DialogDescription>
               </div>
@@ -841,65 +841,65 @@ export default function StaffPage() {
 
           {selectedStaff && (
             <div className="space-y-4 pt-2 text-xs">
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-[#F7F4EE] rounded-xl">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-semibold">Department</span>
-                  <span className="font-semibold text-slate-900">{selectedStaff.department}</span>
+                  <span className="text-[#948779] block text-[10px] uppercase font-semibold">Department</span>
+                  <span className="font-semibold text-[#362A22]">{selectedStaff.department}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-semibold">Monthly Salary</span>
-                  <span className="font-semibold text-indigo-700 font-mono">
+                  <span className="text-[#948779] block text-[10px] uppercase font-semibold">Monthly Salary</span>
+                  <span className="font-semibold text-[#362A22] font-mono">
                     ₹{Number(selectedStaff.monthlySalary).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-semibold">Contact Mobile</span>
-                  <span className="font-mono text-slate-800">{selectedStaff.mobileNumber}</span>
+                  <span className="text-[#948779] block text-[10px] uppercase font-semibold">Contact Mobile</span>
+                  <span className="font-mono text-[#362A22]">{selectedStaff.mobileNumber}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-semibold">Joining Date</span>
-                  <span className="text-slate-800">{new Date(selectedStaff.joiningDate).toLocaleDateString()}</span>
+                  <span className="text-[#948779] block text-[10px] uppercase font-semibold">Joining Date</span>
+                  <span className="text-[#362A22]">{new Date(selectedStaff.joiningDate).toLocaleDateString()}</span>
                 </div>
                 {selectedStaff.email && (
                   <div className="col-span-2">
-                    <span className="text-slate-400 block text-[10px] uppercase font-semibold">Email</span>
-                    <span className="text-slate-800">{selectedStaff.email}</span>
+                    <span className="text-[#948779] block text-[10px] uppercase font-semibold">Email</span>
+                    <span className="text-[#362A22]">{selectedStaff.email}</span>
                   </div>
                 )}
                 {selectedStaff.emergencyContact && (
                   <div className="col-span-2">
-                    <span className="text-slate-400 block text-[10px] uppercase font-semibold">Emergency Contact</span>
-                    <span className="text-slate-800">{selectedStaff.emergencyContact}</span>
+                    <span className="text-[#948779] block text-[10px] uppercase font-semibold">Emergency Contact</span>
+                    <span className="text-[#362A22]">{selectedStaff.emergencyContact}</span>
                   </div>
                 )}
               </div>
 
               {/* Bank Details */}
-              <div className="p-3 bg-slate-50 rounded-xl space-y-1 border border-slate-100">
-                <span className="font-bold text-slate-800 block text-xs mb-1">Banking Information</span>
-                <div className="grid grid-cols-2 gap-2 text-slate-600">
+              <div className="p-3 bg-[#F7F4EE] rounded-xl space-y-1 border border-[#EAE3D8]">
+                <span className="font-bold text-[#362A22] block text-xs mb-1">Banking Information</span>
+                <div className="grid grid-cols-2 gap-2 text-[#79695B]">
                   <div>
-                    <span className="text-slate-400 text-[10px] uppercase block">Account Holder:</span>
-                    <span className="font-medium text-slate-900">{selectedStaff.bankAccountHolder || "Not configured"}</span>
+                    <span className="text-[#948779] text-[10px] uppercase block">Account Holder:</span>
+                    <span className="font-medium text-[#362A22]">{selectedStaff.bankAccountHolder || "Not configured"}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[10px] uppercase block">Account Number:</span>
-                    <span className="font-mono text-slate-900">{selectedStaff.bankAccountNumber || "Not configured"}</span>
+                    <span className="text-[#948779] text-[10px] uppercase block">Account Number:</span>
+                    <span className="font-mono text-[#362A22]">{selectedStaff.bankAccountNumber || "Not configured"}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 text-[10px] uppercase block">IFSC Code:</span>
-                    <span className="font-mono text-slate-900 uppercase">{selectedStaff.bankIfscCode || "Not configured"}</span>
+                    <span className="text-[#948779] text-[10px] uppercase block">IFSC Code:</span>
+                    <span className="font-mono text-[#362A22] uppercase">{selectedStaff.bankIfscCode || "Not configured"}</span>
                   </div>
                 </div>
               </div>
 
               {/* Records count summary */}
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="p-2.5 bg-indigo-50/60 rounded-lg border border-indigo-100">
-                  <span className="text-base font-bold text-indigo-700 block">
+                <div className="p-2.5 bg-[#FAF6F0]/60 rounded-lg border border-indigo-100">
+                  <span className="text-base font-bold text-[#362A22] block">
                     {selectedStaff._count?.attendanceRecords || 0}
                   </span>
-                  <span className="text-[10px] text-indigo-600 uppercase font-semibold">Attendance Days</span>
+                  <span className="text-[10px] text-[#B08A60] uppercase font-semibold">Attendance Days</span>
                 </div>
                 <div className="p-2.5 bg-emerald-50/60 rounded-lg border border-emerald-100">
                   <span className="text-base font-bold text-emerald-700 block">
@@ -924,7 +924,7 @@ export default function StaffPage() {
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t border-slate-100">
+          <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
             <Button variant="outline" size="sm" onClick={() => setDetailsModalOpen(false)}>
               Close
             </Button>
@@ -936,16 +936,16 @@ export default function StaffPage() {
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Confirm Staff Deletion / Archival
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Are you sure you want to delete or archive employee {selectedStaff?.fullName} ({selectedStaff?.employeeCode})?
               If attendance or payroll history exists, the employee will be safely marked as TERMINATED to preserve audit records.
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="pt-3 border-t border-slate-100">
+          <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
             <Button variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
               Cancel
             </Button>

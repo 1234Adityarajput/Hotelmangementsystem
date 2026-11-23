@@ -121,12 +121,12 @@ export default function DigitalRegistersPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Digital Hotel Registers
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Official immutable read-only statutory registers. Search, filter, export to CSV/Excel, and print audit records.
           </p>
         </div>
@@ -144,7 +144,7 @@ export default function DigitalRegistersPage() {
             variant="outline"
             size="sm"
             onClick={() => window.print()}
-            className="text-xs flex items-center gap-1.5 bg-white text-slate-700"
+            className="text-xs flex items-center gap-1.5 bg-white text-[#5D493D]"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print Register</span>
@@ -153,8 +153,8 @@ export default function DigitalRegistersPage() {
       </div>
 
       {/* Register Selector Grid */}
-      <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2">
-        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+      <div className="bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm space-y-2">
+        <span className="text-[11px] font-bold text-[#948779] uppercase tracking-wider block">
           Select Statutory Register:
         </span>
         <div className="flex flex-wrap gap-1.5">
@@ -167,8 +167,8 @@ export default function DigitalRegistersPage() {
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 activeRegister === reg.id
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  ? "bg-[#362A22] text-white shadow-sm"
+                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
               }`}
             >
               {reg.label}
@@ -178,9 +178,9 @@ export default function DigitalRegistersPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-slate-500">Date Range:</span>
+          <span className="text-xs font-semibold text-[#79695B]">Date Range:</span>
           <Input
             type="date"
             value={startDate}
@@ -191,7 +191,7 @@ export default function DigitalRegistersPage() {
             className="h-8 text-xs w-36"
             placeholder="From"
           />
-          <span className="text-xs text-slate-400">to</span>
+          <span className="text-xs text-[#948779]">to</span>
           <Input
             type="date"
             value={endDate}
@@ -218,7 +218,7 @@ export default function DigitalRegistersPage() {
         </div>
 
         <div className="relative w-64">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
           <Input
             type="text"
             placeholder="Search register records..."
@@ -233,14 +233,14 @@ export default function DigitalRegistersPage() {
       </div>
 
       {/* Active Register Content */}
-      <Card className="border-slate-200 shadow-sm overflow-hidden print:border-none print:shadow-none">
-        <CardHeader className="bg-slate-50/60 border-b border-slate-200 py-3">
+      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden print:border-none print:shadow-none">
+        <CardHeader className="bg-[#F7F4EE] border-b border-[#E3D9CA] py-3">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-sm font-bold text-slate-900">
+              <CardTitle className="text-sm font-bold text-[#362A22]">
                 {currentMeta?.label}
               </CardTitle>
-              <CardDescription className="text-xs text-slate-500">
+              <CardDescription className="text-xs text-[#79695B]">
                 Total {total} entries recorded in database
               </CardDescription>
             </div>
@@ -252,17 +252,17 @@ export default function DigitalRegistersPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
             </div>
           ) : items.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-400">
+            <div className="p-12 text-center text-xs text-[#948779]">
               No entries found in {currentMeta?.label} matching your filter criteria.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
                 {/* Dynamically render headers based on active register */}
-                <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-semibold border-b border-slate-200">
+                <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[10px] font-semibold border-b border-[#E3D9CA]">
                   <tr>
                     {activeRegister === "guests" && (
                       <>
@@ -385,23 +385,23 @@ export default function DigitalRegistersPage() {
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#EAE3D8]">
                   {items.map((row: any) => (
-                    <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
+                    <tr key={row.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
                       {activeRegister === "guests" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-indigo-600">{row.guestCode}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900">{row.fullName}</td>
-                          <td className="px-4 py-3 text-slate-600 font-mono">{row.mobileNumber}</td>
-                          <td className="px-4 py-3 text-slate-600">{row.city || row.country || "-"}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.guestCode}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.fullName}</td>
+                          <td className="px-4 py-3 text-[#79695B] font-mono">{row.mobileNumber}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{row.city || row.country || "-"}</td>
                           <td className="px-4 py-3 font-semibold">{row._count?.stayHistory || 0} Stays</td>
-                          <td className="px-4 py-3 text-slate-400">{new Date(row.createdAt).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-[#948779]">{new Date(row.createdAt).toLocaleDateString()}</td>
                         </>
                       )}
                       {activeRegister === "rooms" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-bold text-slate-900">Room {row.roomNumber}</td>
-                          <td className="px-4 py-3 text-slate-600">{row.roomType?.name}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">Room {row.roomNumber}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{row.roomType?.name}</td>
                           <td className="px-4 py-3">Floor {row.floor}</td>
                           <td className="px-4 py-3 font-mono font-semibold">₹{Number(row.pricePerNight)}</td>
                           <td className="px-4 py-3">
@@ -411,10 +411,10 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "bookings" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-indigo-600">{row.bookingNumber}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900">{row.primaryGuest?.fullName}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.bookingNumber}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.primaryGuest?.fullName}</td>
                           <td className="px-4 py-3">Room {row.room?.roomNumber}</td>
-                          <td className="px-4 py-3 text-slate-600">{new Date(row.checkInDate).toLocaleDateString()} → {new Date(row.expectedCheckOutDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{new Date(row.checkInDate).toLocaleDateString()} → {new Date(row.expectedCheckOutDate).toLocaleDateString()}</td>
                           <td className="px-4 py-3 font-semibold">{row.numberOfNights} Nights</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] font-semibold">{row.bookingStatus}</Badge>
@@ -423,11 +423,11 @@ export default function DigitalRegistersPage() {
                       )}
                       {(activeRegister === "arrivals" || activeRegister === "inhouse" || activeRegister === "departures") && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-indigo-600">{row.bookingNumber}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900">{row.primaryGuest?.fullName}</td>
-                          <td className="px-4 py-3 font-bold text-slate-800">Room {row.room?.roomNumber}</td>
-                          <td className="px-4 py-3 text-slate-600">{new Date(row.checkInDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 text-slate-600">{new Date(row.expectedCheckOutDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.bookingNumber}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.primaryGuest?.fullName}</td>
+                          <td className="px-4 py-3 font-bold text-[#362A22]">Room {row.room?.roomNumber}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{new Date(row.checkInDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{new Date(row.expectedCheckOutDate).toLocaleDateString()}</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] font-semibold">{row.bookingStatus}</Badge>
                           </td>
@@ -435,8 +435,8 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "items" && (
                         <>
-                          <td className="px-4 py-3 font-semibold text-slate-900">{row.name}</td>
-                          <td className="px-4 py-3 text-slate-600">{row.category?.name}</td>
+                          <td className="px-4 py-3 font-semibold text-[#362A22]">{row.name}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{row.category?.name}</td>
                           <td className="px-4 py-3 font-mono font-bold text-emerald-700">₹{Number(row.unitPrice)}</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] font-semibold bg-emerald-50 text-emerald-700">Active</Badge>
@@ -445,11 +445,11 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "invoices" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-indigo-600">{row.invoiceNumber}</td>
-                          <td className="px-4 py-3 font-mono text-slate-600">{row.booking?.bookingNumber}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900">{row.booking?.primaryGuest?.fullName}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.invoiceNumber}</td>
+                          <td className="px-4 py-3 font-mono text-[#79695B]">{row.booking?.bookingNumber}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.booking?.primaryGuest?.fullName}</td>
                           <td className="px-4 py-3 font-mono">₹{Number(row.subtotal).toFixed(2)}</td>
-                          <td className="px-4 py-3 font-mono font-bold text-slate-900">₹{Number(row.totalAmount).toFixed(2)}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.totalAmount).toFixed(2)}</td>
                           <td className="px-4 py-3 font-mono text-emerald-600 font-semibold">₹{Number(row.totalPaid).toFixed(2)}</td>
                           <td className="px-4 py-3 font-mono text-amber-600 font-bold">₹{Number(row.balanceAmount).toFixed(2)}</td>
                           <td className="px-4 py-3">
@@ -459,11 +459,11 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "payments" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-indigo-600">{row.paymentReference}</td>
-                          <td className="px-4 py-3 font-mono text-slate-600">{row.booking?.bookingNumber}</td>
-                          <td className="px-4 py-3 text-slate-700 font-medium">{row.paymentMethod}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.paymentReference}</td>
+                          <td className="px-4 py-3 font-mono text-[#79695B]">{row.booking?.bookingNumber}</td>
+                          <td className="px-4 py-3 text-[#5D493D] font-medium">{row.paymentMethod}</td>
                           <td className="px-4 py-3 font-mono font-bold text-emerald-700">₹{Number(row.amount).toFixed(2)}</td>
-                          <td className="px-4 py-3 text-slate-600">{new Date(row.paymentDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{new Date(row.paymentDate).toLocaleDateString()}</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] font-semibold bg-emerald-50 text-emerald-700">{row.paymentStatus}</Badge>
                           </td>
@@ -471,11 +471,11 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "staff" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-indigo-600">{row.employeeCode}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900">{row.fullName}</td>
-                          <td className="px-4 py-3 text-slate-700">{row.designation}</td>
-                          <td className="px-4 py-3 text-slate-500">{row.department}</td>
-                          <td className="px-4 py-3 font-mono font-bold text-slate-900">₹{Number(row.monthlySalary).toFixed(2)}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.employeeCode}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.fullName}</td>
+                          <td className="px-4 py-3 text-[#5D493D]">{row.designation}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{row.department}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.monthlySalary).toFixed(2)}</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] font-semibold">{row.employmentStatus}</Badge>
                           </td>
@@ -483,8 +483,8 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "attendance" && (
                         <>
-                          <td className="px-4 py-3 font-mono text-slate-600">{new Date(row.attendanceDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900">{row.staff?.fullName} ({row.staff?.employeeCode})</td>
+                          <td className="px-4 py-3 font-mono text-[#79695B]">{new Date(row.attendanceDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.staff?.fullName} ({row.staff?.employeeCode})</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] font-semibold">{row.attendanceStatus}</Badge>
                           </td>
@@ -494,9 +494,9 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "advances" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-indigo-600">{row.advanceReference}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900">{row.staff?.fullName}</td>
-                          <td className="px-4 py-3 font-mono font-semibold text-slate-900">₹{Number(row.amount).toFixed(2)}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.advanceReference}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.staff?.fullName}</td>
+                          <td className="px-4 py-3 font-mono font-semibold text-[#362A22]">₹{Number(row.amount).toFixed(2)}</td>
                           <td className="px-4 py-3 font-mono text-emerald-600">₹{Number(row.recoveredAmount).toFixed(2)}</td>
                           <td className="px-4 py-3 font-mono font-bold text-amber-600">₹{Number(row.balanceAmount).toFixed(2)}</td>
                           <td className="px-4 py-3">
@@ -506,11 +506,11 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "salaries" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-semibold text-indigo-600">{row.payrollMonth}/{row.payrollYear}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900">{row.staff?.fullName}</td>
+                          <td className="px-4 py-3 font-mono font-semibold text-[#B08A60]">{row.payrollMonth}/{row.payrollYear}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.staff?.fullName}</td>
                           <td className="px-4 py-3 font-mono">{Number(row.payableDays)} Days</td>
                           <td className="px-4 py-3 font-mono">₹{Number(row.grossSalary).toFixed(2)}</td>
-                          <td className="px-4 py-3 font-mono font-bold text-indigo-700">₹{Number(row.netSalary).toFixed(2)}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.netSalary).toFixed(2)}</td>
                           <td className="px-4 py-3 font-mono font-bold text-amber-600">₹{Number(row.balanceAmount).toFixed(2)}</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] font-semibold">{row.payrollStatus}</Badge>
@@ -519,12 +519,12 @@ export default function DigitalRegistersPage() {
                       )}
                       {activeRegister === "expenses" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-indigo-600">{row.expenseReference}</td>
-                          <td className="px-4 py-3 text-slate-600">{new Date(row.paymentDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 text-slate-700">{row.category?.name}</td>
-                          <td className="px-4 py-3 font-medium text-slate-900 truncate max-w-xs">{row.description}</td>
-                          <td className="px-4 py-3 text-slate-600">{row.paymentMethod}</td>
-                          <td className="px-4 py-3 font-mono font-bold text-slate-900">₹{Number(row.amount).toFixed(2)}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.expenseReference}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{new Date(row.paymentDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-[#5D493D]">{row.category?.name}</td>
+                          <td className="px-4 py-3 font-medium text-[#362A22] truncate max-w-xs">{row.description}</td>
+                          <td className="px-4 py-3 text-[#79695B]">{row.paymentMethod}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.amount).toFixed(2)}</td>
                         </>
                       )}
                     </tr>
@@ -536,7 +536,7 @@ export default function DigitalRegistersPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="p-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <div className="p-3 border-t border-[#EAE3D8] flex items-center justify-between text-xs text-[#79695B]">
               <span>Showing page {page} of {totalPages} ({total} total entries)</span>
               <div className="flex items-center gap-1">
                 <Button

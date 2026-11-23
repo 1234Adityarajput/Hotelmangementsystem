@@ -139,18 +139,18 @@ export default function PaymentsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Payment Processing & Financial Ledger
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Log advance deposits, partial payments, final checkout settlements via Cash, UPI, Bank Transfer or Card.
           </p>
         </div>
         <Button
           onClick={handleOpenRecord}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 shadow-sm text-xs"
+          className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm text-xs"
         >
           <Plus className="w-4 h-4" />
           <span>Record New Payment</span>
@@ -159,11 +159,11 @@ export default function PaymentsPage() {
 
       {/* KPI Stats Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="border-slate-200 shadow-sm">
+        <Card className="border-[#E3D9CA] shadow-sm">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-semibold text-slate-500 uppercase block">Total Recorded</span>
-              <span className="text-xl font-bold text-slate-900 font-mono">
+              <span className="text-[11px] font-semibold text-[#79695B] uppercase block">Total Recorded</span>
+              <span className="text-xl font-bold text-[#362A22] font-mono">
                 ₹{totalCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </span>
             </div>
@@ -173,25 +173,25 @@ export default function PaymentsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm">
+        <Card className="border-[#E3D9CA] shadow-sm">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-semibold text-slate-500 uppercase block">Total Transactions</span>
-              <span className="text-xl font-bold text-slate-900 font-mono">{total} Entries</span>
+              <span className="text-[11px] font-semibold text-[#79695B] uppercase block">Total Transactions</span>
+              <span className="text-xl font-bold text-[#362A22] font-mono">{total} Entries</span>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-[#FAF6F0] text-[#B08A60] flex items-center justify-center">
               <CreditCard className="w-5 h-5" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm">
+        <Card className="border-[#E3D9CA] shadow-sm">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-semibold text-slate-500 uppercase block">Settlement Channels</span>
-              <span className="text-xs font-semibold text-slate-700 block mt-1">UPI • Cash • Bank • Card</span>
+              <span className="text-[11px] font-semibold text-[#79695B] uppercase block">Settlement Channels</span>
+              <span className="text-xs font-semibold text-[#5D493D] block mt-1">UPI • Cash • Bank • Card</span>
             </div>
-            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-[#B08A60] flex items-center justify-center font-bold">
               <CheckCircle2 className="w-5 h-5" />
             </div>
           </CardContent>
@@ -199,9 +199,9 @@ export default function PaymentsPage() {
       </div>
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-xs font-semibold text-slate-500 mr-1">Method:</span>
+          <span className="text-xs font-semibold text-[#79695B] mr-1">Method:</span>
           {["ALL", "UPI", "CASH", "BANK_TRANSFER", "OTHER"].map((m) => (
             <button
               key={m}
@@ -212,7 +212,7 @@ export default function PaymentsPage() {
               className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 methodFilter === m
                   ? "bg-slate-900 text-white font-semibold"
-                  : "bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200"
+                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
               }`}
             >
               {m}
@@ -222,19 +222,19 @@ export default function PaymentsPage() {
       </div>
 
       {/* Payments Table */}
-      <Card className="border-slate-200 shadow-sm overflow-hidden">
+      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-indigo-600" />
+              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
             </div>
           ) : payments.length === 0 ? (
-            <div className="p-12 text-center text-xs text-slate-400">
+            <div className="p-12 text-center text-xs text-[#948779]">
               No payments found. Click &quot;Record New Payment&quot; to log a settlement.
             </div>
           ) : (
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-semibold border-b border-slate-200">
+              <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                 <tr>
                   <th className="px-4 py-3">Reference #</th>
                   <th className="px-4 py-3">Guest & Room</th>
@@ -246,21 +246,21 @@ export default function PaymentsPage() {
                   <th className="px-4 py-3 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[#EAE3D8]">
                 {payments.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="px-4 py-3 font-mono font-medium text-indigo-600">
+                  <tr key={p.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
+                    <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">
                       {p.paymentReference}
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-900">
+                    <td className="px-4 py-3 font-medium text-[#362A22]">
                       <div>{p.booking?.primaryGuest?.fullName}</div>
-                      <div className="text-[10px] text-slate-400">Room {p.booking?.room?.roomNumber}</div>
+                      <div className="text-[10px] text-[#948779]">Room {p.booking?.room?.roomNumber}</div>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-[#79695B]">
                       {new Date(p.paymentDate).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant="outline" className="text-[10px] font-semibold bg-slate-50">
+                      <Badge variant="outline" className="text-[10px] font-semibold bg-[#F7F4EE]">
                         {p.paymentType}
                       </Badge>
                     </td>
@@ -278,10 +278,10 @@ export default function PaymentsPage() {
                         {p.paymentMethod}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 font-mono font-bold text-slate-900 text-sm">
+                    <td className="px-4 py-3 font-mono font-bold text-[#362A22] text-sm">
                       ₹{Number(p.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-500">
+                    <td className="px-4 py-3 font-mono text-[#79695B]">
                       {p.invoice?.invoiceNumber || "—"}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -304,22 +304,22 @@ export default function PaymentsPage() {
       <Dialog open={recordModalOpen} onOpenChange={setRecordModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-900">
+            <DialogTitle className="text-base font-bold text-[#362A22]">
               Record Customer Payment
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
+            <DialogDescription className="text-xs text-[#79695B]">
               Posts transaction to accounting ledger and updates invoice balance.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleRecordPayment} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Select Booking *</label>
+              <label className="font-semibold text-[#5D493D]">Select Booking *</label>
               <select
                 required
                 value={paymentForm.bookingId}
                 onChange={(e) => setPaymentForm({ ...paymentForm, bookingId: e.target.value })}
-                className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
               >
                 {bookings.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -331,11 +331,11 @@ export default function PaymentsPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Payment Type</label>
+                <label className="font-semibold text-[#5D493D]">Payment Type</label>
                 <select
                   value={paymentForm.paymentType}
                   onChange={(e) => setPaymentForm({ ...paymentForm, paymentType: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white"
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
                 >
                   <option value="ADVANCE">Advance Deposit</option>
                   <option value="PARTIAL">Partial Payment</option>
@@ -344,11 +344,11 @@ export default function PaymentsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Payment Method</label>
+                <label className="font-semibold text-[#5D493D]">Payment Method</label>
                 <select
                   value={paymentForm.paymentMethod}
                   onChange={(e) => setPaymentForm({ ...paymentForm, paymentMethod: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-slate-200 rounded-md px-2 bg-white"
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
                 >
                   <option value="UPI">UPI / QR Code</option>
                   <option value="CASH">Cash</option>
@@ -360,7 +360,7 @@ export default function PaymentsPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Amount (₹) *</label>
+                <label className="font-semibold text-[#5D493D]">Amount (₹) *</label>
                 <Input
                   type="number"
                   required
@@ -373,7 +373,7 @@ export default function PaymentsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Payment Date</label>
+                <label className="font-semibold text-[#5D493D]">Payment Date</label>
                 <Input
                   type="date"
                   value={paymentForm.paymentDate}
@@ -384,7 +384,7 @@ export default function PaymentsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Transaction Reference / UTR</label>
+              <label className="font-semibold text-[#5D493D]">Transaction Reference / UTR</label>
               <Input
                 value={paymentForm.transactionReference}
                 onChange={(e) => setPaymentForm({ ...paymentForm, transactionReference: e.target.value })}
@@ -394,7 +394,7 @@ export default function PaymentsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-slate-700">Notes</label>
+              <label className="font-semibold text-[#5D493D]">Notes</label>
               <Input
                 value={paymentForm.notes}
                 onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
@@ -403,11 +403,11 @@ export default function PaymentsPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-slate-100">
+            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setRecordModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
                 {submitting ? "Saving..." : "Record Payment"}
               </Button>
             </DialogFooter>

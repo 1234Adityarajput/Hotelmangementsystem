@@ -99,12 +99,12 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
             Hotel Settings & System Administration
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#79695B] mt-0.5">
             Configure hotel profile, default check-in/out hours, tax percentages, and inspect database infrastructure health.
           </p>
         </div>
@@ -121,27 +121,27 @@ export default function SettingsPage() {
 
       {loading ? (
         <div className="p-16 flex justify-center items-center">
-          <LoadingSpinner className="w-8 h-8 text-indigo-600" />
+          <LoadingSpinner className="w-8 h-8 text-[#B08A60]" />
         </div>
       ) : (
         <form onSubmit={handleSave} className="space-y-6">
           {/* Hotel Identity Profile */}
-          <Card className="border-slate-200 shadow-sm bg-white">
-            <CardHeader className="pb-3 border-b border-slate-100">
+          <Card className="border-[#E3D9CA] shadow-sm bg-white">
+            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
               <div className="flex items-center gap-2">
-                <Building className="w-4 h-4 text-indigo-600" />
-                <CardTitle className="text-sm font-bold text-slate-900">
+                <Building className="w-4 h-4 text-[#B08A60]" />
+                <CardTitle className="text-sm font-bold text-[#362A22]">
                   Hotel Business Profile
                 </CardTitle>
               </div>
-              <CardDescription className="text-xs text-slate-500">
+              <CardDescription className="text-xs text-[#79695B]">
                 Official property identity displayed on guest invoices, printable vouchers, and reports.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4 space-y-4 text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Hotel Name *</label>
+                  <label className="font-semibold text-[#5D493D]">Hotel Name *</label>
                   <Input
                     required
                     value={form.hotelName}
@@ -151,7 +151,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Official Contact Mobile</label>
+                  <label className="font-semibold text-[#5D493D]">Official Contact Mobile</label>
                   <Input
                     value={form.mobileNumber}
                     onChange={(e) => setForm({ ...form, mobileNumber: e.target.value })}
@@ -160,7 +160,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Official Contact Email</label>
+                  <label className="font-semibold text-[#5D493D]">Official Contact Email</label>
                   <Input
                     type="email"
                     value={form.email}
@@ -170,17 +170,17 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Operating Currency</label>
+                  <label className="font-semibold text-[#5D493D]">Operating Currency</label>
                   <Input
                     disabled
                     value={form.currencyCode}
-                    className="h-8 text-xs font-mono bg-slate-50 text-slate-500"
+                    className="h-8 text-xs font-mono bg-[#F7F4EE] text-[#79695B]"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Property Physical Address</label>
+                <label className="font-semibold text-[#5D493D]">Property Physical Address</label>
                 <Input
                   value={form.hotelAddress}
                   onChange={(e) => setForm({ ...form, hotelAddress: e.target.value })}
@@ -191,22 +191,22 @@ export default function SettingsPage() {
           </Card>
 
           {/* Operational Policy & Timings */}
-          <Card className="border-slate-200 shadow-sm bg-white">
-            <CardHeader className="pb-3 border-b border-slate-100">
+          <Card className="border-[#E3D9CA] shadow-sm bg-white">
+            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-indigo-600" />
-                <CardTitle className="text-sm font-bold text-slate-900">
+                <Clock className="w-4 h-4 text-[#B08A60]" />
+                <CardTitle className="text-sm font-bold text-[#362A22]">
                   Front Desk Policy & Defaults
                 </CardTitle>
               </div>
-              <CardDescription className="text-xs text-slate-500">
+              <CardDescription className="text-xs text-[#79695B]">
                 Standard check-in/out timings and HR payroll configuration.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4 space-y-4 text-xs">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Standard Check-In Time</label>
+                  <label className="font-semibold text-[#5D493D]">Standard Check-In Time</label>
                   <Input
                     value={form.defaultCheckInTime}
                     onChange={(e) => setForm({ ...form, defaultCheckInTime: e.target.value })}
@@ -215,7 +215,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Standard Check-Out Time</label>
+                  <label className="font-semibold text-[#5D493D]">Standard Check-Out Time</label>
                   <Input
                     value={form.defaultCheckOutTime}
                     onChange={(e) => setForm({ ...form, defaultCheckOutTime: e.target.value })}
@@ -224,7 +224,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Standard Salary Days (Per Month)</label>
+                  <label className="font-semibold text-[#5D493D]">Standard Salary Days (Per Month)</label>
                   <Input
                     type="number"
                     min="20"
@@ -239,35 +239,35 @@ export default function SettingsPage() {
           </Card>
 
           {/* Taxation & Invoicing Configuration */}
-          <Card className="border-slate-200 shadow-sm bg-white">
-            <CardHeader className="pb-3 border-b border-slate-100">
+          <Card className="border-[#E3D9CA] shadow-sm bg-white">
+            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
               <div className="flex items-center gap-2">
-                <Percent className="w-4 h-4 text-indigo-600" />
-                <CardTitle className="text-sm font-bold text-slate-900">
+                <Percent className="w-4 h-4 text-[#B08A60]" />
+                <CardTitle className="text-sm font-bold text-[#362A22]">
                   Taxation & Billing Parameters
                 </CardTitle>
               </div>
-              <CardDescription className="text-xs text-slate-500">
+              <CardDescription className="text-xs text-[#79695B]">
                 Configure GST/VAT percentage applied on finalized room tariffs and POS items.
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-4 space-y-4 text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                <div className="flex items-center gap-3 p-3 bg-[#F7F4EE] rounded-lg border border-[#EAE3D8]">
                   <input
                     type="checkbox"
                     id="taxEnabled"
                     checked={form.taxEnabled}
                     onChange={(e) => setForm({ ...form, taxEnabled: e.target.checked })}
-                    className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                    className="w-4 h-4 text-[#B08A60] rounded border-slate-300 focus:ring-[#B08A60]"
                   />
-                  <label htmlFor="taxEnabled" className="font-semibold text-slate-800 cursor-pointer">
+                  <label htmlFor="taxEnabled" className="font-semibold text-[#362A22] cursor-pointer">
                     Enable GST / Service Tax Calculation on Invoices
                   </label>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Default Tax Percentage (%)</label>
+                  <label className="font-semibold text-[#5D493D]">Default Tax Percentage (%)</label>
                   <Input
                     type="number"
                     step="0.01"
@@ -288,7 +288,7 @@ export default function SettingsPage() {
             <Button
               type="submit"
               disabled={saving}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 shadow-sm text-xs px-5"
+              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm text-xs px-5"
             >
               <Save className="w-4 h-4" />
               <span>{saving ? "Saving Changes..." : "Save Hotel Settings"}</span>
@@ -301,7 +301,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Database className="w-4 h-4 text-emerald-600" />
-                  <CardTitle className="text-sm font-bold text-slate-900">
+                  <CardTitle className="text-sm font-bold text-[#362A22]">
                     Live Neon PostgreSQL Infrastructure Health
                   </CardTitle>
                 </div>
@@ -313,33 +313,33 @@ export default function SettingsPage() {
             <CardContent className="pt-4 space-y-3 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-3 bg-white rounded-lg border border-emerald-100">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Database Provider</span>
-                  <span className="font-bold text-slate-800 text-sm">{health?.database.provider}</span>
+                  <span className="text-[10px] text-[#948779] uppercase font-semibold block">Database Provider</span>
+                  <span className="font-bold text-[#362A22] text-sm">{health?.database.provider}</span>
                 </div>
                 <div className="p-3 bg-white rounded-lg border border-emerald-100">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Database Latency</span>
+                  <span className="text-[10px] text-[#948779] uppercase font-semibold block">Database Latency</span>
                   <span className="font-mono font-bold text-emerald-600 text-sm">{health?.database.latencyMs} ms</span>
                 </div>
                 <div className="p-3 bg-white rounded-lg border border-emerald-100">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Server Uptime</span>
-                  <span className="font-mono font-bold text-slate-800 text-sm">{health?.server.uptimeSeconds}s</span>
+                  <span className="text-[10px] text-[#948779] uppercase font-semibold block">Server Uptime</span>
+                  <span className="font-mono font-bold text-[#362A22] text-sm">{health?.server.uptimeSeconds}s</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
-                <div className="flex items-center gap-2 font-bold text-slate-900">
-                  <HardDrive className="w-4 h-4 text-indigo-600" />
+              <div className="p-3 bg-white rounded-lg border border-[#E3D9CA] space-y-2">
+                <div className="flex items-center gap-2 font-bold text-[#362A22]">
+                  <HardDrive className="w-4 h-4 text-[#B08A60]" />
                   <span>Neon Serverless Backup & Recovery Protocol</span>
                 </div>
-                <p className="text-slate-600 leading-relaxed text-[11px]">
+                <p className="text-[#79695B] leading-relaxed text-[11px]">
                   Your database is hosted on <strong>Neon Serverless PostgreSQL</strong> on AWS. Data is protected by continuous Write-Ahead Log (WAL) streaming and instant branch copy-on-write snapshots.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
-                  <div className="flex items-center gap-1.5 text-slate-700">
+                  <div className="flex items-center gap-1.5 text-[#5D493D]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Point-in-Time Recovery (PITR) up to minute precision</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-slate-700">
+                  <div className="flex items-center gap-1.5 text-[#5D493D]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Zero-impact instantaneous database branching</span>
                   </div>

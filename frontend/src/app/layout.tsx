@@ -6,8 +6,8 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { AppShell } from "@/components/layout/app-shell";
 
 export const metadata: Metadata = {
-  title: "Grand Horizon - Hotel Management System",
-  description: "Modular Monolithic Hotel Management Software Architecture",
+  title: "Grand Horizon - Luxury Hotel & Resort OS",
+  description: "Modern Editorial Luxury Hotel Management Software System (Ivory & Espresso Theme)",
 };
 
 export default function RootLayout({
@@ -17,7 +17,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased bg-slate-50 text-slate-900">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-sans antialiased bg-[#F7F4EE] text-[#362A22]">
         <QueryProvider>
           <AuthProvider>
             <AppShell>{children}</AppShell>
