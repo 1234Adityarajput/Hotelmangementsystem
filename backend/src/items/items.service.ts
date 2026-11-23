@@ -158,6 +158,71 @@ export class ItemsService {
     });
   }
 
+  private async syncActiveInvoice(bookingId: string) {
+    try {
+      const invoice = await this.prisma.invoice.findFirst({
+        where: {
+          bookingId,
+          invoiceStatus: { in: ['DRAFT', 'FINALIZED', 'PARTIALLY_PAID'] },
+        },
+      });
+      if (!invoice) return;
+
+      const booking = await this.prisma.booking.findUnique({
+        where: { id: bookingId },
+        include: { bookingItems: true },
+      });
+      if (!booking) return;
+
+      const roomCharges = Math.round(Number(booking.roomRatePerNight) * booking.numberOfNights * 100) / 100;
+      const additionalCharges = Math.round(
+        booking.bookingItems.reduce((sum, item) => sum + Number(item.totalAmount), 0) * 100,
+      ) / 100;
+      const subtotal = Math.round((roomCharges + additionalCharges) * 100) / 100;
+
+      let discountAmount = 0.0;
+      const discountVal = Number(invoice.discountValue);
+      if (invoice.discountType === 'PERCENTAGE') {
+        discountAmount = Math.round(subtotal * (discountVal / 100) * 100) / 100;
+      } else if (invoice.discountType === 'FIXED') {
+        discountAmount = Math.min(discountVal, subtotal);
+      }
+
+      const taxableAmount = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
+      const taxPercentage = Number(invoice.taxPercentage);
+      const taxAmount = Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
+      const totalAmount = Math.round((taxableAmount + taxAmount) * 100) / 100;
+
+      const totalPaid = Number(invoice.totalPaid);
+      const balanceAmount = Math.round((totalAmount - totalPaid) * 100) / 100;
+
+      let invoiceStatus = invoice.invoiceStatus;
+      if (balanceAmount <= 0) {
+        invoiceStatus = 'PAID';
+      } else if (totalPaid > 0) {
+        invoiceStatus = 'PARTIALLY_PAID';
+      } else {
+        invoiceStatus = 'FINALIZED';
+      }
+
+      await this.prisma.invoice.update({
+        where: { id: invoice.id },
+        data: {
+          roomCharges,
+          additionalCharges,
+          subtotal,
+          discountAmount,
+          taxAmount,
+          totalAmount,
+          balanceAmount,
+          invoiceStatus,
+        },
+      });
+    } catch (e) {
+      // non-fatal if invoice sync encounters an edge case
+    }
+  }
+
   async addBookingItem(dto: CreateBookingItemDto) {
     const booking = await this.prisma.booking.findUnique({ where: { id: dto.bookingId } });
     if (!booking) {
@@ -168,7 +233,7 @@ export class ItemsService {
     const now = new Date();
     const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
-    return this.prisma.bookingItem.create({
+    const item = await this.prisma.bookingItem.create({
       data: {
         bookingId: dto.bookingId,
         itemId: dto.itemId,
@@ -182,6 +247,9 @@ export class ItemsService {
       },
       include: { item: true },
     });
+
+    await this.syncActiveInvoice(dto.bookingId);
+    return item;
   }
 
   async deleteBookingItem(id: string) {
@@ -191,6 +259,7 @@ export class ItemsService {
     }
 
     await this.prisma.bookingItem.delete({ where: { id } });
+    await this.syncActiveInvoice(item.bookingId);
     return { success: true, message: 'Booking item removed successfully' };
   }
 }

@@ -1,8 +1,14 @@
 import { apiClient } from "@/lib/api-client";
-import { ApiResponse, Invoice } from "@/types";
+import { ApiResponse, Invoice, BillingComponentBreakdown, ActiveFoliosResponse } from "@/types";
 
 export const billingService = {
-  async findAll(params?: { status?: string; bookingId?: string; search?: string; page?: number; limit?: number }): Promise<{
+  async findAll(params?: {
+    status?: string;
+    bookingId?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{
     items: Invoice[];
     total: number;
     page: number;
@@ -20,6 +26,31 @@ export const billingService = {
 
   async findByBooking(bookingId: string): Promise<Invoice[]> {
     const res = await apiClient.get<ApiResponse<Invoice[]>>(`/invoices/booking/${bookingId}`);
+    return res.data.data;
+  },
+
+  async getActiveFolios(search?: string): Promise<ActiveFoliosResponse> {
+    const res = await apiClient.get<ApiResponse<ActiveFoliosResponse>>("/invoices/active-folios", {
+      params: { search },
+    });
+    return res.data.data;
+  },
+
+  async getLiveBillingFolio(bookingId: string): Promise<BillingComponentBreakdown> {
+    const res = await apiClient.get<ApiResponse<BillingComponentBreakdown>>(`/invoices/live/${bookingId}`);
+    return res.data.data;
+  },
+
+  async quickPostCharge(data: {
+    bookingId: string;
+    itemName: string;
+    unitPrice: number;
+    quantity: number;
+    category?: string;
+    itemId?: string;
+    notes?: string;
+  }): Promise<{ message: string; bookingItem: any; updatedFolio: BillingComponentBreakdown }> {
+    const res = await apiClient.post<ApiResponse<any>>("/invoices/quick-post-charge", data);
     return res.data.data;
   },
 

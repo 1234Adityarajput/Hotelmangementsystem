@@ -208,13 +208,22 @@ export default function InvoicesPage() {
             Generate GST-compliant checkout bills, manage tax and discount snapshots, and record payment settlements.
           </p>
         </div>
-        <Button
-          onClick={() => handleOpenGenerate()}
-          className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm text-xs"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Generate Invoice</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <a
+            href="/billing"
+            className="border border-[#E3D9CA] bg-[#EEE7DA] hover:bg-[#E3D9CA] text-[#362A22] flex items-center gap-1.5 shadow-sm text-xs px-3 py-2 rounded-md font-medium transition-colors"
+          >
+            <Receipt className="w-3.5 h-3.5" />
+            <span>Automatic Guest Folios</span>
+          </a>
+          <Button
+            onClick={() => handleOpenGenerate()}
+            className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm text-xs"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Generate Invoice</span>
+          </Button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}

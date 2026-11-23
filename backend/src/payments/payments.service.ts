@@ -127,8 +127,8 @@ export class PaymentsService {
     }
 
     if (invoice) {
-      const currentBalance = Number(invoice.balanceAmount);
-      if (paymentAmount > currentBalance) {
+      const currentBalance = Math.round(Number(invoice.balanceAmount) * 100) / 100;
+      if (paymentAmount > currentBalance + 0.05) {
         throw new BadRequestException(
           `Payment amount (₹${paymentAmount}) exceeds invoice balance (₹${currentBalance}).`,
         );
@@ -158,7 +158,7 @@ export class PaymentsService {
       // 2. If linked to an invoice, recalculate totalPaid and balanceAmount
       if (invoice) {
         const newTotalPaid = Math.round((Number(invoice.totalPaid) + paymentAmount) * 100) / 100;
-        const newBalance = Math.round((Number(invoice.totalAmount) - newTotalPaid) * 100) / 100;
+        const newBalance = Math.max(0, Math.round((Number(invoice.totalAmount) - newTotalPaid) * 100) / 100);
         const newStatus = newBalance <= 0 ? 'PAID' : 'PARTIALLY_PAID';
 
         await tx.invoice.update({

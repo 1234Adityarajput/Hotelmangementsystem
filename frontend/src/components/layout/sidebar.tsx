@@ -13,6 +13,7 @@ import {
   UtensilsCrossed,
   Receipt,
   CreditCard,
+  Calculator,
   UserCheck,
   CalendarCheck2,
   HandCoins,
@@ -78,6 +79,12 @@ export function Sidebar() {
     {
       title: "OPERATIONS",
       items: [
+        {
+          name: "Automatic Billing",
+          href: "/billing",
+          icon: Calculator,
+          active: pathname.startsWith("/billing"),
+        },
         {
           name: "Items & Services",
           href: "/items",

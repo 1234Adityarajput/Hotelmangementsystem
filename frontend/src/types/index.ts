@@ -338,6 +338,97 @@ export interface BookingItem {
   notes?: string | null;
 }
 
+export interface BillingComponentBreakdown {
+  bookingId: string;
+  bookingNumber: string;
+  guestName: string;
+  guestMobile: string;
+  guestAddress: string;
+  roomNumber: string;
+  roomType: string;
+  checkInDate: string;
+  expectedCheckOutDate: string;
+  actualCheckInAt: string | null;
+  actualCheckOutAt: string | null;
+  numberOfNights: number;
+  roomRatePerNight: number;
+
+  // Billing Components
+  roomCharges: number;
+  foodAndBeverageCharges: number;
+  laundryCharges: number;
+  roomServiceCharges: number;
+  extraBedCharges: number;
+  otherServicesCharges: number;
+  additionalItemCharges: number;
+  totalAdditionalCharges: number;
+  subtotal: number;
+
+  discountType: 'PERCENTAGE' | 'FIXED' | null;
+  discountValue: number;
+  discountAmount: number;
+  taxableAmount: number;
+  taxPercentage: number;
+  taxAmount: number;
+
+  // Final Bill = Room Charges + Additional Charges + Taxes - Discount
+  finalBill: number;
+
+  // Payments Breakdown
+  payments: {
+    advancePayments: number;
+    partialPayments: number;
+    finalPayments: number;
+    totalPaymentsReceived: number;
+    paymentList: Array<{
+      id: string;
+      reference: string;
+      type: 'ADVANCE' | 'PARTIAL' | 'FINAL' | 'REFUND';
+      method: string;
+      amount: number;
+      date: string;
+      status: string;
+    }>;
+  };
+
+  // Remaining Balance = Final Bill - Total Payments Received
+  remainingBalance: number;
+  isFullySettled: boolean;
+
+  itemizedCharges: Array<{
+    id: string;
+    name: string;
+    category: string;
+    billingComponent: string;
+    unitPrice: number;
+    quantity: number;
+    totalAmount: number;
+    date: string;
+    time?: string | null;
+    notes?: string | null;
+  }>;
+
+  existingInvoice?: any;
+
+  calculationFormulas: {
+    roomCharges: string;
+    additionalCharges: string;
+    finalBill: string;
+    remainingBalance: string;
+  };
+}
+
+export interface ActiveFoliosResponse {
+  folios: BillingComponentBreakdown[];
+  kpis: {
+    totalActiveFolios: number;
+    totalLiveRoomCharges: number;
+    totalLiveAdditionalCharges: number;
+    totalPaymentsReceived: number;
+    totalRemainingBalance: number;
+  };
+}
+
 export interface Invoice {
   id: string;
   invoiceNumber: string;

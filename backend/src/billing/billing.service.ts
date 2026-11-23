@@ -2,6 +2,87 @@ import { Injectable, NotFoundException, BadRequestException, ConflictException }
 import { PrismaService } from '../database/prisma.service';
 import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
 import { QueryInvoiceDto } from './dto/query-invoice.dto';
+import { QuickPostChargeDto } from './dto/quick-post-charge.dto';
+
+export interface BillingComponentBreakdown {
+  bookingId: string;
+  bookingNumber: string;
+  guestName: string;
+  guestMobile: string;
+  guestAddress: string;
+  roomNumber: string;
+  roomType: string;
+  checkInDate: string;
+  expectedCheckOutDate: string;
+  actualCheckInAt: string | null;
+  actualCheckOutAt: string | null;
+  numberOfNights: number;
+  roomRatePerNight: number;
+
+  // Billing Components
+  roomCharges: number;
+  foodAndBeverageCharges: number;
+  laundryCharges: number;
+  roomServiceCharges: number;
+  extraBedCharges: number;
+  otherServicesCharges: number;
+  additionalItemCharges: number;
+  totalAdditionalCharges: number;
+  subtotal: number;
+
+  discountType: 'PERCENTAGE' | 'FIXED' | null;
+  discountValue: number;
+  discountAmount: number;
+  taxableAmount: number;
+  taxPercentage: number;
+  taxAmount: number;
+
+  // Final Bill = Room Charges + Additional Charges + Taxes - Discount
+  finalBill: number;
+
+  // Payments Breakdown
+  payments: {
+    advancePayments: number;
+    partialPayments: number;
+    finalPayments: number;
+    totalPaymentsReceived: number;
+    paymentList: Array<{
+      id: string;
+      reference: string;
+      type: string;
+      method: string;
+      amount: number;
+      date: string;
+      status: string;
+    }>;
+  };
+
+  // Remaining Balance = Final Bill - Total Payments Received
+  remainingBalance: number;
+  isFullySettled: boolean;
+
+  itemizedCharges: Array<{
+    id: string;
+    name: string;
+    category: string;
+    billingComponent: string;
+    unitPrice: number;
+    quantity: number;
+    totalAmount: number;
+    date: string;
+    time?: string | null;
+    notes?: string | null;
+  }>;
+
+  existingInvoice?: any;
+
+  calculationFormulas: {
+    roomCharges: string;
+    additionalCharges: string;
+    finalBill: string;
+    remainingBalance: string;
+  };
+}
 
 @Injectable()
 export class BillingService {
@@ -14,6 +95,86 @@ export class BillingService {
       where: { invoiceNumber: { startsWith: prefix } },
     });
     return `${prefix}-${String(count + 1).padStart(4, '0')}`;
+  }
+
+  // Helper: Classify any item/service into exact billing component
+  classifyItemComponent(itemName: string, categoryName?: string): string {
+    const text = `${itemName} ${categoryName || ''}`.toLowerCase();
+
+    // 1. Extra Bed Charges
+    if (
+      text.includes('extra bed') ||
+      text.includes('rollaway') ||
+      text.includes('mattress') ||
+      text.includes('crib') ||
+      text.includes('linen') ||
+      text.includes('extra cot')
+    ) {
+      return 'Extra Bed Charges';
+    }
+
+    // 2. Room Service Charges
+    if (
+      text.includes('room service') ||
+      text.includes('in-room dining') ||
+      text.includes('ir dining') ||
+      text.includes('delivery charge')
+    ) {
+      return 'Room Service Charges';
+    }
+
+    // 3. Laundry Charges
+    if (
+      text.includes('laundry') ||
+      text.includes('dry clean') ||
+      text.includes('ironing') ||
+      text.includes('pressing') ||
+      text.includes('wash & fold') ||
+      text.includes('laundry service')
+    ) {
+      return 'Laundry Charges';
+    }
+
+    // 4. Food and Beverage Charges
+    if (
+      text.includes('food') ||
+      text.includes('beverage') ||
+      text.includes('dining') ||
+      text.includes('breakfast') ||
+      text.includes('lunch') ||
+      text.includes('dinner') ||
+      text.includes('tea') ||
+      text.includes('coffee') ||
+      text.includes('snack') ||
+      text.includes('minibar') ||
+      text.includes('juice') ||
+      text.includes('water bottle') ||
+      text.includes('restaurant') ||
+      text.includes('dessert')
+    ) {
+      return 'Food and Beverage Charges';
+    }
+
+    // 5. Other Hotel Services
+    if (
+      text.includes('service') ||
+      text.includes('transport') ||
+      text.includes('airport') ||
+      text.includes('cab') ||
+      text.includes('taxi') ||
+      text.includes('car rental') ||
+      text.includes('spa') ||
+      text.includes('massage') ||
+      text.includes('parking') ||
+      text.includes('banquet') ||
+      text.includes('conference') ||
+      text.includes('tour')
+    ) {
+      return 'Other Hotel Services';
+    }
+
+    // 6. Additional Item Charges
+    return 'Additional Item Charges';
   }
 
   async findAll(query: QueryInvoiceDto) {
@@ -74,7 +235,7 @@ export class BillingService {
           include: {
             primaryGuest: true,
             room: { include: { roomType: true } },
-            bookingItems: { include: { item: true } },
+            bookingItems: { include: { item: { include: { category: true } } } },
           },
         },
         payments: { orderBy: { paymentDate: 'desc' } },
@@ -95,6 +256,366 @@ export class BillingService {
         payments: true,
       },
       orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  // ============================================================================
+  // LIVE AUTOMATIC BILLING & PAYMENT CALCULATION ENGINE
+  // ============================================================================
+  async getLiveBillingFolio(bookingId: string): Promise<BillingComponentBreakdown> {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        primaryGuest: true,
+        room: { include: { roomType: true } },
+        bookingItems: {
+          include: { item: { include: { category: true } } },
+          orderBy: { createdAt: 'asc' },
+        },
+        payments: {
+          where: { paymentStatus: 'COMPLETED' },
+          orderBy: { paymentDate: 'asc' },
+        },
+        invoices: {
+          where: { invoiceStatus: { not: 'CANCELLED' } },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
+    if (!booking) {
+      throw new NotFoundException(`Booking with ID ${bookingId} not found`);
+    }
+
+    const settings = await this.prisma.hotelSetting.findUnique({ where: { id: 'default' } });
+    const defaultTax = settings?.defaultTaxPercentage ? Number(settings.defaultTaxPercentage) : 12.0;
+
+    // 1. Room Charges Calculation
+    // Room Charges = Room Price Per Night × Number of Nights
+    const ratePerNight = Number(booking.roomRatePerNight);
+    const nights = booking.numberOfNights;
+    const roomCharges = Math.round(ratePerNight * nights * 100) / 100;
+
+    // 2. Additional Charges Categorized
+    let foodAndBeverageCharges = 0;
+    let laundryCharges = 0;
+    let roomServiceCharges = 0;
+    let extraBedCharges = 0;
+    let otherServicesCharges = 0;
+    let additionalItemCharges = 0;
+
+    const itemizedCharges = booking.bookingItems.map((bi) => {
+      const amount = Number(bi.totalAmount);
+      const component = this.classifyItemComponent(bi.itemNameSnapshot, bi.item?.category?.name);
+
+      if (component === 'Food and Beverage Charges') foodAndBeverageCharges += amount;
+      else if (component === 'Laundry Charges') laundryCharges += amount;
+      else if (component === 'Room Service Charges') roomServiceCharges += amount;
+      else if (component === 'Extra Bed Charges') extraBedCharges += amount;
+      else if (component === 'Other Hotel Services') otherServicesCharges += amount;
+      else additionalItemCharges += amount;
+
+      return {
+        id: bi.id,
+        name: bi.itemNameSnapshot,
+        category: bi.item?.category?.name || 'General Item',
+        billingComponent: component,
+        unitPrice: Number(bi.unitPrice),
+        quantity: bi.quantity,
+        totalAmount: amount,
+        date: bi.purchaseDate ? new Date(bi.purchaseDate).toISOString().split('T')[0] : '',
+        time: bi.purchaseTime,
+        notes: bi.notes,
+      };
+    });
+
+    foodAndBeverageCharges = Math.round(foodAndBeverageCharges * 100) / 100;
+    laundryCharges = Math.round(laundryCharges * 100) / 100;
+    roomServiceCharges = Math.round(roomServiceCharges * 100) / 100;
+    extraBedCharges = Math.round(extraBedCharges * 100) / 100;
+    otherServicesCharges = Math.round(otherServicesCharges * 100) / 100;
+    additionalItemCharges = Math.round(additionalItemCharges * 100) / 100;
+
+    // Additional Charges = Sum of All Items and Services
+    const totalAdditionalCharges = Math.round(
+      (foodAndBeverageCharges +
+        laundryCharges +
+        roomServiceCharges +
+        extraBedCharges +
+        otherServicesCharges +
+        additionalItemCharges) *
+        100,
+    ) / 100;
+
+    // Subtotal
+    const subtotal = Math.round((roomCharges + totalAdditionalCharges) * 100) / 100;
+
+    // Existing active invoice if available
+    const existingInvoice = booking.invoices[0] || null;
+
+    const taxPercentage = existingInvoice ? Number(existingInvoice.taxPercentage) : defaultTax;
+    const discountType = existingInvoice ? (existingInvoice.discountType as any) : null;
+    const discountValue = existingInvoice ? Number(existingInvoice.discountValue) : 0;
+
+    let discountAmount = 0;
+    if (discountType === 'PERCENTAGE') {
+      discountAmount = Math.round(subtotal * (discountValue / 100) * 100) / 100;
+    } else if (discountType === 'FIXED') {
+      discountAmount = Math.min(discountValue, subtotal);
+    }
+    discountAmount = Math.round(discountAmount * 100) / 100;
+
+    const taxableAmount = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
+    const taxAmount = Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
+
+    // Final Bill = Room Charges + Additional Charges + Taxes − Discount
+    const finalBill = Math.round((taxableAmount + taxAmount) * 100) / 100;
+
+    // Payments Breakdown
+    let advancePayments = 0;
+    let partialPayments = 0;
+    let finalPayments = 0;
+
+    const paymentList = booking.payments.map((p) => {
+      const amt = Number(p.amount);
+      if (p.paymentType === 'ADVANCE') advancePayments += amt;
+      else if (p.paymentType === 'PARTIAL') partialPayments += amt;
+      else if (p.paymentType === 'FINAL') finalPayments += amt;
+
+      return {
+        id: p.id,
+        reference: p.paymentReference,
+        type: p.paymentType,
+        method: p.paymentMethod,
+        amount: amt,
+        date: new Date(p.paymentDate).toISOString().split('T')[0],
+        status: p.paymentStatus,
+      };
+    });
+
+    advancePayments = Math.round(advancePayments * 100) / 100;
+    partialPayments = Math.round(partialPayments * 100) / 100;
+    finalPayments = Math.round(finalPayments * 100) / 100;
+
+    const totalPaymentsReceived = Math.round((advancePayments + partialPayments + finalPayments) * 100) / 100;
+
+    // Remaining Balance = Final Bill − Total Payments Received
+    const remainingBalance = Math.round((finalBill - totalPaymentsReceived) * 100) / 100;
+    const isFullySettled = remainingBalance <= 0;
+
+    return {
+      bookingId: booking.id,
+      bookingNumber: booking.bookingNumber,
+      guestName: booking.primaryGuest?.fullName || 'Guest',
+      guestMobile: booking.primaryGuest?.mobileNumber || '',
+      guestAddress: [booking.primaryGuest?.city, booking.primaryGuest?.state, booking.primaryGuest?.country]
+        .filter(Boolean)
+        .join(', '),
+      roomNumber: booking.room?.roomNumber || '',
+      roomType: booking.room?.roomType?.name || 'Standard',
+      checkInDate: new Date(booking.checkInDate).toISOString().split('T')[0],
+      expectedCheckOutDate: new Date(booking.expectedCheckOutDate).toISOString().split('T')[0],
+      actualCheckInAt: booking.actualCheckInAt ? booking.actualCheckInAt.toISOString() : null,
+      actualCheckOutAt: booking.actualCheckOutAt ? booking.actualCheckOutAt.toISOString() : null,
+      numberOfNights: nights,
+      roomRatePerNight: ratePerNight,
+
+      roomCharges,
+      foodAndBeverageCharges,
+      laundryCharges,
+      roomServiceCharges,
+      extraBedCharges,
+      otherServicesCharges,
+      additionalItemCharges,
+      totalAdditionalCharges,
+      subtotal,
+
+      discountType,
+      discountValue,
+      discountAmount,
+      taxableAmount,
+      taxPercentage,
+      taxAmount,
+
+      finalBill,
+
+      payments: {
+        advancePayments,
+        partialPayments,
+        finalPayments,
+        totalPaymentsReceived,
+        paymentList,
+      },
+
+      remainingBalance,
+      isFullySettled,
+
+      itemizedCharges,
+      existingInvoice,
+
+      calculationFormulas: {
+        roomCharges: `₹${ratePerNight} × ${nights} Nights = ₹${roomCharges}`,
+        additionalCharges: `F&B (₹${foodAndBeverageCharges}) + Laundry (₹${laundryCharges}) + Room Service (₹${roomServiceCharges}) + Extra Bed (₹${extraBedCharges}) + Other Services (₹${otherServicesCharges}) + Additional Items (₹${additionalItemCharges}) = ₹${totalAdditionalCharges}`,
+        finalBill: `Room Charges (₹${roomCharges}) + Additional Charges (₹${totalAdditionalCharges}) + Taxes (₹${taxAmount}) - Discount (₹${discountAmount}) = ₹${finalBill}`,
+        remainingBalance: `Final Bill (₹${finalBill}) - Total Payments Received (₹${totalPaymentsReceived}) = ₹${remainingBalance}`,
+      },
+    };
+  }
+
+  // List all active stays with real-time live billing calculation
+  async getActiveFolios(search?: string) {
+    const where: any = {
+      bookingStatus: { in: ['CHECKED_IN', 'RESERVED'] },
+    };
+
+    if (search && search.trim()) {
+      const term = search.trim();
+      where.OR = [
+        { bookingNumber: { contains: term, mode: 'insensitive' } },
+        { primaryGuest: { fullName: { contains: term, mode: 'insensitive' } } },
+        { primaryGuest: { mobileNumber: { contains: term } } },
+        { room: { roomNumber: { contains: term, mode: 'insensitive' } } },
+      ];
+    }
+
+    const bookings = await this.prisma.booking.findMany({
+      where,
+      orderBy: { checkInDate: 'asc' },
+      select: { id: true },
+    });
+
+    const folios = await Promise.all(bookings.map((b) => this.getLiveBillingFolio(b.id)));
+
+    // Calculate aggregated KPIs across all active folios
+    const totalActiveFolios = folios.length;
+    const totalLiveRoomCharges = Math.round(folios.reduce((s, f) => s + f.roomCharges, 0) * 100) / 100;
+    const totalLiveAdditionalCharges =
+      Math.round(folios.reduce((s, f) => s + f.totalAdditionalCharges, 0) * 100) / 100;
+    const totalPaymentsReceived =
+      Math.round(folios.reduce((s, f) => s + f.payments.totalPaymentsReceived, 0) * 100) / 100;
+    const totalRemainingBalance =
+      Math.round(folios.reduce((s, f) => s + Math.max(0, f.remainingBalance), 0) * 100) / 100;
+
+    return {
+      folios,
+      kpis: {
+        totalActiveFolios,
+        totalLiveRoomCharges,
+        totalLiveAdditionalCharges,
+        totalPaymentsReceived,
+        totalRemainingBalance,
+      },
+    };
+  }
+
+  // Quick post item/service and instantly recalculate guest billing record
+  async quickPostCharge(dto: QuickPostChargeDto) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: dto.bookingId },
+    });
+
+    if (!booking) {
+      throw new NotFoundException(`Booking with ID ${dto.bookingId} not found`);
+    }
+
+    const totalAmount = Math.round(Number(dto.unitPrice) * dto.quantity * 100) / 100;
+    const now = new Date();
+    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    // Create BookingItem
+    const bookingItem = await this.prisma.bookingItem.create({
+      data: {
+        bookingId: dto.bookingId,
+        itemId: dto.itemId || null,
+        itemNameSnapshot: dto.itemName.trim(),
+        quantity: dto.quantity,
+        unitPrice: dto.unitPrice,
+        totalAmount,
+        purchaseDate: now,
+        purchaseTime: timeString,
+        notes: dto.notes ? `${dto.category ? `[${dto.category}] ` : ''}${dto.notes}` : dto.category ? `[${dto.category}]` : null,
+      },
+      include: { item: { include: { category: true } } },
+    });
+
+    // Automatically sync active invoice if one exists
+    await this.syncInvoiceForBooking(dto.bookingId);
+
+    // Return updated live billing breakdown
+    const updatedFolio = await this.getLiveBillingFolio(dto.bookingId);
+
+    return {
+      message: `Charge of ₹${totalAmount} posted successfully. Guest billing record updated automatically.`,
+      bookingItem,
+      updatedFolio,
+    };
+  }
+
+  // Automatically recalculate and sync any active invoice for this booking
+  async syncInvoiceForBooking(bookingId: string) {
+    const invoice = await this.prisma.invoice.findFirst({
+      where: {
+        bookingId,
+        invoiceStatus: { in: ['DRAFT', 'FINALIZED', 'PARTIALLY_PAID'] },
+      },
+      include: { payments: true },
+    });
+
+    if (!invoice) return null;
+
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        bookingItems: true,
+      },
+    });
+
+    if (!booking) return null;
+
+    const roomCharges = Math.round(Number(booking.roomRatePerNight) * booking.numberOfNights * 100) / 100;
+    const additionalCharges = Math.round(
+      booking.bookingItems.reduce((sum, item) => sum + Number(item.totalAmount), 0) * 100,
+    ) / 100;
+    const subtotal = Math.round((roomCharges + additionalCharges) * 100) / 100;
+
+    let discountAmount = 0.0;
+    const discountVal = Number(invoice.discountValue);
+    if (invoice.discountType === 'PERCENTAGE') {
+      discountAmount = Math.round(subtotal * (discountVal / 100) * 100) / 100;
+    } else if (invoice.discountType === 'FIXED') {
+      discountAmount = Math.min(discountVal, subtotal);
+    }
+
+    const taxableAmount = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
+    const taxPercentage = Number(invoice.taxPercentage);
+    const taxAmount = Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
+    const totalAmount = Math.round((taxableAmount + taxAmount) * 100) / 100;
+
+    const totalPaid = Number(invoice.totalPaid);
+    const balanceAmount = Math.round((totalAmount - totalPaid) * 100) / 100;
+
+    let invoiceStatus = invoice.invoiceStatus;
+    if (balanceAmount <= 0) {
+      invoiceStatus = 'PAID';
+    } else if (totalPaid > 0) {
+      invoiceStatus = 'PARTIALLY_PAID';
+    } else {
+      invoiceStatus = 'FINALIZED';
+    }
+
+    return this.prisma.invoice.update({
+      where: { id: invoice.id },
+      data: {
+        roomCharges,
+        additionalCharges,
+        subtotal,
+        discountAmount,
+        taxAmount,
+        totalAmount,
+        balanceAmount,
+        invoiceStatus,
+      },
     });
   }
 
