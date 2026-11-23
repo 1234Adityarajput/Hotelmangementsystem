@@ -144,27 +144,39 @@ export default function StaysPage() {
   const handleOpenWalkIn = async () => {
     try {
       const [gRes, rRes] = await Promise.all([
-        guestsService.findAll({ limit: 100 }),
-        roomsService.findAvailable(),
+        guestsService.findAll({ limit: 100 }).catch(() => ({ items: [], total: 0 })),
+        roomsService.findAvailable().catch(() => []),
       ]);
-      if (gRes.items.length === 0) {
+
+      const guestList: Guest[] = Array.isArray(gRes?.items)
+        ? gRes.items
+        : Array.isArray(gRes)
+        ? (gRes as any)
+        : [];
+      const roomList: Room[] = Array.isArray(rRes)
+        ? rRes
+        : Array.isArray((rRes as any)?.items)
+        ? (rRes as any).items
+        : [];
+
+      if (guestList.length === 0) {
         toast.info("No registered guests found. Please add a guest in the Guest Directory first.");
       }
-      if (rRes.length === 0) {
+      if (roomList.length === 0) {
         toast.warning("All rooms are currently occupied or under maintenance. No rooms available.");
       }
-      setAllGuests(gRes.items);
-      setAllAvailableRooms(rRes);
-      if (rRes.length > 0) {
-        setWalkInForm((prev) => ({
-          ...prev,
-          primaryGuestId: gRes.items[0]?.id || "",
-          roomId: rRes[0].id,
-          roomRatePerNight: Number(rRes[0].pricePerNight),
-        }));
-      }
+
+      setAllGuests(guestList);
+      setAllAvailableRooms(roomList);
+      setWalkInForm((prev) => ({
+        ...prev,
+        primaryGuestId: guestList[0]?.id || "",
+        roomId: roomList[0]?.id || "",
+        roomRatePerNight: roomList[0] ? Number(roomList[0].pricePerNight) : prev.roomRatePerNight,
+      }));
       setWalkInModalOpen(true);
     } catch (err: any) {
+      console.error("Failed to prepare walk-in check-in:", err);
       const msg = err.response?.data?.message || err.message || "Failed to prepare walk-in check-in";
       toast.error(msg);
     }

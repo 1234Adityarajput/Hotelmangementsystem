@@ -104,16 +104,19 @@ export default function AutomaticBillingPage() {
     try {
       setLoading(true);
       const [folioRes, catItems, catList, invRes, payRes] = await Promise.all([
-        billingService.getActiveFolios(search || undefined),
-        itemsService.findAllItems(),
-        itemsService.findAllCategories(),
-        billingService.findAll({ limit: 50 }),
-        paymentsService.findAll({ limit: 50 }),
+        billingService.getActiveFolios(search || undefined).catch((e) => {
+          console.warn("Active folios fetch error:", e);
+          return { folios: [], kpis: null };
+        }),
+        itemsService.findAllItems().catch(() => []),
+        itemsService.findAllCategories().catch(() => []),
+        billingService.findAll({ limit: 50 }).catch(() => ({ items: [], total: 0 })),
+        paymentsService.findAll({ limit: 50 }).catch(() => ({ items: [], total: 0 })),
       ]);
 
-      setFolios(folioRes.folios || []);
+      setFolios(folioRes?.folios || []);
       setKpis(
-        folioRes.kpis || {
+        folioRes?.kpis || {
           totalActiveFolios: 0,
           totalLiveRoomCharges: 0,
           totalLiveAdditionalCharges: 0,
@@ -121,12 +124,13 @@ export default function AutomaticBillingPage() {
           totalRemainingBalance: 0,
         }
       );
-      setCatalogItems(catItems || []);
-      setCategories(catList || []);
-      setInvoices(invRes.items || []);
-      setPayments(payRes.items || []);
-    } catch (err) {
-      toast.error("Failed to load real-time billing folios");
+      setCatalogItems(Array.isArray(catItems) ? catItems : (catItems as any)?.items || []);
+      setCategories(Array.isArray(catList) ? catList : (catList as any)?.items || []);
+      setInvoices(invRes?.items || (Array.isArray(invRes) ? invRes : []));
+      setPayments(payRes?.items || (Array.isArray(payRes) ? payRes : []));
+    } catch (err: any) {
+      console.error("Failed to load real-time billing folios:", err);
+      toast.error(err?.response?.data?.message || err?.message || "Failed to load real-time billing folios");
     } finally {
       setLoading(false);
     }

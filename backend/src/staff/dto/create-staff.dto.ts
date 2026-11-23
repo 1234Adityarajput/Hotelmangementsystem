@@ -11,6 +11,11 @@ import {
 import { Type } from 'class-transformer';
 
 export class CreateStaffDto {
+  @ApiPropertyOptional({ example: 'EMP-2026-0001', description: 'Custom Employee ID or auto-generated' })
+  @IsOptional()
+  @IsString()
+  employeeCode?: string;
+
   @ApiProperty({ example: 'Rahul Sharma', description: 'Employee full name' })
   @IsString()
   @IsNotEmpty({ message: 'Full name is required' })
@@ -86,4 +91,9 @@ export class CreateStaffDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @ApiPropertyOptional({ example: 'ACTIVE', enum: ['ACTIVE', 'INACTIVE', 'TERMINATED', 'RESIGNED'] })
+  @IsOptional()
+  @IsString()
+  employmentStatus?: 'ACTIVE' | 'INACTIVE' | 'TERMINATED' | 'RESIGNED';
 }

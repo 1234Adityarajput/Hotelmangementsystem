@@ -41,7 +41,17 @@ export class StaffService {
       throw new ConflictException(`Staff member with mobile number ${dto.mobileNumber} already registered (${existing.employeeCode})`);
     }
 
-    const employeeCode = await this.generateEmployeeCode();
+    let employeeCode = dto.employeeCode?.trim();
+    if (employeeCode) {
+      const codeExists = await this.prisma.staff.findUnique({
+        where: { employeeCode },
+      });
+      if (codeExists) {
+        throw new ConflictException(`Employee ID ${employeeCode} already exists`);
+      }
+    } else {
+      employeeCode = await this.generateEmployeeCode();
+    }
 
     const staff = await this.prisma.staff.create({
       data: {
@@ -61,7 +71,7 @@ export class StaffService {
         bankAccountNumber: dto.bankAccountNumber,
         bankIfscCode: dto.bankIfscCode,
         notes: dto.notes,
-        employmentStatus: 'ACTIVE',
+        employmentStatus: dto.employmentStatus || 'ACTIVE',
       },
     });
 
