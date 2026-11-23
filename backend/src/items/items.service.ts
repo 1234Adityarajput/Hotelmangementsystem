@@ -1,0 +1,196 @@
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { PrismaService } from '../database/prisma.service';
+import { CreateItemCategoryDto } from './dto/create-category.dto';
+import { UpdateItemCategoryDto } from './dto/update-category.dto';
+import { CreateItemDto } from './dto/create-item.dto';
+import { UpdateItemDto } from './dto/update-item.dto';
+import { CreateBookingItemDto } from './dto/create-booking-item.dto';
+
+@Injectable()
+export class ItemsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  // ==========================================================================
+  // ITEM CATEGORIES
+  // ==========================================================================
+  async findAllCategories() {
+    return this.prisma.itemCategory.findMany({
+      orderBy: { name: 'asc' },
+      include: {
+        _count: {
+          select: { items: true },
+        },
+      },
+    });
+  }
+
+  async createCategory(dto: CreateItemCategoryDto) {
+    const existing = await this.prisma.itemCategory.findUnique({ where: { name: dto.name.trim() } });
+    if (existing) {
+      throw new ConflictException(`Item category "${dto.name}" already exists`);
+    }
+
+    return this.prisma.itemCategory.create({
+      data: {
+        name: dto.name.trim(),
+        description: dto.description,
+        isActive: dto.isActive !== undefined ? dto.isActive : true,
+      },
+    });
+  }
+
+  async updateCategory(id: string, dto: UpdateItemCategoryDto) {
+    const existing = await this.prisma.itemCategory.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Item category with ID ${id} not found`);
+    }
+
+    if (dto.name && dto.name.trim() !== existing.name) {
+      const conflict = await this.prisma.itemCategory.findUnique({ where: { name: dto.name.trim() } });
+      if (conflict) {
+        throw new ConflictException(`Item category "${dto.name}" already exists`);
+      }
+    }
+
+    return this.prisma.itemCategory.update({
+      where: { id },
+      data: {
+        ...(dto.name !== undefined && { name: dto.name.trim() }),
+        ...(dto.description !== undefined && { description: dto.description }),
+        ...(dto.isActive !== undefined && { isActive: dto.isActive }),
+      },
+    });
+  }
+
+  async deleteCategory(id: string) {
+    const itemCount = await this.prisma.item.count({ where: { categoryId: id } });
+    if (itemCount > 0) {
+      throw new ConflictException(`Cannot delete category with ${itemCount} associated items. Deactivate instead.`);
+    }
+
+    await this.prisma.itemCategory.delete({ where: { id } });
+    return { success: true, message: 'Category deleted successfully' };
+  }
+
+  // ==========================================================================
+  // ITEMS CATALOG
+  // ==========================================================================
+  async findAllItems(categoryId?: string, search?: string) {
+    const where: any = {};
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+    if (search) {
+      where.name = { contains: search.trim(), mode: 'insensitive' };
+    }
+
+    return this.prisma.item.findMany({
+      where,
+      orderBy: { name: 'asc' },
+      include: { category: true },
+    });
+  }
+
+  async findOneItem(id: string) {
+    const item = await this.prisma.item.findUnique({
+      where: { id },
+      include: { category: true },
+    });
+    if (!item) {
+      throw new NotFoundException(`Item with ID ${id} not found`);
+    }
+    return item;
+  }
+
+  async createItem(dto: CreateItemDto) {
+    const category = await this.prisma.itemCategory.findUnique({ where: { id: dto.categoryId } });
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${dto.categoryId} not found`);
+    }
+
+    return this.prisma.item.create({
+      data: {
+        categoryId: dto.categoryId,
+        name: dto.name.trim(),
+        description: dto.description,
+        unitPrice: dto.unitPrice,
+        isActive: dto.isActive !== undefined ? dto.isActive : true,
+      },
+      include: { category: true },
+    });
+  }
+
+  async updateItem(id: string, dto: UpdateItemDto) {
+    const existing = await this.prisma.item.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Item with ID ${id} not found`);
+    }
+
+    return this.prisma.item.update({
+      where: { id },
+      data: {
+        ...(dto.categoryId !== undefined && { categoryId: dto.categoryId }),
+        ...(dto.name !== undefined && { name: dto.name.trim() }),
+        ...(dto.description !== undefined && { description: dto.description }),
+        ...(dto.unitPrice !== undefined && { unitPrice: dto.unitPrice }),
+        ...(dto.isActive !== undefined && { isActive: dto.isActive }),
+      },
+      include: { category: true },
+    });
+  }
+
+  async deleteItem(id: string) {
+    await this.prisma.item.update({
+      where: { id },
+      data: { isActive: false },
+    });
+    return { success: true, message: 'Item deactivated successfully' };
+  }
+
+  // ==========================================================================
+  // BOOKING ITEMS (ROOM SERVICE & EXTRA ORDERS)
+  // ==========================================================================
+  async findBookingItems(bookingId: string) {
+    return this.prisma.bookingItem.findMany({
+      where: { bookingId },
+      include: { item: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async addBookingItem(dto: CreateBookingItemDto) {
+    const booking = await this.prisma.booking.findUnique({ where: { id: dto.bookingId } });
+    if (!booking) {
+      throw new NotFoundException(`Booking with ID ${dto.bookingId} not found`);
+    }
+
+    const totalAmount = Number(dto.unitPrice) * dto.quantity;
+    const now = new Date();
+    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    return this.prisma.bookingItem.create({
+      data: {
+        bookingId: dto.bookingId,
+        itemId: dto.itemId,
+        itemNameSnapshot: dto.itemName,
+        quantity: dto.quantity,
+        unitPrice: dto.unitPrice,
+        totalAmount,
+        purchaseDate: now,
+        purchaseTime: timeString,
+        notes: dto.notes,
+      },
+      include: { item: true },
+    });
+  }
+
+  async deleteBookingItem(id: string) {
+    const item = await this.prisma.bookingItem.findUnique({ where: { id } });
+    if (!item) {
+      throw new NotFoundException(`Booking item with ID ${id} not found`);
+    }
+
+    await this.prisma.bookingItem.delete({ where: { id } });
+    return { success: true, message: 'Booking item removed successfully' };
+  }
+}

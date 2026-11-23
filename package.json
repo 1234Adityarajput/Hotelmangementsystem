@@ -1,0 +1,32 @@
+{
+  "name": "hotel-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Modular Monolithic Hotel Management Software",
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run start:dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "lint:frontend": "npm --prefix frontend run lint",
+    "lint:backend": "npm --prefix backend run lint",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "typecheck:frontend": "npm --prefix frontend run typecheck",
+    "typecheck:backend": "npm --prefix backend run typecheck",
+    "typecheck": "npm run typecheck:backend && npm run typecheck:frontend",
+    "prisma:generate": "npm --prefix backend run prisma:generate",
+    "prisma:migrate": "npm --prefix backend run prisma:migrate",
+    "prisma:seed": "npm --prefix backend run prisma:seed"
+  },
+  "keywords": [
+    "hotel-management",
+    "modular-monolith",
+    "nestjs",
+    "nextjs",
+    "prisma",
+    "postgresql"
+  ],
+  "author": "Solo Developer",
+  "license": "UNLICENSED"
+}
