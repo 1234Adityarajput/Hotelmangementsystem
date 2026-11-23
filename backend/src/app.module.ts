@@ -13,6 +13,15 @@ import { BookingsModule } from './bookings/bookings.module';
 import { ItemsModule } from './items/items.module';
 import { BillingModule } from './billing/billing.module';
 import { PaymentsModule } from './payments/payments.module';
+import { StaffModule } from './staff/staff.module';
+import { AttendanceModule } from './attendance/attendance.module';
+import { StaffAdvancesModule } from './advances/staff-advances.module';
+import { PayrollModule } from './payroll/payroll.module';
+import { ExpensesModule } from './expenses/expenses.module';
+import { RegistersModule } from './registers/registers.module';
+import { ReportsModule } from './reports/reports.module';
+import { SettingsModule } from './settings/settings.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -37,6 +46,15 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
     ItemsModule,
     BillingModule,
     PaymentsModule,
+    StaffModule,
+    AttendanceModule,
+    StaffAdvancesModule,
+    PayrollModule,
+    ExpensesModule,
+    RegistersModule,
+    ReportsModule,
+    SettingsModule,
+    AuditLogsModule,
   ],
   providers: [
     {

@@ -249,3 +249,178 @@ export interface Payment {
   booking?: Booking;
   invoice?: Invoice;
 }
+
+// ============================================================================
+// MODULE 10: STAFF MANAGEMENT TYPES
+// ============================================================================
+export interface Staff {
+  id: string;
+  employeeCode: string;
+  fullName: string;
+  mobileNumber: string;
+  alternateMobileNumber?: string | null;
+  email?: string | null;
+  address?: string | null;
+  dateOfBirth?: string | null;
+  emergencyContact?: string | null;
+  designation: string;
+  department: string;
+  joiningDate: string;
+  employmentStatus: 'ACTIVE' | 'INACTIVE' | 'TERMINATED' | 'RESIGNED';
+  monthlySalary: number;
+  bankAccountHolder?: string | null;
+  bankAccountNumber?: string | null;
+  bankIfscCode?: string | null;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  _count?: {
+    attendanceRecords: number;
+    salaryRecords: number;
+    advances: number;
+  };
+}
+
+// ============================================================================
+// MODULE 11: ATTENDANCE TYPES
+// ============================================================================
+export interface Attendance {
+  id: string;
+  staffId: string;
+  attendanceDate: string;
+  attendanceStatus: 'PRESENT' | 'ABSENT' | 'HALF_DAY' | 'LEAVE' | 'WEEKLY_OFF';
+  checkInTime?: string | null;
+  checkOutTime?: string | null;
+  workingHours?: number | null;
+  overtimeHours: number;
+  notes?: string | null;
+  createdAt: string;
+  staff?: Staff;
+}
+
+// ============================================================================
+// MODULE 12: STAFF ADVANCE TYPES
+// ============================================================================
+export interface StaffAdvance {
+  id: string;
+  staffId: string;
+  advanceReference: string;
+  amount: number;
+  advanceDate: string;
+  paymentMethod: 'CASH' | 'UPI' | 'BANK_TRANSFER' | 'OTHER';
+  repaymentStatus: 'PENDING' | 'PARTIALLY_REPAID' | 'REPAID' | 'WAIVED';
+  recoveredAmount: number;
+  balanceAmount: number;
+  salaryRecordId?: string | null;
+  notes?: string | null;
+  createdAt: string;
+  staff?: Staff;
+  salaryRecord?: SalaryRecord | null;
+}
+
+// ============================================================================
+// MODULE 13: PAYROLL & SALARY TYPES
+// ============================================================================
+export interface SalaryPayment {
+  id: string;
+  salaryRecordId: string;
+  paymentReference: string;
+  paymentAmount: number;
+  paymentMethod: 'CASH' | 'UPI' | 'BANK_TRANSFER' | 'OTHER';
+  paymentDate: string;
+  transactionReference?: string | null;
+  notes?: string | null;
+  createdAt: string;
+}
+
+export interface SalaryRecord {
+  id: string;
+  staffId: string;
+  payrollMonth: number;
+  payrollYear: number;
+  monthlyBasicSalary: number;
+  configuredSalaryDays: number;
+  payableDays: number;
+  presentDays: number;
+  absentDays: number;
+  halfDays: number;
+  paidLeaves: number;
+  unpaidLeaves: number;
+  overtimeHours: number;
+  overtimeAmount: number;
+  grossSalary: number;
+  deductions: number;
+  advanceDeductions: number;
+  netSalary: number;
+  totalPaid: number;
+  balanceAmount: number;
+  payrollStatus: 'DRAFT' | 'FINALIZED' | 'PAID' | 'CANCELLED';
+  finalizedAt?: string | null;
+  createdAt: string;
+  staff?: Staff;
+  salaryPayments?: SalaryPayment[];
+  staffAdvances?: StaffAdvance[];
+}
+
+// ============================================================================
+// MODULE 14: EXPENSE TYPES
+// ============================================================================
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  description?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  _count?: { expenses: number };
+}
+
+export interface Expense {
+  id: string;
+  expenseReference: string;
+  expenseCategoryId: string;
+  description: string;
+  amount: number;
+  paymentMethod: 'CASH' | 'UPI' | 'BANK_TRANSFER' | 'OTHER';
+  paymentDate: string;
+  transactionReference?: string | null;
+  notes?: string | null;
+  createdAt: string;
+  category?: ExpenseCategory;
+}
+
+// ============================================================================
+// MODULE 18: HOTEL SETTINGS TYPES
+// ============================================================================
+export interface HotelSetting {
+  id: string;
+  isSingleton: boolean;
+  hotelName: string;
+  hotelAddress?: string | null;
+  mobileNumber?: string | null;
+  email?: string | null;
+  logoFileReference?: string | null;
+  currencyCode: string;
+  timezone: string;
+  defaultCheckInTime: string;
+  defaultCheckOutTime: string;
+  taxEnabled: boolean;
+  defaultTaxPercentage: number;
+  defaultSalaryDays: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================================================
+// MODULE 19: AUDIT LOG TYPES
+// ============================================================================
+export interface AuditLog {
+  id: string;
+  entityType: string;
+  entityId: string;
+  action: 'CREATE' | 'UPDATE' | 'DELETE' | 'FINALIZE' | 'CANCEL' | 'CORRECTION';
+  previousValues?: any;
+  newValues?: any;
+  changedAt: string;
+  description?: string | null;
+}
+
