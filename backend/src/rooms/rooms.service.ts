@@ -218,6 +218,13 @@ export class RoomsService {
     return this.update(id, { roomStatus: status });
   }
 
+  async updatePrice(id: string, pricePerNight: number) {
+    if (pricePerNight === undefined || pricePerNight === null || isNaN(Number(pricePerNight))) {
+      throw new BadRequestException('Valid pricePerNight is required');
+    }
+    return this.update(id, { pricePerNight: Number(pricePerNight) });
+  }
+
   async remove(id: string) {
     const activeBooking = await this.prisma.booking.findFirst({
       where: {

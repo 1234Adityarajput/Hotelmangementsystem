@@ -14,6 +14,19 @@ import {
   Edit2,
   Layers,
   Sparkles,
+  Calendar,
+  Eye,
+  Users,
+  Trash2,
+  LayoutGrid,
+  List,
+  IndianRupee,
+  ShieldAlert,
+  ArrowRight,
+  UserCheck,
+  Check,
+  X,
+  FileText,
 } from "lucide-react";
 import { roomsService } from "@/services/rooms.service";
 import { Room, RoomType } from "@/types";
@@ -33,6 +46,7 @@ import {
 
 export default function RoomsPage() {
   const [activeTab, setActiveTab] = useState<"rooms" | "types">("rooms");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,9 +54,17 @@ export default function RoomsPage() {
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [typeFilter, setTypeFilter] = useState<string>("ALL");
+  const [floorFilter, setFloorFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
 
-  // Room modal
+  // Check Room Availability date-range explorer
+  const [availabilityExplorerOpen, setAvailabilityExplorerOpen] = useState(false);
+  const [availCheckIn, setAvailCheckIn] = useState("");
+  const [availCheckOut, setAvailCheckOut] = useState("");
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [availableRoomsResult, setAvailableRoomsResult] = useState<Room[] | null>(null);
+
+  // Add / Edit Room modal
   const [roomModalOpen, setRoomModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [roomForm, setRoomForm] = useState({
@@ -54,7 +76,16 @@ export default function RoomsPage() {
     roomStatus: "AVAILABLE" as "AVAILABLE" | "OCCUPIED" | "MAINTENANCE",
   });
 
-  // Type modal
+  // Quick Price Update modal
+  const [quickPriceModalOpen, setQuickPriceModalOpen] = useState(false);
+  const [priceRoom, setPriceRoom] = useState<Room | null>(null);
+  const [newPrice, setNewPrice] = useState<number>(2000);
+
+  // Room Dossier / View Details modal
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [selectedRoomDetails, setSelectedRoomDetails] = useState<Room | null>(null);
+
+  // Room Type modal
   const [typeModalOpen, setTypeModalOpen] = useState(false);
   const [editingType, setEditingType] = useState<RoomType | null>(null);
   const [typeForm, setTypeForm] = useState({
@@ -73,6 +104,7 @@ export default function RoomsPage() {
         roomsService.findAll({
           status: statusFilter !== "ALL" ? (statusFilter as any) : undefined,
           roomTypeId: typeFilter !== "ALL" ? typeFilter : undefined,
+          floor: floorFilter !== "ALL" ? Number(floorFilter) : undefined,
           search: search || undefined,
           limit: 100,
         }),
@@ -81,7 +113,7 @@ export default function RoomsPage() {
       setRooms(rRes.items);
       setRoomTypes(tRes);
     } catch (err) {
-      toast.error("Failed to load room inventory");
+      toast.error("Failed to load room inventory from database");
     } finally {
       setLoading(false);
     }
@@ -89,15 +121,64 @@ export default function RoomsPage() {
 
   useEffect(() => {
     fetchData();
-  }, [statusFilter, typeFilter, search]);
+  }, [statusFilter, typeFilter, floorFilter, search]);
 
+  // Availability statistics
+  const totalRoomsCount = rooms.length;
+  const availableRoomsCount = rooms.filter((r) => r.roomStatus === "AVAILABLE").length;
+  const occupiedRoomsCount = rooms.filter((r) => r.roomStatus === "OCCUPIED").length;
+  const maintenanceRoomsCount = rooms.filter((r) => r.roomStatus === "MAINTENANCE").length;
+  const occupancyPercentage =
+    totalRoomsCount > 0 ? Math.round((occupiedRoomsCount / totalRoomsCount) * 100) : 0;
+
+  // Floors list
+  const uniqueFloors = Array.from(new Set(rooms.map((r) => r.floor))).sort((a, b) => a - b);
+
+  // Check Availability for date range
+  const handleCheckAvailability = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!availCheckIn || !availCheckOut) {
+      toast.error("Please select both Check-in and Check-out dates");
+      return;
+    }
+    if (new Date(availCheckIn) >= new Date(availCheckOut)) {
+      toast.error("Check-out date must be after Check-in date");
+      return;
+    }
+
+    try {
+      setCheckingAvailability(true);
+      const res = await roomsService.findAvailable({
+        checkIn: availCheckIn,
+        checkOut: availCheckOut,
+        roomTypeId: typeFilter !== "ALL" ? typeFilter : undefined,
+      });
+      setAvailableRoomsResult(res);
+      toast.success(`Found ${res.length} available room(s) for selected dates`);
+    } catch (err) {
+      toast.error("Failed to calculate room availability");
+    } finally {
+      setCheckingAvailability(false);
+    }
+  };
+
+  const handleClearAvailabilityFilter = () => {
+    setAvailableRoomsResult(null);
+    setAvailCheckIn("");
+    setAvailCheckOut("");
+    setAvailabilityExplorerOpen(false);
+  };
+
+  // Add / Edit Room
   const handleOpenAddRoom = () => {
     setEditingRoom(null);
     setRoomForm({
       roomNumber: "",
       roomTypeId: roomTypes[0]?.id || "",
       floor: 1,
-      pricePerNight: roomTypes[0]?.defaultPricePerNight ? Number(roomTypes[0].defaultPricePerNight) : 2000,
+      pricePerNight: roomTypes[0]?.defaultPricePerNight
+        ? Number(roomTypes[0].defaultPricePerNight)
+        : 2000,
       description: "",
       roomStatus: "AVAILABLE",
     });
@@ -120,28 +201,120 @@ export default function RoomsPage() {
   const handleSaveRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!roomForm.roomNumber.trim()) {
-      toast.error("Room number is required");
+      toast.error("Room Number is required");
+      return;
+    }
+    if (!roomForm.roomTypeId) {
+      toast.error("Please select a Room Type");
       return;
     }
 
     try {
       setSubmitting(true);
       if (editingRoom) {
-        await roomsService.update(editingRoom.id, roomForm);
+        await roomsService.update(editingRoom.id, {
+          ...roomForm,
+          pricePerNight: Number(roomForm.pricePerNight),
+          floor: Number(roomForm.floor),
+        });
         toast.success(`Room ${roomForm.roomNumber} updated successfully`);
       } else {
-        await roomsService.create(roomForm);
+        await roomsService.create({
+          ...roomForm,
+          pricePerNight: Number(roomForm.pricePerNight),
+          floor: Number(roomForm.floor),
+        });
         toast.success(`Room ${roomForm.roomNumber} added to inventory`);
       }
       setRoomModalOpen(false);
       fetchData();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Error saving room");
+      toast.error(err.response?.data?.message || "Error saving room details");
     } finally {
       setSubmitting(false);
     }
   };
 
+  // Quick Price Update
+  const handleOpenQuickPrice = (r: Room) => {
+    setPriceRoom(r);
+    setNewPrice(Number(r.pricePerNight));
+    setQuickPriceModalOpen(true);
+  };
+
+  const handleSaveQuickPrice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!priceRoom) return;
+
+    if (newPrice < 0 || isNaN(newPrice)) {
+      toast.error("Please enter a valid price per night");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await roomsService.updatePrice(priceRoom.id, Number(newPrice));
+      toast.success(
+        `Room ${priceRoom.roomNumber} price updated to ₹${Number(newPrice).toLocaleString("en-IN")}`
+      );
+      setQuickPriceModalOpen(false);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to update price");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Quick Status Toggle
+  const handleQuickStatusChange = async (
+    room: Room,
+    newStatus: "AVAILABLE" | "OCCUPIED" | "MAINTENANCE"
+  ) => {
+    try {
+      await roomsService.updateStatus(room.id, newStatus);
+      const statusLabel =
+        newStatus === "AVAILABLE"
+          ? "Available"
+          : newStatus === "MAINTENANCE"
+          ? "Under Maintenance"
+          : "Occupied";
+      toast.success(`Room ${room.roomNumber} is now ${statusLabel}`);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Cannot change room status");
+    }
+  };
+
+  // Room Dossier / View Details
+  const handleOpenDetails = async (roomId: string) => {
+    try {
+      const r = await roomsService.findOne(roomId);
+      setSelectedRoomDetails(r);
+      setDetailsModalOpen(true);
+    } catch (err) {
+      toast.error("Could not load full room details");
+    }
+  };
+
+  // Deactivate Room
+  const handleDeactivateRoom = async (room: Room) => {
+    if (room.roomStatus === "OCCUPIED") {
+      toast.error(`Cannot deactivate Room ${room.roomNumber} because it is currently occupied`);
+      return;
+    }
+    if (!confirm(`Are you sure you want to deactivate Room ${room.roomNumber}?`)) return;
+
+    try {
+      await roomsService.remove(room.id);
+      toast.success(`Room ${room.roomNumber} deactivated`);
+      fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Cannot deactivate room");
+    }
+  };
+
+  // Room Type CRUD
   const handleOpenAddType = () => {
     setEditingType(null);
     setTypeForm({
@@ -174,10 +347,18 @@ export default function RoomsPage() {
     try {
       setSubmitting(true);
       if (editingType) {
-        await roomsService.updateType(editingType.id, typeForm);
+        await roomsService.updateType(editingType.id, {
+          ...typeForm,
+          defaultPricePerNight: Number(typeForm.defaultPricePerNight),
+          capacity: Number(typeForm.capacity),
+        });
         toast.success(`Room type "${typeForm.name}" updated`);
       } else {
-        await roomsService.createType(typeForm);
+        await roomsService.createType({
+          ...typeForm,
+          defaultPricePerNight: Number(typeForm.defaultPricePerNight),
+          capacity: Number(typeForm.capacity),
+        });
         toast.success(`Room type "${typeForm.name}" created`);
       }
       setTypeModalOpen(false);
@@ -189,101 +370,355 @@ export default function RoomsPage() {
     }
   };
 
-  const handleQuickStatusChange = async (room: Room, newStatus: "AVAILABLE" | "OCCUPIED" | "MAINTENANCE") => {
-    try {
-      await roomsService.updateStatus(room.id, newStatus);
-      toast.success(`Room ${room.roomNumber} marked as ${newStatus}`);
-      fetchData();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Cannot change status");
-    }
-  };
+  // Display rooms (either available search result or full list)
+  const displayRooms = availableRoomsResult !== null ? availableRoomsResult : rooms;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* Editorial Luxury Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
-            Room Inventory & Categories
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold tracking-wider text-[#B08A60] uppercase bg-[#EEE7DA] px-2.5 py-0.5 rounded-full">
+              Hospitality Operations • Room Management
+            </span>
+            <span className="text-[11px] text-[#79695B]">• Live Inventory & Availability</span>
+          </div>
+          <h2 className="text-3xl font-serif font-bold tracking-tight text-[#362A22] mt-1">
+            Room Inventory & Status Control
           </h2>
-          <p className="text-xs text-[#79695B] mt-0.5">
-            Configure room numbers, floors, nightly rates, live statuses, and room categories.
+          <p className="text-xs text-[#79695B] mt-1 max-w-2xl">
+            Maintain complete hotel room details: room numbers, room types, descriptions, nightly prices, live room statuses (Available, Occupied, Under Maintenance), and check room availability.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex items-center gap-2.5">
+          <Button
+            variant="outline"
+            onClick={() => setAvailabilityExplorerOpen(!availabilityExplorerOpen)}
+            className="border-[#B08A60] text-[#362A22] hover:bg-[#EEE7DA] flex items-center gap-1.5 text-xs h-9"
+          >
+            <Calendar className="w-4 h-4 text-[#B08A60]" />
+            <span>Check Room Availability</span>
+          </Button>
+
           {activeTab === "rooms" ? (
             <Button
               onClick={handleOpenAddRoom}
-              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm"
+              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-2 shadow-sm font-medium px-4 h-9"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-[#B08A60]" />
               <span>Add Room</span>
             </Button>
           ) : (
             <Button
               onClick={handleOpenAddType}
-              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm"
+              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-2 shadow-sm font-medium px-4 h-9"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-[#B08A60]" />
               <span>Add Room Type</span>
             </Button>
           )}
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#E3D9CA] pb-2">
-        <button
-          onClick={() => setActiveTab("rooms")}
-          className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
-            activeTab === "rooms"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "text-[#79695B] hover:bg-slate-100"
-          }`}
+      {/* KPI Room Availability & Status Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
+        {/* Total Rooms */}
+        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#EEE7DA] flex items-center justify-center text-[#362A22]">
+              <BedDouble className="w-5 h-5 text-[#B08A60]" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-[#948779] tracking-wider">Total Rooms</p>
+              <h3 className="text-xl font-serif font-bold text-[#362A22]">{totalRoomsCount}</h3>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Available Rooms */}
+        <Card
+          onClick={() => setStatusFilter("AVAILABLE")}
+          className="bg-white border-[#E3D9CA] shadow-sm cursor-pointer hover:border-[#32765B] transition-colors"
         >
-          <BedDouble className="w-3.5 h-3.5" />
-          <span>Rooms ({rooms.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("types")}
-          className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
-            activeTab === "types"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "text-[#79695B] hover:bg-slate-100"
-          }`}
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#E7F1E9] flex items-center justify-center text-[#32765B]">
+              <CheckCircle2 className="w-5 h-5 text-[#32765B]" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-[#32765B] tracking-wider flex items-center gap-1">
+                <span>Available</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#32765B] animate-pulse" />
+              </p>
+              <h3 className="text-xl font-serif font-bold text-[#32765B]">{availableRoomsCount}</h3>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Occupied Rooms */}
+        <Card
+          onClick={() => setStatusFilter("OCCUPIED")}
+          className="bg-white border-[#E3D9CA] shadow-sm cursor-pointer hover:border-[#627D91] transition-colors"
         >
-          <Layers className="w-3.5 h-3.5" />
-          <span>Room Types ({roomTypes.length})</span>
-        </button>
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#E9EFF3] flex items-center justify-center text-[#627D91]">
+              <UserCheck className="w-5 h-5 text-[#627D91]" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-[#627D91] tracking-wider">Occupied</p>
+              <h3 className="text-xl font-serif font-bold text-[#362A22]">{occupiedRoomsCount}</h3>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Under Maintenance */}
+        <Card
+          onClick={() => setStatusFilter("MAINTENANCE")}
+          className="bg-white border-[#E3D9CA] shadow-sm cursor-pointer hover:border-[#A97832] transition-colors"
+        >
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#F6EDDC] flex items-center justify-center text-[#A97832]">
+              <Wrench className="w-5 h-5 text-[#A97832]" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-[#A97832] tracking-wider">
+                Under Maintenance
+              </p>
+              <h3 className="text-xl font-serif font-bold text-[#A97832]">{maintenanceRoomsCount}</h3>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Occupancy Rate */}
+        <Card className="bg-white border-[#E3D9CA] shadow-sm col-span-2 sm:col-span-1">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#EEE7DA] flex items-center justify-center text-[#362A22]">
+              <DoorOpen className="w-5 h-5 text-[#B08A60]" />
+            </div>
+            <div>
+              <p className="text-[10px] uppercase font-bold text-[#948779] tracking-wider">Live Occupancy</p>
+              <h3 className="text-xl font-serif font-bold text-[#362A22]">{occupancyPercentage}%</h3>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
+      {/* Date Range Room Availability Explorer Panel */}
+      {availabilityExplorerOpen && (
+        <Card className="bg-[#F7F4EE] border-[#B08A60] shadow-md animate-in fade-in slide-in-from-top-2 duration-200">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between border-b border-[#E3D9CA] pb-2">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[#B08A60]" />
+                <h4 className="text-sm font-bold text-[#362A22]">
+                  Check Room Availability for Stay Dates
+                </h4>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearAvailabilityFilter}
+                className="h-7 text-xs text-[#79695B] hover:text-[#362A22]"
+              >
+                <X className="w-3.5 h-3.5 mr-1" />
+                Close Explorer
+              </Button>
+            </div>
+
+            <form
+              onSubmit={handleCheckAvailability}
+              className="flex flex-wrap items-end gap-3 text-xs"
+            >
+              <div className="space-y-1">
+                <label className="font-semibold text-[#362A22]">Check-In Date *</label>
+                <Input
+                  type="date"
+                  required
+                  value={availCheckIn}
+                  onChange={(e) => setAvailCheckIn(e.target.value)}
+                  className="h-8 text-xs bg-white border-[#E3D9CA] w-40"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-[#362A22]">Check-Out Date *</label>
+                <Input
+                  type="date"
+                  required
+                  value={availCheckOut}
+                  onChange={(e) => setAvailCheckOut(e.target.value)}
+                  className="h-8 text-xs bg-white border-[#E3D9CA] w-40"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-[#362A22]">Room Type (Optional)</label>
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22] w-44"
+                >
+                  <option value="ALL">All Categories</option>
+                  {roomTypes.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={checkingAvailability}
+                size="sm"
+                className="h-8 text-xs bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5"
+              >
+                {checkingAvailability ? (
+                  <LoadingSpinner className="w-3.5 h-3.5" />
+                ) : (
+                  <Search className="w-3.5 h-3.5 text-[#B08A60]" />
+                )}
+                <span>Check Availability</span>
+              </Button>
+
+              {availableRoomsResult !== null && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearAvailabilityFilter}
+                  className="h-8 text-xs border-[#E3D9CA] text-[#79695B]"
+                >
+                  Reset Filter
+                </Button>
+              )}
+            </form>
+
+            {availableRoomsResult !== null && (
+              <div className="p-2.5 bg-[#E7F1E9] border border-[#32765B]/30 rounded-lg text-xs text-[#32765B] flex items-center justify-between">
+                <span>
+                  Showing <strong>{availableRoomsResult.length}</strong> available room(s) between{" "}
+                  <strong>{new Date(availCheckIn).toLocaleDateString("en-IN")}</strong> and{" "}
+                  <strong>{new Date(availCheckOut).toLocaleDateString("en-IN")}</strong>.
+                </span>
+                <span className="font-semibold text-[11px] uppercase tracking-wide">
+                  Verified Unbooked Inventory
+                </span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Tabs & View Controls Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-[#E3D9CA] pb-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTab("rooms")}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
+              activeTab === "rooms"
+                ? "bg-[#362A22] text-white shadow-sm"
+                : "text-[#79695B] hover:bg-[#EEE7DA]"
+            }`}
+          >
+            <BedDouble className="w-3.5 h-3.5 text-[#B08A60]" />
+            <span>Rooms Directory ({rooms.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("types")}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
+              activeTab === "types"
+                ? "bg-[#362A22] text-white shadow-sm"
+                : "text-[#79695B] hover:bg-[#EEE7DA]"
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5 text-[#B08A60]" />
+            <span>Room Categories & Pricing ({roomTypes.length})</span>
+          </button>
+        </div>
+
+        {activeTab === "rooms" && (
+          <div className="flex items-center gap-1.5 bg-[#F7F4EE] p-1 rounded-lg border border-[#E3D9CA]">
+            <Button
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className={`h-7 px-2.5 text-xs ${
+                viewMode === "grid"
+                  ? "bg-[#362A22] text-white hover:bg-[#43352B]"
+                  : "text-[#79695B] hover:text-[#362A22]"
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5 mr-1" />
+              <span>Grid View</span>
+            </Button>
+            <Button
+              variant={viewMode === "table" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("table")}
+              className={`h-7 px-2.5 text-xs ${
+                viewMode === "table"
+                  ? "bg-[#362A22] text-white hover:bg-[#43352B]"
+                  : "text-[#79695B] hover:text-[#362A22]"
+              }`}
+            >
+              <List className="w-3.5 h-3.5 mr-1" />
+              <span>Table View</span>
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* ROOMS DIRECTORY */}
       {activeTab === "rooms" && (
         <>
-          {/* Filter Bar */}
+          {/* Filters & Search Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
-            <div className="flex items-center gap-2 flex-wrap">
+            {/* Status Filter Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-xs font-semibold text-[#79695B] mr-1">Status:</span>
-              {["ALL", "AVAILABLE", "OCCUPIED", "MAINTENANCE"].map((st) => (
+              {[
+                { key: "ALL", label: "All Rooms" },
+                { key: "AVAILABLE", label: "Available" },
+                { key: "OCCUPIED", label: "Occupied" },
+                { key: "MAINTENANCE", label: "Under Maintenance" },
+              ].map((st) => (
                 <button
-                  key={st}
-                  onClick={() => setStatusFilter(st)}
-                  className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
-                    statusFilter === st
-                      ? "bg-slate-900 text-white font-semibold"
-                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
+                  key={st.key}
+                  onClick={() => setStatusFilter(st.key)}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                    statusFilter === st.key
+                      ? "bg-[#362A22] text-white shadow-sm"
+                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
                   }`}
                 >
-                  {st}
+                  {st.label}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Dropdown Filters & Search */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Floor Filter */}
+              <select
+                value={floorFilter}
+                onChange={(e) => setFloorFilter(e.target.value)}
+                className="h-8 text-xs border border-[#E3D9CA] rounded-lg px-2 bg-[#F7F4EE] text-[#362A22]"
+              >
+                <option value="ALL">All Floors</option>
+                {uniqueFloors.map((f) => (
+                  <option key={f} value={f}>
+                    Floor {f}
+                  </option>
+                ))}
+              </select>
+
+              {/* Room Type Filter */}
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#5D493D]"
+                className="h-8 text-xs border border-[#E3D9CA] rounded-lg px-2 bg-[#F7F4EE] text-[#362A22]"
               >
                 <option value="ALL">All Categories</option>
                 {roomTypes.map((t) => (
@@ -293,159 +728,470 @@ export default function RoomsPage() {
                 ))}
               </select>
 
-              <div className="relative w-48">
+              {/* Search Box */}
+              <div className="relative w-44 sm:w-52">
                 <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
                 <Input
                   type="text"
-                  placeholder="Search room..."
+                  placeholder="Search room number..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-xs"
+                  className="pl-8 h-8 text-xs bg-[#F7F4EE] border-[#E3D9CA]"
                 />
               </div>
             </div>
           </div>
 
-          {/* Room Inventory Grid */}
-          {loading ? (
-            <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
-            </div>
-          ) : rooms.length === 0 ? (
-            <div className="p-12 text-center text-xs text-[#948779] bg-white rounded-xl border border-[#E3D9CA]">
-              No rooms matching the criteria. Click &quot;Add Room&quot; to create one.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {rooms.map((r) => (
-                <Card
-                  key={r.id}
-                  className={`border transition-all hover:shadow-md ${
-                    r.roomStatus === "AVAILABLE"
-                      ? "border-emerald-200/90 bg-emerald-50/20"
-                      : r.roomStatus === "OCCUPIED"
-                      ? "border-blue-200/90 bg-blue-50/20"
-                      : "border-amber-200/90 bg-amber-50/20"
-                  }`}
-                >
-                  <CardContent className="p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-lg font-bold text-[#362A22]">Room {r.roomNumber}</span>
-                        <span className="text-[11px] text-[#79695B] block">Floor {r.floor}</span>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] font-bold ${
-                          r.roomStatus === "AVAILABLE"
-                            ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-                            : r.roomStatus === "OCCUPIED"
-                            ? "bg-blue-100 text-blue-800 border-blue-300"
-                            : "bg-amber-100 text-amber-800 border-amber-300"
+          {/* GRID VIEW */}
+          {viewMode === "grid" && (
+            <>
+              {loading ? (
+                <div className="p-16 flex flex-col justify-center items-center gap-3 bg-white rounded-xl border border-[#E3D9CA]">
+                  <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
+                  <p className="text-xs text-[#79695B]">Loading room inventory from database...</p>
+                </div>
+              ) : displayRooms.length === 0 ? (
+                <div className="p-16 text-center text-xs text-[#79695B] bg-white rounded-xl border border-[#E3D9CA] space-y-3">
+                  <BedDouble className="w-10 h-10 text-[#B08A60] mx-auto opacity-60" />
+                  <p className="font-medium text-[#362A22]">
+                    No rooms found matching your active filter criteria.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleOpenAddRoom}
+                    className="border-[#B08A60] text-[#362A22] hover:bg-[#EEE7DA]"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1 text-[#B08A60]" /> Add New Room
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {displayRooms.map((r) => {
+                    const isAvailable = r.roomStatus === "AVAILABLE";
+                    const isOccupied = r.roomStatus === "OCCUPIED";
+                    const isMaintenance = r.roomStatus === "MAINTENANCE";
+
+                    return (
+                      <Card
+                        key={r.id}
+                        className={`border bg-white transition-all hover:shadow-md relative overflow-hidden ${
+                          isAvailable
+                            ? "border-[#32765B]/30 hover:border-[#32765B]"
+                            : isOccupied
+                            ? "border-[#627D91]/30 hover:border-[#627D91]"
+                            : "border-[#A97832]/30 hover:border-[#A97832]"
                         }`}
                       >
-                        {r.roomStatus}
-                      </Badge>
-                    </div>
+                        {/* Top Status Accent Bar */}
+                        <div
+                          className={`h-1.5 w-full ${
+                            isAvailable
+                              ? "bg-[#32765B]"
+                              : isOccupied
+                              ? "bg-[#627D91]"
+                              : "bg-[#A97832]"
+                          }`}
+                        />
 
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between text-[#79695B]">
-                        <span className="text-[#948779]">Category:</span>
-                        <span className="font-semibold text-[#362A22]">{r.roomType?.name}</span>
-                      </div>
-                      <div className="flex justify-between text-[#79695B]">
-                        <span className="text-[#948779]">Nightly Rate:</span>
-                        <span className="font-bold text-[#362A22]">
-                          ₹{Number(r.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                        </span>
-                      </div>
-                      {r.currentBooking && (
-                        <div className="p-2 bg-white rounded border border-[#E3D9CA] text-[11px] text-[#79695B] mt-2">
-                          <span className="font-semibold text-[#362A22] block truncate">
-                            {r.currentBooking.primaryGuest?.fullName}
-                          </span>
-                          <span className="text-[10px] text-[#948779]">
-                            {r.currentBooking.bookingStatus}
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                        <CardContent className="p-4 space-y-3">
+                          {/* Room Header: Number, Floor & Status Badge */}
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xl font-serif font-bold text-[#362A22]">
+                                  Room {r.roomNumber}
+                                </span>
+                              </div>
+                              <span className="text-[11px] font-mono text-[#79695B] block">
+                                Floor {r.floor} • Cap: {r.roomType?.capacity || 2}
+                              </span>
+                            </div>
 
-                    <div className="pt-2 border-t border-[#EAE3D8] flex items-center justify-between gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleOpenEditRoom(r)}
-                        className="h-7 text-xs flex-1 text-[#5D493D]"
-                      >
-                        <Edit2 className="w-3 h-3 mr-1" /> Edit
-                      </Button>
-                      {r.roomStatus !== "OCCUPIED" && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            handleQuickStatusChange(
-                              r,
-                              r.roomStatus === "AVAILABLE" ? "MAINTENANCE" : "AVAILABLE",
-                            )
-                          }
-                          title={r.roomStatus === "AVAILABLE" ? "Put in Maintenance" : "Mark Available"}
-                          className="h-7 text-xs text-amber-700 hover:bg-amber-100/60"
-                        >
-                          {r.roomStatus === "AVAILABLE" ? (
-                            <Wrench className="w-3.5 h-3.5" />
-                          ) : (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          )}
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] font-bold uppercase tracking-wider ${
+                                isAvailable
+                                  ? "bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30"
+                                  : isOccupied
+                                  ? "bg-[#E9EFF3] text-[#627D91] border-[#627D91]/30"
+                                  : "bg-[#F6EDDC] text-[#A97832] border-[#A97832]/30"
+                              }`}
+                            >
+                              {isAvailable
+                                ? "Available"
+                                : isOccupied
+                                ? "Occupied"
+                                : "Under Maintenance"}
+                            </Badge>
+                          </div>
+
+                          {/* Room Type & Description */}
+                          <div className="space-y-1.5 text-xs">
+                            <div className="flex justify-between items-center text-[#79695B]">
+                              <span className="text-[#948779] text-[11px] uppercase font-semibold">
+                                Category:
+                              </span>
+                              <span className="font-semibold text-[#362A22]">{r.roomType?.name}</span>
+                            </div>
+
+                            {/* Room Description */}
+                            <div className="text-[11px] text-[#79695B] bg-[#F7F4EE] p-2 rounded-lg border border-[#E3D9CA]/60 min-h-[42px] line-clamp-2">
+                              {r.description || (
+                                <span className="italic text-[#948779]">
+                                  {r.roomType?.description || "Standard room with premium hospitality amenities."}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Price Per Night with Quick Update Action */}
+                            <div className="flex justify-between items-center pt-1">
+                              <span className="text-[#948779] text-[11px] uppercase font-semibold">
+                                Price Per Night:
+                              </span>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono font-bold text-sm text-[#362A22]">
+                                  ₹{Number(r.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenQuickPrice(r)}
+                                  className="text-[#B08A60] hover:text-[#362A22] p-0.5"
+                                  title="Update Price"
+                                >
+                                  <Edit2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Active Occupant Details if Occupied */}
+                            {r.currentBooking && (
+                              <div className="p-2 bg-[#E9EFF3]/60 rounded-lg border border-[#627D91]/20 text-[11px] text-[#362A22] mt-1 space-y-0.5">
+                                <div className="flex items-center justify-between font-semibold">
+                                  <span className="truncate">
+                                    {r.currentBooking.primaryGuest?.fullName}
+                                  </span>
+                                  <Badge variant="outline" className="text-[9px] bg-white">
+                                    {r.currentBooking.bookingStatus}
+                                  </Badge>
+                                </div>
+                                <div className="text-[10px] text-[#79695B] font-mono">
+                                  {r.currentBooking.primaryGuest?.mobileNumber}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action Buttons Footer */}
+                          <div className="pt-2 border-t border-[#EAE3D8] flex items-center justify-between gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenDetails(r.id)}
+                              className="h-7 text-[11px] px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                              title="View Room Dossier"
+                            >
+                              <Eye className="w-3 h-3 mr-1 text-[#B08A60]" />
+                              Dossier
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenEditRoom(r)}
+                              className="h-7 text-[11px] px-2 text-[#5D493D] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                              title="Edit Room Details"
+                            >
+                              <Edit2 className="w-3 h-3 mr-1" />
+                              Edit
+                            </Button>
+
+                            {/* Quick Status Toggle Button */}
+                            {!isOccupied && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleQuickStatusChange(
+                                    r,
+                                    isAvailable ? "MAINTENANCE" : "AVAILABLE"
+                                  )
+                                }
+                                title={
+                                  isAvailable
+                                    ? "Mark as Under Maintenance"
+                                    : "Mark as Available"
+                                }
+                                className={`h-7 px-2 text-[11px] ${
+                                  isAvailable
+                                    ? "text-[#A97832] hover:bg-[#F6EDDC]"
+                                    : "text-[#32765B] hover:bg-[#E7F1E9]"
+                                }`}
+                              >
+                                {isAvailable ? (
+                                  <>
+                                    <Wrench className="w-3 h-3 mr-1" />
+                                    <span>Maintain</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle2 className="w-3 h-3 mr-1 text-[#32765B]" />
+                                    <span>Ready</span>
+                                  </>
+                                )}
+                              </Button>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* TABLE VIEW */}
+          {viewMode === "table" && (
+            <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
+              <CardContent className="p-0">
+                {loading ? (
+                  <div className="p-16 flex flex-col justify-center items-center gap-3">
+                    <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
+                    <p className="text-xs text-[#79695B]">Loading room inventory...</p>
+                  </div>
+                ) : displayRooms.length === 0 ? (
+                  <div className="p-16 text-center text-xs text-[#79695B]">
+                    No rooms matching your active filters.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                        <tr>
+                          <th className="px-4 py-3.5">Room Number</th>
+                          <th className="px-4 py-3.5">Room Type</th>
+                          <th className="px-4 py-3.5">Room Description</th>
+                          <th className="px-4 py-3.5">Floor</th>
+                          <th className="px-4 py-3.5">Price Per Night</th>
+                          <th className="px-4 py-3.5">Room Status</th>
+                          <th className="px-4 py-3.5">Current Occupant</th>
+                          <th className="px-4 py-3.5 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#EAE3D8]">
+                        {displayRooms.map((r) => {
+                          const isAvailable = r.roomStatus === "AVAILABLE";
+                          const isOccupied = r.roomStatus === "OCCUPIED";
+                          const isMaintenance = r.roomStatus === "MAINTENANCE";
+
+                          return (
+                            <tr key={r.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                              {/* Room Number */}
+                              <td className="px-4 py-3.5 font-serif font-bold text-sm text-[#362A22]">
+                                Room {r.roomNumber}
+                              </td>
+
+                              {/* Room Type */}
+                              <td className="px-4 py-3.5">
+                                <span className="font-semibold text-[#362A22] block">
+                                  {r.roomType?.name}
+                                </span>
+                                <span className="text-[11px] text-[#79695B]">
+                                  Capacity: {r.roomType?.capacity || 2} Guests
+                                </span>
+                              </td>
+
+                              {/* Room Description */}
+                              <td className="px-4 py-3.5 text-[#79695B] max-w-xs">
+                                <span className="truncate block" title={r.description || ""}>
+                                  {r.description || (
+                                    <span className="italic text-[#948779]">
+                                      {r.roomType?.description || "Standard boutique amenities"}
+                                    </span>
+                                  )}
+                                </span>
+                              </td>
+
+                              {/* Floor */}
+                              <td className="px-4 py-3.5 font-mono text-[#362A22]">
+                                Floor {r.floor}
+                              </td>
+
+                              {/* Price Per Night */}
+                              <td className="px-4 py-3.5 font-mono font-bold text-[#362A22]">
+                                <div className="flex items-center gap-1.5">
+                                  <span>
+                                    ₹{Number(r.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenQuickPrice(r)}
+                                    className="text-[#B08A60] hover:text-[#362A22]"
+                                    title="Quick Price Update"
+                                  >
+                                    <Edit2 className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </td>
+
+                              {/* Room Status */}
+                              <td className="px-4 py-3.5">
+                                <Badge
+                                  variant="outline"
+                                  className={`text-[10px] font-bold uppercase tracking-wider ${
+                                    isAvailable
+                                      ? "bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30"
+                                      : isOccupied
+                                      ? "bg-[#E9EFF3] text-[#627D91] border-[#627D91]/30"
+                                      : "bg-[#F6EDDC] text-[#A97832] border-[#A97832]/30"
+                                  }`}
+                                >
+                                  {isAvailable
+                                    ? "Available"
+                                    : isOccupied
+                                    ? "Occupied"
+                                    : "Under Maintenance"}
+                                </Badge>
+                              </td>
+
+                              {/* Current Occupant */}
+                              <td className="px-4 py-3.5 text-[#79695B]">
+                                {r.currentBooking ? (
+                                  <div>
+                                    <span className="font-semibold text-[#362A22] block">
+                                      {r.currentBooking.primaryGuest?.fullName}
+                                    </span>
+                                    <span className="font-mono text-[10px] text-[#948779]">
+                                      {r.currentBooking.primaryGuest?.mobileNumber}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[#948779] italic">—</span>
+                                )}
+                              </td>
+
+                              {/* Actions */}
+                              <td className="px-4 py-3.5 text-right space-x-1.5 whitespace-nowrap">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleOpenDetails(r.id)}
+                                  className="h-7 px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]"
+                                  title="View Details"
+                                >
+                                  <Eye className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                                  Dossier
+                                </Button>
+
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleOpenEditRoom(r)}
+                                  className="h-7 px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]"
+                                  title="Edit Room"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5 mr-1" />
+                                  Edit
+                                </Button>
+
+                                {!isOccupied && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleQuickStatusChange(
+                                        r,
+                                        isAvailable ? "MAINTENANCE" : "AVAILABLE"
+                                      )
+                                    }
+                                    className={`h-7 px-2 ${
+                                      isAvailable
+                                        ? "text-[#A97832] hover:bg-[#F6EDDC]"
+                                        : "text-[#32765B] hover:bg-[#E7F1E9]"
+                                    }`}
+                                  >
+                                    {isAvailable ? "Maintain" : "Ready"}
+                                  </Button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           )}
         </>
       )}
 
+      {/* ROOM CATEGORIES & PRICING TAB */}
       {activeTab === "types" && (
-        <Card className="border-[#E3D9CA] shadow-sm">
+        <Card className="border-[#E3D9CA] shadow-sm bg-white overflow-hidden">
+          <CardHeader className="border-b border-[#E3D9CA] pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg font-serif font-bold text-[#362A22]">
+                  Room Types & Pricing Rules
+                </CardTitle>
+                <CardDescription className="text-xs text-[#79695B]">
+                  Define base nightly rates and default guest capacities across categories.
+                </CardDescription>
+              </div>
+              <Button
+                onClick={handleOpenAddType}
+                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-8"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1 text-[#B08A60]" /> Add Room Type
+              </Button>
+            </div>
+          </CardHeader>
           <CardContent className="p-0">
             <table className="w-full text-xs text-left">
               <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
                 <tr>
-                  <th className="px-4 py-3">Category Name</th>
-                  <th className="px-4 py-3">Capacity</th>
-                  <th className="px-4 py-3">Default Nightly Rate</th>
-                  <th className="px-4 py-3">Total Rooms</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3.5">Category Name</th>
+                  <th className="px-4 py-3.5">Description</th>
+                  <th className="px-4 py-3.5">Guest Capacity</th>
+                  <th className="px-4 py-3.5">Default Nightly Rate</th>
+                  <th className="px-4 py-3.5">Assigned Rooms</th>
+                  <th className="px-4 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EAE3D8]">
                 {roomTypes.map((t) => (
-                  <tr key={t.id} className="hover:bg-[#F7F4EE]/70">
-                    <td className="px-4 py-3 font-semibold text-[#362A22]">
-                      <div>{t.name}</div>
-                      <div className="text-[11px] text-[#948779] font-normal">{t.description || "—"}</div>
+                  <tr key={t.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
+                    <td className="px-4 py-3.5 font-semibold text-[#362A22]">
+                      {t.name}
                     </td>
-                    <td className="px-4 py-3 text-[#79695B]">{t.capacity} Guests</td>
-                    <td className="px-4 py-3 font-bold text-[#362A22]">
+                    <td className="px-4 py-3.5 text-[#79695B] max-w-sm">
+                      {t.description || "—"}
+                    </td>
+                    <td className="px-4 py-3.5 text-[#79695B] font-medium">
+                      <span className="flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-[#B08A60]" />
+                        {t.capacity} Guests
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 font-mono font-bold text-[#362A22]">
                       ₹{Number(t.defaultPricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-4 py-3">
-                      <Badge variant="outline" className="text-[10px]">
+                    <td className="px-4 py-3.5">
+                      <Badge variant="outline" className="text-[10px] bg-[#EEE7DA] text-[#362A22]">
                         {t._count?.rooms || 0} Rooms
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3.5 text-right space-x-1.5">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenEditType(t)}
-                        className="h-7 px-2 text-[#79695B] hover:text-[#B08A60]"
+                        className="h-7 px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]"
                       >
-                        <Edit2 className="w-3.5 h-3.5" />
+                        <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
                       </Button>
                     </td>
                   </tr>
@@ -456,32 +1202,39 @@ export default function RoomsPage() {
         </Card>
       )}
 
-      {/* Add / Edit Room Modal */}
+      {/* ========================================================================= */}
+      {/* ADD / EDIT ROOM MODAL (WITH ROOM NUMBER, TYPE, DESCRIPTION, PRICE, STATUS)  */}
+      {/* ========================================================================= */}
       <Dialog open={roomModalOpen} onOpenChange={setRoomModalOpen}>
-        <DialogContent className="max-w-md bg-white">
-          <DialogHeader>
-            <DialogTitle className="text-base font-bold text-[#362A22]">
+        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+            <span className="text-[10px] uppercase font-bold text-[#B08A60] bg-[#EEE7DA] px-2 py-0.5 rounded w-fit">
+              {editingRoom ? "Inventory Update" : "New Inventory Item"}
+            </span>
+            <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
               {editingRoom ? `Edit Room ${editingRoom.roomNumber}` : "Add New Room"}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#79695B]">
-              Configure room inventory parameters.
+              Configure room number, room type, description, price per night, and status.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSaveRoom} className="space-y-3 pt-2 text-xs">
+          <form onSubmit={handleSaveRoom} className="space-y-3.5 pt-2 text-xs">
+            {/* 1. Room Number */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Room Number *</label>
+              <label className="font-semibold text-[#362A22]">Room Number *</label>
               <Input
                 required
                 value={roomForm.roomNumber}
                 onChange={(e) => setRoomForm({ ...roomForm, roomNumber: e.target.value })}
-                placeholder="e.g. 101 or 204"
-                className="h-8 text-xs font-mono"
+                placeholder="e.g. 101, 204, or PH-1"
+                className="h-8 text-xs font-mono border-[#E3D9CA]"
               />
             </div>
 
+            {/* 2. Room Type */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Room Category *</label>
+              <label className="font-semibold text-[#362A22]">Room Type / Category *</label>
               <select
                 required
                 value={roomForm.roomTypeId}
@@ -493,7 +1246,7 @@ export default function RoomsPage() {
                     pricePerNight: sel ? Number(sel.defaultPricePerNight) : roomForm.pricePerNight,
                   });
                 }}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
               >
                 {roomTypes.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -503,123 +1256,400 @@ export default function RoomsPage() {
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            {/* 3. Room Description */}
+            <div className="space-y-1">
+              <label className="font-semibold text-[#362A22]">Room Description</label>
+              <textarea
+                rows={2}
+                value={roomForm.description}
+                onChange={(e) => setRoomForm({ ...roomForm, description: e.target.value })}
+                placeholder="Corner room with king bed, balcony, garden view, premium minibar..."
+                className="w-full text-xs border border-[#E3D9CA] rounded-md p-2 bg-white text-[#362A22] focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
+              />
+            </div>
+
+            {/* 4. Floor & Price Per Night */}
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Floor</label>
+                <label className="font-semibold text-[#362A22]">Floor</label>
                 <Input
                   type="number"
                   min="0"
                   max="50"
                   value={roomForm.floor}
                   onChange={(e) => setRoomForm({ ...roomForm, floor: Number(e.target.value) })}
-                  className="h-8 text-xs"
+                  className="h-8 text-xs border-[#E3D9CA]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Nightly Rate (₹) *</label>
+                <label className="font-semibold text-[#362A22]">Price Per Night (₹) *</label>
                 <Input
                   type="number"
                   required
                   min="0"
                   step="50"
                   value={roomForm.pricePerNight}
-                  onChange={(e) => setRoomForm({ ...roomForm, pricePerNight: Number(e.target.value) })}
-                  className="h-8 text-xs font-mono"
+                  onChange={(e) =>
+                    setRoomForm({ ...roomForm, pricePerNight: Number(e.target.value) })
+                  }
+                  className="h-8 text-xs font-mono border-[#E3D9CA]"
                 />
               </div>
             </div>
 
+            {/* 5. Room Status */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Initial Status</label>
+              <label className="font-semibold text-[#362A22]">Room Status *</label>
               <select
                 value={roomForm.roomStatus}
-                onChange={(e) => setRoomForm({ ...roomForm, roomStatus: e.target.value as any })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
+                onChange={(e) =>
+                  setRoomForm({ ...roomForm, roomStatus: e.target.value as any })
+                }
+                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
               >
-                <option value="AVAILABLE">AVAILABLE</option>
-                <option value="MAINTENANCE">MAINTENANCE</option>
+                <option value="AVAILABLE">Available</option>
+                <option value="MAINTENANCE">Under Maintenance</option>
+                {editingRoom && <option value="OCCUPIED">Occupied</option>}
               </select>
             </div>
 
             <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
-              <Button type="button" variant="outline" size="sm" onClick={() => setRoomModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setRoomModalOpen(false)}
+                className="text-xs border-[#E3D9CA]"
+              >
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
-                {submitting ? "Saving..." : editingRoom ? "Save Changes" : "Create Room"}
+              <Button
+                type="submit"
+                size="sm"
+                disabled={submitting}
+                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs"
+              >
+                {submitting ? "Saving..." : editingRoom ? "Save Room Details" : "Create Room"}
               </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {/* Add / Edit Room Type Modal */}
-      <Dialog open={typeModalOpen} onOpenChange={setTypeModalOpen}>
-        <DialogContent className="max-w-md bg-white">
-          <DialogHeader>
-            <DialogTitle className="text-base font-bold text-[#362A22]">
-              {editingType ? `Edit Room Type` : "New Room Type"}
+      {/* ========================================================================= */}
+      {/* QUICK PRICE UPDATE MODAL                                                  */}
+      {/* ========================================================================= */}
+      <Dialog open={quickPriceModalOpen} onOpenChange={setQuickPriceModalOpen}>
+        <DialogContent className="max-w-sm bg-white border-[#E3D9CA] shadow-2xl p-5">
+          <DialogHeader className="border-b border-[#E3D9CA] pb-2.5">
+            <DialogTitle className="text-base font-serif font-bold text-[#362A22]">
+              Update Nightly Rate • Room {priceRoom?.roomNumber}
             </DialogTitle>
             <DialogDescription className="text-xs text-[#79695B]">
-              Manage category pricing and guest capacity.
+              Category: {priceRoom?.roomType?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveQuickPrice} className="space-y-3 pt-2 text-xs">
+            <div className="p-3 bg-[#F7F4EE] rounded-lg border border-[#E3D9CA] flex justify-between items-center">
+              <span className="text-[#79695B]">Current Rate:</span>
+              <span className="font-mono font-bold text-[#362A22]">
+                ₹{Number(priceRoom?.pricePerNight || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-semibold text-[#362A22]">New Nightly Price (₹) *</label>
+              <Input
+                type="number"
+                required
+                min="0"
+                step="50"
+                value={newPrice}
+                onChange={(e) => setNewPrice(Number(e.target.value))}
+                className="h-9 text-sm font-mono border-[#E3D9CA]"
+                autoFocus
+              />
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setQuickPriceModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={submitting}
+                className="bg-[#362A22] hover:bg-[#43352B] text-white"
+              >
+                {submitting ? "Updating..." : "Save New Price"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* ROOM DOSSIER / VIEW DETAILS MODAL                                         */}
+      {/* ========================================================================= */}
+      <Dialog open={detailsModalOpen} onOpenChange={setDetailsModalOpen}>
+        <DialogContent className="max-w-xl bg-white border-[#E3D9CA] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono font-bold text-[#B08A60] bg-[#EEE7DA] px-2 py-0.5 rounded">
+                  Floor {selectedRoomDetails?.floor}
+                </span>
+                <DialogTitle className="text-2xl font-serif font-bold text-[#362A22] mt-1">
+                  Room {selectedRoomDetails?.roomNumber}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#79695B]">
+                  {selectedRoomDetails?.roomType?.name} • Detailed Room Dossier
+                </DialogDescription>
+              </div>
+
+              <Badge
+                variant="outline"
+                className={`text-[10px] font-bold uppercase tracking-wider ${
+                  selectedRoomDetails?.roomStatus === "AVAILABLE"
+                    ? "bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30"
+                    : selectedRoomDetails?.roomStatus === "OCCUPIED"
+                    ? "bg-[#E9EFF3] text-[#627D91] border-[#627D91]/30"
+                    : "bg-[#F6EDDC] text-[#A97832] border-[#A97832]/30"
+                }`}
+              >
+                {selectedRoomDetails?.roomStatus === "AVAILABLE"
+                  ? "Available"
+                  : selectedRoomDetails?.roomStatus === "OCCUPIED"
+                  ? "Occupied"
+                  : "Under Maintenance"}
+              </Badge>
+            </div>
+          </DialogHeader>
+
+          {selectedRoomDetails && (
+            <div className="space-y-4 pt-2 text-xs">
+              {/* Specs Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3.5 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA]">
+                <div>
+                  <span className="text-[#948779] block text-[10px] uppercase font-bold tracking-wider">
+                    Room Type
+                  </span>
+                  <span className="font-semibold text-[#362A22]">
+                    {selectedRoomDetails.roomType?.name}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[#948779] block text-[10px] uppercase font-bold tracking-wider">
+                    Guest Capacity
+                  </span>
+                  <span className="font-medium text-[#362A22]">
+                    {selectedRoomDetails.roomType?.capacity || 2} Persons
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[#948779] block text-[10px] uppercase font-bold tracking-wider">
+                    Nightly Rate
+                  </span>
+                  <span className="font-mono font-bold text-[#362A22]">
+                    ₹{Number(selectedRoomDetails.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="p-3 bg-white rounded-xl border border-[#E3D9CA] space-y-1">
+                <span className="text-[10px] uppercase font-bold text-[#948779] tracking-wider block">
+                  Room Description & Amenities
+                </span>
+                <p className="text-xs text-[#362A22]">
+                  {selectedRoomDetails.description || (
+                    <span className="italic text-[#948779]">
+                      {selectedRoomDetails.roomType?.description || "No custom room description recorded."}
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              {/* Current Occupant Details (if Occupied) */}
+              {selectedRoomDetails.roomStatus === "OCCUPIED" && (
+                <div className="p-3.5 bg-[#E9EFF3] rounded-xl border border-[#627D91]/30 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs text-[#362A22] flex items-center gap-1.5">
+                      <UserCheck className="w-3.5 h-3.5 text-[#627D91]" />
+                      <span>Current Occupant Information</span>
+                    </span>
+                  </div>
+                  {((selectedRoomDetails.bookings && selectedRoomDetails.bookings[0]) || selectedRoomDetails.currentBooking) ? (
+                    (() => {
+                      const activeBooking =
+                        (selectedRoomDetails.bookings && selectedRoomDetails.bookings[0]) ||
+                        selectedRoomDetails.currentBooking;
+                      return (
+                        <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+                          <div>
+                            <span className="text-[#79695B] block text-[10px]">Guest Name:</span>
+                            <span className="font-semibold text-[#362A22]">
+                              {activeBooking.primaryGuest?.fullName || "Primary Guest"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[#79695B] block text-[10px]">Contact Mobile:</span>
+                            <span className="font-mono text-[#362A22]">
+                              {activeBooking.primaryGuest?.mobileNumber || "—"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[#79695B] block text-[10px]">Check-In Date:</span>
+                            <span className="text-[#362A22]">
+                              {activeBooking.checkInDate
+                                ? new Date(activeBooking.checkInDate).toLocaleDateString("en-IN")
+                                : "—"}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[#79695B] block text-[10px]">Expected Check-Out:</span>
+                            <span className="text-[#362A22]">
+                              {activeBooking.expectedCheckOutDate
+                                ? new Date(activeBooking.expectedCheckOutDate).toLocaleDateString("en-IN")
+                                : "—"}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <p className="text-xs text-[#79695B]">Room is marked occupied.</p>
+                  )}
+                </div>
+              )}
+
+              {/* Actions Footer */}
+              <div className="flex items-center justify-between pt-2 border-t border-[#EAE3D8]">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDeactivateRoom(selectedRoomDetails)}
+                  className="text-xs text-rose-600 border-rose-200 hover:bg-rose-50"
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  Deactivate Room
+                </Button>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setDetailsModalOpen(false);
+                      handleOpenEditRoom(selectedRoomDetails);
+                    }}
+                    className="text-xs border-[#E3D9CA]"
+                  >
+                    <Edit2 className="w-3.5 h-3.5 mr-1" />
+                    Edit Details
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setDetailsModalOpen(false)}
+                    className="text-xs bg-[#362A22] hover:bg-[#43352B] text-white"
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* ADD / EDIT ROOM TYPE MODAL                                                */}
+      {/* ========================================================================= */}
+      <Dialog open={typeModalOpen} onOpenChange={setTypeModalOpen}>
+        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+            <DialogTitle className="text-base font-serif font-bold text-[#362A22]">
+              {editingType ? `Edit Category: ${editingType.name}` : "New Room Category"}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#79695B]">
+              Configure category pricing and guest capacity.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveType} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Category Name *</label>
+              <label className="font-semibold text-[#362A22]">Category Name *</label>
               <Input
                 required
                 value={typeForm.name}
                 onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })}
                 placeholder="e.g. Deluxe Double Suite"
-                className="h-8 text-xs"
+                className="h-8 text-xs border-[#E3D9CA]"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Guest Capacity</label>
+                <label className="font-semibold text-[#362A22]">Guest Capacity</label>
                 <Input
                   type="number"
                   min="1"
                   max="10"
                   value={typeForm.capacity}
                   onChange={(e) => setTypeForm({ ...typeForm, capacity: Number(e.target.value) })}
-                  className="h-8 text-xs"
+                  className="h-8 text-xs border-[#E3D9CA]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Default Rate (₹)</label>
+                <label className="font-semibold text-[#362A22]">Default Nightly Rate (₹)</label>
                 <Input
                   type="number"
                   min="0"
                   step="100"
                   value={typeForm.defaultPricePerNight}
-                  onChange={(e) => setTypeForm({ ...typeForm, defaultPricePerNight: Number(e.target.value) })}
-                  className="h-8 text-xs font-mono"
+                  onChange={(e) =>
+                    setTypeForm({ ...typeForm, defaultPricePerNight: Number(e.target.value) })
+                  }
+                  className="h-8 text-xs font-mono border-[#E3D9CA]"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Description</label>
-              <Input
+              <label className="font-semibold text-[#362A22]">Description</label>
+              <textarea
+                rows={2}
                 value={typeForm.description}
                 onChange={(e) => setTypeForm({ ...typeForm, description: e.target.value })}
-                placeholder="Amenities, bed size, view..."
-                className="h-8 text-xs"
+                placeholder="Category amenities, king size bed, view, etc."
+                className="w-full text-xs border border-[#E3D9CA] rounded-md p-2 bg-white text-[#362A22] focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
               />
             </div>
 
             <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
-              <Button type="button" variant="outline" size="sm" onClick={() => setTypeModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setTypeModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
-                {submitting ? "Saving..." : editingType ? "Update Type" : "Create Type"}
+              <Button
+                type="submit"
+                size="sm"
+                disabled={submitting}
+                className="bg-[#362A22] hover:bg-[#43352B] text-white"
+              >
+                {submitting ? "Saving..." : editingType ? "Update Category" : "Create Category"}
               </Button>
             </DialogFooter>
           </form>

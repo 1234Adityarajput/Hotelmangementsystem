@@ -231,6 +231,7 @@ export interface Room {
   updatedAt: string;
   roomType: RoomType;
   currentBooking?: any;
+  bookings?: any[];
 }
 
 export interface BookingGuest {

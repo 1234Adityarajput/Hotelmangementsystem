@@ -54,6 +54,15 @@ export class RoomsController {
     return this.roomsService.updateStatus(id, status);
   }
 
+  @Patch(':id/price')
+  @ApiOperation({ summary: 'Update room price per night' })
+  async updatePrice(
+    @Param('id') id: string,
+    @Body('pricePerNight') pricePerNight: number,
+  ) {
+    return this.roomsService.updatePrice(id, pricePerNight);
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Deactivate a room' })
   async remove(@Param('id') id: string) {

@@ -38,6 +38,11 @@ export const roomsService = {
     return res.data.data;
   },
 
+  async updatePrice(id: string, pricePerNight: number): Promise<Room> {
+    const res = await apiClient.patch<ApiResponse<Room>>(`/rooms/${id}/price`, { pricePerNight });
+    return res.data.data;
+  },
+
   async remove(id: string): Promise<any> {
     const res = await apiClient.delete<ApiResponse<any>>(`/rooms/${id}`);
     return res.data.data;
