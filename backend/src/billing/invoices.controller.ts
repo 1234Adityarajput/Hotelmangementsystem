@@ -44,6 +44,9 @@ export class InvoicesController {
   @Get(':id')
   @ApiOperation({ summary: 'Get full invoice breakdown including payments and room charges' })
   async findOne(@Param('id') id: string) {
+    if (id === 'active-folios') {
+      return this.billingService.getActiveFolios();
+    }
     return this.billingService.findOne(id);
   }
 
