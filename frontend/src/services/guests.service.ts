@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import { ApiResponse, Guest, GuestDocument } from "@/types";
+import { ApiResponse, Guest, GuestDocument, AdditionalGuest } from "@/types";
 
 export const guestsService = {
   async findAll(params?: { search?: string; page?: number; limit?: number }): Promise<{
@@ -28,13 +28,26 @@ export const guestsService = {
     return res.data.data;
   },
 
-  async addDocument(guestId: string, data: { documentType: string; documentNumber: string; documentFileReference: string }): Promise<GuestDocument> {
+  async addDocument(
+    guestId: string,
+    data: { documentType: string; documentNumber: string; documentFileReference: string }
+  ): Promise<GuestDocument> {
     const res = await apiClient.post<ApiResponse<GuestDocument>>(`/guests/${guestId}/documents`, data);
     return res.data.data;
   },
 
   async deleteDocument(guestId: string, docId: string): Promise<any> {
     const res = await apiClient.delete<ApiResponse<any>>(`/guests/${guestId}/documents/${docId}`);
+    return res.data.data;
+  },
+
+  async addCoGuest(guestId: string, data: AdditionalGuest): Promise<Guest> {
+    const res = await apiClient.post<ApiResponse<Guest>>(`/guests/${guestId}/co-guests`, data);
+    return res.data.data;
+  },
+
+  async deleteCoGuest(guestId: string, coGuestId: string): Promise<Guest> {
+    const res = await apiClient.delete<ApiResponse<Guest>>(`/guests/${guestId}/co-guests/${coGuestId}`);
     return res.data.data;
   },
 };

@@ -168,6 +168,18 @@ export interface GuestDocument {
   uploadedAt: string;
 }
 
+export interface AdditionalGuest {
+  id?: string;
+  fullName: string;
+  age?: number | null;
+  gender?: string | null;
+  relationship?: string | null;
+  idProofType?: string | null;
+  idProofNumber?: string | null;
+  documentFileReference?: string | null;
+  uploadedAt?: string;
+}
+
 export interface Guest {
   id: string;
   guestCode: string;
@@ -182,6 +194,11 @@ export interface Guest {
   country: string;
   dateOfBirth?: string | null;
   gender?: string | null;
+  idProofType?: string | null;
+  idProofNumber?: string | null;
+  idProofDocument?: string | null;
+  numberOfGuests?: number;
+  additionalGuests?: AdditionalGuest[];
   createdAt: string;
   updatedAt: string;
   documents?: GuestDocument[];
