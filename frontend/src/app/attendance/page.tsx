@@ -657,7 +657,7 @@ export default function AttendancePage() {
             <CardContent className="p-0">
               {loadingDaily ? (
                 <div className="p-16 flex flex-col justify-center items-center">
-                  <LoadingSpinner className="w-8 h-8 text-[#C4A06A] mb-2" />
+                  <LoadingSpinner text="Loading Attendance Ledgers..." subtext="Retrieving employee muster roll and shift logs..." />
                   <span className="text-xs text-[#82747A]">Loading daily staff register...</span>
                 </div>
               ) : filteredDailyRegister.length === 0 ? (
@@ -961,7 +961,7 @@ export default function AttendancePage() {
             <CardContent className="p-0">
               {loadingMonthly ? (
                 <div className="p-16 flex flex-col justify-center items-center">
-                  <LoadingSpinner className="w-8 h-8 text-[#C4A06A] mb-2" />
+                  <LoadingSpinner text="Loading Attendance Ledgers..." subtext="Retrieving employee muster roll and shift logs..." />
                   <span className="text-xs text-[#82747A]">Generating monthly attendance matrix...</span>
                 </div>
               ) : !monthlyData || monthlyData.staffRows.length === 0 ? (
@@ -1260,7 +1260,7 @@ export default function AttendancePage() {
             <CardContent className="p-0">
               {loadingHistory ? (
                 <div className="p-16 flex flex-col justify-center items-center">
-                  <LoadingSpinner className="w-8 h-8 text-[#C4A06A] mb-2" />
+                  <LoadingSpinner text="Loading Attendance Ledgers..." subtext="Retrieving employee muster roll and shift logs..." />
                   <span className="text-xs text-[#82747A]">Loading attendance history...</span>
                 </div>
               ) : staffHistory.length === 0 ? (

@@ -592,7 +592,7 @@ export default function ExpensesPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-16 flex flex-col justify-center items-center gap-2">
-              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+              <LoadingSpinner text="Loading Hotel Operating Expenses..." subtext="Retrieving operational disbursements and categories..." />
               <span className="text-xs text-[#82747A]">Querying expense records...</span>
             </div>
           ) : expenses.length === 0 ? (

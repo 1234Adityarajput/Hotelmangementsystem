@@ -301,7 +301,7 @@ export default function AdvancesPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-[#C4A06A]" />
+              <LoadingSpinner text="Loading Staff Advances & Recoveries..." subtext="Retrieving employee advance vouchers and balances..." />
             </div>
           ) : advances.length === 0 ? (
             <div className="p-12 text-center text-xs text-[#8E7079]">

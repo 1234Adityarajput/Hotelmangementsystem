@@ -633,7 +633,7 @@ export default function PayrollPage() {
             <CardContent className="p-0">
               {loading ? (
                 <div className="p-16 flex flex-col justify-center items-center">
-                  <LoadingSpinner className="w-8 h-8 text-[#C4A06A] mb-2" />
+                  <LoadingSpinner text="Computing Staff Payroll & Salaries..." subtext="Calculating earned attendance pay and net salary structures..." />
                   <span className="text-xs text-[#82747A]">Loading payroll slips from database...</span>
                 </div>
               ) : filteredRecords.length === 0 ? (

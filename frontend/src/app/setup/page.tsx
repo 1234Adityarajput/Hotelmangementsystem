@@ -19,6 +19,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LoadingSpinner } from "@/components/shared/loading-spinner";
 
 export default function SetupVerificationPage() {
   const { data: health, isLoading, isError, refetch, isFetching } = useHealthQuery();
@@ -61,7 +62,7 @@ export default function SetupVerificationPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#59283A]">
-              {isLoading ? "Checking..." : health ? "Online" : "Offline"}
+              {isLoading ? <LoadingSpinner inline text="Probing API..." /> : health ? "Online" : "Offline"}
             </div>
             <p className="text-xs text-[#82747A] mt-1">Port 4000 • NestJS 10</p>
             <div className="mt-4 flex items-center gap-2">
@@ -80,7 +81,7 @@ export default function SetupVerificationPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-[#59283A]">
-              {isLoading ? "Checking..." : health?.database?.connected ? "Connected" : "Disconnected"}
+              {isLoading ? <LoadingSpinner inline text="Probing DB..." /> : health?.database?.connected ? "Connected" : "Disconnected"}
             </div>
             <p className="text-xs text-[#82747A] mt-1">Neon PostgreSQL 18.7 • AWS us-east-2</p>
             <div className="mt-4 flex items-center gap-2">

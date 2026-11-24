@@ -517,7 +517,7 @@ export default function GuestsPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-16 flex flex-col justify-center items-center gap-3">
-              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+              <LoadingSpinner text="Loading Guest Profiles & Identities..." subtext="Retrieving guest directory and stay histories..." />
               <p className="text-xs text-[#82747A]">Querying Neon PostgreSQL guest records...</p>
             </div>
           ) : filteredGuests.length === 0 ? (

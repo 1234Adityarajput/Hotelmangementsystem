@@ -645,7 +645,7 @@ export default function PaymentsPage() {
           <CardContent className="p-0">
             {loading ? (
               <div className="p-16 flex flex-col justify-center items-center gap-3">
-                <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                <LoadingSpinner text="Loading Payment Collections Ledger..." subtext="Retrieving Cash, UPI, and Bank settlements..." />
                 <p className="text-xs text-[#82747A]">Loading payment transactions...</p>
               </div>
             ) : payments.length === 0 ? (
@@ -859,7 +859,7 @@ export default function PaymentsPage() {
             <CardContent className="p-0">
               {loadingPending ? (
                 <div className="p-16 flex flex-col justify-center items-center gap-3">
-                  <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                  <LoadingSpinner text="Loading Payment Collections Ledger..." subtext="Retrieving Cash, UPI, and Bank settlements..." />
                   <p className="text-xs text-[#82747A]">Scanning live folios and invoices for outstanding balances...</p>
                 </div>
               ) : pendingPayments.length === 0 ? (

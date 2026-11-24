@@ -747,7 +747,7 @@ export default function RoomsPage() {
             <>
               {loading ? (
                 <div className="p-16 flex flex-col justify-center items-center gap-3 bg-white rounded-xl border border-[#E8DDD8]">
-                  <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                  <LoadingSpinner text="Loading Room Inventory & Floors..." subtext="Retrieving room statuses, pricing tiers, and occupancy..." />
                   <p className="text-xs text-[#82747A]">Loading room inventory from database...</p>
                 </div>
               ) : displayRooms.length === 0 ? (
@@ -957,7 +957,7 @@ export default function RoomsPage() {
               <CardContent className="p-0">
                 {loading ? (
                   <div className="p-16 flex flex-col justify-center items-center gap-3">
-                    <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                    <LoadingSpinner text="Loading Room Inventory & Floors..." subtext="Retrieving room statuses, pricing tiers, and occupancy..." />
                     <p className="text-xs text-[#82747A]">Loading room inventory...</p>
                   </div>
                 ) : displayRooms.length === 0 ? (

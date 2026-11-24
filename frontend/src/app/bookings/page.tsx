@@ -304,7 +304,7 @@ export default function BookingsPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-[#C4A06A]" />
+              <LoadingSpinner text="Loading Reservations & Bookings..." subtext="Retrieving upcoming reservations and advance allocations..." />
             </div>
           ) : bookings.length === 0 ? (
             <div className="p-12 text-center text-xs text-[#8E7079]">

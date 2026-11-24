@@ -427,7 +427,7 @@ export default function StaffPage() {
       {/* Staff View: Cards Grid or Dense Table */}
       {loading ? (
         <div className="p-16 flex flex-col justify-center items-center bg-white rounded-xl border border-[#E8DDD8]">
-          <LoadingSpinner className="w-8 h-8 text-[#C4A06A] mb-2" />
+          <LoadingSpinner text="Loading Staff Directory & Personnel..." subtext="Retrieving employee roster, departments, and designations..." />
           <span className="text-xs text-[#82747A]">Loading staff profiles from database...</span>
         </div>
       ) : staffList.length === 0 ? (

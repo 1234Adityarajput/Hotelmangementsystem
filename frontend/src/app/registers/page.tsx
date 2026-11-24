@@ -713,7 +713,7 @@ export default function DigitalRegistersPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-16 flex flex-col justify-center items-center gap-2">
-              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+              <LoadingSpinner text="Compiling Statutory Digital Register..." subtext="Generating certified hotel digital records..." />
               <span className="text-xs text-[#82747A]">Querying digital ledger records...</span>
             </div>
           ) : items.length === 0 ? (

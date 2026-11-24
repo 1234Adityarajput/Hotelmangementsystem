@@ -145,7 +145,7 @@ export default function SettingsPage() {
 
       {loading ? (
         <div className="p-16 flex justify-center items-center">
-          <LoadingSpinner className="w-8 h-8 text-[#B08A60]" />
+          <LoadingSpinner text="Loading Hotel Operational Settings..." subtext="Retrieving property operational policies..." />
         </div>
       ) : (
         <form onSubmit={handleSave} className="space-y-6">

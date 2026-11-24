@@ -226,7 +226,7 @@ export default function AuditLogsPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="py-16 flex justify-center items-center">
-              <LoadingSpinner />
+              <LoadingSpinner text="Loading System Audit Trail..." subtext="Retrieving security and mutation event records..." />
             </div>
           ) : logs.length === 0 ? (
             <div className="py-16 text-center text-[#82747A] text-sm">

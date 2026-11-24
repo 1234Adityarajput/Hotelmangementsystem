@@ -549,9 +549,12 @@ export default function ReportsPage() {
       {activeTab === "executive" && (
         <>
           {executiveLoading ? (
-            <div className="p-20 flex flex-col justify-center items-center gap-3">
-              <LoadingSpinner className="w-8 h-8 text-[#C4A06A]" />
-              <span className="text-xs font-mono text-[#82747A]">Compiling Executive Intelligence...</span>
+            <div className="p-16 flex justify-center items-center">
+              <LoadingSpinner
+                size="lg"
+                text="Compiling Executive Intelligence..."
+                subtext="Aggregating hotel operations, revenue collections, and cash flow..."
+              />
             </div>
           ) : executiveData ? (
             <div className="space-y-6">
@@ -782,9 +785,12 @@ export default function ReportsPage() {
       {activeTab !== "executive" && (
         <div className="space-y-6">
           {reportLoading ? (
-            <div className="p-20 flex flex-col justify-center items-center gap-3">
-              <LoadingSpinner className="w-8 h-8 text-[#C4A06A]" />
-              <span className="text-xs font-mono text-[#82747A]">Compiling Ledger Records...</span>
+            <div className="p-16 flex justify-center items-center">
+              <LoadingSpinner
+                size="lg"
+                text="Compiling Ledger Audit Records..."
+                subtext="Retrieving verified database rows for selected report period..."
+              />
             </div>
           ) : reportData ? (
             <>

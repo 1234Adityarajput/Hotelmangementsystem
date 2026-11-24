@@ -520,7 +520,7 @@ export default function AutomaticBillingPage() {
 
           {loading ? (
             <div className="p-16 flex justify-center items-center">
-              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+              <LoadingSpinner text="Computing Automatic Billings..." subtext="Aggregating room nights, consumed amenities, and payment folios..." />
             </div>
           ) : folios.length === 0 ? (
             <Card className="border-[#E8DDD8] p-12 text-center text-xs text-[#82747A] bg-white">

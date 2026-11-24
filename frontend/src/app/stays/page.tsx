@@ -542,9 +542,11 @@ export default function StaysPage() {
         <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
           <CardContent className="p-0">
             {loading ? (
-              <div className="p-16 flex flex-col justify-center items-center gap-3">
-                <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
-                <p className="text-xs text-[#82747A]">Loading active in-house stays...</p>
+              <div className="p-16 flex justify-center items-center">
+                <LoadingSpinner
+                  text="Loading In-House Guests..."
+                  subtext="Retrieving checked-in guest folios and room assignments..."
+                />
               </div>
             ) : inHouse.length === 0 ? (
               <div className="p-16 text-center text-xs text-[#82747A] space-y-3">
@@ -868,9 +870,11 @@ export default function StaysPage() {
           <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
             <CardContent className="p-0">
               {loading ? (
-                <div className="p-16 flex flex-col justify-center items-center gap-3">
-                  <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
-                  <p className="text-xs text-[#82747A]">Querying digital checkout archives...</p>
+                <div className="p-16 flex justify-center items-center">
+                  <LoadingSpinner
+                    text="Loading Digital Checkout Archives..."
+                    subtext="Querying historical check-out folios and stay records..."
+                  />
                 </div>
               ) : archive.length === 0 ? (
                 <div className="p-16 text-center text-xs text-[#82747A]">
@@ -1183,9 +1187,11 @@ export default function StaysPage() {
           </DialogHeader>
 
           {loadingSummary ? (
-            <div className="p-16 flex flex-col justify-center items-center gap-2">
-              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
-              <p className="text-xs text-[#82747A]">Calculating stay charges, room items & taxes...</p>
+            <div className="p-16 flex justify-center items-center">
+              <LoadingSpinner
+                text="Computing Check-Out Folio..."
+                subtext="Calculating room tariff, services consumed, and GST tax balance..."
+              />
             </div>
           ) : (
             <form onSubmit={handleConfirmCheckOut} className="space-y-4 pt-2 text-xs">

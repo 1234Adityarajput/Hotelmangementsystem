@@ -570,7 +570,7 @@ export default function ItemsPage() {
 
           {loading ? (
             <div className="p-16 flex justify-center items-center">
-              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+              <LoadingSpinner text="Loading Hotel Items & Services Catalog..." subtext="Retrieving restaurant menus, room service, and amenities..." />
             </div>
           ) : items.length === 0 ? (
             <Card className="border-[#E8DDD8] p-12 text-center text-xs text-[#82747A] bg-white">

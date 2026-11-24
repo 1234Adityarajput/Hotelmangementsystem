@@ -76,11 +76,12 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <LoadingSpinner className="w-8 h-8 text-[#C4A06A]" />
-        <p className="text-sm font-medium text-[#82747A]">
-          Querying live Neon PostgreSQL database...
-        </p>
+      <div className="flex flex-col items-center justify-center min-h-[70vh]">
+        <LoadingSpinner
+          size="lg"
+          text="Loading Executive Dashboard"
+          subtext="Querying live room inventory, folios, and financial metrics..."
+        />
       </div>
     );
   }
