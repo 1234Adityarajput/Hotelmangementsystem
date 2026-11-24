@@ -44,85 +44,85 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F5F0EA] font-sans">
       {/* =====================================================================
-          LEFT HERO SECTION (Full-bleed Luxury Hotel Image with Soft Frosted White Blur)
+          LEFT HERO SECTION (Vibrant Luxury Hotel Image with Ultra-Subtle Frosted White Veil)
           ===================================================================== */}
       <div className="relative w-full lg:w-[58%] min-h-[620px] lg:min-h-screen flex flex-col justify-between p-8 sm:p-12 lg:p-16 overflow-hidden">
-        {/* 1. Background Luxury Hotel Image with Blur */}
+        {/* 1. Background Luxury Hotel Image (Sharp & Vivid - No Blur) */}
         <Image
           src="/hotel-hero.jpg"
           alt="Grand Horizon Luxury Boutique Hotel"
           fill
           priority
-          className="object-cover object-center blur-[5px] scale-105"
+          className="object-cover object-center"
         />
 
-        {/* 2. Full-bleed Frosted White Blur Overlay across the entire picture */}
-        <div className="absolute inset-0 bg-white/75 backdrop-blur-md pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/65 to-[#F5F0EA]/75 pointer-events-none" />
+        {/* 2. Ultra-Subtle Minimal Frosted White Overlay (High Transparency so Hotel is Clearly Visible) */}
+        <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/40 via-white/25 to-white/10 pointer-events-none" />
 
         {/* 3. Top Tag / Pill */}
         <div className="relative z-10 flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-white/85 text-[#59283A] border border-[#E8DDD8] shadow-xs backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/90 text-[#59283A] border border-white/80 shadow-sm backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-[#C4A06A] animate-pulse" />
             <span className="tracking-widest uppercase text-[10px] text-[#59283A] font-bold">
               Grand Horizon Platform
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-semibold bg-white/85 text-[#32765B] border border-[#E8DDD8] shadow-xs backdrop-blur-sm">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold bg-white/90 text-[#32765B] border border-white/80 shadow-sm backdrop-blur-md">
             <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
             <span>5-Star Luxury Experience</span>
           </div>
         </div>
 
-        {/* 4. Center Headline & Editorial Introduction (Directly on white blurred canvas - NO CARD) */}
+        {/* 4. Center Headline & Editorial Introduction (Directly on canvas with high contrast) */}
         <div className="relative z-10 my-10 lg:my-auto max-w-xl">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2 h-6 rounded-full bg-gradient-to-b from-[#C4A06A] to-[#59283A]" />
-            <span className="text-[11px] font-bold tracking-widest uppercase text-[#C4A06A]">
+            <span className="text-[11px] font-bold tracking-widest uppercase text-[#59283A] drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
               Next-Gen Hospitality Suite
             </span>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.15] text-[#59283A]">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] text-[#472130] drop-shadow-[0_2px_4px_rgba(255,255,255,0.85)]">
             Smart Luxury Hospitality &amp; Hotel Operations SaaS
           </h1>
 
-          <p className="mt-6 text-sm sm:text-base text-[#472130] leading-relaxed font-normal">
+          <p className="mt-6 text-sm sm:text-base text-[#352630] leading-relaxed font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
             Real-time room inventory management, front desk check-in dispatch, live billing &amp;
             folios, staff payroll engine, and unified property management console designed for
             high-standard hotel operations.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-[#59283A]">
-            <div className="flex items-center gap-1.5 bg-white/80 px-3.5 py-1.5 rounded-xl border border-[#E8DDD8] font-semibold shadow-xs backdrop-blur-sm">
+            <div className="flex items-center gap-1.5 bg-white/90 px-3.5 py-1.5 rounded-xl border border-white/80 font-bold shadow-sm backdrop-blur-md">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
               <span>Modular Monolith</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/80 px-3.5 py-1.5 rounded-xl border border-[#E8DDD8] font-semibold shadow-xs backdrop-blur-sm">
+            <div className="flex items-center gap-1.5 bg-white/90 px-3.5 py-1.5 rounded-xl border border-white/80 font-bold shadow-sm backdrop-blur-md">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
               <span>Neon PostgreSQL Live</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/80 px-3.5 py-1.5 rounded-xl border border-[#E8DDD8] font-semibold shadow-xs backdrop-blur-sm">
+            <div className="flex items-center gap-1.5 bg-white/90 px-3.5 py-1.5 rounded-xl border border-white/80 font-bold shadow-sm backdrop-blur-md">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#C4A06A]" />
               <span>Royal Burgundy &amp; Pearl</span>
             </div>
           </div>
         </div>
 
-        {/* 5. Bottom 3-Column Highlights (Directly on white blurred canvas - NO CARDS) */}
-        <div className="relative z-10 pt-8 border-t border-[#59283A]/15 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* 5. Bottom 3-Column Highlights (Directly on canvas with high contrast) */}
+        <div className="relative z-10 pt-8 border-t border-[#59283A]/20 grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
-            <div className="font-serif text-2xl lg:text-3xl font-bold text-[#59283A]">120+ Rooms</div>
-            <div className="text-xs text-[#82747A] mt-1 font-medium">Active Across All Floors</div>
+            <div className="font-serif text-2xl lg:text-3xl font-extrabold text-[#472130] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]">120+ Rooms</div>
+            <div className="text-xs text-[#59283A] mt-1 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">Active Across All Floors</div>
           </div>
           <div>
-            <div className="font-serif text-2xl lg:text-3xl font-bold text-[#59283A]">Instant Check-In</div>
-            <div className="text-xs text-[#82747A] mt-1 font-medium">Front Desk Key Dispatch</div>
+            <div className="font-serif text-2xl lg:text-3xl font-extrabold text-[#472130] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]">Instant Check-In</div>
+            <div className="text-xs text-[#59283A] mt-1 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">Front Desk Key Dispatch</div>
           </div>
           <div>
-            <div className="font-serif text-2xl lg:text-3xl font-bold text-[#32765B]">Neon DB Live</div>
-            <div className="text-xs text-[#82747A] mt-1 font-medium">100% Encrypted &amp; Audited</div>
+            <div className="font-serif text-2xl lg:text-3xl font-extrabold text-[#32765B] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]">Neon DB Live</div>
+            <div className="text-xs text-[#59283A] mt-1 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">100% Encrypted &amp; Audited</div>
           </div>
         </div>
       </div>
