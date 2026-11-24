@@ -34,8 +34,10 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
-  // Global API Prefix
-  app.setGlobalPrefix('api/v1');
+  // Global API Prefix (Root / and favicon.ico excluded)
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['/', 'favicon.ico'],
+  });
 
   // Global Validation
   app.useGlobalPipes(createValidationPipe());
