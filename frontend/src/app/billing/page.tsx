@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 import { toast } from "sonner";
 import {
   Calculator,
@@ -1052,16 +1053,26 @@ export default function AutomaticBillingPage() {
             <div className="space-y-6 printable-folio">
               {/* Hotel Luxury Letterhead */}
               <div className="border-b-2 border-[#59283A] pb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div>
-                  <h2 className="font-serif text-2xl font-bold tracking-tight text-[#59283A]">
-                    Hotel Radha Palace
-                  </h2>
-                  <p className="text-xs text-[#82747A] mt-0.5">
-                    Boutique Luxury Hospitality Management • Official Stay Folio
-                  </p>
-                  <p className="text-[11px] text-[#8E7079] mt-0.5">
-                    GSTIN: 07AAAAA0000A1Z5 • 108 Heritage Boulevard, New Delhi, India
-                  </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#C4A06A] shadow-md relative flex-shrink-0 bg-[#59283A]">
+                    <Image
+                      src="/radha-krishna-logo.jpg"
+                      alt="Hotel Radha Palace"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h2 className="font-serif text-2xl font-bold tracking-tight text-[#59283A]">
+                      Hotel Radha Palace
+                    </h2>
+                    <p className="text-xs text-[#82747A] mt-0.5">
+                      Boutique Luxury Hospitality Management • Official Stay Folio
+                    </p>
+                    <p className="text-[11px] text-[#8E7079] mt-0.5">
+                      GSTIN: 07AAAAA0000A1Z5 • 108 Heritage Boulevard, New Delhi, India
+                    </p>
+                  </div>
                 </div>
                 <div className="sm:text-right">
                   <div className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">

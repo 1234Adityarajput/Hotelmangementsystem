@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -466,9 +467,14 @@ export default function InvoicesPage() {
             <div className="space-y-6 pt-2 text-xs">
               {/* Hotel Header */}
               <div className="flex items-start justify-between pb-4 border-b border-[#E8DDD8]">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-lg bg-[#59283A] text-white flex items-center justify-center font-bold">
-                    <Building2 className="w-6 h-6" />
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-[#C4A06A] shadow-md relative flex-shrink-0 bg-[#59283A]">
+                    <Image
+                      src="/radha-krishna-logo.jpg"
+                      alt="Hotel Radha Palace"
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                   <div>
                     <h3 className="font-bold text-base text-[#59283A]">Hotel Radha Palace</h3>

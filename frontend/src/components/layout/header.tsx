@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Shield, LogOut, CheckCircle2, ChevronRight, Menu } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
@@ -164,8 +165,8 @@ export function Header({ onOpenMobile }: HeaderProps) {
 
   return (
     <header className="h-20 bg-white border-b border-[#E8DDD8] px-4 sm:px-8 flex items-center justify-between flex-shrink-0 shadow-sm transition-all z-20">
-      {/* Left: Mobile Toggle & Editorial Page Title */}
-      <div className="flex items-center gap-3">
+      {/* Left: Mobile Toggle, Divine Hotel Radha Palace Logo & Editorial Page Title */}
+      <div className="flex items-center gap-3.5">
         {onOpenMobile && (
           <button
             onClick={onOpenMobile}
@@ -175,6 +176,16 @@ export function Header({ onOpenMobile }: HeaderProps) {
             <Menu className="w-5 h-5" />
           </button>
         )}
+
+        {/* Divine Radha Krishna Logo Emblem in Top Bar */}
+        <div className="hidden sm:block w-12 h-12 rounded-xl overflow-hidden shadow-md border-2 border-[#C4A06A] relative flex-shrink-0 bg-[#59283A]">
+          <Image
+            src="/radha-krishna-logo.jpg"
+            alt="Hotel Radha Palace"
+            fill
+            className="object-cover"
+          />
+        </div>
 
         <div className="flex flex-col justify-center">
           <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#82747A] tracking-wider uppercase">

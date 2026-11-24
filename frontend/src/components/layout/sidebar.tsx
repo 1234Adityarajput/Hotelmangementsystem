@@ -297,11 +297,14 @@ export function Sidebar({
     <div className="flex flex-col h-full bg-[#59283A] text-white select-none">
       {/* Brand Header */}
       <div className={cn(
-        "h-20 flex items-center border-b border-[#472130] bg-[#472130]/70 flex-shrink-0 transition-all px-4",
+        "h-24 flex items-center border-b border-[#472130] bg-[#472130]/70 flex-shrink-0 transition-all px-4",
         collapsed ? "justify-center" : "justify-between"
       )}>
-        <Link href="/" className="flex items-center gap-3 min-w-0" onClick={onMobileClose}>
-          <div className="w-11 h-11 rounded-xl overflow-hidden shadow-lg flex-shrink-0 border-2 border-[#C4A06A]/70 relative">
+        <Link href="/" className="flex items-center gap-3.5 min-w-0" onClick={onMobileClose}>
+          <div className={cn(
+            "rounded-2xl overflow-hidden shadow-xl flex-shrink-0 border-2 border-[#C4A06A] relative bg-[#59283A] transition-all",
+            collapsed ? "w-13 h-13" : "w-16 h-16"
+          )}>
             <Image
               src="/radha-krishna-logo.jpg"
               alt="Hotel Radha Palace"
@@ -311,12 +314,12 @@ export function Sidebar({
           </div>
           {!collapsed && (
             <div className="flex flex-col min-w-0">
-              <span className="font-serif font-bold text-base text-white tracking-tight leading-tight truncate">
+              <span className="font-serif font-bold text-lg text-white tracking-tight leading-tight truncate">
                 Hotel Radha Palace
               </span>
-              <div className="flex items-center gap-1 mt-0.5">
-                <Sparkles className="w-2.5 h-2.5 text-[#C4A06A]" />
-                <span className="text-[10px] text-[#C4A06A] tracking-widest uppercase font-semibold">
+              <div className="flex items-center gap-1.5 mt-1">
+                <Sparkles className="w-3 h-3 text-[#C4A06A]" />
+                <span className="text-[11px] text-[#C4A06A] tracking-widest uppercase font-semibold">
                   Royal Luxury OS
                 </span>
               </div>

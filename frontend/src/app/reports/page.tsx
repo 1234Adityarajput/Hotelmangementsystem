@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 import { toast } from "sonner";
 import {
   TrendingUp,
@@ -322,13 +323,23 @@ export default function ReportsPage() {
       {/* Editorial Luxury Print Letterhead (visible ONLY when printed) */}
       <div className="hidden print:block mb-8 pb-4 border-b-2 border-[#59283A]">
         <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-serif font-black tracking-widest text-[#59283A] uppercase">
-              HOTEL RADHA PALACE
-            </h1>
-            <p className="text-xs font-mono text-[#82747A] tracking-wider uppercase mt-0.5">
-              Luxury Hotel & Executive Suites • Official Audit Dossier
-            </p>
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#C4A06A] relative flex-shrink-0 bg-[#59283A]">
+              <Image
+                src="/radha-krishna-logo.jpg"
+                alt="Hotel Radha Palace"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-serif font-black tracking-widest text-[#59283A] uppercase">
+                HOTEL RADHA PALACE
+              </h1>
+              <p className="text-xs font-mono text-[#82747A] tracking-wider uppercase mt-0.5">
+                Luxury Hotel & Executive Suites • Official Audit Dossier
+              </p>
+            </div>
           </div>
           <div className="text-right text-xs font-mono text-[#82747A]">
             <div>Generated: {new Date().toLocaleString("en-IN")}</div>

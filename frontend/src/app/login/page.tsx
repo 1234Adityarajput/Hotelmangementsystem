@@ -132,21 +132,23 @@ export default function LoginPage() {
           ===================================================================== */}
       <div className="w-full lg:w-[42%] flex items-center justify-center p-6 sm:p-10 lg:p-12 bg-[#F5F0EA]">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-[#59283A]/5 border border-[#E8DDD8] p-8 sm:p-10">
-          {/* Brand Header with Divine Radha Krishna Logo */}
-          <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md shadow-[#59283A]/20 border-2 border-[#C4A06A] relative flex-shrink-0">
+          {/* Brand Header with Divine Radha Krishna Logo (Grand & Prominent) */}
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-xl shadow-[#59283A]/25 border-2 border-[#C4A06A] relative flex-shrink-0 bg-[#59283A]">
               <Image
                 src="/radha-krishna-logo.jpg"
                 alt="Hotel Radha Palace"
                 fill
+                priority
                 className="object-cover"
               />
             </div>
-            <div className="flex flex-col">
-              <span className="font-serif text-xl font-bold text-[#59283A] tracking-tight leading-none">
+            <div className="flex flex-col justify-center min-w-0">
+              <span className="font-serif text-2xl sm:text-3xl font-black text-[#59283A] tracking-tight leading-tight">
                 HOTEL RADHA PALACE
               </span>
-              <span className="text-[10px] font-bold text-[#C4A06A] tracking-widest uppercase mt-1">
+              <span className="text-[11px] font-bold text-[#C4A06A] tracking-widest uppercase mt-1.5 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#C4A06A]" />
                 HOTEL MANAGEMENT OS
               </span>
             </div>
