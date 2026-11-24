@@ -51,12 +51,65 @@ export interface ExecutiveReportData {
   };
 }
 
+export interface ReportTypeItem {
+  id: string;
+  title: string;
+  description: string;
+}
+
+export interface ReportTypesCatalog {
+  hotelReports: ReportTypeItem[];
+  staffReports: ReportTypeItem[];
+}
+
+export interface ReportColumn {
+  key: string;
+  label: string;
+  type?: "text" | "currency" | "badge" | "date";
+}
+
+export interface ReportResponse {
+  reportType: string;
+  reportTitle: string;
+  category: "HOTEL" | "STAFF" | "EXECUTIVE";
+  description: string;
+  dateRange: {
+    startDate: string;
+    endDate: string;
+  };
+  kpis: Record<string, string | number>;
+  columns: ReportColumn[];
+  rows: any[];
+  summary?: Record<string, any>;
+}
+
+export interface QueryReportParams {
+  startDate?: string;
+  endDate?: string;
+  search?: string;
+}
+
 export const reportsService = {
+  async getReportTypes(): Promise<ReportTypesCatalog> {
+    const res = await apiClient.get<ApiResponse<ReportTypesCatalog>>("/reports/report-types");
+    return res.data.data;
+  },
+
   async getExecutiveReport(params?: {
     startDate?: string;
     endDate?: string;
   }): Promise<ExecutiveReportData> {
     const res = await apiClient.get<ApiResponse<ExecutiveReportData>>("/reports/executive", {
+      params,
+    });
+    return res.data.data;
+  },
+
+  async generateReport(
+    reportType: string,
+    params?: QueryReportParams
+  ): Promise<ReportResponse> {
+    const res = await apiClient.get<ApiResponse<ReportResponse>>(`/reports/${reportType}`, {
       params,
     });
     return res.data.data;

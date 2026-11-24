@@ -11,4 +11,14 @@ export class QueryReportsDto {
   @IsOptional()
   @IsString()
   endDate?: string;
+
+  @ApiPropertyOptional({ description: 'Search term for filtering report rows' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({ description: 'Optional category, department or filter key' })
+  @IsOptional()
+  @IsString()
+  category?: string;
 }
