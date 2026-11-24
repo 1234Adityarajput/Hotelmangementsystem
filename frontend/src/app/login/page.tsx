@@ -57,72 +57,72 @@ export default function LoginPage() {
         />
 
         {/* 2. Ultra-Subtle Minimal Frosted White Overlay (High Transparency so Hotel is Clearly Visible) */}
-        <div className="absolute inset-0 bg-white/30 backdrop-blur-[2px] pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-white/40 via-white/25 to-white/10 pointer-events-none" />
+        <div className="absolute inset-0 bg-white/35 backdrop-blur-[1.5px] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/45 via-white/30 to-white/15 pointer-events-none" />
 
         {/* 3. Top Tag / Pill */}
         <div className="relative z-10 flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-white/90 text-[#59283A] border border-white/80 shadow-sm backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-[#C4A06A] animate-pulse" />
-            <span className="tracking-widest uppercase text-[10px] text-[#59283A] font-bold">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black bg-white/95 text-[#1E0B14] border border-black/15 shadow-sm backdrop-blur-md">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#C4A06A] animate-pulse" />
+            <span className="tracking-widest uppercase text-[11px] text-[#1E0B14] font-black">
               Grand Horizon Platform
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold bg-white/90 text-[#32765B] border border-white/80 shadow-sm backdrop-blur-md">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-white/95 text-[#166534] border border-black/15 shadow-sm backdrop-blur-md">
+            <CheckCircle2 className="w-4 h-4 text-[#166534] stroke-[2.5]" />
             <span>5-Star Luxury Experience</span>
           </div>
         </div>
 
-        {/* 4. Center Headline & Editorial Introduction (Directly on canvas with high contrast) */}
+        {/* 4. Center Headline & Editorial Introduction (Ultra Dark & Bold) */}
         <div className="relative z-10 my-10 lg:my-auto max-w-xl">
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-2 h-6 rounded-full bg-gradient-to-b from-[#C4A06A] to-[#59283A]" />
-            <span className="text-[11px] font-bold tracking-widest uppercase text-[#59283A] drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
+            <span className="w-2.5 h-6 rounded-full bg-gradient-to-b from-[#C4A06A] to-[#1E0B14]" />
+            <span className="text-xs font-black tracking-widest uppercase text-[#1E0B14]">
               Next-Gen Hospitality Suite
             </span>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] text-[#472130] drop-shadow-[0_2px_4px_rgba(255,255,255,0.85)]">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.12] text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">
             Smart Luxury Hospitality &amp; Hotel Operations SaaS
           </h1>
 
-          <p className="mt-6 text-sm sm:text-base text-[#352630] leading-relaxed font-semibold drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]">
+          <p className="mt-6 text-base sm:text-lg text-[#1E0B14] leading-relaxed font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">
             Real-time room inventory management, front desk check-in dispatch, live billing &amp;
             folios, staff payroll engine, and unified property management console designed for
             high-standard hotel operations.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-[#59283A]">
-            <div className="flex items-center gap-1.5 bg-white/90 px-3.5 py-1.5 rounded-xl border border-white/80 font-bold shadow-sm backdrop-blur-md">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
+          <div className="mt-8 flex flex-wrap items-center gap-3 text-xs">
+            <div className="flex items-center gap-2 bg-white/95 px-4 py-2 rounded-xl border border-black/15 font-black text-[#1E0B14] shadow-sm backdrop-blur-md">
+              <CheckCircle2 className="w-4 h-4 text-[#166534] stroke-[2.5]" />
               <span>Modular Monolith</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/90 px-3.5 py-1.5 rounded-xl border border-white/80 font-bold shadow-sm backdrop-blur-md">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
+            <div className="flex items-center gap-2 bg-white/95 px-4 py-2 rounded-xl border border-black/15 font-black text-[#1E0B14] shadow-sm backdrop-blur-md">
+              <CheckCircle2 className="w-4 h-4 text-[#166534] stroke-[2.5]" />
               <span>Neon PostgreSQL Live</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/90 px-3.5 py-1.5 rounded-xl border border-white/80 font-bold shadow-sm backdrop-blur-md">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <div className="flex items-center gap-2 bg-white/95 px-4 py-2 rounded-xl border border-black/15 font-black text-[#1E0B14] shadow-sm backdrop-blur-md">
+              <CheckCircle2 className="w-4 h-4 text-[#C4A06A] stroke-[2.5]" />
               <span>Royal Burgundy &amp; Pearl</span>
             </div>
           </div>
         </div>
 
-        {/* 5. Bottom 3-Column Highlights (Directly on canvas with high contrast) */}
-        <div className="relative z-10 pt-8 border-t border-[#59283A]/20 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* 5. Bottom 3-Column Highlights (Ultra Dark & Bold) */}
+        <div className="relative z-10 pt-8 border-t-2 border-[#1E0B14]/25 grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
-            <div className="font-serif text-2xl lg:text-3xl font-extrabold text-[#472130] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]">120+ Rooms</div>
-            <div className="text-xs text-[#59283A] mt-1 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">Active Across All Floors</div>
+            <div className="font-serif text-3xl lg:text-4xl font-black text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">120+ Rooms</div>
+            <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">Active Across All Floors</div>
           </div>
           <div>
-            <div className="font-serif text-2xl lg:text-3xl font-extrabold text-[#472130] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]">Instant Check-In</div>
-            <div className="text-xs text-[#59283A] mt-1 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">Front Desk Key Dispatch</div>
+            <div className="font-serif text-3xl lg:text-4xl font-black text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">Instant Check-In</div>
+            <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">Front Desk Key Dispatch</div>
           </div>
           <div>
-            <div className="font-serif text-2xl lg:text-3xl font-extrabold text-[#32765B] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]">Neon DB Live</div>
-            <div className="text-xs text-[#59283A] mt-1 font-bold drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">100% Encrypted &amp; Audited</div>
+            <div className="font-serif text-3xl lg:text-4xl font-black text-[#166534] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">Neon DB Live</div>
+            <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">100% Encrypted &amp; Audited</div>
           </div>
         </div>
       </div>
