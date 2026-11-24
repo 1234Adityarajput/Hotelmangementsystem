@@ -99,7 +99,12 @@ export default function StaysPage() {
   const [allGuests, setAllGuests] = useState<Guest[]>([]);
   const [allAvailableRooms, setAllAvailableRooms] = useState<Room[]>([]);
   const [walkInForm, setWalkInForm] = useState({
+    guestType: "EXISTING" as "EXISTING" | "NEW",
     primaryGuestId: "",
+    newGuestName: "",
+    newGuestMobile: "",
+    newGuestEmail: "",
+    newGuestAddress: "",
     roomId: "",
     checkInDate: new Date().toISOString().split("T")[0],
     checkInTime: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true }),
@@ -159,41 +164,56 @@ export default function StaysPage() {
         ? (rRes as any).items
         : [];
 
-      if (guestList.length === 0) {
-        toast.info("No registered guests found. Please add a guest in the Guest Directory first.");
-      }
-      if (roomList.length === 0) {
-        toast.warning("All rooms are currently occupied or under maintenance. No rooms available.");
-      }
-
       setAllGuests(guestList);
       setAllAvailableRooms(roomList);
       setWalkInForm((prev) => ({
         ...prev,
+        guestType: guestList.length > 0 ? "EXISTING" : "NEW",
         primaryGuestId: guestList[0]?.id || "",
         roomId: roomList[0]?.id || "",
-        roomRatePerNight: roomList[0] ? Number(roomList[0].pricePerNight) : prev.roomRatePerNight,
+        roomRatePerNight: roomList[0] ? Number(roomList[0].pricePerNight) : 2000,
       }));
       setWalkInModalOpen(true);
     } catch (err: any) {
       console.error("Failed to prepare walk-in check-in:", err);
-      const msg = err.response?.data?.message || err.message || "Failed to prepare walk-in check-in";
-      toast.error(msg);
+      setWalkInForm((prev) => ({ ...prev, guestType: "NEW" }));
+      setWalkInModalOpen(true);
     }
   };
 
   const handleConfirmWalkIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!walkInForm.primaryGuestId || !walkInForm.roomId) {
-      toast.error("Please select a Guest and Room");
+    if (!walkInForm.roomId) {
+      toast.error("Please select an available Room");
       return;
     }
 
     try {
       setSubmitting(true);
-      // 1. Create reservation
+      let targetGuestId = walkInForm.primaryGuestId;
+
+      if (walkInForm.guestType === "NEW") {
+        if (!walkInForm.newGuestName.trim() || !walkInForm.newGuestMobile.trim()) {
+          toast.error("Please enter guest full name and mobile number");
+          setSubmitting(false);
+          return;
+        }
+        const createdGuest = await guestsService.create({
+          fullName: walkInForm.newGuestName.trim(),
+          mobileNumber: walkInForm.newGuestMobile.trim(),
+          email: walkInForm.newGuestEmail.trim() || undefined,
+          address: walkInForm.newGuestAddress.trim() || undefined,
+        });
+        targetGuestId = createdGuest.id;
+      } else if (!targetGuestId) {
+        toast.error("Please select a registered Guest");
+        setSubmitting(false);
+        return;
+      }
+
+      // 1. Create reservation (with advance payment recorded)
       const created = await bookingsService.create({
-        primaryGuestId: walkInForm.primaryGuestId,
+        primaryGuestId: targetGuestId,
         roomId: walkInForm.roomId,
         checkInDate: walkInForm.checkInDate,
         checkInTime: walkInForm.checkInTime,
@@ -207,10 +227,10 @@ export default function StaysPage() {
         notes: walkInForm.notes,
       });
 
-      // 2. Perform instant check-in
+      // 2. Perform instant check-in (advanceAmount = 0 to prevent double advance recording)
       await bookingsService.checkIn(created.id, {
         checkInTime: walkInForm.checkInTime,
-        advanceAmount: Number(walkInForm.advanceAmount),
+        advanceAmount: 0,
         advancePaymentMethod: walkInForm.advancePaymentMethod,
       });
 
@@ -218,7 +238,7 @@ export default function StaysPage() {
       setWalkInModalOpen(false);
       fetchData();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Walk-in check-in failed");
+      toast.error(err.response?.data?.message || err.message || "Walk-in check-in failed");
     } finally {
       setSubmitting(false);
     }
@@ -1592,45 +1612,139 @@ export default function StaysPage() {
           </DialogHeader>
 
           <form onSubmit={handleConfirmWalkIn} className="space-y-3.5 pt-2 text-xs">
-            {/* Guest Selection */}
-            <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Select Primary Guest *</label>
-              <select
-                required
-                value={walkInForm.primaryGuestId}
-                onChange={(e) => setWalkInForm({ ...walkInForm, primaryGuestId: e.target.value })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
-              >
-                {allGuests.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.fullName} ({g.mobileNumber}) • {g.guestCode}
-                  </option>
-                ))}
-              </select>
+            {/* Guest Selection Toggle */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="font-semibold text-[#362A22]">Primary Guest *</label>
+                <div className="inline-flex rounded-md p-0.5 bg-[#EEE7DA] text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setWalkInForm({ ...walkInForm, guestType: "EXISTING" })}
+                    className={`px-2.5 py-0.5 rounded font-medium transition-colors ${
+                      walkInForm.guestType === "EXISTING"
+                        ? "bg-[#362A22] text-white shadow-sm"
+                        : "text-[#79695B] hover:text-[#362A22]"
+                    }`}
+                  >
+                    Select Registered ({allGuests.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWalkInForm({ ...walkInForm, guestType: "NEW" })}
+                    className={`px-2.5 py-0.5 rounded font-medium transition-colors ${
+                      walkInForm.guestType === "NEW"
+                        ? "bg-[#362A22] text-white shadow-sm"
+                        : "text-[#79695B] hover:text-[#362A22]"
+                    }`}
+                  >
+                    + Quick New Guest
+                  </button>
+                </div>
+              </div>
+
+              {walkInForm.guestType === "EXISTING" ? (
+                allGuests.length > 0 ? (
+                  <select
+                    value={walkInForm.primaryGuestId}
+                    onChange={(e) => setWalkInForm({ ...walkInForm, primaryGuestId: e.target.value })}
+                    className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                  >
+                    {allGuests.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.fullName} ({g.mobileNumber}) • {g.guestCode}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="p-2.5 bg-[#F7F4EE] rounded-lg border border-[#E3D9CA] text-[11px] text-[#79695B] flex items-center justify-between">
+                    <span>No registered guests found in system.</span>
+                    <button
+                      type="button"
+                      onClick={() => setWalkInForm({ ...walkInForm, guestType: "NEW" })}
+                      className="text-[#362A22] font-semibold underline"
+                    >
+                      Enter Guest Details
+                    </button>
+                  </div>
+                )
+              ) : (
+                <div className="p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-0.5">
+                      <label className="text-[10px] uppercase font-bold text-[#79695B]">Full Name *</label>
+                      <Input
+                        required={walkInForm.guestType === "NEW"}
+                        placeholder="e.g. Ramesh Kumar"
+                        value={walkInForm.newGuestName}
+                        onChange={(e) => setWalkInForm({ ...walkInForm, newGuestName: e.target.value })}
+                        className="h-7 text-xs bg-white border-[#E3D9CA]"
+                      />
+                    </div>
+                    <div className="space-y-0.5">
+                      <label className="text-[10px] uppercase font-bold text-[#79695B]">Mobile Number *</label>
+                      <Input
+                        required={walkInForm.guestType === "NEW"}
+                        placeholder="10-digit mobile"
+                        value={walkInForm.newGuestMobile}
+                        onChange={(e) => setWalkInForm({ ...walkInForm, newGuestMobile: e.target.value })}
+                        className="h-7 text-xs font-mono bg-white border-[#E3D9CA]"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-0.5">
+                      <label className="text-[10px] uppercase font-bold text-[#79695B]">Email (Optional)</label>
+                      <Input
+                        type="email"
+                        placeholder="guest@example.com"
+                        value={walkInForm.newGuestEmail}
+                        onChange={(e) => setWalkInForm({ ...walkInForm, newGuestEmail: e.target.value })}
+                        className="h-7 text-xs bg-white border-[#E3D9CA]"
+                      />
+                    </div>
+                    <div className="space-y-0.5">
+                      <label className="text-[10px] uppercase font-bold text-[#79695B]">City / Address (Optional)</label>
+                      <Input
+                        placeholder="e.g. Mumbai, MH"
+                        value={walkInForm.newGuestAddress}
+                        onChange={(e) => setWalkInForm({ ...walkInForm, newGuestAddress: e.target.value })}
+                        className="h-7 text-xs bg-white border-[#E3D9CA]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Room Selection */}
             <div className="space-y-1">
               <label className="font-semibold text-[#362A22]">Select Available Room *</label>
-              <select
-                required
-                value={walkInForm.roomId}
-                onChange={(e) => {
-                  const sel = allAvailableRooms.find((r) => r.id === e.target.value);
-                  setWalkInForm({
-                    ...walkInForm,
-                    roomId: e.target.value,
-                    roomRatePerNight: sel ? Number(sel.pricePerNight) : walkInForm.roomRatePerNight,
-                  });
-                }}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
-              >
-                {allAvailableRooms.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    Room {r.roomNumber} ({r.roomType?.name} - Floor {r.floor} - ₹{r.pricePerNight}/night)
-                  </option>
-                ))}
-              </select>
+              {allAvailableRooms.length > 0 ? (
+                <select
+                  required
+                  value={walkInForm.roomId}
+                  onChange={(e) => {
+                    const sel = allAvailableRooms.find((r) => r.id === e.target.value);
+                    setWalkInForm({
+                      ...walkInForm,
+                      roomId: e.target.value,
+                      roomRatePerNight: sel ? Number(sel.pricePerNight) : walkInForm.roomRatePerNight,
+                    });
+                  }}
+                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                >
+                  <option value="">-- Choose Available Room --</option>
+                  {allAvailableRooms.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      Room {r.roomNumber} ({r.roomType?.name} - Floor {r.floor} - ₹{r.pricePerNight}/night)
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-amber-800 text-[11px]">
+                  All rooms are currently occupied or under maintenance. No room is available for walk-in.
+                </div>
+              )}
             </div>
 
             {/* Dates & Times */}
