@@ -14,10 +14,10 @@ export class SettingsService {
       update: {},
       create: {
         id: 'default',
-        hotelName: 'Grand Horizon Hotel',
-        hotelAddress: '100 Beach Road, Civil Lines',
+        hotelName: 'Hotel Radha Palace',
+        hotelAddress: 'Hotel Radha Palace, Main Road',
         mobileNumber: '+91 9876543210',
-        email: 'info@grandhorizon.com',
+        email: 'info@hotelradhapalace.com',
         currencyCode: 'INR',
         timezone: 'Asia/Kolkata',
         defaultCheckInTime: '12:00 PM',

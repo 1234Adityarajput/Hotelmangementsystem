@@ -155,8 +155,8 @@ export function Header({ onOpenMobile }: HeaderProps) {
 
     return {
       category: "Hotel Admin",
-      title: "Grand Horizon OS",
-      description: "Royal luxury boutique hotel management platform.",
+      title: "Hotel Radha Palace",
+      description: "Hotel Radha Palace - Royal Luxury Hotel Management Platform.",
     };
   };
 

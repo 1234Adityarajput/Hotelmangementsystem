@@ -5,7 +5,7 @@ export default function Loading() {
     <div className="min-h-[70vh] flex items-center justify-center">
       <LoadingSpinner
         size="lg"
-        text="The Grand Horizon Luxury Hotel & Resort"
+        text="Hotel Radha Palace"
         subtext="Synchronizing live operational records..."
       />
     </div>

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Hotel,
@@ -300,13 +301,18 @@ export function Sidebar({
         collapsed ? "justify-center" : "justify-between"
       )}>
         <Link href="/" className="flex items-center gap-3 min-w-0" onClick={onMobileClose}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C4A06A] to-[#A8834F] flex items-center justify-center text-white shadow-lg flex-shrink-0 border border-[#C4A06A]/30">
-            <Hotel className="w-5 h-5 text-[#352630]" />
+          <div className="w-11 h-11 rounded-xl overflow-hidden shadow-lg flex-shrink-0 border-2 border-[#C4A06A]/70 relative">
+            <Image
+              src="/radha-krishna-logo.jpg"
+              alt="Hotel Radha Palace"
+              fill
+              className="object-cover"
+            />
           </div>
           {!collapsed && (
             <div className="flex flex-col min-w-0">
               <span className="font-serif font-bold text-base text-white tracking-tight leading-tight truncate">
-                Grand Horizon
+                Hotel Radha Palace
               </span>
               <div className="flex items-center gap-1 mt-0.5">
                 <Sparkles className="w-2.5 h-2.5 text-[#C4A06A]" />

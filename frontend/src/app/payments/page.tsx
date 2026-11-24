@@ -1159,7 +1159,7 @@ export default function PaymentsPage() {
                 <div className="flex items-center justify-center gap-1 text-[#C4A06A] mb-1">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span className="text-[10px] uppercase font-bold tracking-widest text-[#82747A]">
-                    Grand Horizon Boutique OS
+                    Hotel Radha Palace OS
                   </span>
                 </div>
                 <h2 className="text-lg font-serif font-bold text-[#59283A]">Official Payment Receipt Voucher</h2>

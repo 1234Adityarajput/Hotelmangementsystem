@@ -1054,7 +1054,7 @@ export default function AutomaticBillingPage() {
               <div className="border-b-2 border-[#59283A] pb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
                   <h2 className="font-serif text-2xl font-bold tracking-tight text-[#59283A]">
-                    Grand Horizon Hotel
+                    Hotel Radha Palace
                   </h2>
                   <p className="text-xs text-[#82747A] mt-0.5">
                     Boutique Luxury Hospitality Management • Official Stay Folio

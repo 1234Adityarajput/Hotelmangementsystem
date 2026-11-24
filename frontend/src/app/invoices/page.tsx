@@ -471,7 +471,7 @@ export default function InvoicesPage() {
                     <Building2 className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-[#59283A]">Grand Horizon Hotel & Suites</h3>
+                    <h3 className="font-bold text-base text-[#59283A]">Hotel Radha Palace</h3>
                     <p className="text-[11px] text-[#82747A]">100 Beach Road, Civil Lines • GSTIN: 27AAAAA0000A1Z5</p>
                   </div>
                 </div>

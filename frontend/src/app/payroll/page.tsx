@@ -1331,7 +1331,7 @@ export default function PayrollPage() {
               {/* Hotel Header */}
               <div className="text-center pb-4 border-b border-[#E8DDD8]">
                 <h3 className="text-xl font-serif font-bold text-[#59283A] tracking-wider uppercase">
-                  Grand Horizon Boutique Luxury Hotel
+                  Hotel Radha Palace
                 </h3>
                 <p className="text-[11px] text-[#82747A] mt-0.5">
                   100 Beach Road, Luxury Promenade • accounts@grandhorizon.com • +91 98765 43210

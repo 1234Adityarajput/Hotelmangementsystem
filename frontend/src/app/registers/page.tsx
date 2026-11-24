@@ -705,7 +705,7 @@ export default function DigitalRegistersPage() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-[#82747A]">Grand Horizon Hotel Official Register</span>
+              <span className="text-[10px] text-[#82747A]">Hotel Radha Palace Official Register</span>
             </div>
           </div>
         </CardHeader>

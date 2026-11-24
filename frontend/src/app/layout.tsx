@@ -19,8 +19,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "The Grand Horizon - Royal Luxury Hotel & Resort OS",
-  description: "Five-Star Luxury Hotel Management System (Royal Burgundy & Pearl Theme)",
+  title: "Hotel Radha Palace - Management OS",
+  description: "Hotel Radha Palace - Luxury Hotel Management System",
 };
 
 export default function RootLayout({

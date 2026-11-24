@@ -65,7 +65,7 @@ export default function LoginPage() {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black bg-white/95 text-[#1E0B14] border border-black/15 shadow-sm backdrop-blur-md">
             <span className="w-2.5 h-2.5 rounded-full bg-[#C4A06A] animate-pulse" />
             <span className="tracking-widest uppercase text-[11px] text-[#1E0B14] font-black">
-              Grand Horizon Platform
+              Hotel Radha Palace
             </span>
           </div>
 
@@ -132,14 +132,19 @@ export default function LoginPage() {
           ===================================================================== */}
       <div className="w-full lg:w-[42%] flex items-center justify-center p-6 sm:p-10 lg:p-12 bg-[#F5F0EA]">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl shadow-[#59283A]/5 border border-[#E8DDD8] p-8 sm:p-10">
-          {/* Brand Header */}
+          {/* Brand Header with Divine Radha Krishna Logo */}
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-[#59283A] flex items-center justify-center text-white shadow-md shadow-[#59283A]/20">
-              <Hotel className="w-6 h-6 text-[#C4A06A]" />
+            <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-md shadow-[#59283A]/20 border-2 border-[#C4A06A] relative flex-shrink-0">
+              <Image
+                src="/radha-krishna-logo.jpg"
+                alt="Hotel Radha Palace"
+                fill
+                className="object-cover"
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-serif text-xl font-bold text-[#59283A] tracking-tight leading-none">
-                GRAND HORIZON
+                HOTEL RADHA PALACE
               </span>
               <span className="text-[10px] font-bold text-[#C4A06A] tracking-widest uppercase mt-1">
                 HOTEL MANAGEMENT OS
@@ -290,7 +295,7 @@ export default function LoginPage() {
           {/* Footer Copyright */}
           <div className="mt-8 pt-5 border-t border-[#E8DDD8] text-center">
             <p className="text-[11px] text-[#82747A]">
-              Grand Horizon Hotel &amp; Resort © 2026 • Live Neon DB Secure Console
+              Hotel Radha Palace © 2026 • Live Neon DB Secure Console
             </p>
           </div>
         </div>

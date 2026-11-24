@@ -324,7 +324,7 @@ export default function ReportsPage() {
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-serif font-black tracking-widest text-[#59283A] uppercase">
-              THE GRAND HORIZON
+              HOTEL RADHA PALACE
             </h1>
             <p className="text-xs font-mono text-[#82747A] tracking-wider uppercase mt-0.5">
               Luxury Hotel & Executive Suites • Official Audit Dossier
@@ -906,7 +906,7 @@ export default function ReportsPage() {
                     Showing {filteredRows.length} of {reportData.rows?.length || 0} records
                   </span>
                   <span className="text-[11px] font-mono text-[#8E7079]">
-                    Grand Horizon Audit Engine • Compliant
+                    Hotel Radha Palace Audit Engine • Compliant
                   </span>
                 </div>
               </div>
