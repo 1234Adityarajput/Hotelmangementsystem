@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Hotel,
   ShieldCheck,
@@ -43,64 +44,84 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F5F0EA] font-sans">
       {/* =====================================================================
-          LEFT HERO SECTION (Ivory & Espresso Modern Editorial Luxury)
+          LEFT HERO SECTION (Cinematic Luxury Hotel Image + Frosted White Blur Glassmorphism)
           ===================================================================== */}
-      <div className="relative w-full lg:w-[58%] bg-gradient-to-br from-[#1E1611] via-[#381926] to-[#59283A] text-[#F5F0EA] flex flex-col justify-between p-8 sm:p-12 lg:p-16 overflow-hidden">
-        {/* Subtle decorative gold/amber radial glow */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C4A06A]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#59283A]/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(#F5F0EA08_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none" />
+      <div className="relative w-full lg:w-[58%] min-h-[620px] lg:min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-14 overflow-hidden">
+        {/* 1. Background Luxury Hotel Image */}
+        <Image
+          src="/hotel-hero.jpg"
+          alt="Grand Horizon Luxury Boutique Hotel"
+          fill
+          priority
+          className="object-cover object-center scale-105 transition-transform duration-1000"
+        />
 
-        {/* Top Tag / Pill */}
-        <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#59283A]/80 text-[#F5F0EA] border border-[#C4A06A]/40 backdrop-blur-md shadow-sm">
+        {/* 2. Soft Ambient Tint Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#251019]/60 via-[#381926]/25 to-black/35 pointer-events-none" />
+
+        {/* 3. Top Tag / Pill */}
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-white/85 text-[#59283A] border border-white/60 backdrop-blur-md shadow-md">
             <span className="w-2 h-2 rounded-full bg-[#C4A06A] animate-pulse" />
-            <span className="tracking-widest uppercase text-[10px] text-[#C4A06A] font-bold">
+            <span className="tracking-widest uppercase text-[10px] text-[#59283A] font-bold">
               Grand Horizon Platform
             </span>
           </div>
+
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-semibold bg-white/80 text-[#32765B] border border-white/60 backdrop-blur-md shadow-xs">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
+            <span>5-Star Luxury Experience</span>
+          </div>
         </div>
 
-        {/* Center Headline & Editorial Introduction */}
-        <div className="relative z-10 my-10 lg:my-auto max-w-xl">
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.15] text-white">
+        {/* 4. Center White Blur Glassmorphism Card with Content */}
+        <div className="relative z-10 my-8 lg:my-auto max-w-xl bg-white/85 backdrop-blur-xl border border-white/80 rounded-3xl p-7 sm:p-9 shadow-2xl shadow-black/20 text-[#352630]">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-6 rounded-full bg-gradient-to-b from-[#C4A06A] to-[#59283A]" />
+            <span className="text-[11px] font-bold tracking-widest uppercase text-[#C4A06A]">
+              Next-Gen Hospitality Suite
+            </span>
+          </div>
+
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.15] text-[#59283A]">
             Smart Luxury Hospitality &amp; Hotel Operations SaaS
           </h1>
-          <p className="mt-6 text-sm sm:text-base text-[#E8DDD8] leading-relaxed font-normal">
+
+          <p className="mt-4 text-sm sm:text-base text-[#472130]/90 leading-relaxed font-normal">
             Real-time room inventory management, front desk check-in dispatch, live billing &amp;
             folios, staff payroll engine, and unified property management console designed for
             high-standard hotel operations.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-[#F5F0EA]">
-            <div className="flex items-center gap-1.5 bg-[#381926]/80 px-3.5 py-1.5 rounded-xl border border-[#C4A06A]/25">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#C4A06A]" />
-              <span className="font-medium">Modular Monolith</span>
+          <div className="mt-6 flex flex-wrap items-center gap-2.5 text-xs text-[#59283A]">
+            <div className="flex items-center gap-1.5 bg-[#F5F0EA]/95 px-3.5 py-1.5 rounded-xl border border-[#E8DDD8] font-semibold shadow-xs">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
+              <span>Modular Monolith</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-[#381926]/80 px-3.5 py-1.5 rounded-xl border border-[#C4A06A]/25">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#C4A06A]" />
-              <span className="font-medium">Neon PostgreSQL Live</span>
+            <div className="flex items-center gap-1.5 bg-[#F5F0EA]/95 px-3.5 py-1.5 rounded-xl border border-[#E8DDD8] font-semibold shadow-xs">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
+              <span>Neon PostgreSQL Live</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-[#381926]/80 px-3.5 py-1.5 rounded-xl border border-[#C4A06A]/25">
+            <div className="flex items-center gap-1.5 bg-[#F5F0EA]/95 px-3.5 py-1.5 rounded-xl border border-[#E8DDD8] font-semibold shadow-xs">
               <CheckCircle2 className="w-3.5 h-3.5 text-[#C4A06A]" />
-              <span className="font-medium">Ivory &amp; Espresso Luxury Design</span>
+              <span>Royal Burgundy &amp; Pearl</span>
             </div>
           </div>
         </div>
 
-        {/* Bottom 3-Column Highlights */}
-        <div className="relative z-10 pt-8 border-t border-[#472130] grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div>
-            <div className="font-serif text-2xl lg:text-3xl font-bold text-white">120+ Rooms</div>
-            <div className="text-xs text-[#8E7079] mt-1">Active Across All Floors</div>
+        {/* 5. Bottom 3-Column Highlights with White Blur */}
+        <div className="relative z-10 pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/60 p-4 shadow-lg">
+            <div className="font-serif text-2xl lg:text-3xl font-bold text-[#59283A]">120+ Rooms</div>
+            <div className="text-xs text-[#82747A] mt-1 font-medium">Active Across All Floors</div>
           </div>
-          <div>
-            <div className="font-serif text-2xl lg:text-3xl font-bold text-white">Instant Check-In</div>
-            <div className="text-xs text-[#8E7079] mt-1">Front Desk Key Dispatch</div>
+          <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/60 p-4 shadow-lg">
+            <div className="font-serif text-2xl lg:text-3xl font-bold text-[#59283A]">Instant Check-In</div>
+            <div className="text-xs text-[#82747A] mt-1 font-medium">Front Desk Key Dispatch</div>
           </div>
-          <div>
-            <div className="font-serif text-2xl lg:text-3xl font-bold text-white">Neon DB Live</div>
-            <div className="text-xs text-[#8E7079] mt-1">100% Encrypted &amp; Audited</div>
+          <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/60 p-4 shadow-lg">
+            <div className="font-serif text-2xl lg:text-3xl font-bold text-[#32765B]">Neon DB Live</div>
+            <div className="text-xs text-[#82747A] mt-1 font-medium">100% Encrypted &amp; Audited</div>
           </div>
         </div>
       </div>
