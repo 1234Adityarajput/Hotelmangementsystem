@@ -376,10 +376,10 @@ export default function ItemsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 text-[11px] font-semibold bg-[#EEE7DA] text-[#362A22] rounded-full border border-[#E3D9CA] tracking-wide uppercase">
+            <span className="px-2.5 py-0.5 text-[11px] font-semibold bg-[#F5F0EA] text-[#59283A] rounded-full border border-[#E8DDD8] tracking-wide uppercase">
               Module 8 • Operations
             </span>
             <span className="flex items-center gap-1 text-[11px] text-[#32765B] font-medium bg-[#E7F1E9] px-2 py-0.5 rounded-full border border-[#C5DFD0]">
@@ -387,10 +387,10 @@ export default function ItemsPage() {
               Live Stay Linking Active
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#362A22] mt-1.5 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#59283A] mt-1.5 tracking-tight">
             Hotel Items & Services Management
           </h1>
-          <p className="text-xs sm:text-sm text-[#79695B] mt-1 max-w-3xl">
+          <p className="text-xs sm:text-sm text-[#82747A] mt-1 max-w-3xl">
             Maintain the hotel&apos;s complete catalog of items, dining menus, and guest services. Set prices, organize categories, and link all purchases directly to guest stays.
           </p>
         </div>
@@ -399,15 +399,15 @@ export default function ItemsPage() {
           <Button
             variant="outline"
             onClick={() => handleOpenAddCategory()}
-            className="border-[#E3D9CA] bg-white hover:bg-[#F7F4EE] text-[#362A22] text-xs h-9 px-3"
+            className="border-[#E8DDD8] bg-white hover:bg-[#F5F0EA] text-[#59283A] text-xs h-9 px-3"
           >
-            <Layers className="w-3.5 h-3.5 mr-1.5 text-[#B08A60]" />
+            <Layers className="w-3.5 h-3.5 mr-1.5 text-[#C4A06A]" />
             Manage Categories
           </Button>
 
           <Button
             onClick={() => handleOpenOrderModal()}
-            className="bg-[#B08A60] hover:bg-[#97734E] text-white text-xs h-9 px-3.5 shadow-sm"
+            className="bg-[#C4A06A] hover:bg-[#97734E] text-white text-xs h-9 px-3.5 shadow-sm"
           >
             <ShoppingBag className="w-3.5 h-3.5 mr-1.5" />
             Post Purchase to Guest
@@ -415,7 +415,7 @@ export default function ItemsPage() {
 
           <Button
             onClick={handleOpenAddItem}
-            className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9 px-3.5 shadow-sm"
+            className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9 px-3.5 shadow-sm"
           >
             <Plus className="w-3.5 h-3.5 mr-1.5" />
             Add New Item
@@ -425,53 +425,53 @@ export default function ItemsPage() {
 
       {/* KPI Overview Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="border-[#E3D9CA] bg-white shadow-sm p-4">
-          <div className="flex items-center justify-between text-xs text-[#79695B] mb-1">
+        <Card className="border-[#E8DDD8] bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between text-xs text-[#82747A] mb-1">
             <span>Total Catalog Items</span>
-            <UtensilsCrossed className="w-3.5 h-3.5 text-[#B08A60]" />
+            <UtensilsCrossed className="w-3.5 h-3.5 text-[#C4A06A]" />
           </div>
-          <div className="text-xl font-bold font-serif text-[#362A22]">{items.length}</div>
-          <p className="text-[10px] text-[#948779] mt-0.5">Active items & services</p>
+          <div className="text-xl font-bold font-serif text-[#59283A]">{items.length}</div>
+          <p className="text-[10px] text-[#8E7079] mt-0.5">Active items & services</p>
         </Card>
 
-        <Card className="border-[#E3D9CA] bg-white shadow-sm p-4">
-          <div className="flex items-center justify-between text-xs text-[#79695B] mb-1">
+        <Card className="border-[#E8DDD8] bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between text-xs text-[#82747A] mb-1">
             <span>Item Categories</span>
-            <Layers className="w-3.5 h-3.5 text-[#B08A60]" />
+            <Layers className="w-3.5 h-3.5 text-[#C4A06A]" />
           </div>
-          <div className="text-xl font-bold font-serif text-[#362A22]">{categories.length}</div>
-          <p className="text-[10px] text-[#948779] mt-0.5">F&B, laundry, transport, etc.</p>
+          <div className="text-xl font-bold font-serif text-[#59283A]">{categories.length}</div>
+          <p className="text-[10px] text-[#8E7079] mt-0.5">F&B, laundry, transport, etc.</p>
         </Card>
 
-        <Card className="border-[#E3D9CA] bg-white shadow-sm p-4">
-          <div className="flex items-center justify-between text-xs text-[#79695B] mb-1">
+        <Card className="border-[#E8DDD8] bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between text-xs text-[#82747A] mb-1">
             <span>Guest Purchases Logged</span>
             <ShoppingBag className="w-3.5 h-3.5 text-[#32765B]" />
           </div>
-          <div className="text-xl font-bold font-mono text-[#362A22]">{guestRecordsTotal}</div>
-          <p className="text-[10px] text-[#948779] mt-0.5">Stay purchase orders</p>
+          <div className="text-xl font-bold font-mono text-[#59283A]">{guestRecordsTotal}</div>
+          <p className="text-[10px] text-[#8E7079] mt-0.5">Stay purchase orders</p>
         </Card>
 
-        <Card className="border-[#E3D9CA] bg-white shadow-sm p-4">
-          <div className="flex items-center justify-between text-xs text-[#79695B] mb-1">
+        <Card className="border-[#E8DDD8] bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between text-xs text-[#82747A] mb-1">
             <span>Purchases Revenue</span>
             <DollarSign className="w-3.5 h-3.5 text-[#32765B]" />
           </div>
           <div className="text-xl font-bold font-mono text-[#32765B]">
             ₹{guestRecordsRevenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
           </div>
-          <p className="text-[10px] text-[#948779] mt-0.5">Billed to guest stays</p>
+          <p className="text-[10px] text-[#8E7079] mt-0.5">Billed to guest stays</p>
         </Card>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex border-b border-[#E3D9CA] gap-4 text-xs font-medium">
+      <div className="flex border-b border-[#E8DDD8] gap-4 text-xs font-medium">
         <button
           onClick={() => setActiveTab("catalog")}
           className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
             activeTab === "catalog"
-              ? "border-[#362A22] text-[#362A22] font-semibold"
-              : "border-transparent text-[#79695B] hover:text-[#362A22]"
+              ? "border-[#59283A] text-[#59283A] font-semibold"
+              : "border-transparent text-[#82747A] hover:text-[#59283A]"
           }`}
         >
           <UtensilsCrossed className="w-3.5 h-3.5" />
@@ -482,8 +482,8 @@ export default function ItemsPage() {
           onClick={() => setActiveTab("guest-records")}
           className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
             activeTab === "guest-records"
-              ? "border-[#362A22] text-[#362A22] font-semibold"
-              : "border-transparent text-[#79695B] hover:text-[#362A22]"
+              ? "border-[#59283A] text-[#59283A] font-semibold"
+              : "border-transparent text-[#82747A] hover:text-[#59283A]"
           }`}
         >
           <Receipt className="w-3.5 h-3.5" />
@@ -494,8 +494,8 @@ export default function ItemsPage() {
           onClick={() => setActiveTab("categories")}
           className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
             activeTab === "categories"
-              ? "border-[#362A22] text-[#362A22] font-semibold"
-              : "border-transparent text-[#79695B] hover:text-[#362A22]"
+              ? "border-[#59283A] text-[#59283A] font-semibold"
+              : "border-transparent text-[#82747A] hover:text-[#59283A]"
           }`}
         >
           <Layers className="w-3.5 h-3.5" />
@@ -509,14 +509,14 @@ export default function ItemsPage() {
       {activeTab === "catalog" && (
         <div className="space-y-4">
           {/* Category Filter Pills & Search */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm">
             <div className="flex items-center gap-1.5 flex-wrap">
               <button
                 onClick={() => setSelectedCategory("ALL")}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   selectedCategory === "ALL"
-                    ? "bg-[#362A22] text-white font-semibold"
-                    : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
+                    ? "bg-[#59283A] text-white font-semibold"
+                    : "bg-[#F5F0EA] text-[#82747A] hover:bg-[#F5F0EA] border border-[#E8DDD8]"
                 }`}
               >
                 All Items ({items.length})
@@ -527,8 +527,8 @@ export default function ItemsPage() {
                   onClick={() => setSelectedCategory(c.id)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     selectedCategory === c.id
-                      ? "bg-[#362A22] text-white font-semibold"
-                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
+                      ? "bg-[#59283A] text-white font-semibold"
+                      : "bg-[#F5F0EA] text-[#82747A] hover:bg-[#F5F0EA] border border-[#E8DDD8]"
                   }`}
                 >
                   {c.name}
@@ -538,28 +538,28 @@ export default function ItemsPage() {
 
             <div className="flex items-center gap-2">
               <div className="relative w-60">
-                <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-[#8E7079] absolute left-2.5 top-2.5" />
                 <Input
                   type="text"
                   placeholder="Search item name..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-xs border-[#E3D9CA]"
+                  className="pl-8 h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
 
               {/* View toggle */}
-              <div className="flex items-center border border-[#E3D9CA] rounded-lg bg-white overflow-hidden p-0.5">
+              <div className="flex items-center border border-[#E8DDD8] rounded-lg bg-white overflow-hidden p-0.5">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-1.5 rounded ${viewMode === "grid" ? "bg-[#362A22] text-white" : "text-[#79695B]"}`}
+                  className={`p-1.5 rounded ${viewMode === "grid" ? "bg-[#59283A] text-white" : "text-[#82747A]"}`}
                   title="Grid View"
                 >
                   <LayoutGrid className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`p-1.5 rounded ${viewMode === "table" ? "bg-[#362A22] text-white" : "text-[#79695B]"}`}
+                  className={`p-1.5 rounded ${viewMode === "table" ? "bg-[#59283A] text-white" : "text-[#82747A]"}`}
                   title="Table View"
                 >
                   <TableIcon className="w-3.5 h-3.5" />
@@ -570,13 +570,13 @@ export default function ItemsPage() {
 
           {loading ? (
             <div className="p-16 flex justify-center items-center">
-              <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
+              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
             </div>
           ) : items.length === 0 ? (
-            <Card className="border-[#E3D9CA] p-12 text-center text-xs text-[#79695B] bg-white">
-              <UtensilsCrossed className="w-8 h-8 mx-auto text-[#B08A60]/40 mb-2" />
-              <p className="font-semibold text-[#362A22] text-sm">No Catalog Items Found</p>
-              <p className="text-[#948779] mt-1">
+            <Card className="border-[#E8DDD8] p-12 text-center text-xs text-[#82747A] bg-white">
+              <UtensilsCrossed className="w-8 h-8 mx-auto text-[#C4A06A]/40 mb-2" />
+              <p className="font-semibold text-[#59283A] text-sm">No Catalog Items Found</p>
+              <p className="text-[#8E7079] mt-1">
                 Click &quot;Add New Item&quot; to add food, beverages, laundry, or hotel services.
               </p>
             </Card>
@@ -586,17 +586,17 @@ export default function ItemsPage() {
               {items.map((it) => (
                 <Card
                   key={it.id}
-                  className="border-[#E3D9CA] bg-white shadow-sm hover:border-[#B08A60] transition-colors flex flex-col justify-between"
+                  className="border-[#E8DDD8] bg-white shadow-sm hover:border-[#C4A06A] transition-colors flex flex-col justify-between"
                 >
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="font-bold text-sm text-[#362A22] block leading-tight">
+                        <span className="font-bold text-sm text-[#59283A] block leading-tight">
                           {it.name}
                         </span>
                         <Badge
                           variant="outline"
-                          className="text-[10px] mt-1 bg-[#F7F4EE] border-[#E3D9CA] text-[#79695B]"
+                          className="text-[10px] mt-1 bg-[#F5F0EA] border-[#E8DDD8] text-[#82747A]"
                         >
                           {it.category?.name || "Service"}
                         </Badge>
@@ -605,29 +605,29 @@ export default function ItemsPage() {
                       {/* Price Badge with quick edit */}
                       <button
                         onClick={() => handleOpenPriceModal(it)}
-                        className="group flex items-center gap-1 text-sm font-bold text-[#362A22] font-mono hover:text-[#B08A60] transition-colors"
+                        className="group flex items-center gap-1 text-sm font-bold text-[#59283A] font-mono hover:text-[#C4A06A] transition-colors"
                         title="Click to update price"
                       >
                         <span>₹{Number(it.unitPrice).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-                        <Edit2 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity text-[#B08A60]" />
+                        <Edit2 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity text-[#C4A06A]" />
                       </button>
                     </div>
 
                     {it.description ? (
-                      <p className="text-xs text-[#79695B] line-clamp-2 min-h-[32px]">
+                      <p className="text-xs text-[#82747A] line-clamp-2 min-h-[32px]">
                         {it.description}
                       </p>
                     ) : (
-                      <p className="text-xs text-[#948779] italic min-h-[32px]">
+                      <p className="text-xs text-[#8E7079] italic min-h-[32px]">
                         No description specified
                       </p>
                     )}
 
-                    <div className="pt-3 border-t border-[#EAE3D8] flex items-center justify-between gap-1.5">
+                    <div className="pt-3 border-t border-[#E8DDD8] flex items-center justify-between gap-1.5">
                       <Button
                         size="sm"
                         onClick={() => handleOpenOrderModal(it)}
-                        className="h-7 text-xs bg-[#EEE7DA] hover:bg-[#E3D9CA] text-[#362A22] border border-[#E3D9CA] flex-1 font-medium"
+                        className="h-7 text-xs bg-[#F5F0EA] hover:bg-[#E8DDD8] text-[#59283A] border border-[#E8DDD8] flex-1 font-medium"
                       >
                         <ShoppingBag className="w-3 h-3 mr-1" />
                         Charge to Room
@@ -637,7 +637,7 @@ export default function ItemsPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenPriceModal(it)}
-                        className="h-7 px-2 text-[#B08A60] hover:bg-[#F7F4EE] text-xs"
+                        className="h-7 px-2 text-[#C4A06A] hover:bg-[#F5F0EA] text-xs"
                         title="Set Price"
                       >
                         <Tag className="w-3.5 h-3.5" />
@@ -647,7 +647,7 @@ export default function ItemsPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenEditItem(it)}
-                        className="h-7 px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#F7F4EE]"
+                        className="h-7 px-2 text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA]"
                         title="Edit Item"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -672,10 +672,10 @@ export default function ItemsPage() {
             </div>
           ) : (
             /* Table View */
-            <Card className="border-[#E3D9CA] bg-white shadow-sm overflow-hidden">
+            <Card className="border-[#E8DDD8] bg-white shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[10px] font-semibold border-b border-[#E3D9CA]">
+                  <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[10px] font-semibold border-b border-[#E8DDD8]">
                     <tr>
                       <th className="px-4 py-3">Item Name</th>
                       <th className="px-4 py-3">Category</th>
@@ -684,19 +684,19 @@ export default function ItemsPage() {
                       <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EAE3D8]">
+                  <tbody className="divide-y divide-[#E8DDD8]">
                     {items.map((it) => (
-                      <tr key={it.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
-                        <td className="px-4 py-3 font-semibold text-[#362A22]">{it.name}</td>
+                      <tr key={it.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
+                        <td className="px-4 py-3 font-semibold text-[#59283A]">{it.name}</td>
                         <td className="px-4 py-3">
-                          <Badge variant="outline" className="text-[10px] border-[#E3D9CA] bg-[#F7F4EE] text-[#79695B]">
+                          <Badge variant="outline" className="text-[10px] border-[#E8DDD8] bg-[#F5F0EA] text-[#82747A]">
                             {it.category?.name || "Service"}
                           </Badge>
                         </td>
-                        <td className="px-4 py-3 text-[#79695B] max-w-xs truncate">
+                        <td className="px-4 py-3 text-[#82747A] max-w-xs truncate">
                           {it.description || "—"}
                         </td>
-                        <td className="px-4 py-3 font-mono font-bold text-[#362A22]">
+                        <td className="px-4 py-3 font-mono font-bold text-[#59283A]">
                           ₹{Number(it.unitPrice).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -705,7 +705,7 @@ export default function ItemsPage() {
                               size="sm"
                               variant="outline"
                               onClick={() => handleOpenOrderModal(it)}
-                              className="h-7 text-[11px] border-[#E3D9CA] text-[#362A22] hover:bg-[#F7F4EE]"
+                              className="h-7 text-[11px] border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
                             >
                               <ShoppingBag className="w-3 h-3 mr-1" />
                               Charge
@@ -714,7 +714,7 @@ export default function ItemsPage() {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleOpenPriceModal(it)}
-                              className="h-7 px-2 text-[#B08A60]"
+                              className="h-7 px-2 text-[#C4A06A]"
                               title="Set Price"
                             >
                               <Tag className="w-3.5 h-3.5" />
@@ -723,7 +723,7 @@ export default function ItemsPage() {
                               size="sm"
                               variant="ghost"
                               onClick={() => handleOpenEditItem(it)}
-                              className="h-7 px-2 text-[#79695B]"
+                              className="h-7 px-2 text-[#82747A]"
                               title="Edit"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
@@ -758,18 +758,18 @@ export default function ItemsPage() {
       {activeTab === "guest-records" && (
         <div className="space-y-4">
           {/* Header Card */}
-          <div className="bg-white p-4 rounded-xl border border-[#E3D9CA] shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="bg-white p-4 rounded-xl border border-[#E8DDD8] shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h3 className="font-serif font-bold text-base text-[#362A22]">
+              <h3 className="font-serif font-bold text-base text-[#59283A]">
                 Guest Item & Service Purchase Records
               </h3>
-              <p className="text-xs text-[#79695B] mt-0.5">
+              <p className="text-xs text-[#82747A] mt-0.5">
                 Every purchase is linked to the guest&apos;s stay duration and automatically factored into their final billing folio.
               </p>
             </div>
             <Button
               onClick={() => handleOpenOrderModal()}
-              className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9 px-3.5 shadow-sm"
+              className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9 px-3.5 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               Post New Guest Purchase
@@ -777,26 +777,26 @@ export default function ItemsPage() {
           </div>
 
           {/* Filter Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm">
             <div className="flex items-center gap-2 flex-wrap">
               <div className="relative w-64">
-                <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-[#8E7079] absolute left-2.5 top-2.5" />
                 <Input
                   type="text"
                   placeholder="Search guest name, room # or item..."
                   value={guestSearch}
                   onChange={(e) => setGuestSearch(e.target.value)}
-                  className="pl-8 h-8 text-xs border-[#E3D9CA]"
+                  className="pl-8 h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-[#79695B]">
-                <Calendar className="w-3.5 h-3.5 text-[#B08A60]" />
+              <div className="flex items-center gap-1.5 text-xs text-[#82747A]">
+                <Calendar className="w-3.5 h-3.5 text-[#C4A06A]" />
                 <Input
                   type="date"
                   value={guestDateFilter}
                   onChange={(e) => setGuestDateFilter(e.target.value)}
-                  className="h-8 text-xs w-36 border-[#E3D9CA]"
+                  className="h-8 text-xs w-36 border-[#E8DDD8]"
                 />
                 {guestDateFilter && (
                   <Button
@@ -811,8 +811,8 @@ export default function ItemsPage() {
               </div>
             </div>
 
-            <div className="text-xs text-[#79695B]">
-              Total Records: <span className="font-semibold text-[#362A22]">{guestRecords.length}</span> • Revenue:{" "}
+            <div className="text-xs text-[#82747A]">
+              Total Records: <span className="font-semibold text-[#59283A]">{guestRecords.length}</span> • Revenue:{" "}
               <span className="font-mono font-bold text-[#32765B]">
                 ₹{guestRecordsRevenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </span>
@@ -820,16 +820,16 @@ export default function ItemsPage() {
           </div>
 
           {/* Guest Records Table */}
-          <Card className="border-[#E3D9CA] bg-white shadow-sm overflow-hidden">
+          <Card className="border-[#E8DDD8] bg-white shadow-sm overflow-hidden">
             <CardContent className="p-0">
               {guestRecords.length === 0 ? (
-                <div className="p-12 text-center text-xs text-[#948779]">
+                <div className="p-12 text-center text-xs text-[#8E7079]">
                   No guest item records logged yet. Click &quot;Post New Guest Purchase&quot; to charge an item to a guest stay.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[10px] font-semibold border-b border-[#E3D9CA]">
+                    <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[10px] font-semibold border-b border-[#E8DDD8]">
                       <tr>
                         <th className="px-4 py-3">Guest Name</th>
                         <th className="px-4 py-3">Room #</th>
@@ -842,41 +842,41 @@ export default function ItemsPage() {
                         <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EAE3D8]">
+                    <tbody className="divide-y divide-[#E8DDD8]">
                       {guestRecords.map((rec) => (
-                        <tr key={rec.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
-                          <td className="px-4 py-3 font-semibold text-[#362A22]">
+                        <tr key={rec.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
+                          <td className="px-4 py-3 font-semibold text-[#59283A]">
                             <div>{rec.guestName}</div>
                             {rec.guestMobile && (
-                              <div className="text-[10px] text-[#948779] font-normal">
+                              <div className="text-[10px] text-[#8E7079] font-normal">
                                 {rec.guestMobile}
                               </div>
                             )}
                           </td>
                           <td className="px-4 py-3">
-                            <span className="px-2 py-0.5 rounded font-mono font-bold bg-[#EEE7DA] text-[#362A22] border border-[#E3D9CA]">
+                            <span className="px-2 py-0.5 rounded font-mono font-bold bg-[#F5F0EA] text-[#59283A] border border-[#E8DDD8]">
                               Room {rec.roomNumber}
                             </span>
                           </td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">
+                          <td className="px-4 py-3 font-medium text-[#59283A]">
                             <div>{rec.itemName}</div>
                             {rec.notes && (
-                              <div className="text-[10px] text-[#948779] italic">{rec.notes}</div>
+                              <div className="text-[10px] text-[#8E7079] italic">{rec.notes}</div>
                             )}
                           </td>
                           <td className="px-4 py-3 text-center font-mono font-semibold">
                             {rec.quantity}
                           </td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">
+                          <td className="px-4 py-3 font-mono text-[#82747A]">
                             ₹{rec.price.toFixed(2)}
                           </td>
                           <td className="px-4 py-3 font-mono font-bold text-[#32765B]">
                             ₹{rec.totalAmount.toFixed(2)}
                           </td>
-                          <td className="px-4 py-3 text-[#79695B] font-mono text-[11px]">
+                          <td className="px-4 py-3 text-[#82747A] font-mono text-[11px]">
                             {rec.purchaseDate}
                           </td>
-                          <td className="px-4 py-3 text-[#79695B] font-mono text-[11px]">
+                          <td className="px-4 py-3 text-[#82747A] font-mono text-[11px]">
                             {rec.purchaseTime || "—"}
                           </td>
                           <td className="px-4 py-3 text-right">
@@ -907,18 +907,18 @@ export default function ItemsPage() {
       {/* ========================================================================= */}
       {activeTab === "categories" && (
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-xl border border-[#E3D9CA] shadow-sm flex items-center justify-between">
+          <div className="bg-white p-4 rounded-xl border border-[#E8DDD8] shadow-sm flex items-center justify-between">
             <div>
-              <h3 className="font-serif font-bold text-base text-[#362A22]">
+              <h3 className="font-serif font-bold text-base text-[#59283A]">
                 Hotel Item & Service Categories
               </h3>
-              <p className="text-xs text-[#79695B] mt-0.5">
+              <p className="text-xs text-[#82747A] mt-0.5">
                 Organize menu items, laundry, room service, extra beds, and hotel services into clean operational categories.
               </p>
             </div>
             <Button
               onClick={handleOpenAddCategory}
-              className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9 px-3.5 shadow-sm"
+              className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9 px-3.5 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               Add Category
@@ -927,23 +927,23 @@ export default function ItemsPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {categories.map((cat) => (
-              <Card key={cat.id} className="border-[#E3D9CA] bg-white shadow-sm flex flex-col justify-between">
-                <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+              <Card key={cat.id} className="border-[#E8DDD8] bg-white shadow-sm flex flex-col justify-between">
+                <CardHeader className="pb-3 border-b border-[#E8DDD8]">
                   <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-sm font-bold text-[#362A22] flex items-center gap-1.5">
-                      <Layers className="w-4 h-4 text-[#B08A60]" />
+                    <CardTitle className="text-sm font-bold text-[#59283A] flex items-center gap-1.5">
+                      <Layers className="w-4 h-4 text-[#C4A06A]" />
                       <span>{cat.name}</span>
                     </CardTitle>
-                    <Badge variant="outline" className="text-[10px] bg-[#F7F4EE] border-[#E3D9CA]">
+                    <Badge variant="outline" className="text-[10px] bg-[#F5F0EA] border-[#E8DDD8]">
                       {cat._count?.items ?? items.filter((i) => i.categoryId === cat.id).length} items
                     </Badge>
                   </div>
-                  <CardDescription className="text-xs text-[#79695B] mt-1">
+                  <CardDescription className="text-xs text-[#82747A] mt-1">
                     {cat.description || "Administrative category"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-3 flex items-center justify-between">
-                  <span className="text-[11px] text-[#948779]">
+                  <span className="text-[11px] text-[#8E7079]">
                     Status: <span className="text-[#32765B] font-semibold">Active</span>
                   </span>
                   <div className="flex items-center gap-1">
@@ -951,7 +951,7 @@ export default function ItemsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleOpenEditCategory(cat)}
-                      className="h-7 px-2 text-[#79695B] hover:text-[#362A22]"
+                      className="h-7 px-2 text-[#82747A] hover:text-[#59283A]"
                     >
                       <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
                     </Button>
@@ -975,12 +975,12 @@ export default function ItemsPage() {
       {/* MODAL 1: ADD / EDIT CATALOG ITEM */}
       {/* ========================================================================= */}
       <Dialog open={itemModalOpen} onOpenChange={setItemModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA]">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8]">
           <DialogHeader>
-            <DialogTitle className="font-serif text-lg text-[#362A22]">
+            <DialogTitle className="font-serif text-lg text-[#59283A]">
               {editingItem ? "Update Item Details" : "Add New Item / Service"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Configure item name, category, pricing, and description for hotel offerings.
             </DialogDescription>
           </DialogHeader>
@@ -988,24 +988,24 @@ export default function ItemsPage() {
           <form onSubmit={handleSaveItem} className="space-y-4 pt-2 text-xs">
             {/* Item Name */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Item Name *</label>
+              <label className="font-semibold text-[#59283A]">Item Name *</label>
               <Input
                 required
                 value={itemForm.name}
                 onChange={(e) => setItemForm({ ...itemForm, name: e.target.value })}
                 placeholder="e.g. Continental Breakfast, 2-Piece Suit Dry Clean, Extra Bed"
-                className="h-9 text-xs border-[#E3D9CA]"
+                className="h-9 text-xs border-[#E8DDD8]"
               />
             </div>
 
             {/* Category */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Category *</label>
+              <label className="font-semibold text-[#59283A]">Category *</label>
               <select
                 required
                 value={itemForm.categoryId}
                 onChange={(e) => setItemForm({ ...itemForm, categoryId: e.target.value })}
-                className="w-full h-9 rounded-md border border-[#E3D9CA] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
+                className="w-full h-9 rounded-md border border-[#E8DDD8] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#C4A06A]"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -1017,7 +1017,7 @@ export default function ItemsPage() {
 
             {/* Price */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Price (₹) *</label>
+              <label className="font-semibold text-[#59283A]">Price (₹) *</label>
               <Input
                 type="number"
                 required
@@ -1025,34 +1025,34 @@ export default function ItemsPage() {
                 step="0.01"
                 value={itemForm.unitPrice}
                 onChange={(e) => setItemForm({ ...itemForm, unitPrice: Number(e.target.value) })}
-                className="h-9 text-xs font-mono font-bold text-[#362A22] border-[#E3D9CA]"
+                className="h-9 text-xs font-mono font-bold text-[#59283A] border-[#E8DDD8]"
               />
             </div>
 
             {/* Description */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#79695B]">Description</label>
+              <label className="font-semibold text-[#82747A]">Description</label>
               <Input
                 value={itemForm.description}
                 onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
                 placeholder="Portion size, preparation details, service turnaround..."
-                className="h-9 text-xs border-[#E3D9CA]"
+                className="h-9 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-2 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setItemModalOpen(false)}
-                className="border-[#E3D9CA] text-xs h-9"
+                className="border-[#E8DDD8] text-xs h-9"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9"
+                className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9"
               >
                 {submitting ? "Saving..." : editingItem ? "Update Item" : "Create Item"}
               </Button>
@@ -1065,30 +1065,30 @@ export default function ItemsPage() {
       {/* MODAL 2: QUICK SET ITEM / SERVICE PRICE */}
       {/* ========================================================================= */}
       <Dialog open={priceModalOpen} onOpenChange={setPriceModalOpen}>
-        <DialogContent className="max-w-sm bg-white border-[#E3D9CA]">
+        <DialogContent className="max-w-sm bg-white border-[#E8DDD8]">
           <DialogHeader>
-            <DialogTitle className="font-serif text-lg text-[#362A22]">
+            <DialogTitle className="font-serif text-lg text-[#59283A]">
               Set Item / Service Price
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
-              Quickly update pricing for <span className="font-semibold text-[#B08A60]">{itemToUpdatePrice?.name}</span>.
+            <DialogDescription className="text-xs text-[#82747A]">
+              Quickly update pricing for <span className="font-semibold text-[#C4A06A]">{itemToUpdatePrice?.name}</span>.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSavePrice} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">New Tariff / Price (₹) *</label>
+              <label className="font-semibold text-[#59283A]">New Tariff / Price (₹) *</label>
               <Input
                 type="number"
                 min="0"
                 step="0.01"
                 value={newPrice}
                 onChange={(e) => setNewPrice(Number(e.target.value))}
-                className="h-9 text-base font-mono font-bold text-[#32765B] border-[#E3D9CA]"
+                className="h-9 text-base font-mono font-bold text-[#32765B] border-[#E8DDD8]"
                 required
                 autoFocus
               />
-              <span className="text-[10px] text-[#948779] block">
+              <span className="text-[10px] text-[#8E7079] block">
                 Current Price: ₹{itemToUpdatePrice ? Number(itemToUpdatePrice.unitPrice).toFixed(2) : "0.00"}
               </span>
             </div>
@@ -1098,7 +1098,7 @@ export default function ItemsPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setPriceModalOpen(false)}
-                className="border-[#E3D9CA] text-xs h-9"
+                className="border-[#E8DDD8] text-xs h-9"
               >
                 Cancel
               </Button>
@@ -1118,51 +1118,51 @@ export default function ItemsPage() {
       {/* MODAL 3: ADD / EDIT CATEGORY */}
       {/* ========================================================================= */}
       <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA]">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8]">
           <DialogHeader>
-            <DialogTitle className="font-serif text-lg text-[#362A22]">
+            <DialogTitle className="font-serif text-lg text-[#59283A]">
               {editingCategory ? "Edit Category" : "New Item Category"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Administrative group for organizing hotel food, drinks, services, and inventory.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveCategory} className="space-y-4 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Category Name *</label>
+              <label className="font-semibold text-[#59283A]">Category Name *</label>
               <Input
                 required
                 value={categoryForm.name}
                 onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
                 placeholder="e.g. Minibar, Room Service, Spa, Transport"
-                className="h-9 text-xs border-[#E3D9CA]"
+                className="h-9 text-xs border-[#E8DDD8]"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#79695B]">Description</label>
+              <label className="font-semibold text-[#82747A]">Description</label>
               <Input
                 value={categoryForm.description}
                 onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
                 placeholder="Category operational scope..."
-                className="h-9 text-xs border-[#E3D9CA]"
+                className="h-9 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-2 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setCategoryModalOpen(false)}
-                className="border-[#E3D9CA] text-xs h-9"
+                className="border-[#E8DDD8] text-xs h-9"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9"
+                className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9"
               >
                 {submitting ? "Saving..." : editingCategory ? "Update Category" : "Create Category"}
               </Button>
@@ -1175,12 +1175,12 @@ export default function ItemsPage() {
       {/* MODAL 4: POST PURCHASE TO GUEST STAY */}
       {/* ========================================================================= */}
       <Dialog open={orderModalOpen} onOpenChange={setOrderModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA]">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8]">
           <DialogHeader>
-            <DialogTitle className="font-serif text-lg text-[#362A22]">
+            <DialogTitle className="font-serif text-lg text-[#59283A]">
               Post Purchase to Guest Stay
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Charges will be immediately linked to the guest&apos;s room stay and reflected on their final checkout bill.
             </DialogDescription>
           </DialogHeader>
@@ -1188,12 +1188,12 @@ export default function ItemsPage() {
           <form onSubmit={handleConfirmOrder} className="space-y-4 pt-2 text-xs">
             {/* Select Stay */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Select In-House Room / Guest *</label>
+              <label className="font-semibold text-[#59283A]">Select In-House Room / Guest *</label>
               <select
                 required
                 value={orderForm.bookingId}
                 onChange={(e) => setOrderForm({ ...orderForm, bookingId: e.target.value })}
-                className="w-full h-9 rounded-md border border-[#E3D9CA] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
+                className="w-full h-9 rounded-md border border-[#E8DDD8] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#C4A06A]"
               >
                 {activeStays.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -1205,7 +1205,7 @@ export default function ItemsPage() {
 
             {/* Select from catalog */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#79695B]">Select Item from Catalog (Optional)</label>
+              <label className="font-semibold text-[#82747A]">Select Item from Catalog (Optional)</label>
               <select
                 value={orderForm.itemId}
                 onChange={(e) => {
@@ -1219,7 +1219,7 @@ export default function ItemsPage() {
                     });
                   }
                 }}
-                className="w-full h-9 rounded-md border border-[#E3D9CA] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
+                className="w-full h-9 rounded-md border border-[#E8DDD8] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#C4A06A]"
               >
                 <option value="">-- Or enter custom service below --</option>
                 {items.map((it) => (
@@ -1232,20 +1232,20 @@ export default function ItemsPage() {
 
             {/* Item Name */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Item or Service Name *</label>
+              <label className="font-semibold text-[#59283A]">Item or Service Name *</label>
               <Input
                 required
                 value={orderForm.itemName}
                 onChange={(e) => setOrderForm({ ...orderForm, itemName: e.target.value })}
                 placeholder="e.g. Club Sandwich & Coffee, Laundry Wash & Press"
-                className="h-9 text-xs border-[#E3D9CA]"
+                className="h-9 text-xs border-[#E8DDD8]"
               />
             </div>
 
             {/* Quantity and Price */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Quantity *</label>
+                <label className="font-semibold text-[#59283A]">Quantity *</label>
                 <Input
                   type="number"
                   min="1"
@@ -1253,12 +1253,12 @@ export default function ItemsPage() {
                   required
                   value={orderForm.quantity}
                   onChange={(e) => setOrderForm({ ...orderForm, quantity: Number(e.target.value) })}
-                  className="h-9 text-xs font-mono border-[#E3D9CA]"
+                  className="h-9 text-xs font-mono border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Price (₹) *</label>
+                <label className="font-semibold text-[#59283A]">Price (₹) *</label>
                 <Input
                   type="number"
                   min="0"
@@ -1266,14 +1266,14 @@ export default function ItemsPage() {
                   required
                   value={orderForm.unitPrice}
                   onChange={(e) => setOrderForm({ ...orderForm, unitPrice: Number(e.target.value) })}
-                  className="h-9 text-xs font-mono font-bold border-[#E3D9CA]"
+                  className="h-9 text-xs font-mono font-bold border-[#E8DDD8]"
                 />
               </div>
             </div>
 
             {/* Total Amount Preview */}
-            <div className="p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] flex items-center justify-between text-xs">
-              <span className="text-[#79695B] font-medium">Total Amount to Charge:</span>
+            <div className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] flex items-center justify-between text-xs">
+              <span className="text-[#82747A] font-medium">Total Amount to Charge:</span>
               <span className="font-mono font-bold text-base text-[#32765B]">
                 ₹{(Number(orderForm.quantity) * Number(orderForm.unitPrice)).toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
@@ -1283,28 +1283,28 @@ export default function ItemsPage() {
 
             {/* Notes */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#79695B]">Special Notes / Instructions</label>
+              <label className="font-semibold text-[#82747A]">Special Notes / Instructions</label>
               <Input
                 value={orderForm.notes}
                 onChange={(e) => setOrderForm({ ...orderForm, notes: e.target.value })}
                 placeholder="e.g. In-room dining delivered at 4:15 PM"
-                className="h-9 text-xs border-[#E3D9CA]"
+                className="h-9 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-2 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOrderModalOpen(false)}
-                className="border-[#E3D9CA] text-xs h-9"
+                className="border-[#E8DDD8] text-xs h-9"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-9"
+                className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9"
               >
                 {submitting ? "Posting..." : "Charge to Guest Stay"}
               </Button>
@@ -1317,12 +1317,12 @@ export default function ItemsPage() {
       {/* MODAL 5: DELETE ITEM CONFIRMATION */}
       {/* ========================================================================= */}
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <DialogContent className="max-w-sm bg-white border-[#E3D9CA]">
+        <DialogContent className="max-w-sm bg-white border-[#E8DDD8]">
           <DialogHeader>
-            <DialogTitle className="font-serif text-lg text-[#362A22]">
+            <DialogTitle className="font-serif text-lg text-[#59283A]">
               Delete Catalog Item
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Are you sure you want to remove <span className="font-bold text-[#B54C44]">{itemToDelete?.name}</span>? If it has historical guest purchase records, it will be safely deactivated to preserve financial integrity.
             </DialogDescription>
           </DialogHeader>
@@ -1332,7 +1332,7 @@ export default function ItemsPage() {
               type="button"
               variant="outline"
               onClick={() => setDeleteModalOpen(false)}
-              className="border-[#E3D9CA] text-xs h-9"
+              className="border-[#E8DDD8] text-xs h-9"
             >
               Cancel
             </Button>

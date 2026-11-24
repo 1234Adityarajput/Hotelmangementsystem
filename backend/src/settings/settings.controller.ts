@@ -26,4 +26,10 @@ export class SettingsController {
   async getSystemHealth() {
     return this.settingsService.getSystemHealth();
   }
+
+  @Get('backup')
+  @ApiOperation({ summary: 'Generate and download full on-demand database snapshot backup' })
+  async createDatabaseBackup() {
+    return this.settingsService.createDatabaseBackup();
+  }
 }

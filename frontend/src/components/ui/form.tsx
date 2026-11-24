@@ -78,7 +78,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-2", className)} {...props} />
+      <div ref={ref} className={cn("space-y-1.5", className)} {...props} />
     </FormItemContext.Provider>
   );
 });
@@ -94,8 +94,8 @@ const FormLabel = React.forwardRef<
     <LabelPrimitive.Root
       ref={ref}
       className={cn(
-        "text-sm font-medium leading-none text-[#5D493D] peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-        error && "text-red-500",
+        "text-xs font-semibold leading-none text-[#352630] peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+        error && "text-[#B54C44]",
         className,
       )}
       htmlFor={formItemId}
@@ -138,7 +138,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn("text-sm text-[#79695B]", className)}
+      className={cn("text-xs text-[#82747A]", className)}
       {...props}
     />
   );
@@ -160,11 +160,9 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-sm font-medium text-red-500", className)}
+      className={cn("text-xs font-medium text-[#B54C44]", className)}
       {...props}
-    >
-      {body}
-    </p>
+    />
   );
 });
 FormMessage.displayName = "FormMessage";

@@ -26,12 +26,12 @@ export default function SetupVerificationPage() {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* Title & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
+          <h2 className="text-2xl font-bold tracking-tight text-[#59283A]">
             Database & System Verification
           </h2>
-          <p className="text-sm text-[#79695B] mt-1">
+          <p className="text-sm text-[#82747A] mt-1">
             Live health verification for Neon PostgreSQL and NestJS modular monolith backend.
           </p>
         </div>
@@ -54,35 +54,35 @@ export default function SetupVerificationPage() {
 
       {/* Live System Connectivity Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-[#E3D9CA] shadow-sm">
+        <Card className="border-[#E8DDD8] shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-[#5D493D]">Backend API</CardTitle>
-            <Server className="w-4 h-4 text-[#79695B]" />
+            <CardTitle className="text-sm font-medium text-[#7A4652]">Backend API</CardTitle>
+            <Server className="w-4 h-4 text-[#82747A]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#362A22]">
+            <div className="text-2xl font-bold text-[#59283A]">
               {isLoading ? "Checking..." : health ? "Online" : "Offline"}
             </div>
-            <p className="text-xs text-[#79695B] mt-1">Port 4000 • NestJS 10</p>
+            <p className="text-xs text-[#82747A] mt-1">Port 4000 • NestJS 10</p>
             <div className="mt-4 flex items-center gap-2">
               <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
                 {health?.version || "v1.0.0"}
               </Badge>
-              <span className="text-xs text-[#79695B]">Uptime: {health?.uptimeSeconds || 0}s</span>
+              <span className="text-xs text-[#82747A]">Uptime: {health?.uptimeSeconds || 0}s</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-[#E3D9CA] shadow-sm">
+        <Card className="border-[#E8DDD8] shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-[#5D493D]">Database Engine</CardTitle>
-            <Database className="w-4 h-4 text-[#79695B]" />
+            <CardTitle className="text-sm font-medium text-[#7A4652]">Database Engine</CardTitle>
+            <Database className="w-4 h-4 text-[#82747A]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#362A22]">
+            <div className="text-2xl font-bold text-[#59283A]">
               {isLoading ? "Checking..." : health?.database?.connected ? "Connected" : "Disconnected"}
             </div>
-            <p className="text-xs text-[#79695B] mt-1">Neon PostgreSQL 18.7 • AWS us-east-2</p>
+            <p className="text-xs text-[#82747A] mt-1">Neon PostgreSQL 18.7 • AWS us-east-2</p>
             <div className="mt-4 flex items-center gap-2">
               <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
                 Latency: {health?.database?.latencyMs || 0}ms
@@ -92,16 +92,16 @@ export default function SetupVerificationPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-[#E3D9CA] shadow-sm">
+        <Card className="border-[#E8DDD8] shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-[#5D493D]">Authentication</CardTitle>
-            <ShieldCheck className="w-4 h-4 text-[#79695B]" />
+            <CardTitle className="text-sm font-medium text-[#7A4652]">Authentication</CardTitle>
+            <ShieldCheck className="w-4 h-4 text-[#82747A]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#362A22]">Single Admin</div>
-            <p className="text-xs text-[#79695B] mt-1">JWT + Bcrypt (12 Rounds)</p>
+            <div className="text-2xl font-bold text-[#59283A]">Single Admin</div>
+            <p className="text-xs text-[#82747A] mt-1">JWT + Bcrypt (12 Rounds)</p>
             <div className="mt-4 flex items-center gap-2">
-              <Badge variant="outline" className="bg-[#FAF6F0] text-[#362A22] border-[#E3D9CA] text-xs">
+              <Badge variant="outline" className="bg-[#F5F0EA] text-[#59283A] border-[#E8DDD8] text-xs">
                 No RBAC / Staff Login
               </Badge>
             </div>

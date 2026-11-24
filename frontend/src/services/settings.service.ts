@@ -36,4 +36,9 @@ export const settingsService = {
     const res = await apiClient.get<ApiResponse<SystemHealthData>>("/settings/health");
     return res.data.data;
   },
+
+  async downloadBackup(): Promise<any> {
+    const res = await apiClient.get<ApiResponse<any>>("/settings/backup");
+    return res.data.data;
+  },
 };

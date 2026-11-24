@@ -399,18 +399,18 @@ export default function StaysPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Editorial Luxury Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold tracking-wider text-[#B08A60] uppercase bg-[#EEE7DA] px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold tracking-wider text-[#C4A06A] uppercase bg-[#F5F0EA] px-2.5 py-0.5 rounded-full">
               Front Desk Operations • Module 6
             </span>
-            <span className="text-[11px] text-[#79695B]">• Stay Management & Digital Folios</span>
+            <span className="text-[11px] text-[#82747A]">• Stay Management & Digital Folios</span>
           </div>
-          <h2 className="text-3xl font-serif font-bold tracking-tight text-[#362A22] mt-1">
+          <h2 className="text-3xl font-serif font-bold tracking-tight text-[#59283A] mt-1">
             Check-In & Check-Out Management
           </h2>
-          <p className="text-xs text-[#79695B] mt-1 max-w-2xl">
+          <p className="text-xs text-[#82747A] mt-1 max-w-2xl">
             Manage the complete guest stay lifecycle: check-in details, room allocation, stay duration, in-house guests, room relocations, checkout billing folios, and digital archives.
           </p>
         </div>
@@ -420,16 +420,16 @@ export default function StaysPage() {
             variant="outline"
             size="sm"
             onClick={fetchData}
-            className="text-xs border-[#E3D9CA] text-[#79695B] hover:text-[#362A22] h-9"
+            className="text-xs border-[#E8DDD8] text-[#82747A] hover:text-[#59283A] h-9"
           >
             Refresh Board
           </Button>
 
           <Button
             onClick={handleOpenWalkIn}
-            className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-2 text-xs font-medium h-9 shadow-sm"
+            className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-2 text-xs font-medium h-9 shadow-sm"
           >
-            <DoorOpen className="w-4 h-4 text-[#B08A60]" />
+            <DoorOpen className="w-4 h-4 text-[#C4A06A]" />
             <span>Walk-In Check-In</span>
           </Button>
         </div>
@@ -437,66 +437,66 @@ export default function StaysPage() {
 
       {/* KPI Overview Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#E7F1E9] flex items-center justify-center text-[#32765B]">
               <BedDouble className="w-5 h-5 text-[#32765B]" />
             </div>
             <div>
               <p className="text-[10px] uppercase font-bold text-[#32765B] tracking-wider">In-House Guests</p>
-              <h3 className="text-xl font-serif font-bold text-[#362A22]">{inHouse.length}</h3>
+              <h3 className="text-xl font-serif font-bold text-[#59283A]">{inHouse.length}</h3>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#EEE7DA] flex items-center justify-center text-[#362A22]">
-              <DoorOpen className="w-5 h-5 text-[#B08A60]" />
+            <div className="w-10 h-10 rounded-xl bg-[#F5F0EA] flex items-center justify-center text-[#59283A]">
+              <DoorOpen className="w-5 h-5 text-[#C4A06A]" />
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold text-[#948779] tracking-wider">Pending Check-Ins</p>
-              <h3 className="text-xl font-serif font-bold text-[#362A22]">{arrivals.length}</h3>
+              <p className="text-[10px] uppercase font-bold text-[#8E7079] tracking-wider">Pending Check-Ins</p>
+              <h3 className="text-xl font-serif font-bold text-[#59283A]">{arrivals.length}</h3>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#F6EDDC] flex items-center justify-center text-[#A97832]">
               <LogOut className="w-5 h-5 text-[#A97832]" />
             </div>
             <div>
               <p className="text-[10px] uppercase font-bold text-[#A97832] tracking-wider">Due Check-Outs</p>
-              <h3 className="text-xl font-serif font-bold text-[#362A22]">{departures.length}</h3>
+              <h3 className="text-xl font-serif font-bold text-[#59283A]">{departures.length}</h3>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#E9EFF3] flex items-center justify-center text-[#627D91]">
               <ShieldCheck className="w-5 h-5 text-[#627D91]" />
             </div>
             <div>
               <p className="text-[10px] uppercase font-bold text-[#627D91] tracking-wider">Digital Records</p>
-              <h3 className="text-xl font-serif font-bold text-[#362A22]">{archiveTotal}</h3>
+              <h3 className="text-xl font-serif font-bold text-[#59283A]">{archiveTotal}</h3>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Lifecycle Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#E3D9CA] pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-[#E8DDD8] pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab("inhouse")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === "inhouse"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "text-[#79695B] hover:bg-[#EEE7DA]"
+              ? "bg-[#59283A] text-white shadow-sm"
+              : "text-[#82747A] hover:bg-[#F5F0EA]"
           }`}
         >
-          <BedDouble className="w-3.5 h-3.5 text-[#B08A60]" />
+          <BedDouble className="w-3.5 h-3.5 text-[#C4A06A]" />
           <span>Currently In-House ({inHouse.length})</span>
         </button>
 
@@ -504,11 +504,11 @@ export default function StaysPage() {
           onClick={() => setActiveTab("arrivals")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === "arrivals"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "text-[#79695B] hover:bg-[#EEE7DA]"
+              ? "bg-[#59283A] text-white shadow-sm"
+              : "text-[#82747A] hover:bg-[#F5F0EA]"
           }`}
         >
-          <DoorOpen className="w-3.5 h-3.5 text-[#B08A60]" />
+          <DoorOpen className="w-3.5 h-3.5 text-[#C4A06A]" />
           <span>Expected Check-Ins ({arrivals.length})</span>
         </button>
 
@@ -516,11 +516,11 @@ export default function StaysPage() {
           onClick={() => setActiveTab("departures")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === "departures"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "text-[#79695B] hover:bg-[#EEE7DA]"
+              ? "bg-[#59283A] text-white shadow-sm"
+              : "text-[#82747A] hover:bg-[#F5F0EA]"
           }`}
         >
-          <LogOut className="w-3.5 h-3.5 text-[#B08A60]" />
+          <LogOut className="w-3.5 h-3.5 text-[#C4A06A]" />
           <span>Today&apos;s Check-Outs ({departures.length})</span>
         </button>
 
@@ -528,41 +528,41 @@ export default function StaysPage() {
           onClick={() => setActiveTab("archive")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 whitespace-nowrap ${
             activeTab === "archive"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "text-[#79695B] hover:bg-[#EEE7DA]"
+              ? "bg-[#59283A] text-white shadow-sm"
+              : "text-[#82747A] hover:bg-[#F5F0EA]"
           }`}
         >
-          <History className="w-3.5 h-3.5 text-[#B08A60]" />
+          <History className="w-3.5 h-3.5 text-[#C4A06A]" />
           <span>Digital Check-Out Archive ({archiveTotal})</span>
         </button>
       </div>
 
       {/* TAB 1: IN-HOUSE GUESTS */}
       {activeTab === "inhouse" && (
-        <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
+        <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
           <CardContent className="p-0">
             {loading ? (
               <div className="p-16 flex flex-col justify-center items-center gap-3">
-                <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-                <p className="text-xs text-[#79695B]">Loading active in-house stays...</p>
+                <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                <p className="text-xs text-[#82747A]">Loading active in-house stays...</p>
               </div>
             ) : inHouse.length === 0 ? (
-              <div className="p-16 text-center text-xs text-[#79695B] space-y-3">
-                <BedDouble className="w-10 h-10 text-[#B08A60] mx-auto opacity-60" />
-                <p className="font-medium text-[#362A22]">
+              <div className="p-16 text-center text-xs text-[#82747A] space-y-3">
+                <BedDouble className="w-10 h-10 text-[#C4A06A] mx-auto opacity-60" />
+                <p className="font-medium text-[#59283A]">
                   No guests currently in-house. Check in an arrival from the Arrivals tab or register a Walk-in.
                 </p>
                 <Button
                   onClick={handleOpenWalkIn}
-                  className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs"
+                  className="bg-[#59283A] hover:bg-[#472130] text-white text-xs"
                 >
-                  <DoorOpen className="w-3.5 h-3.5 mr-1 text-[#B08A60]" /> Process Walk-In Check-In
+                  <DoorOpen className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" /> Process Walk-In Check-In
                 </Button>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                  <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                     <tr>
                       <th className="px-4 py-3.5">Room</th>
                       <th className="px-4 py-3.5">Guest Information</th>
@@ -574,36 +574,36 @@ export default function StaysPage() {
                       <th className="px-4 py-3.5 text-right">Stay Operations</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EAE3D8]">
+                  <tbody className="divide-y divide-[#E8DDD8]">
                     {inHouse.map((b) => (
-                      <tr key={b.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                      <tr key={b.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
                         {/* Room */}
-                        <td className="px-4 py-3.5 font-semibold text-[#362A22]">
-                          <div className="text-base font-serif font-bold text-[#362A22]">
+                        <td className="px-4 py-3.5 font-semibold text-[#59283A]">
+                          <div className="text-base font-serif font-bold text-[#59283A]">
                             Room {b.room?.roomNumber}
                           </div>
-                          <div className="text-[10px] text-[#79695B]">
+                          <div className="text-[10px] text-[#82747A]">
                             {b.room?.roomType?.name} • Floor {b.room?.floor}
                           </div>
                         </td>
 
                         {/* Guest */}
                         <td className="px-4 py-3.5">
-                          <div className="font-semibold text-sm text-[#362A22]">
+                          <div className="font-semibold text-sm text-[#59283A]">
                             {b.primaryGuest?.fullName}
                           </div>
-                          <div className="text-[11px] text-[#79695B] font-mono flex items-center gap-1 mt-0.5">
-                            <Phone className="w-3 h-3 text-[#B08A60]" />
+                          <div className="text-[11px] text-[#82747A] font-mono flex items-center gap-1 mt-0.5">
+                            <Phone className="w-3 h-3 text-[#C4A06A]" />
                             <span>{b.primaryGuest?.mobileNumber}</span>
                           </div>
                         </td>
 
                         {/* Check-In Timestamp */}
-                        <td className="px-4 py-3.5 text-[#79695B]">
-                          <div className="font-medium text-[#362A22]">
+                        <td className="px-4 py-3.5 text-[#82747A]">
+                          <div className="font-medium text-[#59283A]">
                             {new Date(b.checkInDate).toLocaleDateString("en-IN")}
                           </div>
-                          <div className="text-[11px] text-[#948779] font-mono">
+                          <div className="text-[11px] text-[#8E7079] font-mono">
                             {b.actualCheckInAt
                               ? new Date(b.actualCheckInAt).toLocaleTimeString("en-US", {
                                   hour: "2-digit",
@@ -615,19 +615,19 @@ export default function StaysPage() {
                         </td>
 
                         {/* Expected Departure */}
-                        <td className="px-4 py-3.5 text-[#79695B]">
-                          <div className="font-medium text-[#362A22]">
+                        <td className="px-4 py-3.5 text-[#82747A]">
+                          <div className="font-medium text-[#59283A]">
                             {new Date(b.expectedCheckOutDate).toLocaleDateString("en-IN")}
                           </div>
-                          <div className="text-[11px] text-[#948779] font-mono">
+                          <div className="text-[11px] text-[#8E7079] font-mono">
                             {b.expectedCheckOutTime || "11:00 AM"}
                           </div>
                         </td>
 
                         {/* Duration & Rate */}
-                        <td className="px-4 py-3.5 text-[#362A22]">
+                        <td className="px-4 py-3.5 text-[#59283A]">
                           <div className="font-semibold">{b.numberOfNights} Night(s)</div>
-                          <div className="text-[11px] text-[#79695B] font-mono">
+                          <div className="text-[11px] text-[#82747A] font-mono">
                             ₹{Number(b.roomRatePerNight).toLocaleString("en-IN")} / night
                           </div>
                         </td>
@@ -641,7 +641,7 @@ export default function StaysPage() {
 
                         {/* Room Items */}
                         <td className="px-4 py-3.5">
-                          <Badge variant="outline" className="text-[10px] bg-[#EEE7DA] text-[#362A22]">
+                          <Badge variant="outline" className="text-[10px] bg-[#F5F0EA] text-[#59283A]">
                             {b.bookingItems?.length || 0} Orders
                           </Badge>
                         </td>
@@ -652,17 +652,17 @@ export default function StaysPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleOpenRelocate(b)}
-                            className="h-7 text-xs text-[#5D493D] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                            className="h-7 text-xs text-[#7A4652] hover:bg-[#F5F0EA] border-[#E8DDD8]"
                             title="Relocate guest to another room"
                           >
-                            <ArrowRightLeft className="w-3.5 h-3.5 mr-1 text-[#B08A60]" /> Relocate
+                            <ArrowRightLeft className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" /> Relocate
                           </Button>
 
                           <Link href={`/items?bookingId=${b.id}`}>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-7 text-xs text-[#5D493D] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                              className="h-7 text-xs text-[#7A4652] hover:bg-[#F5F0EA] border-[#E8DDD8]"
                               title="Add POS Item or Room Service"
                             >
                               <Plus className="w-3.5 h-3.5 mr-1" /> Service
@@ -672,9 +672,9 @@ export default function StaysPage() {
                           <Button
                             size="sm"
                             onClick={() => handleOpenCheckOutModal(b)}
-                            className="h-7 text-xs bg-[#362A22] hover:bg-[#43352B] text-white"
+                            className="h-7 text-xs bg-[#59283A] hover:bg-[#472130] text-white"
                           >
-                            <LogOut className="w-3.5 h-3.5 mr-1 text-[#B08A60]" /> Check-Out Folio
+                            <LogOut className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" /> Check-Out Folio
                           </Button>
                         </td>
                       </tr>
@@ -689,17 +689,17 @@ export default function StaysPage() {
 
       {/* TAB 2: EXPECTED ARRIVALS (CHECK-INS) */}
       {activeTab === "arrivals" && (
-        <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
+        <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
           <CardContent className="p-0">
             {arrivals.length === 0 ? (
-              <div className="p-16 text-center text-xs text-[#79695B] space-y-2">
-                <DoorOpen className="w-10 h-10 text-[#B08A60] mx-auto opacity-60" />
-                <p className="font-medium text-[#362A22]">No pending arrivals scheduled for check-in.</p>
+              <div className="p-16 text-center text-xs text-[#82747A] space-y-2">
+                <DoorOpen className="w-10 h-10 text-[#C4A06A] mx-auto opacity-60" />
+                <p className="font-medium text-[#59283A]">No pending arrivals scheduled for check-in.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                  <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                     <tr>
                       <th className="px-4 py-3.5">Booking #</th>
                       <th className="px-4 py-3.5">Guest Information</th>
@@ -711,41 +711,41 @@ export default function StaysPage() {
                       <th className="px-4 py-3.5 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EAE3D8]">
+                  <tbody className="divide-y divide-[#E8DDD8]">
                     {arrivals.map((b) => (
-                      <tr key={b.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
-                        <td className="px-4 py-3.5 font-mono font-medium text-[#B08A60]">
-                          <span className="bg-[#EEE7DA] px-2 py-0.5 rounded text-[11px]">
+                      <tr key={b.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
+                        <td className="px-4 py-3.5 font-mono font-medium text-[#C4A06A]">
+                          <span className="bg-[#F5F0EA] px-2 py-0.5 rounded text-[11px]">
                             {b.bookingNumber}
                           </span>
                         </td>
 
                         <td className="px-4 py-3.5">
-                          <div className="font-semibold text-[#362A22]">{b.primaryGuest?.fullName}</div>
-                          <div className="text-[11px] text-[#79695B] font-mono">
+                          <div className="font-semibold text-[#59283A]">{b.primaryGuest?.fullName}</div>
+                          <div className="text-[11px] text-[#82747A] font-mono">
                             {b.primaryGuest?.mobileNumber}
                           </div>
                         </td>
 
                         <td className="px-4 py-3.5">
-                          <span className="font-bold text-[#362A22]">Room {b.room?.roomNumber}</span>
-                          <span className="text-[11px] text-[#79695B] block">
+                          <span className="font-bold text-[#59283A]">Room {b.room?.roomNumber}</span>
+                          <span className="text-[11px] text-[#82747A] block">
                             {b.room?.roomType?.name}
                           </span>
                         </td>
 
-                        <td className="px-4 py-3.5 text-[#79695B]">
+                        <td className="px-4 py-3.5 text-[#82747A]">
                           <div>{new Date(b.checkInDate).toLocaleDateString("en-IN")}</div>
-                          <div className="text-[10px] text-[#948779] font-mono">
+                          <div className="text-[10px] text-[#8E7079] font-mono">
                             {b.checkInTime || "12:00 PM"}
                           </div>
                         </td>
 
-                        <td className="px-4 py-3.5 font-medium text-[#362A22]">
+                        <td className="px-4 py-3.5 font-medium text-[#59283A]">
                           {b.numberOfNights} Night(s)
                         </td>
 
-                        <td className="px-4 py-3.5 font-mono font-medium text-[#362A22]">
+                        <td className="px-4 py-3.5 font-mono font-medium text-[#59283A]">
                           ₹{Number(b.roomRatePerNight).toLocaleString("en-IN")}
                         </td>
 
@@ -759,9 +759,9 @@ export default function StaysPage() {
                           <Button
                             size="sm"
                             onClick={() => handleOpenCheckInModal(b)}
-                            className="h-7 text-xs bg-[#362A22] hover:bg-[#43352B] text-white"
+                            className="h-7 text-xs bg-[#59283A] hover:bg-[#472130] text-white"
                           >
-                            <DoorOpen className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                            <DoorOpen className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                             Process Check-In
                           </Button>
                         </td>
@@ -777,17 +777,17 @@ export default function StaysPage() {
 
       {/* TAB 3: EXPECTED DEPARTURES (CHECK-OUTS TODAY) */}
       {activeTab === "departures" && (
-        <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
+        <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
           <CardContent className="p-0">
             {departures.length === 0 ? (
-              <div className="p-16 text-center text-xs text-[#79695B] space-y-2">
-                <LogOut className="w-10 h-10 text-[#B08A60] mx-auto opacity-60" />
-                <p className="font-medium text-[#362A22]">No departures scheduled for check-out today.</p>
+              <div className="p-16 text-center text-xs text-[#82747A] space-y-2">
+                <LogOut className="w-10 h-10 text-[#C4A06A] mx-auto opacity-60" />
+                <p className="font-medium text-[#59283A]">No departures scheduled for check-out today.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                  <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                     <tr>
                       <th className="px-4 py-3.5">Room</th>
                       <th className="px-4 py-3.5">Guest</th>
@@ -798,25 +798,25 @@ export default function StaysPage() {
                       <th className="px-4 py-3.5 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EAE3D8]">
+                  <tbody className="divide-y divide-[#E8DDD8]">
                     {departures.map((b) => (
-                      <tr key={b.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
-                        <td className="px-4 py-3.5 font-bold text-sm text-[#362A22]">
+                      <tr key={b.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
+                        <td className="px-4 py-3.5 font-bold text-sm text-[#59283A]">
                           Room {b.room?.roomNumber}
                         </td>
-                        <td className="px-4 py-3.5 font-semibold text-[#362A22]">
+                        <td className="px-4 py-3.5 font-semibold text-[#59283A]">
                           {b.primaryGuest?.fullName}
                         </td>
-                        <td className="px-4 py-3.5 text-[#79695B]">
+                        <td className="px-4 py-3.5 text-[#82747A]">
                           <div>{new Date(b.expectedCheckOutDate).toLocaleDateString("en-IN")}</div>
-                          <div className="text-[10px] text-[#948779] font-mono">
+                          <div className="text-[10px] text-[#8E7079] font-mono">
                             {b.expectedCheckOutTime || "11:00 AM"}
                           </div>
                         </td>
-                        <td className="px-4 py-3.5 font-medium text-[#362A22]">
+                        <td className="px-4 py-3.5 font-medium text-[#59283A]">
                           {b.numberOfNights} Nights
                         </td>
-                        <td className="px-4 py-3.5 font-mono text-[#362A22]">
+                        <td className="px-4 py-3.5 font-mono text-[#59283A]">
                           ₹{Number(b.roomRatePerNight).toLocaleString("en-IN")}
                         </td>
                         <td className="px-4 py-3.5 font-mono font-bold text-[#32765B]">
@@ -826,9 +826,9 @@ export default function StaysPage() {
                           <Button
                             size="sm"
                             onClick={() => handleOpenCheckOutModal(b)}
-                            className="h-7 text-xs bg-[#362A22] hover:bg-[#43352B] text-white"
+                            className="h-7 text-xs bg-[#59283A] hover:bg-[#472130] text-white"
                           >
-                            <LogOut className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                            <LogOut className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                             Check-Out Folio
                           </Button>
                         </td>
@@ -845,9 +845,9 @@ export default function StaysPage() {
       {/* TAB 4: DIGITAL CHECK-OUT ARCHIVE */}
       {activeTab === "archive" && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E8DDD8]">
             <div className="relative w-full sm:w-80">
-              <Search className="w-3.5 h-3.5 text-[#948779] absolute left-3 top-2.5" />
+              <Search className="w-3.5 h-3.5 text-[#8E7079] absolute left-3 top-2.5" />
               <Input
                 type="text"
                 placeholder="Search archived stays by guest, booking, or room..."
@@ -856,30 +856,30 @@ export default function StaysPage() {
                   setArchiveSearch(e.target.value);
                   setArchivePage(1);
                 }}
-                className="pl-9 h-8 text-xs bg-[#F7F4EE] border-[#E3D9CA]"
+                className="pl-9 h-8 text-xs bg-[#F5F0EA] border-[#E8DDD8]"
               />
             </div>
-            <div className="text-xs text-[#79695B]">
-              Showing <span className="font-semibold text-[#362A22]">{archive.length}</span> of{" "}
-              <span className="font-semibold text-[#362A22]">{archiveTotal}</span> completed digital stay records
+            <div className="text-xs text-[#82747A]">
+              Showing <span className="font-semibold text-[#59283A]">{archive.length}</span> of{" "}
+              <span className="font-semibold text-[#59283A]">{archiveTotal}</span> completed digital stay records
             </div>
           </div>
 
-          <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
+          <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
             <CardContent className="p-0">
               {loading ? (
                 <div className="p-16 flex flex-col justify-center items-center gap-3">
-                  <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-                  <p className="text-xs text-[#79695B]">Querying digital checkout archives...</p>
+                  <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                  <p className="text-xs text-[#82747A]">Querying digital checkout archives...</p>
                 </div>
               ) : archive.length === 0 ? (
-                <div className="p-16 text-center text-xs text-[#79695B]">
+                <div className="p-16 text-center text-xs text-[#82747A]">
                   No archived check-out records found.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                    <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                       <tr>
                         <th className="px-4 py-3.5">Booking / Invoice</th>
                         <th className="px-4 py-3.5">Guest Details</th>
@@ -891,46 +891,46 @@ export default function StaysPage() {
                         <th className="px-4 py-3.5 text-right">Digital Dossier</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EAE3D8]">
+                    <tbody className="divide-y divide-[#E8DDD8]">
                       {archive.map((b) => {
                         const inv = b.invoices && b.invoices[0];
                         return (
-                          <tr key={b.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                          <tr key={b.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
                             <td className="px-4 py-3.5 font-mono">
-                              <span className="font-semibold text-[#362A22] block">
+                              <span className="font-semibold text-[#59283A] block">
                                 {b.bookingNumber}
                               </span>
                               {inv && (
-                                <span className="text-[10px] text-[#B08A60]">{inv.invoiceNumber}</span>
+                                <span className="text-[10px] text-[#C4A06A]">{inv.invoiceNumber}</span>
                               )}
                             </td>
 
                             <td className="px-4 py-3.5">
-                              <div className="font-semibold text-[#362A22]">
+                              <div className="font-semibold text-[#59283A]">
                                 {b.primaryGuest?.fullName}
                               </div>
-                              <div className="text-[11px] text-[#79695B] font-mono">
+                              <div className="text-[11px] text-[#82747A] font-mono">
                                 {b.primaryGuest?.mobileNumber}
                               </div>
                             </td>
 
                             <td className="px-4 py-3.5">
-                              <span className="font-bold text-[#362A22]">Room {b.room?.roomNumber}</span>
-                              <span className="text-[10px] text-[#79695B] block">{b.room?.roomType?.name}</span>
+                              <span className="font-bold text-[#59283A]">Room {b.room?.roomNumber}</span>
+                              <span className="text-[10px] text-[#82747A] block">{b.room?.roomType?.name}</span>
                             </td>
 
-                            <td className="px-4 py-3.5 text-[#79695B]">
+                            <td className="px-4 py-3.5 text-[#82747A]">
                               <div>{new Date(b.checkInDate).toLocaleDateString("en-IN")}</div>
-                              <div className="text-[10px] text-[#948779]">
+                              <div className="text-[10px] text-[#8E7079]">
                                 Out: {b.actualCheckOutAt ? new Date(b.actualCheckOutAt).toLocaleDateString("en-IN") : "—"}
                               </div>
                             </td>
 
-                            <td className="px-4 py-3.5 font-medium text-[#362A22]">
+                            <td className="px-4 py-3.5 font-medium text-[#59283A]">
                               {b.numberOfNights} Nights
                             </td>
 
-                            <td className="px-4 py-3.5 font-mono font-bold text-[#362A22]">
+                            <td className="px-4 py-3.5 font-mono font-bold text-[#59283A]">
                               ₹{Number(inv?.totalAmount || Number(b.roomRatePerNight) * b.numberOfNights).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                             </td>
 
@@ -968,9 +968,9 @@ export default function StaysPage() {
                                   });
                                   setReceiptModalOpen(true);
                                 }}
-                                className="h-7 text-xs border-[#E3D9CA] text-[#79695B] hover:text-[#362A22]"
+                                className="h-7 text-xs border-[#E8DDD8] text-[#82747A] hover:text-[#59283A]"
                               >
-                                <FileText className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                                <FileText className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                                 Folio Dossier
                               </Button>
                             </td>
@@ -990,15 +990,15 @@ export default function StaysPage() {
       {/* CHECK-IN MODAL (ALL 9 CHECK-IN FIELDS)                                    */}
       {/* ========================================================================= */}
       <Dialog open={checkInModalOpen} onOpenChange={setCheckInModalOpen}>
-        <DialogContent className="max-w-lg bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+        <DialogContent className="max-w-lg bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
             <span className="text-[10px] uppercase font-bold text-[#32765B] bg-[#E7F1E9] px-2 py-0.5 rounded w-fit">
               Front Desk Arrival Processing
             </span>
-            <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
+            <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
               Check-In Verification • #{checkInBooking?.bookingNumber}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Verify guest credentials, room allocation, check-in timestamp, and advance payment.
             </DialogDescription>
           </DialogHeader>
@@ -1006,41 +1006,41 @@ export default function StaysPage() {
           {checkInBooking && (
             <form onSubmit={handleConfirmCheckIn} className="space-y-4 pt-2 text-xs">
               {/* 1. Guest Details */}
-              <div className="p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] space-y-1">
-                <span className="text-[10px] font-bold uppercase text-[#948779] tracking-wider block">
+              <div className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] space-y-1">
+                <span className="text-[10px] font-bold uppercase text-[#8E7079] tracking-wider block">
                   1. Guest Information
                 </span>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-[#362A22] text-sm">
+                  <span className="font-bold text-[#59283A] text-sm">
                     {checkInBooking.primaryGuest?.fullName}
                   </span>
-                  <span className="font-mono text-[#79695B]">
+                  <span className="font-mono text-[#82747A]">
                     {checkInBooking.primaryGuest?.mobileNumber}
                   </span>
                 </div>
-                <div className="text-[11px] text-[#79695B]">
+                <div className="text-[11px] text-[#82747A]">
                   {checkInBooking.primaryGuest?.city || "India"} • ID Verified
                 </div>
               </div>
 
               {/* 2. Room Details & Pricing */}
-              <div className="grid grid-cols-2 gap-3 p-3 bg-white rounded-xl border border-[#E3D9CA]">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-white rounded-xl border border-[#E8DDD8]">
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold">
                     2. Room Number & Category
                   </span>
-                  <span className="font-bold text-[#362A22]">
+                  <span className="font-bold text-[#59283A]">
                     Room {checkInBooking.room?.roomNumber}
                   </span>
-                  <span className="text-[11px] text-[#79695B] block">
+                  <span className="text-[11px] text-[#82747A] block">
                     {checkInBooking.room?.roomType?.name}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold">
                     Room Price Per Night
                   </span>
-                  <span className="font-mono font-bold text-[#362A22]">
+                  <span className="font-mono font-bold text-[#59283A]">
                     ₹{Number(checkInBooking.roomRatePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -1049,54 +1049,54 @@ export default function StaysPage() {
               {/* Dates & Times */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#362A22]">Check-In Date</label>
+                  <label className="font-semibold text-[#59283A]">Check-In Date</label>
                   <Input
                     disabled
                     value={new Date(checkInBooking.checkInDate).toLocaleDateString("en-IN")}
-                    className="h-8 text-xs bg-[#F7F4EE] border-[#E3D9CA]"
+                    className="h-8 text-xs bg-[#F5F0EA] border-[#E8DDD8]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#362A22]">Check-In Time *</label>
+                  <label className="font-semibold text-[#59283A]">Check-In Time *</label>
                   <Input
                     required
                     value={checkInTime}
                     onChange={(e) => setCheckInTime(e.target.value)}
                     placeholder="e.g. 12:30 PM"
-                    className="h-8 text-xs font-mono border-[#E3D9CA]"
+                    className="h-8 text-xs font-mono border-[#E8DDD8]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#362A22]">Expected Check-Out Date</label>
+                  <label className="font-semibold text-[#59283A]">Expected Check-Out Date</label>
                   <Input
                     disabled
                     value={new Date(checkInBooking.expectedCheckOutDate).toLocaleDateString("en-IN")}
-                    className="h-8 text-xs bg-[#F7F4EE] border-[#E3D9CA]"
+                    className="h-8 text-xs bg-[#F5F0EA] border-[#E8DDD8]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#362A22]">Expected Check-Out Time</label>
+                  <label className="font-semibold text-[#59283A]">Expected Check-Out Time</label>
                   <Input
                     disabled
                     value={checkInBooking.expectedCheckOutTime || "11:00 AM"}
-                    className="h-8 text-xs bg-[#F7F4EE] border-[#E3D9CA]"
+                    className="h-8 text-xs bg-[#F5F0EA] border-[#E8DDD8]"
                   />
                 </div>
               </div>
 
               {/* Number of Nights */}
-              <div className="flex justify-between items-center p-2.5 bg-[#F7F4EE] rounded-lg border border-[#E3D9CA]">
-                <span className="font-semibold text-[#362A22]">Duration of Stay:</span>
-                <span className="font-bold text-[#362A22]">{checkInBooking.numberOfNights} Night(s)</span>
+              <div className="flex justify-between items-center p-2.5 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8]">
+                <span className="font-semibold text-[#59283A]">Duration of Stay:</span>
+                <span className="font-bold text-[#59283A]">{checkInBooking.numberOfNights} Night(s)</span>
               </div>
 
               {/* Advance Payment */}
-              <div className="p-3 bg-white rounded-xl border border-[#E3D9CA] space-y-2">
+              <div className="p-3 bg-white rounded-xl border border-[#E8DDD8] space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-[#362A22] text-[11px] uppercase tracking-wider">
+                  <span className="font-bold text-[#59283A] text-[11px] uppercase tracking-wider">
                     Advance Payment
                   </span>
                   <span className="font-mono text-xs font-bold text-[#32765B]">
@@ -1106,23 +1106,23 @@ export default function StaysPage() {
 
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <div>
-                    <label className="text-[10px] text-[#79695B] font-semibold">Collect Additional Advance (₹)</label>
+                    <label className="text-[10px] text-[#82747A] font-semibold">Collect Additional Advance (₹)</label>
                     <Input
                       type="number"
                       min="0"
                       step="100"
                       value={checkInAdvanceAmount}
                       onChange={(e) => setCheckInAdvanceAmount(Number(e.target.value))}
-                      className="h-8 text-xs font-mono border-[#E3D9CA]"
+                      className="h-8 text-xs font-mono border-[#E8DDD8]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[10px] text-[#79695B] font-semibold">Payment Method</label>
+                    <label className="text-[10px] text-[#82747A] font-semibold">Payment Method</label>
                     <select
                       value={checkInAdvanceMethod}
                       onChange={(e) => setCheckInAdvanceMethod(e.target.value)}
-                      className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                      className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                     >
                       <option value="CASH">Cash</option>
                       <option value="UPI">UPI</option>
@@ -1133,7 +1133,7 @@ export default function StaysPage() {
                 </div>
               </div>
 
-              <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+              <DialogFooter className="pt-2 border-t border-[#E8DDD8]">
                 <Button
                   type="button"
                   variant="outline"
@@ -1146,12 +1146,12 @@ export default function StaysPage() {
                   type="submit"
                   size="sm"
                   disabled={submitting}
-                  className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5"
+                  className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5"
                 >
                   {submitting ? (
                     <LoadingSpinner className="w-3.5 h-3.5 mr-1" />
                   ) : (
-                    <DoorOpen className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                    <DoorOpen className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                   )}
                   <span>Confirm Check-In</span>
                 </Button>
@@ -1165,17 +1165,17 @@ export default function StaysPage() {
       {/* CHECK-OUT FOLIO MODAL (ALL 12 CHECK-OUT FIELDS)                           */}
       {/* ========================================================================= */}
       <Dialog open={checkOutModalOpen} onOpenChange={setCheckOutModalOpen}>
-        <DialogContent className="max-w-2xl bg-white border-[#E3D9CA] shadow-2xl p-6 max-h-[92vh] overflow-y-auto">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+        <DialogContent className="max-w-2xl bg-white border-[#E8DDD8] shadow-2xl p-6 max-h-[92vh] overflow-y-auto">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#A97832] bg-[#F6EDDC] px-2 py-0.5 rounded">
                   Digital Check-Out & Settlement
                 </span>
-                <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
                   Complete Guest Check-Out • Room {checkOutBooking?.room?.roomNumber}
                 </DialogTitle>
-                <DialogDescription className="text-xs text-[#79695B]">
+                <DialogDescription className="text-xs text-[#82747A]">
                   Guest: {checkOutBooking?.primaryGuest?.fullName} • Folio Breakdown & Balance Settlement
                 </DialogDescription>
               </div>
@@ -1184,80 +1184,80 @@ export default function StaysPage() {
 
           {loadingSummary ? (
             <div className="p-16 flex flex-col justify-center items-center gap-2">
-              <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-              <p className="text-xs text-[#79695B]">Calculating stay charges, room items & taxes...</p>
+              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+              <p className="text-xs text-[#82747A]">Calculating stay charges, room items & taxes...</p>
             </div>
           ) : (
             <form onSubmit={handleConfirmCheckOut} className="space-y-4 pt-2 text-xs">
               {/* Stay Header Summary */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold">Check-In</span>
-                  <span className="font-semibold text-[#362A22]">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold">Check-In</span>
+                  <span className="font-semibold text-[#59283A]">
                     {checkOutBooking ? new Date(checkOutBooking.checkInDate).toLocaleDateString("en-IN") : "—"}
                   </span>
-                  <span className="text-[10px] text-[#79695B] block font-mono">
+                  <span className="text-[10px] text-[#82747A] block font-mono">
                     {checkOutBooking?.checkInTime || "12:00 PM"}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold">Actual Check-Out</span>
-                  <span className="font-semibold text-[#362A22]">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold">Actual Check-Out</span>
+                  <span className="font-semibold text-[#59283A]">
                     {new Date().toLocaleDateString("en-IN")}
                   </span>
-                  <span className="text-[10px] text-[#79695B] block font-mono">
+                  <span className="text-[10px] text-[#82747A] block font-mono">
                     {actualCheckOutTime}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold">Total Nights</span>
-                  <span className="font-bold text-sm text-[#362A22]">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold">Total Nights</span>
+                  <span className="font-bold text-sm text-[#59283A]">
                     {checkoutSummary?.totalNumberOfNights || 1} Night(s)
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold">Room Rate</span>
-                  <span className="font-mono font-bold text-[#362A22]">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold">Room Rate</span>
+                  <span className="font-mono font-bold text-[#59283A]">
                     ₹{Number(checkOutBooking?.roomRatePerNight || 0).toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
 
               {/* Line Items & Charges Breakdown */}
-              <div className="p-3.5 bg-white rounded-xl border border-[#E3D9CA] space-y-2.5">
-                <h5 className="font-bold text-[#362A22] uppercase tracking-wider text-[11px] flex items-center justify-between border-b border-[#EAE3D8] pb-1.5">
+              <div className="p-3.5 bg-white rounded-xl border border-[#E8DDD8] space-y-2.5">
+                <h5 className="font-bold text-[#59283A] uppercase tracking-wider text-[11px] flex items-center justify-between border-b border-[#E8DDD8] pb-1.5">
                   <span>Stay Charges Breakdown</span>
-                  <span className="text-[#948779] text-[10px] font-normal">All amounts in INR (₹)</span>
+                  <span className="text-[#8E7079] text-[10px] font-normal">All amounts in INR (₹)</span>
                 </h5>
 
                 <div className="space-y-1.5">
                   {/* Room Charges */}
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-[#79695B]">
+                    <span className="text-[#82747A]">
                       Room Charges ({checkoutSummary?.totalNumberOfNights} night(s) × ₹
                       {Number(checkOutBooking?.roomRatePerNight || 0).toLocaleString("en-IN")}):
                     </span>
-                    <span className="font-mono font-semibold text-[#362A22]">
+                    <span className="font-mono font-semibold text-[#59283A]">
                       ₹{computedRoomCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
                   {/* Additional Item Charges */}
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-[#79695B]">
+                    <span className="text-[#82747A]">
                       Additional Item Charges (Room Service, POS, Minibar):
                     </span>
-                    <span className="font-mono font-semibold text-[#362A22]">
+                    <span className="font-mono font-semibold text-[#59283A]">
                       ₹{computedAdditionalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
                   {/* Additional Items breakdown (if any) */}
                   {checkoutSummary?.additionalItems && checkoutSummary.additionalItems.length > 0 && (
-                    <div className="pl-3 py-1 border-l-2 border-[#E3D9CA] text-[11px] space-y-0.5 text-[#79695B]">
+                    <div className="pl-3 py-1 border-l-2 border-[#E8DDD8] text-[11px] space-y-0.5 text-[#82747A]">
                       {checkoutSummary.additionalItems.map((it: any) => (
                         <div key={it.id} className="flex justify-between">
                           <span>
@@ -1273,7 +1273,7 @@ export default function StaysPage() {
 
                   {/* Service Charges Input */}
                   <div className="flex justify-between items-center text-xs pt-1">
-                    <span className="text-[#79695B]">Service Charges / Facility Fees:</span>
+                    <span className="text-[#82747A]">Service Charges / Facility Fees:</span>
                     <div className="w-28">
                       <Input
                         type="number"
@@ -1281,7 +1281,7 @@ export default function StaysPage() {
                         step="50"
                         value={serviceCharges}
                         onChange={(e) => setServiceCharges(Number(e.target.value))}
-                        className="h-7 text-xs font-mono text-right border-[#E3D9CA]"
+                        className="h-7 text-xs font-mono text-right border-[#E8DDD8]"
                       />
                     </div>
                   </div>
@@ -1289,11 +1289,11 @@ export default function StaysPage() {
                   {/* Discount Input */}
                   <div className="flex justify-between items-center text-xs pt-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[#79695B]">Discount:</span>
+                      <span className="text-[#82747A]">Discount:</span>
                       <select
                         value={discountType}
                         onChange={(e) => setDiscountType(e.target.value as any)}
-                        className="h-6 text-[10px] border border-[#E3D9CA] rounded px-1 bg-white"
+                        className="h-6 text-[10px] border border-[#E8DDD8] rounded px-1 bg-white"
                       >
                         <option value="PERCENTAGE">% Percentage</option>
                         <option value="FIXED">₹ Fixed Amount</option>
@@ -1305,7 +1305,7 @@ export default function StaysPage() {
                         min="0"
                         value={discountValue}
                         onChange={(e) => setDiscountValue(Number(e.target.value))}
-                        className="h-7 w-20 text-xs font-mono text-right border-[#E3D9CA]"
+                        className="h-7 w-20 text-xs font-mono text-right border-[#E8DDD8]"
                       />
                       <span className="font-mono text-xs text-rose-600 font-medium w-24 text-right">
                         -₹{computedDiscount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
@@ -1315,16 +1315,16 @@ export default function StaysPage() {
 
                   {/* Tax */}
                   <div className="flex justify-between items-center text-xs pt-1">
-                    <span className="text-[#79695B]">Tax / GST ({taxPercentage}%):</span>
-                    <span className="font-mono font-semibold text-[#362A22]">
+                    <span className="text-[#82747A]">Tax / GST ({taxPercentage}%):</span>
+                    <span className="font-mono font-semibold text-[#59283A]">
                       ₹{computedTax.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
                   {/* Total Bill Amount */}
-                  <div className="flex justify-between items-center text-sm font-bold text-[#362A22] pt-2 border-t border-[#E3D9CA]">
+                  <div className="flex justify-between items-center text-sm font-bold text-[#59283A] pt-2 border-t border-[#E8DDD8]">
                     <span>Total Bill Amount:</span>
-                    <span className="font-mono text-base text-[#362A22]">
+                    <span className="font-mono text-base text-[#59283A]">
                       ₹{computedTotalBill.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -1358,18 +1358,18 @@ export default function StaysPage() {
               </div>
 
               {/* Settlement Payment Section */}
-              <div className="p-3.5 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] space-y-2.5">
-                <span className="font-bold text-[#362A22] text-[11px] uppercase tracking-wider block">
+              <div className="p-3.5 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] space-y-2.5">
+                <span className="font-bold text-[#59283A] text-[11px] uppercase tracking-wider block">
                   Check-Out Settlement Payment
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <div>
-                    <label className="text-[11px] font-semibold text-[#362A22]">Payment Method</label>
+                    <label className="text-[11px] font-semibold text-[#59283A]">Payment Method</label>
                     <select
                       value={paymentMethod}
                       onChange={(e) => setPaymentMethod(e.target.value as any)}
-                      className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                      className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                     >
                       <option value="CASH">Cash</option>
                       <option value="UPI">UPI</option>
@@ -1379,39 +1379,39 @@ export default function StaysPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[#362A22]">Settlement Amount (₹)</label>
+                    <label className="text-[11px] font-semibold text-[#59283A]">Settlement Amount (₹)</label>
                     <Input
                       type="number"
                       min="0"
                       step="50"
                       value={settlementAmount}
                       onChange={(e) => setSettlementAmount(Number(e.target.value))}
-                      className="h-8 text-xs font-mono bg-white border-[#E3D9CA]"
+                      className="h-8 text-xs font-mono bg-white border-[#E8DDD8]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[#362A22]">Actual Check-Out Time</label>
+                    <label className="text-[11px] font-semibold text-[#59283A]">Actual Check-Out Time</label>
                     <Input
                       value={actualCheckOutTime}
                       onChange={(e) => setActualCheckOutTime(e.target.value)}
-                      className="h-8 text-xs font-mono bg-white border-[#E3D9CA]"
+                      className="h-8 text-xs font-mono bg-white border-[#E8DDD8]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-[#362A22]">Notes / Settlement Remarks</label>
+                  <label className="text-[11px] font-semibold text-[#59283A]">Notes / Settlement Remarks</label>
                   <Input
                     value={checkOutNotes}
                     onChange={(e) => setCheckOutNotes(e.target.value)}
                     placeholder="e.g. Settled in full at front desk counter"
-                    className="h-8 text-xs bg-white border-[#E3D9CA]"
+                    className="h-8 text-xs bg-white border-[#E8DDD8]"
                   />
                 </div>
               </div>
 
-              <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+              <DialogFooter className="pt-2 border-t border-[#E8DDD8]">
                 <Button
                   type="button"
                   variant="outline"
@@ -1424,12 +1424,12 @@ export default function StaysPage() {
                   type="submit"
                   size="sm"
                   disabled={submitting}
-                  className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5"
+                  className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5"
                 >
                   {submitting ? (
                     <LoadingSpinner className="w-3.5 h-3.5 mr-1" />
                   ) : (
-                    <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                    <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                   )}
                   <span>Complete Digital Check-Out & Finalize Invoice</span>
                 </Button>
@@ -1443,17 +1443,17 @@ export default function StaysPage() {
       {/* DIGITAL STAY DOSSIER & RECEIPT MODAL                                      */}
       {/* ========================================================================= */}
       <Dialog open={receiptModalOpen} onOpenChange={setReceiptModalOpen}>
-        <DialogContent className="max-w-xl bg-white border-[#E3D9CA] shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3 text-center sm:text-left">
+        <DialogContent className="max-w-xl bg-white border-[#E8DDD8] shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3 text-center sm:text-left">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#32765B] bg-[#E7F1E9] px-2 py-0.5 rounded">
                   Official Digital Receipt • Stay Settled
                 </span>
-                <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
                   {receiptData?.invoice?.invoiceNumber || "Digital Checkout Dossier"}
                 </DialogTitle>
-                <DialogDescription className="text-xs text-[#79695B]">
+                <DialogDescription className="text-xs text-[#82747A]">
                   Archived permanently in Neon PostgreSQL database.
                 </DialogDescription>
               </div>
@@ -1461,9 +1461,9 @@ export default function StaysPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => window.print()}
-                className="h-8 text-xs border-[#B08A60] text-[#362A22]"
+                className="h-8 text-xs border-[#C4A06A] text-[#59283A]"
               >
-                <Printer className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                <Printer className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                 Print Folio
               </Button>
             </div>
@@ -1472,41 +1472,41 @@ export default function StaysPage() {
           {receiptData && (
             <div className="space-y-4 pt-2 text-xs">
               {/* Hotel & Guest dossier */}
-              <div className="p-4 rounded-xl bg-[#F7F4EE] border border-[#E3D9CA] space-y-2">
-                <div className="flex justify-between border-b border-[#E3D9CA] pb-2">
+              <div className="p-4 rounded-xl bg-[#F5F0EA] border border-[#E8DDD8] space-y-2">
+                <div className="flex justify-between border-b border-[#E8DDD8] pb-2">
                   <div>
-                    <span className="font-bold text-[#362A22] text-sm block">GRAND BOUTIQUE HOTEL</span>
-                    <span className="text-[10px] text-[#79695B]">Luxury Hospitality Suite</span>
+                    <span className="font-bold text-[#59283A] text-sm block">GRAND BOUTIQUE HOTEL</span>
+                    <span className="text-[10px] text-[#82747A]">Luxury Hospitality Suite</span>
                   </div>
-                  <div className="text-right font-mono text-[11px] text-[#362A22]">
+                  <div className="text-right font-mono text-[11px] text-[#59283A]">
                     <div>Booking: {receiptData.booking?.bookingNumber}</div>
-                    <div className="text-[#B08A60] font-bold">{receiptData.invoice?.invoiceNumber}</div>
+                    <div className="text-[#C4A06A] font-bold">{receiptData.invoice?.invoiceNumber}</div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs pt-1">
                   <div>
-                    <span className="text-[#948779] block text-[10px]">Guest Name:</span>
-                    <span className="font-semibold text-[#362A22]">
+                    <span className="text-[#8E7079] block text-[10px]">Guest Name:</span>
+                    <span className="font-semibold text-[#59283A]">
                       {receiptData.booking?.primaryGuest?.fullName}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[#948779] block text-[10px]">Room Allocated:</span>
-                    <span className="font-bold text-[#362A22]">
+                    <span className="text-[#8E7079] block text-[10px]">Room Allocated:</span>
+                    <span className="font-bold text-[#59283A]">
                       Room {receiptData.booking?.room?.roomNumber} ({receiptData.booking?.room?.roomType?.name})
                     </span>
                   </div>
                   <div>
-                    <span className="text-[#948779] block text-[10px]">Check-In:</span>
-                    <span className="text-[#362A22]">
+                    <span className="text-[#8E7079] block text-[10px]">Check-In:</span>
+                    <span className="text-[#59283A]">
                       {new Date(receiptData.booking?.checkInDate).toLocaleDateString("en-IN")}{" "}
                       {receiptData.booking?.checkInTime}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[#948779] block text-[10px]">Check-Out:</span>
-                    <span className="text-[#362A22]">
+                    <span className="text-[#8E7079] block text-[10px]">Check-Out:</span>
+                    <span className="text-[#59283A]">
                       {receiptData.folio?.actualCheckOutDate || new Date().toLocaleDateString("en-IN")}{" "}
                       {receiptData.folio?.actualCheckOutTime}
                     </span>
@@ -1515,15 +1515,15 @@ export default function StaysPage() {
               </div>
 
               {/* Itemized Folio Table */}
-              <div className="border border-[#E3D9CA] rounded-xl overflow-hidden">
+              <div className="border border-[#E8DDD8] rounded-xl overflow-hidden">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#F7F4EE] text-[#79695B] border-b border-[#E3D9CA]">
+                  <thead className="bg-[#F5F0EA] text-[#82747A] border-b border-[#E8DDD8]">
                     <tr>
                       <th className="px-3 py-2">Charge Description</th>
                       <th className="px-3 py-2 text-right">Amount (₹)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EAE3D8]">
+                  <tbody className="divide-y divide-[#E8DDD8]">
                     <tr>
                       <td className="px-3 py-2">
                         Room Accommodation ({receiptData.folio?.totalNumberOfNights || receiptData.booking?.numberOfNights} Night(s))
@@ -1560,7 +1560,7 @@ export default function StaysPage() {
                         ₹{Number(receiptData.folio?.tax || receiptData.invoice?.taxAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </td>
                     </tr>
-                    <tr className="font-bold bg-[#F7F4EE]/60 text-[#362A22]">
+                    <tr className="font-bold bg-[#F5F0EA]/60 text-[#59283A]">
                       <td className="px-3 py-2.5">Total Bill Amount</td>
                       <td className="px-3 py-2.5 text-right font-mono text-sm">
                         ₹{Number(receiptData.folio?.totalBillAmount || receiptData.invoice?.totalAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
@@ -1584,7 +1584,7 @@ export default function StaysPage() {
                 <Button
                   size="sm"
                   onClick={() => setReceiptModalOpen(false)}
-                  className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs w-full sm:w-auto"
+                  className="bg-[#59283A] hover:bg-[#472130] text-white text-xs w-full sm:w-auto"
                 >
                   Done
                 </Button>
@@ -1598,15 +1598,15 @@ export default function StaysPage() {
       {/* DIRECT WALK-IN CHECK-IN MODAL                                             */}
       {/* ========================================================================= */}
       <Dialog open={walkInModalOpen} onOpenChange={setWalkInModalOpen}>
-        <DialogContent className="max-w-xl bg-white border-[#E3D9CA] shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <span className="text-[10px] uppercase font-bold text-[#362A22] bg-[#EEE7DA] px-2 py-0.5 rounded w-fit">
+        <DialogContent className="max-w-xl bg-white border-[#E8DDD8] shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <span className="text-[10px] uppercase font-bold text-[#59283A] bg-[#F5F0EA] px-2 py-0.5 rounded w-fit">
               Front Desk Quick Intake
             </span>
-            <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
+            <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
               Direct Walk-In Check-In
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Instantly assign room, record check-in time, collect advance payment, and mark guest in-house.
             </DialogDescription>
           </DialogHeader>
@@ -1615,15 +1615,15 @@ export default function StaysPage() {
             {/* Guest Selection Toggle */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="font-semibold text-[#362A22]">Primary Guest *</label>
-                <div className="inline-flex rounded-md p-0.5 bg-[#EEE7DA] text-[11px]">
+                <label className="font-semibold text-[#59283A]">Primary Guest *</label>
+                <div className="inline-flex rounded-md p-0.5 bg-[#F5F0EA] text-[11px]">
                   <button
                     type="button"
                     onClick={() => setWalkInForm({ ...walkInForm, guestType: "EXISTING" })}
                     className={`px-2.5 py-0.5 rounded font-medium transition-colors ${
                       walkInForm.guestType === "EXISTING"
-                        ? "bg-[#362A22] text-white shadow-sm"
-                        : "text-[#79695B] hover:text-[#362A22]"
+                        ? "bg-[#59283A] text-white shadow-sm"
+                        : "text-[#82747A] hover:text-[#59283A]"
                     }`}
                   >
                     Select Registered ({allGuests.length})
@@ -1633,8 +1633,8 @@ export default function StaysPage() {
                     onClick={() => setWalkInForm({ ...walkInForm, guestType: "NEW" })}
                     className={`px-2.5 py-0.5 rounded font-medium transition-colors ${
                       walkInForm.guestType === "NEW"
-                        ? "bg-[#362A22] text-white shadow-sm"
-                        : "text-[#79695B] hover:text-[#362A22]"
+                        ? "bg-[#59283A] text-white shadow-sm"
+                        : "text-[#82747A] hover:text-[#59283A]"
                     }`}
                   >
                     + Quick New Guest
@@ -1647,7 +1647,7 @@ export default function StaysPage() {
                   <select
                     value={walkInForm.primaryGuestId}
                     onChange={(e) => setWalkInForm({ ...walkInForm, primaryGuestId: e.target.value })}
-                    className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                    className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                   >
                     {allGuests.map((g) => (
                       <option key={g.id} value={g.id}>
@@ -1656,59 +1656,59 @@ export default function StaysPage() {
                     ))}
                   </select>
                 ) : (
-                  <div className="p-2.5 bg-[#F7F4EE] rounded-lg border border-[#E3D9CA] text-[11px] text-[#79695B] flex items-center justify-between">
+                  <div className="p-2.5 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8] text-[11px] text-[#82747A] flex items-center justify-between">
                     <span>No registered guests found in system.</span>
                     <button
                       type="button"
                       onClick={() => setWalkInForm({ ...walkInForm, guestType: "NEW" })}
-                      className="text-[#362A22] font-semibold underline"
+                      className="text-[#59283A] font-semibold underline"
                     >
                       Enter Guest Details
                     </button>
                   </div>
                 )
               ) : (
-                <div className="p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] space-y-2">
+                <div className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-0.5">
-                      <label className="text-[10px] uppercase font-bold text-[#79695B]">Full Name *</label>
+                      <label className="text-[10px] uppercase font-bold text-[#82747A]">Full Name *</label>
                       <Input
                         required={walkInForm.guestType === "NEW"}
                         placeholder="e.g. Ramesh Kumar"
                         value={walkInForm.newGuestName}
                         onChange={(e) => setWalkInForm({ ...walkInForm, newGuestName: e.target.value })}
-                        className="h-7 text-xs bg-white border-[#E3D9CA]"
+                        className="h-7 text-xs bg-white border-[#E8DDD8]"
                       />
                     </div>
                     <div className="space-y-0.5">
-                      <label className="text-[10px] uppercase font-bold text-[#79695B]">Mobile Number *</label>
+                      <label className="text-[10px] uppercase font-bold text-[#82747A]">Mobile Number *</label>
                       <Input
                         required={walkInForm.guestType === "NEW"}
                         placeholder="10-digit mobile"
                         value={walkInForm.newGuestMobile}
                         onChange={(e) => setWalkInForm({ ...walkInForm, newGuestMobile: e.target.value })}
-                        className="h-7 text-xs font-mono bg-white border-[#E3D9CA]"
+                        className="h-7 text-xs font-mono bg-white border-[#E8DDD8]"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-0.5">
-                      <label className="text-[10px] uppercase font-bold text-[#79695B]">Email (Optional)</label>
+                      <label className="text-[10px] uppercase font-bold text-[#82747A]">Email (Optional)</label>
                       <Input
                         type="email"
                         placeholder="guest@example.com"
                         value={walkInForm.newGuestEmail}
                         onChange={(e) => setWalkInForm({ ...walkInForm, newGuestEmail: e.target.value })}
-                        className="h-7 text-xs bg-white border-[#E3D9CA]"
+                        className="h-7 text-xs bg-white border-[#E8DDD8]"
                       />
                     </div>
                     <div className="space-y-0.5">
-                      <label className="text-[10px] uppercase font-bold text-[#79695B]">City / Address (Optional)</label>
+                      <label className="text-[10px] uppercase font-bold text-[#82747A]">City / Address (Optional)</label>
                       <Input
                         placeholder="e.g. Mumbai, MH"
                         value={walkInForm.newGuestAddress}
                         onChange={(e) => setWalkInForm({ ...walkInForm, newGuestAddress: e.target.value })}
-                        className="h-7 text-xs bg-white border-[#E3D9CA]"
+                        className="h-7 text-xs bg-white border-[#E8DDD8]"
                       />
                     </div>
                   </div>
@@ -1718,7 +1718,7 @@ export default function StaysPage() {
 
             {/* Room Selection */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Select Available Room *</label>
+              <label className="font-semibold text-[#59283A]">Select Available Room *</label>
               {allAvailableRooms.length > 0 ? (
                 <select
                   required
@@ -1731,7 +1731,7 @@ export default function StaysPage() {
                       roomRatePerNight: sel ? Number(sel.pricePerNight) : walkInForm.roomRatePerNight,
                     });
                   }}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                 >
                   <option value="">-- Choose Available Room --</option>
                   {allAvailableRooms.map((r) => (
@@ -1750,28 +1750,28 @@ export default function StaysPage() {
             {/* Dates & Times */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Check-In Date *</label>
+                <label className="font-semibold text-[#59283A]">Check-In Date *</label>
                 <Input
                   type="date"
                   required
                   value={walkInForm.checkInDate}
                   onChange={(e) => setWalkInForm({ ...walkInForm, checkInDate: e.target.value })}
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Check-In Time *</label>
+                <label className="font-semibold text-[#59283A]">Check-In Time *</label>
                 <Input
                   required
                   value={walkInForm.checkInTime}
                   onChange={(e) => setWalkInForm({ ...walkInForm, checkInTime: e.target.value })}
-                  className="h-8 text-xs font-mono border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Expected Check-Out Date *</label>
+                <label className="font-semibold text-[#59283A]">Expected Check-Out Date *</label>
                 <Input
                   type="date"
                   required
@@ -1779,18 +1779,18 @@ export default function StaysPage() {
                   onChange={(e) =>
                     setWalkInForm({ ...walkInForm, expectedCheckOutDate: e.target.value })
                   }
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Expected Check-Out Time</label>
+                <label className="font-semibold text-[#59283A]">Expected Check-Out Time</label>
                 <Input
                   value={walkInForm.expectedCheckOutTime}
                   onChange={(e) =>
                     setWalkInForm({ ...walkInForm, expectedCheckOutTime: e.target.value })
                   }
-                  className="h-8 text-xs font-mono border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono border-[#E8DDD8]"
                 />
               </div>
             </div>
@@ -1798,7 +1798,7 @@ export default function StaysPage() {
             {/* Nights & Room Rate */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Number of Nights</label>
+                <label className="font-semibold text-[#59283A]">Number of Nights</label>
                 <Input
                   type="number"
                   min="1"
@@ -1806,12 +1806,12 @@ export default function StaysPage() {
                   onChange={(e) =>
                     setWalkInForm({ ...walkInForm, numberOfNights: Number(e.target.value) })
                   }
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Room Price Per Night (₹)</label>
+                <label className="font-semibold text-[#59283A]">Room Price Per Night (₹)</label>
                 <Input
                   type="number"
                   min="0"
@@ -1820,15 +1820,15 @@ export default function StaysPage() {
                   onChange={(e) =>
                     setWalkInForm({ ...walkInForm, roomRatePerNight: Number(e.target.value) })
                   }
-                  className="h-8 text-xs font-mono border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono border-[#E8DDD8]"
                 />
               </div>
             </div>
 
             {/* Advance Payment */}
-            <div className="grid grid-cols-2 gap-3 p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA]">
+            <div className="grid grid-cols-2 gap-3 p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Advance Payment (₹)</label>
+                <label className="font-semibold text-[#59283A]">Advance Payment (₹)</label>
                 <Input
                   type="number"
                   min="0"
@@ -1837,18 +1837,18 @@ export default function StaysPage() {
                   onChange={(e) =>
                     setWalkInForm({ ...walkInForm, advanceAmount: Number(e.target.value) })
                   }
-                  className="h-8 text-xs font-mono bg-white border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono bg-white border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Payment Method</label>
+                <label className="font-semibold text-[#59283A]">Payment Method</label>
                 <select
                   value={walkInForm.advancePaymentMethod}
                   onChange={(e) =>
                     setWalkInForm({ ...walkInForm, advancePaymentMethod: e.target.value })
                   }
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                 >
                   <option value="CASH">Cash</option>
                   <option value="UPI">UPI</option>
@@ -1857,7 +1857,7 @@ export default function StaysPage() {
               </div>
             </div>
 
-            <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-2 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
@@ -1870,12 +1870,12 @@ export default function StaysPage() {
                 type="submit"
                 size="sm"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5"
+                className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5"
               >
                 {submitting ? (
                   <LoadingSpinner className="w-3.5 h-3.5 mr-1" />
                 ) : (
-                  <DoorOpen className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                  <DoorOpen className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                 )}
                 <span>Check-In Guest Now</span>
               </Button>
@@ -1888,19 +1888,19 @@ export default function StaysPage() {
       {/* ROOM RELOCATION MODAL                                                     */}
       {/* ========================================================================= */}
       <Dialog open={relocateModalOpen} onOpenChange={setRelocateModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <DialogTitle className="text-base font-serif font-bold text-[#362A22]">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <DialogTitle className="text-base font-serif font-bold text-[#59283A]">
               Relocate Room • {selectedBooking?.primaryGuest?.fullName}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Currently residing in Room {selectedBooking?.room?.roomNumber}.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleConfirmRelocate} className="space-y-3.5 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Target Destination Room *</label>
+              <label className="font-semibold text-[#59283A]">Target Destination Room *</label>
               {availableRooms.length === 0 ? (
                 <div className="p-3 bg-[#F8E8E5] text-[#B54C44] rounded-lg text-xs">
                   No other rooms available for the remaining stay period.
@@ -1910,7 +1910,7 @@ export default function StaysPage() {
                   required
                   value={newRoomId}
                   onChange={(e) => setNewRoomId(e.target.value)}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                 >
                   {availableRooms.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -1922,16 +1922,16 @@ export default function StaysPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Relocation Reason</label>
+              <label className="font-semibold text-[#59283A]">Relocation Reason</label>
               <Input
                 value={relocateReason}
                 onChange={(e) => setRelocateReason(e.target.value)}
                 placeholder="e.g. AC maintenance, guest upgrade request"
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-2 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-2 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
@@ -1944,7 +1944,7 @@ export default function StaysPage() {
                 type="submit"
                 size="sm"
                 disabled={submitting || availableRooms.length === 0}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white"
+                className="bg-[#59283A] hover:bg-[#472130] text-white"
               >
                 {submitting ? "Processing..." : "Confirm Relocation"}
               </Button>

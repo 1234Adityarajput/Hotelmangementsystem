@@ -321,10 +321,10 @@ export default function PaymentsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 text-[11px] font-semibold bg-[#EEE7DA] text-[#362A22] rounded-full border border-[#E3D9CA] tracking-wide uppercase">
+            <span className="px-2.5 py-0.5 text-[11px] font-semibold bg-[#F5F0EA] text-[#59283A] rounded-full border border-[#E8DDD8] tracking-wide uppercase">
               Module 14 • Financial Operations
             </span>
             <span className="flex items-center gap-1 text-[11px] text-[#32765B] font-medium bg-[#E7F1E9] px-2 py-0.5 rounded-full border border-[#C5DFD0]">
@@ -332,10 +332,10 @@ export default function PaymentsPage() {
               Live Multi-Channel Settlement Ledger
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#362A22] mt-1.5 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#59283A] mt-1.5 tracking-tight">
             Payment Management & Cashier Ledger
           </h1>
-          <p className="text-xs sm:text-sm text-[#79695B] mt-1 max-w-3xl">
+          <p className="text-xs sm:text-sm text-[#82747A] mt-1 max-w-3xl">
             Maintain complete records of all guest transactions: advance deposits, partial payments, final checkout settlements, cash/UPI receipts, and pending balances.
           </p>
         </div>
@@ -346,7 +346,7 @@ export default function PaymentsPage() {
             size="sm"
             onClick={fetchPayments}
             disabled={loading}
-            className="border-[#E3D9CA] bg-white hover:bg-[#F7F4EE] text-[#362A22] text-xs h-9 px-3"
+            className="border-[#E8DDD8] bg-white hover:bg-[#F5F0EA] text-[#59283A] text-xs h-9 px-3"
           >
             <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -356,18 +356,18 @@ export default function PaymentsPage() {
             variant="outline"
             size="sm"
             onClick={handleExportCSV}
-            className="border-[#E3D9CA] bg-white hover:bg-[#F7F4EE] text-[#362A22] text-xs h-9 px-3"
+            className="border-[#E8DDD8] bg-white hover:bg-[#F5F0EA] text-[#59283A] text-xs h-9 px-3"
           >
-            <Download className="w-3.5 h-3.5 mr-1.5 text-[#B08A60]" />
+            <Download className="w-3.5 h-3.5 mr-1.5 text-[#C4A06A]" />
             Export CSV
           </Button>
 
           <Button
             size="sm"
             onClick={() => handleOpenRecord()}
-            className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 text-xs h-9 px-4 shadow-sm"
+            className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 text-xs h-9 px-4 shadow-sm"
           >
-            <Plus className="w-4 h-4 text-[#B08A60]" />
+            <Plus className="w-4 h-4 text-[#C4A06A]" />
             <span>Record Payment</span>
           </Button>
         </div>
@@ -375,68 +375,68 @@ export default function PaymentsPage() {
 
       {/* KPI Overview Strip (5 Cards) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between text-[#79695B] text-xs mb-1">
+            <div className="flex items-center justify-between text-[#82747A] text-xs mb-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider">Total Collections</span>
-              <Wallet className="w-4 h-4 text-[#B08A60]" />
+              <Wallet className="w-4 h-4 text-[#C4A06A]" />
             </div>
-            <h3 className="text-xl font-serif font-bold text-[#362A22]">
+            <h3 className="text-xl font-serif font-bold text-[#59283A]">
               ₹{stats.totalCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </h3>
-            <p className="text-[10px] text-[#79695B] mt-0.5">{stats.totalCount} completed transactions</p>
+            <p className="text-[10px] text-[#82747A] mt-0.5">{stats.totalCount} completed transactions</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between text-[#79695B] text-xs mb-1">
+            <div className="flex items-center justify-between text-[#82747A] text-xs mb-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider">Today&apos;s Inflow</span>
               <Calendar className="w-4 h-4 text-[#32765B]" />
             </div>
             <h3 className="text-xl font-serif font-bold text-[#32765B]">
               ₹{stats.todayCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </h3>
-            <p className="text-[10px] text-[#79695B] mt-0.5">{stats.todayCount} settlements today</p>
+            <p className="text-[10px] text-[#82747A] mt-0.5">{stats.todayCount} settlements today</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between text-[#79695B] text-xs mb-1">
+            <div className="flex items-center justify-between text-[#82747A] text-xs mb-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider">UPI / QR Digital</span>
               <QrCode className="w-4 h-4 text-purple-600" />
             </div>
-            <h3 className="text-xl font-serif font-bold text-[#362A22]">
+            <h3 className="text-xl font-serif font-bold text-[#59283A]">
               ₹{stats.upiCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </h3>
-            <p className="text-[10px] text-[#79695B] mt-0.5">{stats.upiCount} instant UPI receipts</p>
+            <p className="text-[10px] text-[#82747A] mt-0.5">{stats.upiCount} instant UPI receipts</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between text-[#79695B] text-xs mb-1">
+            <div className="flex items-center justify-between text-[#82747A] text-xs mb-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider">Cash Counter</span>
               <Banknote className="w-4 h-4 text-emerald-600" />
             </div>
-            <h3 className="text-xl font-serif font-bold text-[#362A22]">
+            <h3 className="text-xl font-serif font-bold text-[#59283A]">
               ₹{stats.cashCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </h3>
-            <p className="text-[10px] text-[#79695B] mt-0.5">{stats.cashCount} cash transactions</p>
+            <p className="text-[10px] text-[#82747A] mt-0.5">{stats.cashCount} cash transactions</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between text-[#79695B] text-xs mb-1">
+            <div className="flex items-center justify-between text-[#82747A] text-xs mb-1">
               <span className="font-semibold uppercase text-[10px] tracking-wider text-[#B54C44]">Pending Balances</span>
               <AlertCircle className="w-4 h-4 text-[#B54C44]" />
             </div>
             <h3 className="text-xl font-serif font-bold text-[#B54C44]">
               ₹{stats.pendingBalanceTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </h3>
-            <p className="text-[10px] text-[#79695B] mt-0.5">
+            <p className="text-[10px] text-[#82747A] mt-0.5">
               {stats.pendingBalanceCount > 0 ? `${stats.pendingBalanceCount} folios due` : "All settled"}
             </p>
           </CardContent>
@@ -444,7 +444,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* Module 14 Feature Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#E3D9CA] pb-2 flex-wrap">
+      <div className="flex items-center gap-2 border-b border-[#E8DDD8] pb-2 flex-wrap">
         <button
           onClick={() => {
             setActiveTab("history");
@@ -452,11 +452,11 @@ export default function PaymentsPage() {
           }}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             activeTab === "history" && typeFilter === "ALL"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "bg-[#F7F4EE] text-[#79695B] hover:text-[#362A22] border border-[#E3D9CA]"
+              ? "bg-[#59283A] text-white shadow-sm"
+              : "bg-[#F5F0EA] text-[#82747A] hover:text-[#59283A] border border-[#E8DDD8]"
           }`}
         >
-          <Receipt className="w-3.5 h-3.5 text-[#B08A60]" />
+          <Receipt className="w-3.5 h-3.5 text-[#C4A06A]" />
           <span>Payment History & Ledger ({total})</span>
         </button>
 
@@ -464,8 +464,8 @@ export default function PaymentsPage() {
           onClick={() => setActiveTab("pending")}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             activeTab === "pending"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "bg-[#F7F4EE] text-[#79695B] hover:text-[#362A22] border border-[#E3D9CA]"
+              ? "bg-[#59283A] text-white shadow-sm"
+              : "bg-[#F5F0EA] text-[#82747A] hover:text-[#59283A] border border-[#E8DDD8]"
           }`}
         >
           <Clock className="w-3.5 h-3.5 text-[#B54C44]" />
@@ -484,8 +484,8 @@ export default function PaymentsPage() {
           }}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             activeTab === "advance" || typeFilter === "ADVANCE"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "bg-[#F7F4EE] text-[#79695B] hover:text-[#362A22] border border-[#E3D9CA]"
+              ? "bg-[#59283A] text-white shadow-sm"
+              : "bg-[#F5F0EA] text-[#82747A] hover:text-[#59283A] border border-[#E8DDD8]"
           }`}
         >
           <ShieldCheck className="w-3.5 h-3.5 text-[#32765B]" />
@@ -496,22 +496,22 @@ export default function PaymentsPage() {
           onClick={() => setActiveTab("channels")}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             activeTab === "channels"
-              ? "bg-[#362A22] text-white shadow-sm"
-              : "bg-[#F7F4EE] text-[#79695B] hover:text-[#362A22] border border-[#E3D9CA]"
+              ? "bg-[#59283A] text-white shadow-sm"
+              : "bg-[#F5F0EA] text-[#82747A] hover:text-[#59283A] border border-[#E8DDD8]"
           }`}
         >
-          <CreditCard className="w-3.5 h-3.5 text-[#B08A60]" />
+          <CreditCard className="w-3.5 h-3.5 text-[#C4A06A]" />
           <span>Settlement Channels Breakdown</span>
         </button>
       </div>
 
       {/* Multi-Dimensional Filter Bar (Visible in History & Advance Tabs) */}
       {(activeTab === "history" || activeTab === "advance") && (
-        <div className="bg-white p-3.5 rounded-xl border border-[#E3D9CA] shadow-sm space-y-3">
+        <div className="bg-white p-3.5 rounded-xl border border-[#E8DDD8] shadow-sm space-y-3">
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="w-3.5 h-3.5 text-[#948779] absolute left-3 top-2.5" />
+              <Search className="w-3.5 h-3.5 text-[#8E7079] absolute left-3 top-2.5" />
               <Input
                 type="text"
                 placeholder="Search by Payment Reference #, Guest Name, Room #, UTR / Cheque..."
@@ -520,15 +520,15 @@ export default function PaymentsPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                className="pl-9 h-8 text-xs bg-[#F7F4EE] border-[#E3D9CA] text-[#362A22] placeholder:text-[#948779]"
+                className="pl-9 h-8 text-xs bg-[#F5F0EA] border-[#E8DDD8] text-[#59283A] placeholder:text-[#8E7079]"
               />
             </div>
 
             {/* Date Range Picker */}
             <div className="flex items-center gap-1.5 flex-wrap">
-              <div className="flex items-center gap-1 bg-[#F7F4EE] px-2 py-0.5 rounded border border-[#E3D9CA]">
-                <Calendar className="w-3 h-3 text-[#B08A60]" />
-                <span className="text-[10px] font-semibold text-[#79695B]">From:</span>
+              <div className="flex items-center gap-1 bg-[#F5F0EA] px-2 py-0.5 rounded border border-[#E8DDD8]">
+                <Calendar className="w-3 h-3 text-[#C4A06A]" />
+                <span className="text-[10px] font-semibold text-[#82747A]">From:</span>
                 <input
                   type="date"
                   value={startDate}
@@ -536,12 +536,12 @@ export default function PaymentsPage() {
                     setStartDate(e.target.value);
                     setPage(1);
                   }}
-                  className="bg-transparent text-xs text-[#362A22] outline-none h-6"
+                  className="bg-transparent text-xs text-[#59283A] outline-none h-6"
                 />
               </div>
 
-              <div className="flex items-center gap-1 bg-[#F7F4EE] px-2 py-0.5 rounded border border-[#E3D9CA]">
-                <span className="text-[10px] font-semibold text-[#79695B]">To:</span>
+              <div className="flex items-center gap-1 bg-[#F5F0EA] px-2 py-0.5 rounded border border-[#E8DDD8]">
+                <span className="text-[10px] font-semibold text-[#82747A]">To:</span>
                 <input
                   type="date"
                   value={endDate}
@@ -549,7 +549,7 @@ export default function PaymentsPage() {
                     setEndDate(e.target.value);
                     setPage(1);
                   }}
-                  className="bg-transparent text-xs text-[#362A22] outline-none h-6"
+                  className="bg-transparent text-xs text-[#59283A] outline-none h-6"
                 />
               </div>
 
@@ -557,14 +557,14 @@ export default function PaymentsPage() {
                 <button
                   type="button"
                   onClick={() => applyDatePreset("today")}
-                  className="px-2 py-1 text-[10px] font-medium rounded bg-[#F7F4EE] hover:bg-[#EEE7DA] text-[#362A22] border border-[#E3D9CA]"
+                  className="px-2 py-1 text-[10px] font-medium rounded bg-[#F5F0EA] hover:bg-[#F5F0EA] text-[#59283A] border border-[#E8DDD8]"
                 >
                   Today
                 </button>
                 <button
                   type="button"
                   onClick={() => applyDatePreset("month")}
-                  className="px-2 py-1 text-[10px] font-medium rounded bg-[#F7F4EE] hover:bg-[#EEE7DA] text-[#362A22] border border-[#E3D9CA]"
+                  className="px-2 py-1 text-[10px] font-medium rounded bg-[#F5F0EA] hover:bg-[#F5F0EA] text-[#59283A] border border-[#E8DDD8]"
                 >
                   This Month
                 </button>
@@ -582,10 +582,10 @@ export default function PaymentsPage() {
           </div>
 
           {/* Filter Pills for Type & Method */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-[#EAE3D8] text-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-[#E8DDD8] text-xs">
             {/* Payment Type */}
             <div className="flex items-center gap-1 flex-wrap">
-              <span className="text-[11px] font-semibold text-[#79695B] mr-1">Type:</span>
+              <span className="text-[11px] font-semibold text-[#82747A] mr-1">Type:</span>
               {[
                 { label: "All Types", val: "ALL" },
                 { label: "Advance Payments", val: "ADVANCE" },
@@ -600,8 +600,8 @@ export default function PaymentsPage() {
                   }}
                   className={`px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors ${
                     typeFilter === t.val
-                      ? "bg-[#362A22] text-white"
-                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
+                      ? "bg-[#59283A] text-white"
+                      : "bg-[#F5F0EA] text-[#82747A] hover:bg-[#F5F0EA] border border-[#E8DDD8]"
                   }`}
                 >
                   {t.label}
@@ -611,7 +611,7 @@ export default function PaymentsPage() {
 
             {/* Payment Method / Channel */}
             <div className="flex items-center gap-1 flex-wrap">
-              <span className="text-[11px] font-semibold text-[#79695B] mr-1">Channel:</span>
+              <span className="text-[11px] font-semibold text-[#82747A] mr-1">Channel:</span>
               {[
                 { label: "All", val: "ALL" },
                 { label: "UPI", val: "UPI" },
@@ -627,8 +627,8 @@ export default function PaymentsPage() {
                   }}
                   className={`px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors ${
                     methodFilter === m.val
-                      ? "bg-[#B08A60] text-white"
-                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
+                      ? "bg-[#C4A06A] text-white"
+                      : "bg-[#F5F0EA] text-[#82747A] hover:bg-[#F5F0EA] border border-[#E8DDD8]"
                   }`}
                 >
                   {m.label}
@@ -641,20 +641,20 @@ export default function PaymentsPage() {
 
       {/* TAB 1 & 3: PAYMENT LEDGER TABLE */}
       {(activeTab === "history" || activeTab === "advance") && (
-        <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
+        <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
           <CardContent className="p-0">
             {loading ? (
               <div className="p-16 flex flex-col justify-center items-center gap-3">
-                <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-                <p className="text-xs text-[#79695B]">Loading payment transactions...</p>
+                <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                <p className="text-xs text-[#82747A]">Loading payment transactions...</p>
               </div>
             ) : payments.length === 0 ? (
               <div className="p-16 text-center space-y-3">
-                <CreditCard className="w-10 h-10 text-[#B08A60] mx-auto opacity-50" />
-                <p className="text-sm font-medium text-[#362A22]">No payments matching the selected filters.</p>
+                <CreditCard className="w-10 h-10 text-[#C4A06A] mx-auto opacity-50" />
+                <p className="text-sm font-medium text-[#59283A]">No payments matching the selected filters.</p>
                 <Button
                   onClick={() => handleOpenRecord()}
-                  className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-8"
+                  className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-8"
                 >
                   <Plus className="w-3.5 h-3.5 mr-1" /> Record New Payment
                 </Button>
@@ -662,7 +662,7 @@ export default function PaymentsPage() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                  <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                     <tr>
                       <th className="px-4 py-3.5">Reference & UTR</th>
                       <th className="px-4 py-3.5">Guest & Room</th>
@@ -675,41 +675,41 @@ export default function PaymentsPage() {
                       <th className="px-4 py-3.5 text-right">Receipt Voucher</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EAE3D8]">
+                  <tbody className="divide-y divide-[#E8DDD8]">
                     {payments.map((p) => (
-                      <tr key={p.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                      <tr key={p.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
                         {/* Reference */}
                         <td className="px-4 py-3.5">
-                          <div className="font-mono font-bold text-[#362A22]">{p.paymentReference}</div>
+                          <div className="font-mono font-bold text-[#59283A]">{p.paymentReference}</div>
                           {p.transactionReference && (
-                            <div className="text-[10px] text-[#948779] font-mono mt-0.5">
+                            <div className="text-[10px] text-[#8E7079] font-mono mt-0.5">
                               Ref: {p.transactionReference}
                             </div>
                           )}
                         </td>
 
                         {/* Guest & Room */}
-                        <td className="px-4 py-3.5 font-medium text-[#362A22]">
-                          <div className="font-semibold text-[#362A22]">
+                        <td className="px-4 py-3.5 font-medium text-[#59283A]">
+                          <div className="font-semibold text-[#59283A]">
                             {p.booking?.primaryGuest?.fullName || "Walk-In Guest"}
                           </div>
-                          <div className="text-[10px] text-[#79695B] flex items-center gap-1.5 mt-0.5">
-                            <span className="font-semibold text-[#362A22]">Room {p.booking?.room?.roomNumber}</span>
+                          <div className="text-[10px] text-[#82747A] flex items-center gap-1.5 mt-0.5">
+                            <span className="font-semibold text-[#59283A]">Room {p.booking?.room?.roomNumber}</span>
                             <span>•</span>
                             <span>{p.booking?.primaryGuest?.mobileNumber}</span>
                           </div>
                         </td>
 
                         {/* Transaction Date */}
-                        <td className="px-4 py-3.5 text-[#79695B]">
-                          <div className="font-medium text-[#362A22]">
+                        <td className="px-4 py-3.5 text-[#82747A]">
+                          <div className="font-medium text-[#59283A]">
                             {new Date(p.paymentDate).toLocaleDateString("en-IN", {
                               day: "numeric",
                               month: "short",
                               year: "numeric",
                             })}
                           </div>
-                          <div className="text-[10px] text-[#948779]">
+                          <div className="text-[10px] text-[#8E7079]">
                             {new Date(p.createdAt).toLocaleTimeString("en-US", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -727,7 +727,7 @@ export default function PaymentsPage() {
                                 ? "bg-[#E7F1E9] text-[#32765B] border-[#C5DFD0]"
                                 : p.paymentType === "PARTIAL"
                                 ? "bg-amber-50 text-amber-800 border-amber-200"
-                                : "bg-[#EEE7DA] text-[#362A22] border-[#E3D9CA]"
+                                : "bg-[#F5F0EA] text-[#59283A] border-[#E8DDD8]"
                             }`}
                           >
                             {p.paymentType === "ADVANCE"
@@ -760,14 +760,14 @@ export default function PaymentsPage() {
                         </td>
 
                         {/* Amount */}
-                        <td className="px-4 py-3.5 font-mono font-bold text-[#362A22] text-sm">
+                        <td className="px-4 py-3.5 font-mono font-bold text-[#59283A] text-sm">
                           ₹{Number(p.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </td>
 
                         {/* Linked Bill / Stay */}
-                        <td className="px-4 py-3.5 font-mono text-[11px] text-[#79695B]">
+                        <td className="px-4 py-3.5 font-mono text-[11px] text-[#82747A]">
                           {p.invoice ? (
-                            <span className="text-[#B08A60] font-semibold block">{p.invoice.invoiceNumber}</span>
+                            <span className="text-[#C4A06A] font-semibold block">{p.invoice.invoiceNumber}</span>
                           ) : (
                             <span className="block">{p.booking?.bookingNumber}</span>
                           )}
@@ -789,9 +789,9 @@ export default function PaymentsPage() {
                           <Button
                             size="sm"
                             onClick={() => handleViewReceipt(p)}
-                            className="h-7 text-xs bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1 ml-auto"
+                            className="h-7 text-xs bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1 ml-auto"
                           >
-                            <Receipt className="w-3 h-3 text-[#B08A60]" />
+                            <Receipt className="w-3 h-3 text-[#C4A06A]" />
                             <span>Receipt</span>
                           </Button>
                         </td>
@@ -804,7 +804,7 @@ export default function PaymentsPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between p-3 border-t border-[#EAE3D8] text-xs text-[#79695B]">
+              <div className="flex items-center justify-between p-3 border-t border-[#E8DDD8] text-xs text-[#82747A]">
                 <div>
                   Showing page {page} of {totalPages} ({total} total transactions)
                 </div>
@@ -814,7 +814,7 @@ export default function PaymentsPage() {
                     size="sm"
                     disabled={page <= 1}
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="h-7 text-xs border-[#E3D9CA]"
+                    className="h-7 text-xs border-[#E8DDD8]"
                   >
                     Previous
                   </Button>
@@ -823,7 +823,7 @@ export default function PaymentsPage() {
                     size="sm"
                     disabled={page >= totalPages}
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="h-7 text-xs border-[#E3D9CA]"
+                    className="h-7 text-xs border-[#E8DDD8]"
                   >
                     Next
                   </Button>
@@ -837,43 +837,43 @@ export default function PaymentsPage() {
       {/* TAB 2: PENDING PAYMENTS & OUTSTANDING BALANCES */}
       {activeTab === "pending" && (
         <div className="space-y-4">
-          <div className="bg-[#EEE7DA]/70 border border-[#E3D9CA] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+          <div className="bg-[#F5F0EA]/70 border border-[#E8DDD8] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
             <div>
-              <div className="flex items-center gap-2 font-semibold text-[#362A22]">
+              <div className="flex items-center gap-2 font-semibold text-[#59283A]">
                 <AlertCircle className="w-4 h-4 text-[#B54C44]" />
                 <span className="text-sm">Pending Payments & Outstanding Folios Tracking</span>
               </div>
-              <p className="text-[#79695B] mt-0.5">
+              <p className="text-[#82747A] mt-0.5">
                 Stays and checkout invoices with unsettled balances. Front desk cashier can record advance, partial or final settlement directly.
               </p>
             </div>
             <div className="text-right">
-              <span className="text-[10px] uppercase font-bold text-[#79695B] block">Total Unsettled Dues</span>
+              <span className="text-[10px] uppercase font-bold text-[#82747A] block">Total Unsettled Dues</span>
               <span className="text-xl font-bold font-serif text-[#B54C44]">
                 ₹{totalPendingOutstanding.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </span>
             </div>
           </div>
 
-          <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
+          <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
             <CardContent className="p-0">
               {loadingPending ? (
                 <div className="p-16 flex flex-col justify-center items-center gap-3">
-                  <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-                  <p className="text-xs text-[#79695B]">Scanning live folios and invoices for outstanding balances...</p>
+                  <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                  <p className="text-xs text-[#82747A]">Scanning live folios and invoices for outstanding balances...</p>
                 </div>
               ) : pendingPayments.length === 0 ? (
                 <div className="p-16 text-center space-y-2">
                   <CheckCircle2 className="w-10 h-10 text-[#32765B] mx-auto opacity-70" />
-                  <h4 className="font-serif font-bold text-base text-[#362A22]">All Payments Settled!</h4>
-                  <p className="text-xs text-[#79695B]">
+                  <h4 className="font-serif font-bold text-base text-[#59283A]">All Payments Settled!</h4>
+                  <p className="text-xs text-[#82747A]">
                     There are currently no active folios or invoices with outstanding balances.
                   </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                    <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                       <tr>
                         <th className="px-4 py-3.5">Record Reference</th>
                         <th className="px-4 py-3.5">Guest Information</th>
@@ -885,23 +885,23 @@ export default function PaymentsPage() {
                         <th className="px-4 py-3.5 text-right">Settlement Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EAE3D8]">
+                    <tbody className="divide-y divide-[#E8DDD8]">
                       {pendingPayments.map((item) => (
-                        <tr key={item.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                        <tr key={item.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
                           <td className="px-4 py-3.5 font-mono">
-                            <span className="font-bold text-[#362A22] block">{item.referenceNumber}</span>
-                            <span className="text-[10px] text-[#948779] uppercase">
+                            <span className="font-bold text-[#59283A] block">{item.referenceNumber}</span>
+                            <span className="text-[10px] text-[#8E7079] uppercase">
                               {item.recordType === "INVOICE" ? "Finalized Invoice" : "Active Stay Folio"}
                             </span>
                           </td>
-                          <td className="px-4 py-3.5 font-medium text-[#362A22]">
-                            <div className="font-semibold text-[#362A22]">{item.guestName}</div>
-                            <div className="text-[10px] text-[#79695B] font-mono">{item.mobileNumber}</div>
+                          <td className="px-4 py-3.5 font-medium text-[#59283A]">
+                            <div className="font-semibold text-[#59283A]">{item.guestName}</div>
+                            <div className="text-[10px] text-[#82747A] font-mono">{item.mobileNumber}</div>
                           </td>
-                          <td className="px-4 py-3.5 font-bold text-[#362A22]">
+                          <td className="px-4 py-3.5 font-bold text-[#59283A]">
                             Room {item.roomNumber}
                           </td>
-                          <td className="px-4 py-3.5 font-mono text-[#362A22]">
+                          <td className="px-4 py-3.5 font-mono text-[#59283A]">
                             ₹{Number(item.totalAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                           </td>
                           <td className="px-4 py-3.5 font-mono font-medium text-[#32765B]">
@@ -922,9 +922,9 @@ export default function PaymentsPage() {
                             <Button
                               size="sm"
                               onClick={() => handleOpenRecord(item.bookingId, item.balanceDue, "FINAL")}
-                              className="h-7 text-xs bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1 ml-auto"
+                              className="h-7 text-xs bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1 ml-auto"
                             >
-                              <CreditCard className="w-3 h-3 text-[#B08A60]" />
+                              <CreditCard className="w-3 h-3 text-[#C4A06A]" />
                               <span>Collect Payment</span>
                             </Button>
                           </td>
@@ -942,74 +942,74 @@ export default function PaymentsPage() {
       {/* TAB 4: SETTLEMENT CHANNELS BREAKDOWN */}
       {activeTab === "channels" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-white border-[#E3D9CA] shadow-sm p-4 space-y-3">
+          <Card className="bg-white border-[#E8DDD8] shadow-sm p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase font-bold text-[#79695B]">UPI / QR Codes</span>
+              <span className="text-xs uppercase font-bold text-[#82747A]">UPI / QR Codes</span>
               <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-700">
                 <QrCode className="w-4 h-4" />
               </div>
             </div>
             <div>
-              <h3 className="text-2xl font-serif font-bold text-[#362A22]">
+              <h3 className="text-2xl font-serif font-bold text-[#59283A]">
                 ₹{stats.upiCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </h3>
-              <p className="text-xs text-[#79695B] mt-0.5">{stats.upiCount} successful transactions</p>
+              <p className="text-xs text-[#82747A] mt-0.5">{stats.upiCount} successful transactions</p>
             </div>
-            <div className="text-[11px] text-[#79695B] pt-2 border-t border-[#EAE3D8]">
+            <div className="text-[11px] text-[#82747A] pt-2 border-t border-[#E8DDD8]">
               Supports PhonePe, Google Pay, Paytm, BHIM and dynamic hotel counter QR.
             </div>
           </Card>
 
-          <Card className="bg-white border-[#E3D9CA] shadow-sm p-4 space-y-3">
+          <Card className="bg-white border-[#E8DDD8] shadow-sm p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase font-bold text-[#79695B]">Cash Drawer</span>
+              <span className="text-xs uppercase font-bold text-[#82747A]">Cash Drawer</span>
               <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700">
                 <Banknote className="w-4 h-4" />
               </div>
             </div>
             <div>
-              <h3 className="text-2xl font-serif font-bold text-[#362A22]">
+              <h3 className="text-2xl font-serif font-bold text-[#59283A]">
                 ₹{stats.cashCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </h3>
-              <p className="text-xs text-[#79695B] mt-0.5">{stats.cashCount} cash transactions</p>
+              <p className="text-xs text-[#82747A] mt-0.5">{stats.cashCount} cash transactions</p>
             </div>
-            <div className="text-[11px] text-[#79695B] pt-2 border-t border-[#EAE3D8]">
+            <div className="text-[11px] text-[#82747A] pt-2 border-t border-[#E8DDD8]">
               Physical currency received at front desk and recorded into the Daily Cash Book.
             </div>
           </Card>
 
-          <Card className="bg-white border-[#E3D9CA] shadow-sm p-4 space-y-3">
+          <Card className="bg-white border-[#E8DDD8] shadow-sm p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase font-bold text-[#79695B]">Bank Transfer & Card</span>
+              <span className="text-xs uppercase font-bold text-[#82747A]">Bank Transfer & Card</span>
               <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-700">
                 <CreditCard className="w-4 h-4" />
               </div>
             </div>
             <div>
-              <h3 className="text-2xl font-serif font-bold text-[#362A22]">
+              <h3 className="text-2xl font-serif font-bold text-[#59283A]">
                 ₹{stats.bankCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </h3>
-              <p className="text-xs text-[#79695B] mt-0.5">{stats.bankCount} bank settlements</p>
+              <p className="text-xs text-[#82747A] mt-0.5">{stats.bankCount} bank settlements</p>
             </div>
-            <div className="text-[11px] text-[#79695B] pt-2 border-t border-[#EAE3D8]">
+            <div className="text-[11px] text-[#82747A] pt-2 border-t border-[#E8DDD8]">
               Credit/Debit card POS machine swipes, IMPS, NEFT and corporate bank transfers.
             </div>
           </Card>
 
-          <Card className="bg-white border-[#E3D9CA] shadow-sm p-4 space-y-3">
+          <Card className="bg-white border-[#E8DDD8] shadow-sm p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs uppercase font-bold text-[#79695B]">Other / Travel Portal</span>
+              <span className="text-xs uppercase font-bold text-[#82747A]">Other / Travel Portal</span>
               <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-700">
                 <Wallet className="w-4 h-4" />
               </div>
             </div>
             <div>
-              <h3 className="text-2xl font-serif font-bold text-[#362A22]">
+              <h3 className="text-2xl font-serif font-bold text-[#59283A]">
                 ₹{stats.otherCollected.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </h3>
-              <p className="text-xs text-[#79695B] mt-0.5">{stats.otherCount} settlements</p>
+              <p className="text-xs text-[#82747A] mt-0.5">{stats.otherCount} settlements</p>
             </div>
-            <div className="text-[11px] text-[#79695B] pt-2 border-t border-[#EAE3D8]">
+            <div className="text-[11px] text-[#82747A] pt-2 border-t border-[#E8DDD8]">
               OTA voucher payouts, travel agent reconciliations, and custom voucher settlements.
             </div>
           </Card>
@@ -1020,15 +1020,15 @@ export default function PaymentsPage() {
       {/* RECORD PAYMENT MODAL                                                      */}
       {/* ========================================================================= */}
       <Dialog open={recordModalOpen} onOpenChange={setRecordModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <span className="text-[10px] uppercase font-bold text-[#362A22] bg-[#EEE7DA] px-2 py-0.5 rounded w-fit">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <span className="text-[10px] uppercase font-bold text-[#59283A] bg-[#F5F0EA] px-2 py-0.5 rounded w-fit">
               Front Office Cashier Counter
             </span>
-            <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
+            <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
               Record Guest Payment
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Log advance deposit, partial payment or final checkout settlement into the accounting ledger.
             </DialogDescription>
           </DialogHeader>
@@ -1036,12 +1036,12 @@ export default function PaymentsPage() {
           <form onSubmit={handleRecordPayment} className="space-y-3 pt-2 text-xs">
             {/* Booking / Stay Selection */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Select Stay / Guest *</label>
+              <label className="font-semibold text-[#59283A]">Select Stay / Guest *</label>
               <select
                 required
                 value={paymentForm.bookingId}
                 onChange={(e) => setPaymentForm({ ...paymentForm, bookingId: e.target.value })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 {bookings.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -1054,11 +1054,11 @@ export default function PaymentsPage() {
             {/* Payment Type & Method */}
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Payment Type *</label>
+                <label className="font-semibold text-[#59283A]">Payment Type *</label>
                 <select
                   value={paymentForm.paymentType}
                   onChange={(e) => setPaymentForm({ ...paymentForm, paymentType: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                 >
                   <option value="ADVANCE">Advance Deposit</option>
                   <option value="PARTIAL">Partial Payment</option>
@@ -1067,11 +1067,11 @@ export default function PaymentsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Payment Channel *</label>
+                <label className="font-semibold text-[#59283A]">Payment Channel *</label>
                 <select
                   value={paymentForm.paymentMethod}
                   onChange={(e) => setPaymentForm({ ...paymentForm, paymentMethod: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                 >
                   <option value="UPI">UPI / QR Code</option>
                   <option value="CASH">Cash</option>
@@ -1084,7 +1084,7 @@ export default function PaymentsPage() {
             {/* Amount & Date */}
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Amount (₹) *</label>
+                <label className="font-semibold text-[#59283A]">Amount (₹) *</label>
                 <Input
                   type="number"
                   required
@@ -1092,44 +1092,44 @@ export default function PaymentsPage() {
                   step="0.01"
                   value={paymentForm.amount}
                   onChange={(e) => setPaymentForm({ ...paymentForm, amount: Number(e.target.value) })}
-                  className="h-8 text-xs font-mono font-bold bg-[#F7F4EE] border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono font-bold bg-[#F5F0EA] border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Transaction Date</label>
+                <label className="font-semibold text-[#59283A]">Transaction Date</label>
                 <Input
                   type="date"
                   value={paymentForm.paymentDate}
                   onChange={(e) => setPaymentForm({ ...paymentForm, paymentDate: e.target.value })}
-                  className="h-8 text-xs bg-[#F7F4EE] border-[#E3D9CA]"
+                  className="h-8 text-xs bg-[#F5F0EA] border-[#E8DDD8]"
                 />
               </div>
             </div>
 
             {/* Transaction Reference / UTR */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Transaction UTR / Reference # (Optional)</label>
+              <label className="font-semibold text-[#59283A]">Transaction UTR / Reference # (Optional)</label>
               <Input
                 value={paymentForm.transactionReference}
                 onChange={(e) => setPaymentForm({ ...paymentForm, transactionReference: e.target.value })}
                 placeholder="UPI UTR, Cheque No, Bank Ref, Card Auth..."
-                className="h-8 text-xs font-mono bg-white border-[#E3D9CA]"
+                className="h-8 text-xs font-mono bg-white border-[#E8DDD8]"
               />
             </div>
 
             {/* Cashier Notes */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Cashier Notes (Optional)</label>
+              <label className="font-semibold text-[#59283A]">Cashier Notes (Optional)</label>
               <Input
                 value={paymentForm.notes}
                 onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
                 placeholder="Front desk remarks, payee info..."
-                className="h-8 text-xs bg-white border-[#E3D9CA]"
+                className="h-8 text-xs bg-white border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setRecordModalOpen(false)}>
                 Cancel
               </Button>
@@ -1137,9 +1137,9 @@ export default function PaymentsPage() {
                 type="submit"
                 size="sm"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5"
+                className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5"
               >
-                {submitting ? <LoadingSpinner className="w-3.5 h-3.5 mr-1" /> : <CheckCircle2 className="w-3.5 h-3.5 text-[#B08A60]" />}
+                {submitting ? <LoadingSpinner className="w-3.5 h-3.5 mr-1" /> : <CheckCircle2 className="w-3.5 h-3.5 text-[#C4A06A]" />}
                 <span>Record & Generate Receipt</span>
               </Button>
             </DialogFooter>
@@ -1151,61 +1151,61 @@ export default function PaymentsPage() {
       {/* DIGITAL PAYMENT RECEIPT VOUCHER MODAL (PRINTABLE)                        */}
       {/* ========================================================================= */}
       <Dialog open={receiptModalOpen} onOpenChange={setReceiptModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
           {selectedPayment && (
             <div className="space-y-4 text-xs">
               {/* Receipt Header (Printed) */}
-              <div className="text-center pb-3 border-b border-[#E3D9CA]">
-                <div className="flex items-center justify-center gap-1 text-[#B08A60] mb-1">
+              <div className="text-center pb-3 border-b border-[#E8DDD8]">
+                <div className="flex items-center justify-center gap-1 text-[#C4A06A] mb-1">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-[#79695B]">
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-[#82747A]">
                     Grand Horizon Boutique OS
                   </span>
                 </div>
-                <h2 className="text-lg font-serif font-bold text-[#362A22]">Official Payment Receipt Voucher</h2>
-                <p className="text-[10px] text-[#948779]">Luxury Hotel & Stay Collections • Cashier Desk</p>
-                <div className="mt-2 inline-block px-2.5 py-0.5 bg-[#F7F4EE] rounded border border-[#E3D9CA] font-mono text-[11px] font-bold text-[#362A22]">
+                <h2 className="text-lg font-serif font-bold text-[#59283A]">Official Payment Receipt Voucher</h2>
+                <p className="text-[10px] text-[#8E7079]">Luxury Hotel & Stay Collections • Cashier Desk</p>
+                <div className="mt-2 inline-block px-2.5 py-0.5 bg-[#F5F0EA] rounded border border-[#E8DDD8] font-mono text-[11px] font-bold text-[#59283A]">
                   {selectedPayment.paymentReference}
                 </div>
               </div>
 
               {/* Guest & Stay Details */}
-              <div className="bg-[#F7F4EE] p-3 rounded-lg border border-[#E3D9CA] space-y-1.5 text-[11px]">
+              <div className="bg-[#F5F0EA] p-3 rounded-lg border border-[#E8DDD8] space-y-1.5 text-[11px]">
                 <div className="flex justify-between">
-                  <span className="text-[#79695B]">Primary Guest:</span>
-                  <span className="font-bold text-[#362A22]">{selectedPayment.booking?.primaryGuest?.fullName || "Guest"}</span>
+                  <span className="text-[#82747A]">Primary Guest:</span>
+                  <span className="font-bold text-[#59283A]">{selectedPayment.booking?.primaryGuest?.fullName || "Guest"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#79695B]">Mobile Number:</span>
-                  <span className="font-mono text-[#362A22]">{selectedPayment.booking?.primaryGuest?.mobileNumber || "—"}</span>
+                  <span className="text-[#82747A]">Mobile Number:</span>
+                  <span className="font-mono text-[#59283A]">{selectedPayment.booking?.primaryGuest?.mobileNumber || "—"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#79695B]">Allocated Room:</span>
-                  <span className="font-bold text-[#362A22]">Room {selectedPayment.booking?.room?.roomNumber || "—"}</span>
+                  <span className="text-[#82747A]">Allocated Room:</span>
+                  <span className="font-bold text-[#59283A]">Room {selectedPayment.booking?.room?.roomNumber || "—"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#79695B]">Booking Reference:</span>
-                  <span className="font-mono text-[#362A22]">{selectedPayment.booking?.bookingNumber}</span>
+                  <span className="text-[#82747A]">Booking Reference:</span>
+                  <span className="font-mono text-[#59283A]">{selectedPayment.booking?.bookingNumber}</span>
                 </div>
                 {selectedPayment.invoice && (
                   <div className="flex justify-between">
-                    <span className="text-[#79695B]">Associated Invoice:</span>
-                    <span className="font-mono font-bold text-[#B08A60]">{selectedPayment.invoice.invoiceNumber}</span>
+                    <span className="text-[#82747A]">Associated Invoice:</span>
+                    <span className="font-mono font-bold text-[#C4A06A]">{selectedPayment.invoice.invoiceNumber}</span>
                   </div>
                 )}
               </div>
 
               {/* Transaction Summary */}
-              <div className="border border-[#E3D9CA] rounded-lg p-3 space-y-2">
+              <div className="border border-[#E8DDD8] rounded-lg p-3 space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-[#79695B]">Payment Type:</span>
-                  <Badge variant="outline" className="text-[10px] bg-[#EEE7DA] text-[#362A22] border-[#E3D9CA] font-bold">
+                  <span className="text-[#82747A]">Payment Type:</span>
+                  <Badge variant="outline" className="text-[10px] bg-[#F5F0EA] text-[#59283A] border-[#E8DDD8] font-bold">
                     {selectedPayment.paymentType}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[#79695B]">Settlement Channel:</span>
-                  <span className="font-semibold text-[#362A22] flex items-center gap-1">
+                  <span className="text-[#82747A]">Settlement Channel:</span>
+                  <span className="font-semibold text-[#59283A] flex items-center gap-1">
                     {selectedPayment.paymentMethod === "UPI" && <QrCode className="w-3 h-3 text-purple-600" />}
                     {selectedPayment.paymentMethod === "CASH" && <Banknote className="w-3 h-3 text-emerald-600" />}
                     {selectedPayment.paymentMethod === "BANK_TRANSFER" && <CreditCard className="w-3 h-3 text-blue-600" />}
@@ -1214,13 +1214,13 @@ export default function PaymentsPage() {
                 </div>
                 {selectedPayment.transactionReference && (
                   <div className="flex justify-between">
-                    <span className="text-[#79695B]">UTR / Transaction Ref:</span>
-                    <span className="font-mono font-semibold text-[#362A22]">{selectedPayment.transactionReference}</span>
+                    <span className="text-[#82747A]">UTR / Transaction Ref:</span>
+                    <span className="font-mono font-semibold text-[#59283A]">{selectedPayment.transactionReference}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-[#79695B]">Transaction Date:</span>
-                  <span className="text-[#362A22] font-medium">
+                  <span className="text-[#82747A]">Transaction Date:</span>
+                  <span className="text-[#59283A] font-medium">
                     {new Date(selectedPayment.paymentDate).toLocaleDateString("en-IN", {
                       day: "numeric",
                       month: "long",
@@ -1229,8 +1229,8 @@ export default function PaymentsPage() {
                   </span>
                 </div>
 
-                <div className="pt-2 border-t border-[#EAE3D8] flex justify-between items-baseline">
-                  <span className="font-bold text-sm text-[#362A22]">Amount Received:</span>
+                <div className="pt-2 border-t border-[#E8DDD8] flex justify-between items-baseline">
+                  <span className="font-bold text-sm text-[#59283A]">Amount Received:</span>
                   <span className="font-mono text-xl font-bold text-[#32765B]">
                     ₹{Number(selectedPayment.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
@@ -1239,7 +1239,7 @@ export default function PaymentsPage() {
 
               {/* Notes */}
               {selectedPayment.notes && (
-                <div className="text-[11px] text-[#79695B] italic bg-[#FAF6F0] p-2 rounded border border-[#E3D9CA]">
+                <div className="text-[11px] text-[#82747A] italic bg-[#F5F0EA] p-2 rounded border border-[#E8DDD8]">
                   Notes: {selectedPayment.notes}
                 </div>
               )}
@@ -1256,13 +1256,13 @@ export default function PaymentsPage() {
               </div>
 
               {/* Footer Controls */}
-              <DialogFooter className="pt-2 border-t border-[#EAE3D8] flex items-center justify-between sm:justify-between">
+              <DialogFooter className="pt-2 border-t border-[#E8DDD8] flex items-center justify-between sm:justify-between">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setReceiptModalOpen(false)}
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 >
                   Close
                 </Button>
@@ -1270,9 +1270,9 @@ export default function PaymentsPage() {
                   type="button"
                   size="sm"
                   onClick={handlePrintReceipt}
-                  className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 h-8 text-xs shadow-sm"
+                  className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 h-8 text-xs shadow-sm"
                 >
-                  <Printer className="w-3.5 h-3.5 text-[#B08A60]" />
+                  <Printer className="w-3.5 h-3.5 text-[#C4A06A]" />
                   <span>Print Receipt</span>
                 </Button>
               </DialogFooter>

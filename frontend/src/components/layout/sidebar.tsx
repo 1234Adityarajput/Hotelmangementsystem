@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -25,10 +25,27 @@ import {
   ShieldAlert,
   Activity,
   Shield,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  X,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}
+
+export function Sidebar({
+  mobileOpen = false,
+  onMobileClose,
+  collapsed = false,
+  onToggleCollapse,
+}: SidebarProps) {
   const pathname = usePathname();
 
   if (pathname === "/login") {
@@ -121,7 +138,7 @@ export function Sidebar() {
           active: pathname.startsWith("/attendance"),
         },
         {
-          name: "Staff Advances",
+          name: "Advances",
           href: "/advances",
           icon: HandCoins,
           active: pathname.startsWith("/advances"),
@@ -155,7 +172,7 @@ export function Sidebar() {
       title: "RECORDS",
       items: [
         {
-          name: "Digital Registers",
+          name: "Registers",
           href: "/registers",
           icon: BookOpenCheck,
           active: pathname.startsWith("/registers"),
@@ -172,13 +189,13 @@ export function Sidebar() {
       title: "ADMINISTRATION",
       items: [
         {
-          name: "Hotel Settings",
+          name: "Settings",
           href: "/settings",
           icon: Settings,
           active: pathname.startsWith("/settings"),
         },
         {
-          name: "DB Health & Setup",
+          name: "DB Setup",
           href: "/setup",
           icon: Activity,
           active: pathname.startsWith("/setup"),
@@ -187,43 +204,78 @@ export function Sidebar() {
     },
   ];
 
-  return (
-    <aside className="w-64 bg-[#362A22] text-[#EEE7DA] flex flex-col flex-shrink-0 border-r border-[#2A201A] shadow-xl select-none">
+  const sidebarContent = (
+    <div className="flex flex-col h-full bg-[#59283A] text-white select-none">
       {/* Brand Header */}
-      <div className="h-20 flex items-center px-6 border-b border-[#43352B] gap-3.5 bg-[#2A201A]/60">
-        <div className="w-10 h-10 rounded-xl bg-[#B08A60] flex items-center justify-center text-white shadow-md font-bold text-lg flex-shrink-0">
-          <Hotel className="w-5 h-5 text-white" />
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="font-serif font-bold text-base text-white tracking-tight leading-tight truncate">
-            Grand Horizon
-          </span>
-          <span className="text-[10px] text-[#B08A60] tracking-widest uppercase font-semibold mt-0.5">
-            Boutique Luxury OS
-          </span>
-        </div>
+      <div className={cn(
+        "h-20 flex items-center border-b border-[#472130] bg-[#472130]/70 flex-shrink-0 transition-all px-4",
+        collapsed ? "justify-center" : "justify-between"
+      )}>
+        <Link href="/" className="flex items-center gap-3 min-w-0" onClick={onMobileClose}>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C4A06A] to-[#A8834F] flex items-center justify-center text-white shadow-lg flex-shrink-0 border border-[#C4A06A]/30">
+            <Hotel className="w-5 h-5 text-[#352630]" />
+          </div>
+          {!collapsed && (
+            <div className="flex flex-col min-w-0">
+              <span className="font-serif font-bold text-base text-white tracking-tight leading-tight truncate">
+                Grand Horizon
+              </span>
+              <div className="flex items-center gap-1 mt-0.5">
+                <Sparkles className="w-2.5 h-2.5 text-[#C4A06A]" />
+                <span className="text-[10px] text-[#C4A06A] tracking-widest uppercase font-semibold">
+                  Royal Luxury OS
+                </span>
+              </div>
+            </div>
+          )}
+        </Link>
+
+        {/* Desktop Collapse Toggle */}
+        {onToggleCollapse && !collapsed && (
+          <button
+            onClick={onToggleCollapse}
+            className="hidden lg:flex p-1.5 rounded-lg text-[#8E7079] hover:text-white hover:bg-[#472130] transition-colors"
+            title="Collapse Sidebar"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Mobile Close Button */}
+        {onMobileClose && (
+          <button
+            onClick={onMobileClose}
+            className="lg:hidden p-1.5 rounded-lg text-[#8E7079] hover:text-white hover:bg-[#472130] transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Admin Access Pill */}
-      <div className="px-5 py-2.5 border-b border-[#43352B] bg-[#2A201A]/30">
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center gap-1.5 text-[#C4B5AC]">
-            <Shield className="w-3.5 h-3.5 text-[#B08A60]" />
-            <span className="text-[11px] font-medium tracking-wide">System Access:</span>
+      {!collapsed && (
+        <div className="px-4 py-2 border-b border-[#472130] bg-[#472130]/40">
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5 text-[#8E7079]">
+              <Shield className="w-3.5 h-3.5 text-[#C4A06A]" />
+              <span className="text-[11px] font-medium text-white/80">System Access:</span>
+            </div>
+            <span className="text-[10px] bg-[#472130] text-[#C4A06A] border border-[#C4A06A]/30 px-2 py-0.5 rounded-full font-semibold">
+              Admin Verified
+            </span>
           </div>
-          <span className="text-[10px] bg-[#43352B] text-[#EEE7DA] border border-[#79695B]/40 px-2 py-0.5 rounded-full font-semibold">
-            Single Admin
-          </span>
         </div>
-      </div>
+      )}
 
       {/* Navigation Groups */}
       <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
         {navGroups.map((group) => (
           <div key={group.title} className="space-y-1">
-            <div className="px-3 text-[10px] font-bold text-[#948779] tracking-wider uppercase">
-              {group.title}
-            </div>
+            {!collapsed && (
+              <div className="px-3 text-[10px] font-bold text-[#8E7079] tracking-wider uppercase">
+                {group.title}
+              </div>
+            )}
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = item.icon;
@@ -231,15 +283,30 @@ export function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
+                    onClick={onMobileClose}
+                    title={collapsed ? item.name : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-all duration-150",
+                      "group relative flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-xl transition-all duration-150",
                       item.active
-                        ? "bg-[#B08A60] text-white shadow-sm font-semibold tracking-wide"
-                        : "text-[#DDD4CE] hover:text-white hover:bg-[#43352B]",
+                        ? "bg-[#472130] text-white shadow-sm font-semibold tracking-wide"
+                        : "text-white/90 hover:text-white hover:bg-[#472130]/60",
+                      collapsed && "justify-center px-2",
                     )}
                   >
-                    <Icon className={cn("w-4 h-4 flex-shrink-0", item.active ? "text-white" : "text-[#B08A60]")} />
-                    <span className="truncate">{item.name}</span>
+                    {/* Champagne Gold Active Indicator Bar */}
+                    {item.active && (
+                      <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#C4A06A] rounded-r-full" />
+                    )}
+
+                    <Icon
+                      className={cn(
+                        "w-4 h-4 flex-shrink-0 transition-colors",
+                        item.active
+                          ? "text-[#C4A06A]"
+                          : "text-[#8E7079] group-hover:text-white",
+                      )}
+                    />
+                    {!collapsed && <span className="truncate">{item.name}</span>}
                   </Link>
                 );
               })}
@@ -249,16 +316,63 @@ export function Sidebar() {
       </nav>
 
       {/* Footer System Status */}
-      <div className="p-4 border-t border-[#43352B] text-xs bg-[#2A201A]/70 text-[#C4B5AC]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#32765B] animate-pulse" />
-            <span className="text-white font-medium text-[11px]">Neon DB Connected</span>
-          </div>
-          <span className="text-[10px] text-[#B08A60] font-mono">v1.0</span>
-        </div>
-        <p className="mt-1 text-[10px] text-[#948779]">PostgreSQL 18.7 • Modular Monolith</p>
+      <div className={cn(
+        "p-4 border-t border-[#472130] text-xs bg-[#472130]/70 text-[#8E7079] flex-shrink-0",
+        collapsed && "p-2 text-center"
+      )}>
+        {collapsed ? (
+          <div className="w-2.5 h-2.5 rounded-full bg-[#32765B] mx-auto animate-pulse" title="PostgreSQL Live" />
+        ) : (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#32765B] animate-pulse" />
+                <span className="text-white font-medium text-[11px]">Neon DB Connected</span>
+              </div>
+              <span className="text-[10px] text-[#C4A06A] font-mono">v2.0</span>
+            </div>
+            <p className="mt-1 text-[10px] text-[#8E7079]">Royal Burgundy & Pearl • Monolith</p>
+          </>
+        )}
       </div>
-    </aside>
+
+      {/* Expand Button for Collapsed State */}
+      {collapsed && onToggleCollapse && (
+        <button
+          onClick={onToggleCollapse}
+          className="p-3 text-[#8E7079] hover:text-white hover:bg-[#472130] transition-colors flex justify-center border-t border-[#472130]"
+          title="Expand Sidebar"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <aside
+        className={cn(
+          "hidden lg:flex flex-col flex-shrink-0 border-r border-[#472130] shadow-2xl transition-all duration-300 z-30",
+          collapsed ? "w-20" : "w-64"
+        )}
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Backdrop & Drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={onMobileClose}
+          />
+          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] shadow-2xl z-50 animate-in slide-in-from-left duration-200">
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

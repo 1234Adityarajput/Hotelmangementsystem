@@ -99,7 +99,125 @@ export class SettingsService {
         strategy: 'Continuous Neon Write-Ahead Log (WAL) & Branch Snapshots',
         pointInTimeRecovery: 'Enabled',
         automatedDailyRetention: 'Configured via Neon Cloud Console',
+        onDemandBackup: 'Available via /api/v1/settings/backup',
       },
     };
+  }
+
+  // On-demand Full Database Snapshot Export
+  async createDatabaseBackup() {
+    const start = Date.now();
+    const [
+      settings,
+      roomTypes,
+      rooms,
+      guests,
+      guestDocuments,
+      bookings,
+      bookingGuests,
+      itemCategories,
+      items,
+      bookingItems,
+      invoices,
+      payments,
+      staff,
+      attendances,
+      salaryRecords,
+      salaryPayments,
+      staffAdvances,
+      expenseCategories,
+      expenses,
+      auditLogs,
+    ] = await Promise.all([
+      this.prisma.hotelSetting.findMany(),
+      this.prisma.roomType.findMany(),
+      this.prisma.room.findMany(),
+      this.prisma.guest.findMany(),
+      this.prisma.guestDocument.findMany(),
+      this.prisma.booking.findMany(),
+      this.prisma.bookingGuest.findMany(),
+      this.prisma.itemCategory.findMany(),
+      this.prisma.item.findMany(),
+      this.prisma.bookingItem.findMany(),
+      this.prisma.invoice.findMany(),
+      this.prisma.payment.findMany(),
+      this.prisma.staff.findMany(),
+      this.prisma.attendance.findMany(),
+      this.prisma.salaryRecord.findMany(),
+      this.prisma.salaryPayment.findMany(),
+      this.prisma.staffAdvance.findMany(),
+      this.prisma.expenseCategory.findMany(),
+      this.prisma.expense.findMany(),
+      this.prisma.auditLog.findMany({ take: 500, orderBy: { changedAt: 'desc' } }),
+    ]);
+
+    const backupData = {
+      system: 'The Grand Horizon Hotel Management OS',
+      theme: 'Royal Burgundy & Pearl Luxury',
+      version: '2.0.0',
+      exportTimestamp: new Date().toISOString(),
+      generationTimeMs: Date.now() - start,
+      database: {
+        provider: 'Neon Serverless PostgreSQL',
+        databaseName: 'neondb',
+      },
+      summary: {
+        hotelSettingsCount: settings.length,
+        roomTypesCount: roomTypes.length,
+        roomsCount: rooms.length,
+        guestsCount: guests.length,
+        guestDocumentsCount: guestDocuments.length,
+        bookingsCount: bookings.length,
+        bookingGuestsCount: bookingGuests.length,
+        itemCategoriesCount: itemCategories.length,
+        itemsCatalogCount: items.length,
+        bookingItemsCount: bookingItems.length,
+        invoicesCount: invoices.length,
+        paymentsCount: payments.length,
+        staffCount: staff.length,
+        attendanceRecordsCount: attendances.length,
+        salaryRecordsCount: salaryRecords.length,
+        salaryPaymentsCount: salaryPayments.length,
+        staffAdvancesCount: staffAdvances.length,
+        expenseCategoriesCount: expenseCategories.length,
+        expensesCount: expenses.length,
+        auditLogsCount: auditLogs.length,
+      },
+      records: {
+        settings,
+        roomTypes,
+        rooms,
+        guests,
+        guestDocuments,
+        bookings,
+        bookingGuests,
+        itemCategories,
+        items,
+        bookingItems,
+        invoices,
+        payments,
+        staff,
+        attendances,
+        salaryRecords,
+        salaryPayments,
+        staffAdvances,
+        expenseCategories,
+        expenses,
+        auditLogs,
+      },
+    };
+
+    // Log the backup activity into Audit Logs
+    await this.prisma.auditLog.create({
+      data: {
+        entityType: 'SETTINGS',
+        entityId: 'backup',
+        action: 'CREATE',
+        description: `Full database snapshot backup generated with ${Object.values(backupData.summary).reduce((a, b) => a + b, 0)} total records`,
+        newValues: backupData.summary,
+      },
+    });
+
+    return backupData;
   }
 }

@@ -282,21 +282,21 @@ export default function DigitalRegistersPage() {
       HEADER BAR
       =======================================================================
       */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E3D9CA] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8DDD8] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase font-bold text-[#362A22] bg-[#EEE7DA] px-2 py-0.5 rounded tracking-wider">
+            <span className="text-[10px] uppercase font-bold text-[#59283A] bg-[#F5F0EA] px-2 py-0.5 rounded tracking-wider">
               Statutory Hotel Ledgers • Module 12
             </span>
-            <Badge variant="outline" className="text-[10px] border-[#B08A60] text-[#362A22] bg-white">
+            <Badge variant="outline" className="text-[10px] border-[#C4A06A] text-[#59283A] bg-white">
               13 Core Digital Registers
             </Badge>
           </div>
-          <h1 className="text-2xl font-serif font-bold text-[#362A22] mt-1 flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-[#B08A60]" />
+          <h1 className="text-2xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+            <BookOpen className="w-6 h-6 text-[#C4A06A]" />
             Digital Register Management
           </h1>
-          <p className="text-xs text-[#79695B] max-w-3xl mt-0.5">
+          <p className="text-xs text-[#82747A] max-w-3xl mt-0.5">
             Digitally maintaining the exact information traditionally recorded in physical hotel books & ledgers.
             Real-time searchable by dates, guest names, room numbers, and financial vouchers.
           </p>
@@ -308,17 +308,17 @@ export default function DigitalRegistersPage() {
             variant="outline"
             size="sm"
             onClick={handleExportCSV}
-            className="h-8 text-xs border-[#E3D9CA] hover:bg-[#F7F4EE] text-[#362A22] flex items-center gap-1.5 shadow-sm"
+            className="h-8 text-xs border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#59283A] flex items-center gap-1.5 shadow-sm"
           >
-            <Download className="w-3.5 h-3.5 text-[#B08A60]" />
+            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Export CSV / Excel</span>
           </Button>
           <Button
             size="sm"
             onClick={() => window.print()}
-            className="h-8 text-xs bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm"
+            className="h-8 text-xs bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 shadow-sm"
           >
-            <Printer className="w-3.5 h-3.5 text-[#B08A60]" />
+            <Printer className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Print Register</span>
           </Button>
         </div>
@@ -329,13 +329,13 @@ export default function DigitalRegistersPage() {
       13 REGISTERS SELECTOR TABS (Categorized with Luxury Editorial Design)
       =======================================================================
       */}
-      <div className="bg-white p-4 rounded-xl border border-[#E3D9CA] shadow-sm space-y-3.5 print:hidden">
-        <div className="flex items-center justify-between border-b border-[#EEE7DA] pb-2">
-          <span className="text-[11px] font-bold text-[#362A22] uppercase tracking-wider flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-[#B08A60]" />
+      <div className="bg-white p-4 rounded-xl border border-[#E8DDD8] shadow-sm space-y-3.5 print:hidden">
+        <div className="flex items-center justify-between border-b border-[#F5F0EA] pb-2">
+          <span className="text-[11px] font-bold text-[#59283A] uppercase tracking-wider flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-[#C4A06A]" />
             Select Digital Register (Traditional Hotel Book ➔ Digital Record):
           </span>
-          <span className="text-[10px] text-[#79695B]">13 of 13 Registers Available</span>
+          <span className="text-[10px] text-[#82747A]">13 of 13 Registers Available</span>
         </div>
 
         {/* Categories Grid */}
@@ -344,7 +344,7 @@ export default function DigitalRegistersPage() {
             const groupRegisters = REGISTERS.filter((r) => r.group === groupName);
             return (
               <div key={groupName} className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <span className="text-[10px] font-bold text-[#79695B] uppercase tracking-wider w-40 shrink-0">
+                <span className="text-[10px] font-bold text-[#82747A] uppercase tracking-wider w-40 shrink-0">
                   {groupName}:
                 </span>
                 <div className="flex flex-wrap gap-1.5 flex-1">
@@ -360,11 +360,11 @@ export default function DigitalRegistersPage() {
                         }}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
                           isActive
-                            ? "bg-[#362A22] text-white border-[#362A22] shadow-sm"
-                            : "bg-[#F7F4EE] text-[#5D493D] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                            ? "bg-[#59283A] text-white border-[#59283A] shadow-sm"
+                            : "bg-[#F5F0EA] text-[#7A4652] hover:bg-[#F5F0EA] border-[#E8DDD8]"
                         }`}
                       >
-                        <IconComponent className={`w-3.5 h-3.5 ${isActive ? "text-[#B08A60]" : "text-[#79695B]"}`} />
+                        <IconComponent className={`w-3.5 h-3.5 ${isActive ? "text-[#C4A06A]" : "text-[#82747A]"}`} />
                         <span>{reg.label}</span>
                       </button>
                     );
@@ -381,21 +381,21 @@ export default function DigitalRegistersPage() {
       ACTIVE REGISTER METADATA & TOP DYNAMIC KPI STRIP
       =======================================================================
       */}
-      <div className="bg-[#F7F4EE] border border-[#E3D9CA] rounded-xl p-4 shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E3D9CA] pb-3">
+      <div className="bg-[#F5F0EA] border border-[#E8DDD8] rounded-xl p-4 shadow-sm space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8DDD8] pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-white rounded-lg border border-[#E3D9CA] shadow-sm">
-              {React.createElement(currentMeta.icon, { className: "w-5 h-5 text-[#B08A60]" })}
+            <div className="p-2 bg-white rounded-lg border border-[#E8DDD8] shadow-sm">
+              {React.createElement(currentMeta.icon, { className: "w-5 h-5 text-[#C4A06A]" })}
             </div>
             <div>
-              <h2 className="text-base font-serif font-bold text-[#362A22] flex items-center gap-2">
+              <h2 className="text-base font-serif font-bold text-[#59283A] flex items-center gap-2">
                 {currentMeta.label}
-                <span className="text-xs font-normal text-[#79695B]">— {currentMeta.subtitle}</span>
+                <span className="text-xs font-normal text-[#82747A]">— {currentMeta.subtitle}</span>
               </h2>
-              <p className="text-[11px] text-[#79695B] mt-0.5">{currentMeta.desc}</p>
+              <p className="text-[11px] text-[#82747A] mt-0.5">{currentMeta.desc}</p>
             </div>
           </div>
-          <Badge className="bg-[#362A22] text-white text-[10px] w-fit">
+          <Badge className="bg-[#59283A] text-white text-[10px] w-fit">
             {currentMeta.badge}
           </Badge>
         </div>
@@ -403,35 +403,35 @@ export default function DigitalRegistersPage() {
         {/* Dynamic KPI Cards Based on Active Register */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {/* Default Total Records */}
-          <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-            <span className="text-[10px] uppercase font-bold text-[#79695B] tracking-wider block">Total Entries</span>
-            <span className="text-lg font-serif font-bold text-[#362A22] mt-0.5 block">{total}</span>
-            <span className="text-[10px] text-[#948779]">Stored Digitally</span>
+          <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+            <span className="text-[10px] uppercase font-bold text-[#82747A] tracking-wider block">Total Entries</span>
+            <span className="text-lg font-serif font-bold text-[#59283A] mt-0.5 block">{total}</span>
+            <span className="text-[10px] text-[#8E7079]">Stored Digitally</span>
           </div>
 
           {/* Cash Book Specific KPIs */}
           {activeRegister === "cash-book" && (
             <>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider block">Total Cash Inflow</span>
                 <span className="text-lg font-mono font-bold text-emerald-800 mt-0.5 block">
                   ₹{Number(summary?.totalCashInflow || 0).toLocaleString()}
                 </span>
                 <span className="text-[10px] text-emerald-600">Guest Settlements</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-rose-700 tracking-wider block">Total Cash Outflow</span>
                 <span className="text-lg font-mono font-bold text-rose-800 mt-0.5 block">
                   ₹{Number(summary?.totalCashOutflow || 0).toLocaleString()}
                 </span>
                 <span className="text-[10px] text-rose-600">Expenses & Salaries</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#362A22] tracking-wider block">Net Cash Balance</span>
-                <span className="text-lg font-mono font-bold text-[#B08A60] mt-0.5 block">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#59283A] tracking-wider block">Net Cash Balance</span>
+                <span className="text-lg font-mono font-bold text-[#C4A06A] mt-0.5 block">
                   ₹{Number(summary?.netCashFlow || 0).toLocaleString()}
                 </span>
-                <span className="text-[10px] text-[#79695B]">Inflow − Outflow</span>
+                <span className="text-[10px] text-[#82747A]">Inflow − Outflow</span>
               </div>
             </>
           )}
@@ -439,26 +439,26 @@ export default function DigitalRegistersPage() {
           {/* Business Register Specific KPIs */}
           {activeRegister === "business" && (
             <>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider block">Gross Revenue</span>
                 <span className="text-lg font-mono font-bold text-emerald-800 mt-0.5 block">
                   ₹{Number(summary?.totalGrossRevenue || 0).toLocaleString()}
                 </span>
                 <span className="text-[10px] text-emerald-600">Rooms & Services</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-rose-700 tracking-wider block">Total Expenses</span>
                 <span className="text-lg font-mono font-bold text-rose-800 mt-0.5 block">
                   ₹{Number(summary?.totalExpenses || 0).toLocaleString()}
                 </span>
                 <span className="text-[10px] text-rose-600">Operations & Utilities</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#362A22] tracking-wider block">Net Operating Profit</span>
-                <span className="text-lg font-mono font-bold text-[#B08A60] mt-0.5 block">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#59283A] tracking-wider block">Net Operating Profit</span>
+                <span className="text-lg font-mono font-bold text-[#C4A06A] mt-0.5 block">
                   ₹{Number(summary?.netOperatingProfit || 0).toLocaleString()}
                 </span>
-                <span className="text-[10px] text-[#79695B]">Revenue − Costs</span>
+                <span className="text-[10px] text-[#82747A]">Revenue − Costs</span>
               </div>
             </>
           )}
@@ -466,21 +466,21 @@ export default function DigitalRegistersPage() {
           {/* Billing Specific KPIs */}
           {activeRegister === "billing" && (
             <>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#79695B] tracking-wider block">Total Invoiced</span>
-                <span className="text-lg font-mono font-bold text-[#362A22] mt-0.5 block">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#82747A] tracking-wider block">Total Invoiced</span>
+                <span className="text-lg font-mono font-bold text-[#59283A] mt-0.5 block">
                   ₹{Number(summary?.totalBilled || 0).toLocaleString()}
                 </span>
-                <span className="text-[10px] text-[#79695B]">All Folios</span>
+                <span className="text-[10px] text-[#82747A]">All Folios</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider block">Total Paid</span>
                 <span className="text-lg font-mono font-bold text-emerald-800 mt-0.5 block">
                   ₹{Number(summary?.totalPaid || 0).toLocaleString()}
                 </span>
                 <span className="text-[10px] text-emerald-600">Realized Collections</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-amber-700 tracking-wider block">Balance Due</span>
                 <span className="text-lg font-mono font-bold text-amber-800 mt-0.5 block">
                   ₹{Number(summary?.totalBalanceDue || 0).toLocaleString()}
@@ -493,26 +493,26 @@ export default function DigitalRegistersPage() {
           {/* Payments Specific KPIs */}
           {activeRegister === "payments" && (
             <>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider block">Total Collected</span>
                 <span className="text-lg font-mono font-bold text-emerald-800 mt-0.5 block">
                   ₹{Number(summary?.totalCollected || 0).toLocaleString()}
                 </span>
                 <span className="text-[10px] text-emerald-600">All Channels</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#362A22] tracking-wider block">Cash Inflow</span>
-                <span className="text-lg font-mono font-bold text-[#362A22] mt-0.5 block">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#59283A] tracking-wider block">Cash Inflow</span>
+                <span className="text-lg font-mono font-bold text-[#59283A] mt-0.5 block">
                   ₹{Number(summary?.cashCollected || 0).toLocaleString()}
                 </span>
-                <span className="text-[10px] text-[#79695B]">Cash Drawer</span>
+                <span className="text-[10px] text-[#82747A]">Cash Drawer</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#B08A60] tracking-wider block">UPI & Bank Net</span>
-                <span className="text-lg font-mono font-bold text-[#B08A60] mt-0.5 block">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#C4A06A] tracking-wider block">UPI & Bank Net</span>
+                <span className="text-lg font-mono font-bold text-[#C4A06A] mt-0.5 block">
                   ₹{(Number(summary?.upiCollected || 0) + Number(summary?.bankCollected || 0)).toLocaleString()}
                 </span>
-                <span className="text-[10px] text-[#79695B]">Digital Transfers</span>
+                <span className="text-[10px] text-[#82747A]">Digital Transfers</span>
               </div>
             </>
           )}
@@ -520,24 +520,24 @@ export default function DigitalRegistersPage() {
           {/* Check-ins Specific KPIs */}
           {activeRegister === "check-ins" && (
             <>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider block">Total Check-Ins</span>
                 <span className="text-lg font-serif font-bold text-emerald-800 mt-0.5 block">
                   {summary?.totalCheckIns || total}
                 </span>
                 <span className="text-[10px] text-emerald-600">Arrivals Processed</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#362A22] tracking-wider block">Advance Collected</span>
-                <span className="text-lg font-mono font-bold text-[#B08A60] mt-0.5 block">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#59283A] tracking-wider block">Advance Collected</span>
+                <span className="text-lg font-mono font-bold text-[#C4A06A] mt-0.5 block">
                   ₹{Number(summary?.totalAdvanceCollected || 0).toLocaleString()}
                 </span>
-                <span className="text-[10px] text-[#79695B]">At Check-In</span>
+                <span className="text-[10px] text-[#82747A]">At Check-In</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#79695B] tracking-wider block">Digital Archive</span>
-                <span className="text-lg font-serif font-bold text-[#362A22] mt-0.5 block">100%</span>
-                <span className="text-[10px] text-[#79695B]">Tamper-Proof Records</span>
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#82747A] tracking-wider block">Digital Archive</span>
+                <span className="text-lg font-serif font-bold text-[#59283A] mt-0.5 block">100%</span>
+                <span className="text-[10px] text-[#82747A]">Tamper-Proof Records</span>
               </div>
             </>
           )}
@@ -545,24 +545,24 @@ export default function DigitalRegistersPage() {
           {/* Services Specific KPIs */}
           {activeRegister === "services" && (
             <>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider block">Items & Services Sold</span>
                 <span className="text-lg font-serif font-bold text-emerald-800 mt-0.5 block">
                   {summary?.totalItemsSold || 0}
                 </span>
                 <span className="text-[10px] text-emerald-600">Units Delivered</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#362A22] tracking-wider block">Service Revenue</span>
-                <span className="text-lg font-mono font-bold text-[#B08A60] mt-0.5 block">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#59283A] tracking-wider block">Service Revenue</span>
+                <span className="text-lg font-mono font-bold text-[#C4A06A] mt-0.5 block">
                   ₹{Number(summary?.totalServiceRevenue || 0).toLocaleString()}
                 </span>
-                <span className="text-[10px] text-[#79695B]">F&B, Laundry & Sundries</span>
+                <span className="text-[10px] text-[#82747A]">F&B, Laundry & Sundries</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#79695B] tracking-wider block">Guest Folio Link</span>
-                <span className="text-lg font-serif font-bold text-[#362A22] mt-0.5 block">Automated</span>
-                <span className="text-[10px] text-[#79695B]">Added to Final Bill</span>
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#82747A] tracking-wider block">Guest Folio Link</span>
+                <span className="text-lg font-serif font-bold text-[#59283A] mt-0.5 block">Automated</span>
+                <span className="text-[10px] text-[#82747A]">Added to Final Bill</span>
               </div>
             </>
           )}
@@ -570,20 +570,20 @@ export default function DigitalRegistersPage() {
           {/* Other registers fallback KPIs */}
           {!["cash-book", "business", "billing", "payments", "check-ins", "services"].includes(activeRegister) && (
             <>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#79695B] tracking-wider block">Statutory Format</span>
-                <span className="text-lg font-serif font-bold text-[#362A22] mt-0.5 block">Standard</span>
-                <span className="text-[10px] text-[#79695B]">Hotel Regulations Compliant</span>
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#82747A] tracking-wider block">Statutory Format</span>
+                <span className="text-lg font-serif font-bold text-[#59283A] mt-0.5 block">Standard</span>
+                <span className="text-[10px] text-[#82747A]">Hotel Regulations Compliant</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
                 <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider block">Audit Status</span>
                 <span className="text-lg font-serif font-bold text-emerald-800 mt-0.5 block">Live & Synced</span>
                 <span className="text-[10px] text-emerald-600">Database Verified</span>
               </div>
-              <div className="bg-white p-3 rounded-lg border border-[#E3D9CA] shadow-xs">
-                <span className="text-[10px] uppercase font-bold text-[#362A22] tracking-wider block">Search Coverage</span>
-                <span className="text-lg font-serif font-bold text-[#B08A60] mt-0.5 block">Full Matrix</span>
-                <span className="text-[10px] text-[#79695B]">Date, Name & Room #</span>
+              <div className="bg-white p-3 rounded-lg border border-[#E8DDD8] shadow-xs">
+                <span className="text-[10px] uppercase font-bold text-[#59283A] tracking-wider block">Search Coverage</span>
+                <span className="text-lg font-serif font-bold text-[#C4A06A] mt-0.5 block">Full Matrix</span>
+                <span className="text-[10px] text-[#82747A]">Date, Name & Room #</span>
               </div>
             </>
           )}
@@ -595,11 +595,11 @@ export default function DigitalRegistersPage() {
       ADVANCED FILTER & SEARCH BAR (Date Range, Room Number, Text Search)
       =======================================================================
       */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E3D9CA] shadow-sm print:hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E8DDD8] shadow-sm print:hidden">
         {/* Left Side: Date Range + Presets */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-[#362A22] flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5 text-[#B08A60]" />
+          <span className="text-xs font-semibold text-[#59283A] flex items-center gap-1">
+            <Calendar className="w-3.5 h-3.5 text-[#C4A06A]" />
             Date Range:
           </span>
           <Input
@@ -609,9 +609,9 @@ export default function DigitalRegistersPage() {
               setStartDate(e.target.value);
               setPage(1);
             }}
-            className="h-8 text-xs w-36 border-[#E3D9CA]"
+            className="h-8 text-xs w-36 border-[#E8DDD8]"
           />
-          <span className="text-xs text-[#79695B]">to</span>
+          <span className="text-xs text-[#82747A]">to</span>
           <Input
             type="date"
             value={endDate}
@@ -619,26 +619,26 @@ export default function DigitalRegistersPage() {
               setEndDate(e.target.value);
               setPage(1);
             }}
-            className="h-8 text-xs w-36 border-[#E3D9CA]"
+            className="h-8 text-xs w-36 border-[#E8DDD8]"
           />
 
           {/* Quick Preset Buttons */}
-          <div className="flex items-center gap-1 border-l border-[#EEE7DA] pl-2">
+          <div className="flex items-center gap-1 border-l border-[#F5F0EA] pl-2">
             <button
               onClick={() => setPresetDates("today")}
-              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F7F4EE] hover:bg-[#EEE7DA] text-[#362A22]"
+              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F5F0EA] hover:bg-[#F5F0EA] text-[#59283A]"
             >
               Today
             </button>
             <button
               onClick={() => setPresetDates("week")}
-              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F7F4EE] hover:bg-[#EEE7DA] text-[#362A22]"
+              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F5F0EA] hover:bg-[#F5F0EA] text-[#59283A]"
             >
               Last 7D
             </button>
             <button
               onClick={() => setPresetDates("month")}
-              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F7F4EE] hover:bg-[#EEE7DA] text-[#362A22]"
+              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F5F0EA] hover:bg-[#F5F0EA] text-[#59283A]"
             >
               Last 30D
             </button>
@@ -657,7 +657,7 @@ export default function DigitalRegistersPage() {
         <div className="flex items-center gap-2 flex-wrap">
           {/* Room Number Filter */}
           <div className="relative w-32">
-            <BedDouble className="w-3.5 h-3.5 text-[#79695B] absolute left-2.5 top-2.5" />
+            <BedDouble className="w-3.5 h-3.5 text-[#82747A] absolute left-2.5 top-2.5" />
             <Input
               type="text"
               placeholder="Room #"
@@ -666,13 +666,13 @@ export default function DigitalRegistersPage() {
                 setRoomNumber(e.target.value);
                 setPage(1);
               }}
-              className="pl-8 h-8 text-xs border-[#E3D9CA]"
+              className="pl-8 h-8 text-xs border-[#E8DDD8]"
             />
           </div>
 
           {/* General Text Search */}
           <div className="relative w-64">
-            <Search className="w-3.5 h-3.5 text-[#79695B] absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#82747A] absolute left-2.5 top-2.5" />
             <Input
               type="text"
               placeholder="Search by name, code, ref..."
@@ -681,7 +681,7 @@ export default function DigitalRegistersPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="pl-8 h-8 text-xs border-[#E3D9CA]"
+              className="pl-8 h-8 text-xs border-[#E8DDD8]"
             />
           </div>
         </div>
@@ -692,20 +692,20 @@ export default function DigitalRegistersPage() {
       REGISTER DATA TABLE (Tailored columns for all 13 registers)
       =======================================================================
       */}
-      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden print:border-none print:shadow-none bg-white">
-        <CardHeader className="bg-[#F7F4EE] border-b border-[#E3D9CA] py-3 px-4">
+      <Card className="border-[#E8DDD8] shadow-sm overflow-hidden print:border-none print:shadow-none bg-white">
+        <CardHeader className="bg-[#F5F0EA] border-b border-[#E8DDD8] py-3 px-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-sm font-bold text-[#362A22] flex items-center gap-2">
+              <CardTitle className="text-sm font-bold text-[#59283A] flex items-center gap-2">
                 <span>{currentMeta.label}</span>
-                <span className="text-xs font-normal text-[#79695B]">({currentMeta.subtitle})</span>
+                <span className="text-xs font-normal text-[#82747A]">({currentMeta.subtitle})</span>
               </CardTitle>
-              <CardDescription className="text-xs text-[#79695B]">
+              <CardDescription className="text-xs text-[#82747A]">
                 Showing {items.length} of {total} total digital ledger records
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-[#79695B]">Grand Horizon Hotel Official Register</span>
+              <span className="text-[10px] text-[#82747A]">Grand Horizon Hotel Official Register</span>
             </div>
           </div>
         </CardHeader>
@@ -713,14 +713,14 @@ export default function DigitalRegistersPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-16 flex flex-col justify-center items-center gap-2">
-              <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-              <span className="text-xs text-[#79695B]">Querying digital ledger records...</span>
+              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+              <span className="text-xs text-[#82747A]">Querying digital ledger records...</span>
             </div>
           ) : items.length === 0 ? (
-            <div className="p-16 text-center text-xs text-[#79695B] space-y-1">
-              <AlertCircle className="w-8 h-8 text-[#B08A60] mx-auto opacity-60 mb-2" />
-              <p className="font-semibold text-[#362A22]">No entries found in {currentMeta.label}</p>
-              <p className="text-[11px] text-[#948779]">
+            <div className="p-16 text-center text-xs text-[#82747A] space-y-1">
+              <AlertCircle className="w-8 h-8 text-[#C4A06A] mx-auto opacity-60 mb-2" />
+              <p className="font-semibold text-[#59283A]">No entries found in {currentMeta.label}</p>
+              <p className="text-[11px] text-[#8E7079]">
                 Try adjusting your search query, clearing the date range, or removing the room number filter.
               </p>
             </div>
@@ -732,7 +732,7 @@ export default function DigitalRegistersPage() {
                 TABLE HEADERS
                 ===============================================================
                 */}
-                <thead className="bg-[#F7F4EE] text-[#5D493D] uppercase text-[10px] font-bold border-b border-[#E3D9CA] tracking-wider">
+                <thead className="bg-[#F5F0EA] text-[#7A4652] uppercase text-[10px] font-bold border-b border-[#E8DDD8] tracking-wider">
                   <tr>
                     {/* 1. GUEST REGISTER */}
                     {activeRegister === "guests" && (
@@ -939,30 +939,30 @@ export default function DigitalRegistersPage() {
                 TABLE BODY
                 ===============================================================
                 */}
-                <tbody className="divide-y divide-[#EAE3D8]">
+                <tbody className="divide-y divide-[#E8DDD8]">
                   {items.map((row: any) => (
-                    <tr key={row.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                    <tr key={row.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
                       {/* 1. GUEST REGISTER */}
                       {activeRegister === "guests" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.guestCode}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.fullName}</td>
-                          <td className="px-4 py-3 text-[#79695B] font-mono">{row.mobileNumber}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{row.email || "-"}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{row.city || row.address || "-"}</td>
-                          <td className="px-4 py-3 text-[#79695B]">
+                          <td className="px-4 py-3 font-mono font-medium text-[#C4A06A]">{row.guestCode}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.fullName}</td>
+                          <td className="px-4 py-3 text-[#82747A] font-mono">{row.mobileNumber}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{row.email || "-"}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{row.city || row.address || "-"}</td>
+                          <td className="px-4 py-3 text-[#82747A]">
                             {row.documents && row.documents.length > 0 ? (
                               <span className="font-mono text-[11px] bg-slate-100 px-1.5 py-0.5 rounded">
                                 {row.documents[0].documentType}: {row.documents[0].documentNumber}
                               </span>
                             ) : (
-                              <span className="text-[#948779]">-</span>
+                              <span className="text-[#8E7079]">-</span>
                             )}
                           </td>
-                          <td className="px-4 py-3 font-semibold text-[#362A22]">
+                          <td className="px-4 py-3 font-semibold text-[#59283A]">
                             {row._count?.stayHistory || 0} Stays
                           </td>
-                          <td className="px-4 py-3 text-[#948779]">
+                          <td className="px-4 py-3 text-[#8E7079]">
                             {new Date(row.createdAt).toLocaleDateString()}
                           </td>
                         </>
@@ -971,27 +971,27 @@ export default function DigitalRegistersPage() {
                       {/* 2. CHECK-IN REGISTER */}
                       {activeRegister === "check-ins" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-semibold text-[#B08A60]">{row.bookingNumber}</td>
+                          <td className="px-4 py-3 font-mono font-semibold text-[#C4A06A]">{row.bookingNumber}</td>
                           <td className="px-4 py-3">
-                            <span className="font-medium text-[#362A22] block">{row.guestName}</span>
-                            <span className="text-[11px] text-[#79695B] font-mono">{row.guestMobile}</span>
+                            <span className="font-medium text-[#59283A] block">{row.guestName}</span>
+                            <span className="text-[11px] text-[#82747A] font-mono">{row.guestMobile}</span>
                           </td>
-                          <td className="px-4 py-3 font-semibold text-[#362A22]">
+                          <td className="px-4 py-3 font-semibold text-[#59283A]">
                             Room {row.roomNumber} ({row.roomType})
                           </td>
-                          <td className="px-4 py-3 text-[#5D493D]">
+                          <td className="px-4 py-3 text-[#7A4652]">
                             <span className="font-medium block">{new Date(row.checkInDate).toLocaleDateString()}</span>
-                            <span className="text-[10px] text-[#79695B] font-mono">{row.checkInTime}</span>
+                            <span className="text-[10px] text-[#82747A] font-mono">{row.checkInTime}</span>
                           </td>
-                          <td className="px-4 py-3 text-[#79695B]">
+                          <td className="px-4 py-3 text-[#82747A]">
                             <span>{new Date(row.expectedCheckOutDate).toLocaleDateString()}</span>
                             <span className="text-[10px] block font-mono">{row.expectedCheckOutTime}</span>
                           </td>
-                          <td className="px-4 py-3 font-semibold text-[#362A22]">{row.numberOfNights} Nights</td>
+                          <td className="px-4 py-3 font-semibold text-[#59283A]">{row.numberOfNights} Nights</td>
                           <td className="px-4 py-3 font-mono font-semibold">₹{Number(row.roomPricePerNight)}</td>
                           <td className="px-4 py-3 font-mono font-bold text-emerald-700">
                             ₹{Number(row.advancePayment).toLocaleString()}
-                            <span className="text-[9px] text-[#79695B] block font-sans">({row.advancePaymentMethod})</span>
+                            <span className="text-[9px] text-[#82747A] block font-sans">({row.advancePaymentMethod})</span>
                           </td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-800 border-emerald-200">
@@ -1004,23 +1004,23 @@ export default function DigitalRegistersPage() {
                       {/* 3. CHECK-OUT REGISTER */}
                       {activeRegister === "check-outs" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-semibold text-[#B08A60]">{row.bookingNumber}</td>
+                          <td className="px-4 py-3 font-mono font-semibold text-[#C4A06A]">{row.bookingNumber}</td>
                           <td className="px-4 py-3">
-                            <span className="font-medium text-[#362A22] block">{row.guestName}</span>
-                            <span className="text-[11px] text-[#79695B] font-mono">{row.guestMobile}</span>
+                            <span className="font-medium text-[#59283A] block">{row.guestName}</span>
+                            <span className="text-[11px] text-[#82747A] font-mono">{row.guestMobile}</span>
                           </td>
-                          <td className="px-4 py-3 font-bold text-[#362A22]">Room {row.roomNumber}</td>
-                          <td className="px-4 py-3 text-[#5D493D]">
+                          <td className="px-4 py-3 font-bold text-[#59283A]">Room {row.roomNumber}</td>
+                          <td className="px-4 py-3 text-[#7A4652]">
                             <span className="font-medium block">{new Date(row.actualCheckOutDate).toLocaleDateString()}</span>
-                            <span className="text-[10px] text-[#79695B] font-mono">{row.actualCheckOutTime}</span>
+                            <span className="text-[10px] text-[#82747A] font-mono">{row.actualCheckOutTime}</span>
                           </td>
                           <td className="px-4 py-3 font-semibold">{row.totalNumberOfNights}N</td>
                           <td className="px-4 py-3 font-mono">₹{Number(row.roomCharges).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono text-emerald-700">₹{Number(row.additionalItemCharges).toLocaleString()}</td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">
+                          <td className="px-4 py-3 font-mono text-[#82747A]">
                             +₹{Number(row.tax)} / -₹{Number(row.discount)}
                           </td>
-                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.totalBillAmount).toLocaleString()}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#59283A]">₹{Number(row.totalBillAmount).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono text-emerald-700 font-semibold">
                             ₹{(Number(row.advancePayment) + Number(row.additionalPayments)).toLocaleString()}
                           </td>
@@ -1033,10 +1033,10 @@ export default function DigitalRegistersPage() {
                       {/* 4. ROOM REGISTER */}
                       {activeRegister === "rooms" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-bold text-sm text-[#362A22]">Room {row.roomNumber}</td>
-                          <td className="px-4 py-3 text-[#79695B] font-medium">{row.roomType}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-sm text-[#59283A]">Room {row.roomNumber}</td>
+                          <td className="px-4 py-3 text-[#82747A] font-medium">{row.roomType}</td>
                           <td className="px-4 py-3">Floor {row.floor}</td>
-                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.pricePerNight).toLocaleString()}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#59283A]">₹{Number(row.pricePerNight).toLocaleString()}</td>
                           <td className="px-4 py-3">
                             <Badge
                               variant="outline"
@@ -1051,22 +1051,22 @@ export default function DigitalRegistersPage() {
                               {row.roomStatus}
                             </Badge>
                           </td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.currentGuest}</td>
-                          <td className="px-4 py-3 text-[#79695B] text-[11px]">{row.cleanlinessStatus}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.currentGuest}</td>
+                          <td className="px-4 py-3 text-[#82747A] text-[11px]">{row.cleanlinessStatus}</td>
                         </>
                       )}
 
                       {/* 5. GUEST BILLING REGISTER */}
                       {activeRegister === "billing" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-semibold text-[#B08A60]">{row.invoiceNumber}</td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">{row.bookingNumber}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.guestName}</td>
-                          <td className="px-4 py-3 font-bold text-[#362A22]">Room {row.roomNumber}</td>
+                          <td className="px-4 py-3 font-mono font-semibold text-[#C4A06A]">{row.invoiceNumber}</td>
+                          <td className="px-4 py-3 font-mono text-[#82747A]">{row.bookingNumber}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.guestName}</td>
+                          <td className="px-4 py-3 font-bold text-[#59283A]">Room {row.roomNumber}</td>
                           <td className="px-4 py-3 font-mono">₹{Number(row.roomCharges).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono text-emerald-700">₹{Number(row.additionalCharges).toLocaleString()}</td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">₹{Number(row.taxAmount).toLocaleString()}</td>
-                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.totalAmount).toLocaleString()}</td>
+                          <td className="px-4 py-3 font-mono text-[#82747A]">₹{Number(row.taxAmount).toLocaleString()}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#59283A]">₹{Number(row.totalAmount).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono font-semibold text-emerald-700">₹{Number(row.totalPaid).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono font-bold text-amber-700">₹{Number(row.balanceAmount).toLocaleString()}</td>
                           <td className="px-4 py-3">
@@ -1080,17 +1080,17 @@ export default function DigitalRegistersPage() {
                       {/* 6. PAYMENT REGISTER */}
                       {activeRegister === "payments" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-semibold text-[#B08A60]">{row.paymentReference}</td>
-                          <td className="px-4 py-3 font-mono text-[11px] text-[#79695B]">{row.transactionReference}</td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">{row.bookingNumber}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.guestName}</td>
-                          <td className="px-4 py-3 font-bold text-[#362A22]">Room {row.roomNumber}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">
-                            <span className="bg-[#EEE7DA] px-2 py-0.5 rounded text-[11px]">{row.paymentMethod}</span>
+                          <td className="px-4 py-3 font-mono font-semibold text-[#C4A06A]">{row.paymentReference}</td>
+                          <td className="px-4 py-3 font-mono text-[11px] text-[#82747A]">{row.transactionReference}</td>
+                          <td className="px-4 py-3 font-mono text-[#82747A]">{row.bookingNumber}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.guestName}</td>
+                          <td className="px-4 py-3 font-bold text-[#59283A]">Room {row.roomNumber}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">
+                            <span className="bg-[#F5F0EA] px-2 py-0.5 rounded text-[11px]">{row.paymentMethod}</span>
                           </td>
-                          <td className="px-4 py-3 text-[#79695B]">{row.paymentType}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{row.paymentType}</td>
                           <td className="px-4 py-3 font-mono font-bold text-emerald-700">₹{Number(row.amount).toLocaleString()}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{new Date(row.paymentDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{new Date(row.paymentDate).toLocaleDateString()}</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-800 border-emerald-200">
                               {row.paymentStatus}
@@ -1102,9 +1102,9 @@ export default function DigitalRegistersPage() {
                       {/* 7. DAILY CASH BOOK */}
                       {activeRegister === "cash-book" && (
                         <>
-                          <td className="px-4 py-3 font-mono text-[#5D493D]">
+                          <td className="px-4 py-3 font-mono text-[#7A4652]">
                             <span className="font-semibold block">{new Date(row.date).toLocaleDateString()}</span>
-                            <span className="text-[10px] text-[#79695B]">{row.time}</span>
+                            <span className="text-[10px] text-[#82747A]">{row.time}</span>
                           </td>
                           <td className="px-4 py-3">
                             <span
@@ -1117,9 +1117,9 @@ export default function DigitalRegistersPage() {
                               {row.flowType === "INFLOW" ? "+ CASH IN" : "− CASH OUT"}
                             </span>
                           </td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.category}</td>
-                          <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">{row.reference}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.partyName}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.category}</td>
+                          <td className="px-4 py-3 font-mono font-medium text-[#C4A06A]">{row.reference}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.partyName}</td>
                           <td className="px-4 py-3 font-mono font-semibold">{row.roomNumber !== "-" ? `Room ${row.roomNumber}` : "-"}</td>
                           <td className="px-4 py-3 font-mono font-bold text-emerald-700">
                             {row.flowType === "INFLOW" ? `₹${Number(row.amount).toLocaleString()}` : "-"}
@@ -1127,41 +1127,41 @@ export default function DigitalRegistersPage() {
                           <td className="px-4 py-3 font-mono font-bold text-rose-700">
                             {row.flowType === "OUTFLOW" ? `₹${Number(row.amount).toLocaleString()}` : "-"}
                           </td>
-                          <td className="px-4 py-3 text-[11px] text-[#79695B] truncate max-w-xs">{row.description}</td>
+                          <td className="px-4 py-3 text-[11px] text-[#82747A] truncate max-w-xs">{row.description}</td>
                         </>
                       )}
 
                       {/* 8. SERVICE REGISTER */}
                       {activeRegister === "services" && (
                         <>
-                          <td className="px-4 py-3 font-mono text-[#5D493D]">
+                          <td className="px-4 py-3 font-mono text-[#7A4652]">
                             <span className="font-semibold block">{new Date(row.purchaseDate).toLocaleDateString()}</span>
-                            <span className="text-[10px] text-[#79695B]">{row.purchaseTime}</span>
+                            <span className="text-[10px] text-[#82747A]">{row.purchaseTime}</span>
                           </td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.guestName}</td>
-                          <td className="px-4 py-3 font-bold text-[#362A22]">Room {row.roomNumber}</td>
-                          <td className="px-4 py-3 font-semibold text-[#362A22]">{row.itemName}</td>
-                          <td className="px-4 py-3 text-[#79695B]">
-                            <span className="bg-[#EEE7DA] px-2 py-0.5 rounded text-[11px]">{row.category}</span>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.guestName}</td>
+                          <td className="px-4 py-3 font-bold text-[#59283A]">Room {row.roomNumber}</td>
+                          <td className="px-4 py-3 font-semibold text-[#59283A]">{row.itemName}</td>
+                          <td className="px-4 py-3 text-[#82747A]">
+                            <span className="bg-[#F5F0EA] px-2 py-0.5 rounded text-[11px]">{row.category}</span>
                           </td>
                           <td className="px-4 py-3 font-mono font-bold text-center">{row.quantity}</td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">₹{Number(row.price).toLocaleString()}</td>
+                          <td className="px-4 py-3 font-mono text-[#82747A]">₹{Number(row.price).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono font-bold text-emerald-700">₹{Number(row.totalAmount).toLocaleString()}</td>
-                          <td className="px-4 py-3 font-mono text-[11px] text-[#B08A60]">{row.bookingNumber}</td>
+                          <td className="px-4 py-3 font-mono text-[11px] text-[#C4A06A]">{row.bookingNumber}</td>
                         </>
                       )}
 
                       {/* 9. STAFF REGISTER */}
                       {activeRegister === "staff" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-bold text-[#B08A60]">{row.employeeId}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.fullName}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{row.department}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.designation}</td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">{row.mobileNumber}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{new Date(row.joiningDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.monthlySalary).toLocaleString()}</td>
-                          <td className="px-4 py-3 text-[11px] text-[#79695B] truncate max-w-xs">{row.bankDetails}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#C4A06A]">{row.employeeId}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.fullName}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{row.department}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.designation}</td>
+                          <td className="px-4 py-3 font-mono text-[#82747A]">{row.mobileNumber}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{new Date(row.joiningDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#59283A]">₹{Number(row.monthlySalary).toLocaleString()}</td>
+                          <td className="px-4 py-3 text-[11px] text-[#82747A] truncate max-w-xs">{row.bankDetails}</td>
                           <td className="px-4 py-3">
                             <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-800 border-emerald-200">
                               {row.employmentStatus}
@@ -1173,10 +1173,10 @@ export default function DigitalRegistersPage() {
                       {/* 10. ATTENDANCE REGISTER */}
                       {activeRegister === "attendance" && (
                         <>
-                          <td className="px-4 py-3 font-mono text-[#5D493D] font-medium">{new Date(row.attendanceDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 font-mono text-[#B08A60] font-semibold">{row.employeeId}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.staffName}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{row.department}</td>
+                          <td className="px-4 py-3 font-mono text-[#7A4652] font-medium">{new Date(row.attendanceDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 font-mono text-[#C4A06A] font-semibold">{row.employeeId}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.staffName}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{row.department}</td>
                           <td className="px-4 py-3">
                             <Badge
                               variant="outline"
@@ -1191,8 +1191,8 @@ export default function DigitalRegistersPage() {
                               {row.attendanceStatus}
                             </Badge>
                           </td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">{row.checkInTime}</td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">{row.checkOutTime}</td>
+                          <td className="px-4 py-3 font-mono text-[#82747A]">{row.checkInTime}</td>
+                          <td className="px-4 py-3 font-mono text-[#82747A]">{row.checkOutTime}</td>
                           <td className="px-4 py-3 font-mono font-semibold">{row.workingHours}h</td>
                           <td className="px-4 py-3 font-mono text-amber-700 font-bold">
                             {row.overtimeHours > 0 ? `+${row.overtimeHours}h OT` : "-"}
@@ -1203,17 +1203,17 @@ export default function DigitalRegistersPage() {
                       {/* 11. SALARY REGISTER */}
                       {activeRegister === "salaries" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-bold text-[#B08A60]">{row.payrollPeriod}</td>
-                          <td className="px-4 py-3 font-mono text-[#79695B]">{row.employeeId}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">{row.staffName}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{row.department}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#C4A06A]">{row.payrollPeriod}</td>
+                          <td className="px-4 py-3 font-mono text-[#82747A]">{row.employeeId}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">{row.staffName}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{row.department}</td>
                           <td className="px-4 py-3 font-mono">₹{Number(row.monthlyBasicSalary).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono font-semibold text-center">{row.payableDays}D</td>
                           <td className="px-4 py-3 font-mono text-emerald-700">₹{Number(row.overtimeAmount).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono text-rose-700">
                             -₹{(Number(row.salaryAdvances) + Number(row.otherDeductions)).toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.finalPayableSalary).toLocaleString()}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#59283A]">₹{Number(row.finalPayableSalary).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono font-semibold text-emerald-700">₹{Number(row.totalDisbursed).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono font-bold text-amber-700">₹{Number(row.remainingBalance).toLocaleString()}</td>
                         </>
@@ -1222,37 +1222,37 @@ export default function DigitalRegistersPage() {
                       {/* 12. EXPENSE REGISTER */}
                       {activeRegister === "expenses" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-semibold text-[#B08A60]">{row.expenseReference}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{new Date(row.paymentDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3 font-medium text-[#362A22]">
-                            <span className="bg-[#EEE7DA] px-2 py-0.5 rounded text-[11px]">{row.categoryName}</span>
+                          <td className="px-4 py-3 font-mono font-semibold text-[#C4A06A]">{row.expenseReference}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{new Date(row.paymentDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A]">
+                            <span className="bg-[#F5F0EA] px-2 py-0.5 rounded text-[11px]">{row.categoryName}</span>
                           </td>
-                          <td className="px-4 py-3 font-medium text-[#362A22] truncate max-w-xs">{row.description}</td>
-                          <td className="px-4 py-3 text-[#79695B]">{row.paymentMethod}</td>
+                          <td className="px-4 py-3 font-medium text-[#59283A] truncate max-w-xs">{row.description}</td>
+                          <td className="px-4 py-3 text-[#82747A]">{row.paymentMethod}</td>
                           <td className="px-4 py-3 font-mono font-bold text-rose-700">₹{Number(row.amount).toLocaleString()}</td>
-                          <td className="px-4 py-3 text-[11px] text-[#79695B]">{row.notes}</td>
+                          <td className="px-4 py-3 text-[11px] text-[#82747A]">{row.notes}</td>
                         </>
                       )}
 
                       {/* 13. DAILY BUSINESS REGISTER */}
                       {activeRegister === "business" && (
                         <>
-                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">{row.date}</td>
-                          <td className="px-4 py-3 font-semibold text-[#362A22]">
+                          <td className="px-4 py-3 font-mono font-bold text-[#59283A]">{row.date}</td>
+                          <td className="px-4 py-3 font-semibold text-[#59283A]">
                             {row.occupiedRooms} Rooms ({row.occupancyRate}%)
                           </td>
                           <td className="px-4 py-3 font-mono text-emerald-700 font-bold">{row.checkIns} In</td>
                           <td className="px-4 py-3 font-mono text-amber-700 font-bold">{row.checkOuts} Out</td>
                           <td className="px-4 py-3 font-mono">₹{Number(row.roomRevenue).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono text-emerald-700">₹{Number(row.serviceRevenue).toLocaleString()}</td>
-                          <td className="px-4 py-3 font-mono font-bold text-[#362A22]">₹{Number(row.totalRevenue).toLocaleString()}</td>
+                          <td className="px-4 py-3 font-mono font-bold text-[#59283A]">₹{Number(row.totalRevenue).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono text-rose-700">₹{Number(row.totalExpenses).toLocaleString()}</td>
                           <td className="px-4 py-3 font-mono font-bold text-emerald-800">
                             ₹{Number(row.netOperatingProfit).toLocaleString()}
                           </td>
                           <td className="px-4 py-3 text-[11px] font-mono">
                             <span className="text-emerald-700 font-semibold">C: ₹{Number(row.cashCollected)}</span> |{" "}
-                            <span className="text-[#B08A60] font-semibold">D: ₹{Number(row.digitalCollected)}</span>
+                            <span className="text-[#C4A06A] font-semibold">D: ₹{Number(row.digitalCollected)}</span>
                           </td>
                         </>
                       )}
@@ -1265,9 +1265,9 @@ export default function DigitalRegistersPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="p-3.5 border-t border-[#EAE3D8] flex items-center justify-between text-xs text-[#79695B] bg-[#F7F4EE]/50">
+            <div className="p-3.5 border-t border-[#E8DDD8] flex items-center justify-between text-xs text-[#82747A] bg-[#F5F0EA]/50">
               <span>
-                Showing page <strong className="text-[#362A22]">{page}</strong> of <strong className="text-[#362A22]">{totalPages}</strong> ({total} total entries)
+                Showing page <strong className="text-[#59283A]">{page}</strong> of <strong className="text-[#59283A]">{totalPages}</strong> ({total} total entries)
               </span>
               <div className="flex items-center gap-1.5">
                 <Button
@@ -1275,7 +1275,7 @@ export default function DigitalRegistersPage() {
                   size="sm"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => p - 1)}
-                  className="h-7 px-3 text-xs border-[#E3D9CA] hover:bg-white"
+                  className="h-7 px-3 text-xs border-[#E8DDD8] hover:bg-white"
                 >
                   Previous
                 </Button>
@@ -1284,7 +1284,7 @@ export default function DigitalRegistersPage() {
                   size="sm"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => p + 1)}
-                  className="h-7 px-3 text-xs border-[#E3D9CA] hover:bg-white"
+                  className="h-7 px-3 text-xs border-[#E8DDD8] hover:bg-white"
                 >
                   Next
                 </Button>

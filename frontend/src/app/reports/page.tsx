@@ -235,12 +235,12 @@ export default function ReportsPage() {
 
   // Format cell value based on column definition
   const formatCellValue = (val: any, col: ReportColumn) => {
-    if (val === null || val === undefined || val === "") return <span className="text-[#B0A495]">—</span>;
+    if (val === null || val === undefined || val === "") return <span className="text-[#8E7079]">—</span>;
 
     if (col.type === "currency") {
       const num = Number(val);
       return (
-        <span className="font-mono font-semibold text-[#362A22]">
+        <span className="font-mono font-semibold text-[#59283A]">
           ₹{isNaN(num) ? val : num.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
         </span>
       );
@@ -248,7 +248,7 @@ export default function ReportsPage() {
 
     if (col.type === "badge") {
       const strVal = String(val).toUpperCase();
-      let badgeStyle = "bg-[#FAF6F0] text-[#79695B] border-[#E3D9CA]";
+      let badgeStyle = "bg-[#F5F0EA] text-[#82747A] border-[#E8DDD8]";
       if (strVal === "COMPLETED" || strVal === "PAID" || strVal === "PRESENT" || strVal === "ACTIVE" || strVal === "AVAILABLE") {
         badgeStyle = "bg-emerald-50 text-emerald-800 border-emerald-200";
       } else if (strVal === "PENDING" || strVal === "PARTIAL" || strVal === "HALF_DAY") {
@@ -256,7 +256,7 @@ export default function ReportsPage() {
       } else if (strVal === "CANCELLED" || strVal === "ABSENT" || strVal === "UNPAID" || strVal === "TERMINATED") {
         badgeStyle = "bg-rose-50 text-rose-800 border-rose-200";
       } else if (strVal === "OCCUPIED" || strVal === "CONFIRMED") {
-        badgeStyle = "bg-[#362A22] text-[#F7F4EE] border-[#362A22]";
+        badgeStyle = "bg-[#59283A] text-[#F5F0EA] border-[#59283A]";
       }
       return (
         <Badge variant="outline" className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${badgeStyle}`}>
@@ -269,14 +269,14 @@ export default function ReportsPage() {
       try {
         const d = new Date(val);
         if (!isNaN(d.getTime())) {
-          return <span className="text-xs text-[#5D493D]">{d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</span>;
+          return <span className="text-xs text-[#7A4652]">{d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</span>;
         }
       } catch (e) {
         // fall through
       }
     }
 
-    return <span className="text-xs text-[#362A22]">{String(val)}</span>;
+    return <span className="text-xs text-[#59283A]">{String(val)}</span>;
   };
 
   // Helper icons for specific reports
@@ -320,44 +320,44 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Editorial Luxury Print Letterhead (visible ONLY when printed) */}
-      <div className="hidden print:block mb-8 pb-4 border-b-2 border-[#362A22]">
+      <div className="hidden print:block mb-8 pb-4 border-b-2 border-[#59283A]">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-serif font-black tracking-widest text-[#362A22] uppercase">
+            <h1 className="text-2xl font-serif font-black tracking-widest text-[#59283A] uppercase">
               THE GRAND HORIZON
             </h1>
-            <p className="text-xs font-mono text-[#79695B] tracking-wider uppercase mt-0.5">
+            <p className="text-xs font-mono text-[#82747A] tracking-wider uppercase mt-0.5">
               Luxury Hotel & Executive Suites • Official Audit Dossier
             </p>
           </div>
-          <div className="text-right text-xs font-mono text-[#79695B]">
+          <div className="text-right text-xs font-mono text-[#82747A]">
             <div>Generated: {new Date().toLocaleString("en-IN")}</div>
             <div>Period: {startDate} to {endDate}</div>
           </div>
         </div>
-        <div className="mt-4 pt-2 border-t border-[#E3D9CA]">
-          <h2 className="text-lg font-bold text-[#362A22]">
+        <div className="mt-4 pt-2 border-t border-[#E8DDD8]">
+          <h2 className="text-lg font-bold text-[#59283A]">
             {activeTab === "executive" ? "Executive Analytics & Financial Performance Report" : reportData?.reportTitle}
           </h2>
-          <p className="text-xs text-[#79695B] mt-0.5">
+          <p className="text-xs text-[#82747A] mt-0.5">
             {activeTab === "executive" ? "Aggregated hotel operations, revenue collections, operating expenses, and cash flow analysis." : reportData?.description}
           </p>
         </div>
       </div>
 
       {/* Page Header (Screen only) */}
-      <div className="print:hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+      <div className="print:hidden flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-[#FAF6F0] text-[#79695B] border border-[#E3D9CA]">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-[#F5F0EA] text-[#82747A] border border-[#E8DDD8]">
               Module 15 • Intelligence & Audit
             </span>
-            <span className="text-xs text-[#948779]">• 19 Certified Ledgers</span>
+            <span className="text-xs text-[#8E7079]">• 19 Certified Ledgers</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-[#362A22]">
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-[#59283A]">
             Reports & Analytics
           </h1>
-          <p className="text-xs sm:text-sm text-[#79695B] mt-1">
+          <p className="text-xs sm:text-sm text-[#82747A] mt-1">
             Real-time hotel operations, guest ledgers, revenue inflows, staff payroll, and financial intelligence.
           </p>
         </div>
@@ -367,9 +367,9 @@ export default function ReportsPage() {
             variant="outline"
             size="sm"
             onClick={handleExportCSV}
-            className="text-xs flex items-center gap-1.5 bg-white text-[#362A22] border-[#D6C7B2] hover:bg-[#FAF6F0]"
+            className="text-xs flex items-center gap-1.5 bg-white text-[#59283A] border-[#E8DDD8] hover:bg-[#F5F0EA]"
           >
-            <Download className="w-3.5 h-3.5 text-[#B08A60]" />
+            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Export Excel / CSV</span>
           </Button>
 
@@ -377,9 +377,9 @@ export default function ReportsPage() {
             variant="outline"
             size="sm"
             onClick={handlePrint}
-            className="text-xs flex items-center gap-1.5 bg-white text-[#362A22] border-[#D6C7B2] hover:bg-[#FAF6F0]"
+            className="text-xs flex items-center gap-1.5 bg-white text-[#59283A] border-[#E8DDD8] hover:bg-[#F5F0EA]"
           >
-            <Printer className="w-3.5 h-3.5 text-[#362A22]" />
+            <Printer className="w-3.5 h-3.5 text-[#59283A]" />
             <span>Print Report / PDF</span>
           </Button>
 
@@ -390,7 +390,7 @@ export default function ReportsPage() {
               else fetchSpecificReport(selectedReportId);
               toast.success("Report data refreshed");
             }}
-            className="text-xs flex items-center gap-1.5 bg-[#362A22] text-[#F7F4EE] hover:bg-[#2A201A]"
+            className="text-xs flex items-center gap-1.5 bg-[#59283A] text-[#F5F0EA] hover:bg-[#381926]"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Refresh</span>
@@ -399,13 +399,13 @@ export default function ReportsPage() {
       </div>
 
       {/* Main Tabs Navigation (Screen only) */}
-      <div className="print:hidden flex items-center gap-1.5 p-1 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA]">
+      <div className="print:hidden flex items-center gap-1.5 p-1 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
         <button
           onClick={() => handleTabChange("executive")}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold transition-all ${
             activeTab === "executive"
-              ? "bg-[#362A22] text-[#F7F4EE] shadow-sm"
-              : "text-[#79695B] hover:text-[#362A22] hover:bg-[#EAE3D8]"
+              ? "bg-[#59283A] text-[#F5F0EA] shadow-sm"
+              : "text-[#82747A] hover:text-[#59283A] hover:bg-[#E8DDD8]"
           }`}
         >
           <BarChart3 className="w-4 h-4" />
@@ -416,8 +416,8 @@ export default function ReportsPage() {
           onClick={() => handleTabChange("hotel")}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold transition-all ${
             activeTab === "hotel"
-              ? "bg-[#362A22] text-[#F7F4EE] shadow-sm"
-              : "text-[#79695B] hover:text-[#362A22] hover:bg-[#EAE3D8]"
+              ? "bg-[#59283A] text-[#F5F0EA] shadow-sm"
+              : "text-[#82747A] hover:text-[#59283A] hover:bg-[#E8DDD8]"
           }`}
         >
           <Hotel className="w-4 h-4" />
@@ -428,8 +428,8 @@ export default function ReportsPage() {
           onClick={() => handleTabChange("staff")}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold transition-all ${
             activeTab === "staff"
-              ? "bg-[#362A22] text-[#F7F4EE] shadow-sm"
-              : "text-[#79695B] hover:text-[#362A22] hover:bg-[#EAE3D8]"
+              ? "bg-[#59283A] text-[#F5F0EA] shadow-sm"
+              : "text-[#82747A] hover:text-[#59283A] hover:bg-[#E8DDD8]"
           }`}
         >
           <Users className="w-4 h-4" />
@@ -439,13 +439,13 @@ export default function ReportsPage() {
 
       {/* Sub-Category Report Selector Pills (When Hotel or Staff is active) */}
       {activeTab !== "executive" && catalog && (
-        <div className="print:hidden bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-[#79695B] px-1">
+        <div className="print:hidden bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-xs font-bold text-[#82747A] px-1">
             <span>
               Select {activeTab === "hotel" ? "Hotel Report" : "Staff Report"} (
               {activeTab === "hotel" ? catalog.hotelReports.length : catalog.staffReports.length} Available)
             </span>
-            <span className="text-[11px] text-[#B08A60] font-normal">Click a report ledger below to view</span>
+            <span className="text-[11px] text-[#C4A06A] font-normal">Click a report ledger below to view</span>
           </div>
 
           <div className="flex flex-wrap gap-1.5">
@@ -457,12 +457,12 @@ export default function ReportsPage() {
                   onClick={() => setSelectedReportId(item.id)}
                   className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all ${
                     isSelected
-                      ? "bg-[#362A22] text-[#F7F4EE] border-[#362A22] font-semibold shadow-sm"
-                      : "bg-[#FAF6F0] text-[#5D493D] border-[#E3D9CA] hover:bg-[#F2ECE1] hover:border-[#D6C7B2]"
+                      ? "bg-[#59283A] text-[#F5F0EA] border-[#59283A] font-semibold shadow-sm"
+                      : "bg-[#F5F0EA] text-[#7A4652] border-[#E8DDD8] hover:bg-[#F2ECE1] hover:border-[#E8DDD8]"
                   }`}
                   title={item.description}
                 >
-                  <span className={isSelected ? "text-[#B08A60]" : "text-[#79695B]"}>
+                  <span className={isSelected ? "text-[#C4A06A]" : "text-[#82747A]"}>
                     {getReportIcon(item.id)}
                   </span>
                   <span>{item.title}</span>
@@ -474,24 +474,24 @@ export default function ReportsPage() {
       )}
 
       {/* Universal Date Range & Search Filter Bar */}
-      <div className="print:hidden flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E3D9CA] shadow-sm">
+      <div className="print:hidden flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E8DDD8] shadow-sm">
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#79695B]">
-            <Calendar className="w-3.5 h-3.5 text-[#B08A60]" />
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-[#82747A]">
+            <Calendar className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Date Range:</span>
           </div>
           <Input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="h-8 text-xs w-36 bg-[#FAF6F0] border-[#D6C7B2]"
+            className="h-8 text-xs w-36 bg-[#F5F0EA] border-[#E8DDD8]"
           />
-          <span className="text-xs text-[#948779]">to</span>
+          <span className="text-xs text-[#8E7079]">to</span>
           <Input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="h-8 text-xs w-36 bg-[#FAF6F0] border-[#D6C7B2]"
+            className="h-8 text-xs w-36 bg-[#F5F0EA] border-[#E8DDD8]"
           />
         </div>
 
@@ -500,7 +500,7 @@ export default function ReportsPage() {
             variant="outline"
             size="sm"
             onClick={() => applyPreset("today")}
-            className="h-7 text-xs bg-[#FAF6F0] border-[#D6C7B2] text-[#5D493D] hover:bg-[#F2ECE1]"
+            className="h-7 text-xs bg-[#F5F0EA] border-[#E8DDD8] text-[#7A4652] hover:bg-[#F2ECE1]"
           >
             Today
           </Button>
@@ -508,7 +508,7 @@ export default function ReportsPage() {
             variant="outline"
             size="sm"
             onClick={() => applyPreset("week")}
-            className="h-7 text-xs bg-[#FAF6F0] border-[#D6C7B2] text-[#5D493D] hover:bg-[#F2ECE1]"
+            className="h-7 text-xs bg-[#F5F0EA] border-[#E8DDD8] text-[#7A4652] hover:bg-[#F2ECE1]"
           >
             Last 7 Days
           </Button>
@@ -516,7 +516,7 @@ export default function ReportsPage() {
             variant="outline"
             size="sm"
             onClick={() => applyPreset("month")}
-            className="h-7 text-xs bg-[#FAF6F0] border-[#D6C7B2] text-[#5D493D] hover:bg-[#F2ECE1]"
+            className="h-7 text-xs bg-[#F5F0EA] border-[#E8DDD8] text-[#7A4652] hover:bg-[#F2ECE1]"
           >
             This Month
           </Button>
@@ -524,19 +524,19 @@ export default function ReportsPage() {
             variant="outline"
             size="sm"
             onClick={() => applyPreset("year")}
-            className="h-7 text-xs bg-[#FAF6F0] border-[#D6C7B2] text-[#5D493D] hover:bg-[#F2ECE1]"
+            className="h-7 text-xs bg-[#F5F0EA] border-[#E8DDD8] text-[#7A4652] hover:bg-[#F2ECE1]"
           >
             Year-to-Date
           </Button>
 
           {activeTab !== "executive" && (
             <div className="relative ml-2">
-              <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-[#8E7079] absolute left-2.5 top-1/2 -translate-y-1/2" />
               <Input
                 placeholder="Search ledger records..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-8 text-xs pl-8 w-44 sm:w-56 bg-[#FAF6F0] border-[#D6C7B2]"
+                className="h-8 text-xs pl-8 w-44 sm:w-56 bg-[#F5F0EA] border-[#E8DDD8]"
               />
             </div>
           )}
@@ -550,16 +550,16 @@ export default function ReportsPage() {
         <>
           {executiveLoading ? (
             <div className="p-20 flex flex-col justify-center items-center gap-3">
-              <LoadingSpinner className="w-8 h-8 text-[#B08A60]" />
-              <span className="text-xs font-mono text-[#79695B]">Compiling Executive Intelligence...</span>
+              <LoadingSpinner className="w-8 h-8 text-[#C4A06A]" />
+              <span className="text-xs font-mono text-[#82747A]">Compiling Executive Intelligence...</span>
             </div>
           ) : executiveData ? (
             <div className="space-y-6">
               {/* Executive KPI Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="border-[#E3D9CA] shadow-sm bg-white">
+                <Card className="border-[#E8DDD8] shadow-sm bg-white">
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-xs font-semibold text-[#79695B] uppercase tracking-wider">
+                    <CardTitle className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
                       Revenue Collected
                     </CardTitle>
                     <ArrowUpRight className="w-4 h-4 text-emerald-600" />
@@ -568,15 +568,15 @@ export default function ReportsPage() {
                     <div className="text-2xl font-bold text-emerald-600 font-mono">
                       ₹{Number(executiveData.financials.totalCollectedRevenue).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </div>
-                    <p className="text-[11px] text-[#948779] mt-1">
+                    <p className="text-[11px] text-[#8E7079] mt-1">
                       {executiveData.financials.inflowTransactionsCount} completed transactions
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-[#E3D9CA] shadow-sm bg-white">
+                <Card className="border-[#E8DDD8] shadow-sm bg-white">
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-xs font-semibold text-[#79695B] uppercase tracking-wider">
+                    <CardTitle className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
                       Operating Expenses
                     </CardTitle>
                     <ArrowDownRight className="w-4 h-4 text-rose-500" />
@@ -585,35 +585,35 @@ export default function ReportsPage() {
                     <div className="text-2xl font-bold text-rose-600 font-mono">
                       ₹{Number(executiveData.financials.totalOperatingExpenses).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </div>
-                    <p className="text-[11px] text-[#948779] mt-1">
+                    <p className="text-[11px] text-[#8E7079] mt-1">
                       {executiveData.financials.expenseTransactionsCount} operational disbursements
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-[#E3D9CA] shadow-sm bg-white">
+                <Card className="border-[#E8DDD8] shadow-sm bg-white">
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-xs font-semibold text-[#79695B] uppercase tracking-wider">
+                    <CardTitle className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
                       Payroll Disbursed
                     </CardTitle>
-                    <Users className="w-4 h-4 text-[#B08A60]" />
+                    <Users className="w-4 h-4 text-[#C4A06A]" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-[#362A22] font-mono">
+                    <div className="text-2xl font-bold text-[#59283A] font-mono">
                       ₹{Number(executiveData.financials.totalPayrollDisbursed).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </div>
-                    <p className="text-[11px] text-[#948779] mt-1">
+                    <p className="text-[11px] text-[#8E7079] mt-1">
                       {executiveData.staff.activeStaffCount} active staff members
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-[#E3D9CA] shadow-sm bg-white">
+                <Card className="border-[#E8DDD8] shadow-sm bg-white">
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-xs font-semibold text-[#79695B] uppercase tracking-wider">
+                    <CardTitle className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
                       Net Operating Cash Flow
                     </CardTitle>
-                    <TrendingUp className="w-4 h-4 text-[#B08A60]" />
+                    <TrendingUp className="w-4 h-4 text-[#C4A06A]" />
                   </CardHeader>
                   <CardContent>
                     <div
@@ -623,7 +623,7 @@ export default function ReportsPage() {
                     >
                       ₹{Number(executiveData.financials.netCashFlow).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </div>
-                    <p className="text-[11px] text-[#948779] mt-1">
+                    <p className="text-[11px] text-[#8E7079] mt-1">
                       Revenue minus expenses & payroll
                     </p>
                   </CardContent>
@@ -632,17 +632,17 @@ export default function ReportsPage() {
 
               {/* Operations & Occupancy Breakdown */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="border-[#E3D9CA] shadow-sm bg-white">
-                  <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+                <Card className="border-[#E8DDD8] shadow-sm bg-white">
+                  <CardHeader className="pb-3 border-b border-[#E8DDD8]">
                     <div className="flex justify-between items-center">
-                      <CardTitle className="text-sm font-bold text-[#362A22]">
+                      <CardTitle className="text-sm font-bold text-[#59283A]">
                         Room Occupancy & Inventory Status
                       </CardTitle>
-                      <Badge variant="outline" className="text-[10px] font-mono border-[#D6C7B2] bg-[#FAF6F0] text-[#5D493D]">
+                      <Badge variant="outline" className="text-[10px] font-mono border-[#E8DDD8] bg-[#F5F0EA] text-[#7A4652]">
                         Rate: {executiveData.operations.occupancyRate}%
                       </Badge>
                     </div>
-                    <CardDescription className="text-xs text-[#79695B]">
+                    <CardDescription className="text-xs text-[#82747A]">
                       Total property inventory: {executiveData.operations.totalRooms} rooms
                     </CardDescription>
                   </CardHeader>
@@ -654,11 +654,11 @@ export default function ReportsPage() {
                         </span>
                         <span className="text-[11px] text-emerald-600 font-medium">Available</span>
                       </div>
-                      <div className="p-3 bg-[#FAF6F0] rounded-lg border border-[#E3D9CA]">
-                        <span className="text-xl font-bold text-[#362A22] block">
+                      <div className="p-3 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8]">
+                        <span className="text-xl font-bold text-[#59283A] block">
                           {executiveData.operations.occupiedRooms}
                         </span>
-                        <span className="text-[11px] text-[#B08A60] font-medium">Occupied</span>
+                        <span className="text-[11px] text-[#C4A06A] font-medium">Occupied</span>
                       </div>
                       <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
                         <span className="text-xl font-bold text-amber-700 block">
@@ -669,18 +669,18 @@ export default function ReportsPage() {
                     </div>
 
                     <div className="space-y-2.5">
-                      <span className="text-xs font-bold text-[#5D493D] block">Occupancy by Room Category</span>
+                      <span className="text-xs font-bold text-[#7A4652] block">Occupancy by Room Category</span>
                       {executiveData.operations.roomTypeOccupancy.map((rt) => (
                         <div key={rt.roomTypeName} className="space-y-1">
-                          <div className="flex justify-between text-xs text-[#79695B]">
-                            <span className="font-medium text-[#362A22]">{rt.roomTypeName}</span>
+                          <div className="flex justify-between text-xs text-[#82747A]">
+                            <span className="font-medium text-[#59283A]">{rt.roomTypeName}</span>
                             <span className="font-mono">
                               {rt.occupiedRooms}/{rt.totalRooms} ({rt.occupancyRate}%)
                             </span>
                           </div>
-                          <div className="w-full bg-[#FAF6F0] h-2 rounded-full overflow-hidden border border-[#E3D9CA]">
+                          <div className="w-full bg-[#F5F0EA] h-2 rounded-full overflow-hidden border border-[#E8DDD8]">
                             <div
-                              className="bg-[#362A22] h-2 rounded-full transition-all"
+                              className="bg-[#59283A] h-2 rounded-full transition-all"
                               style={{ width: `${rt.occupancyRate}%` }}
                             />
                           </div>
@@ -690,46 +690,46 @@ export default function ReportsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-[#E3D9CA] shadow-sm bg-white">
-                  <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+                <Card className="border-[#E8DDD8] shadow-sm bg-white">
+                  <CardHeader className="pb-3 border-b border-[#E8DDD8]">
                     <div className="flex justify-between items-center">
-                      <CardTitle className="text-sm font-bold text-[#362A22]">
+                      <CardTitle className="text-sm font-bold text-[#59283A]">
                         Billing, Taxes & Inflow Collections
                       </CardTitle>
-                      <Badge variant="outline" className="text-[10px] font-mono border-[#D6C7B2] bg-[#FAF6F0] text-[#5D493D]">
+                      <Badge variant="outline" className="text-[10px] font-mono border-[#E8DDD8] bg-[#F5F0EA] text-[#7A4652]">
                         Total Invoiced: ₹{Number(executiveData.financials.totalInvoiced).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
                       </Badge>
                     </div>
-                    <CardDescription className="text-xs text-[#79695B]">
+                    <CardDescription className="text-xs text-[#82747A]">
                       Guest folios and settlement channel breakdown
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-4 space-y-4">
                     <div className="grid grid-cols-2 gap-3 text-xs">
-                      <div className="p-3 bg-[#FAF6F0] rounded-lg border border-[#E3D9CA]">
-                        <span className="text-[#948779] text-[10px] uppercase font-semibold block">
+                      <div className="p-3 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8]">
+                        <span className="text-[#8E7079] text-[10px] uppercase font-semibold block">
                           Outstanding Receivables
                         </span>
                         <span className="text-lg font-bold font-mono text-amber-600">
                           ₹{Number(executiveData.financials.totalOutstandingReceivables).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </span>
                       </div>
-                      <div className="p-3 bg-[#FAF6F0] rounded-lg border border-[#E3D9CA]">
-                        <span className="text-[#948779] text-[10px] uppercase font-semibold block">
+                      <div className="p-3 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8]">
+                        <span className="text-[#8E7079] text-[10px] uppercase font-semibold block">
                           Taxes Collected (GST)
                         </span>
-                        <span className="text-lg font-bold font-mono text-[#362A22]">
+                        <span className="text-lg font-bold font-mono text-[#59283A]">
                           ₹{Number(executiveData.financials.totalTaxCollected).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <span className="text-xs font-bold text-[#5D493D] block">Payment Collections by Channel</span>
-                      <div className="divide-y divide-[#EAE3D8] border border-[#E3D9CA] rounded-lg overflow-hidden text-xs">
+                      <span className="text-xs font-bold text-[#7A4652] block">Payment Collections by Channel</span>
+                      <div className="divide-y divide-[#E8DDD8] border border-[#E8DDD8] rounded-lg overflow-hidden text-xs">
                         {executiveData.financials.paymentsByMethod.map((pm) => (
-                          <div key={pm.method} className="p-2.5 flex justify-between items-center bg-white hover:bg-[#FAF6F0]">
-                            <span className="font-semibold text-[#362A22]">{pm.method} ({pm.count} txns)</span>
+                          <div key={pm.method} className="p-2.5 flex justify-between items-center bg-white hover:bg-[#F5F0EA]">
+                            <span className="font-semibold text-[#59283A]">{pm.method} ({pm.count} txns)</span>
                             <span className="font-mono font-bold text-emerald-700">
                               ₹{Number(pm.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                             </span>
@@ -742,26 +742,26 @@ export default function ReportsPage() {
               </div>
 
               {/* Expenses by Category Breakdown */}
-              <Card className="border-[#E3D9CA] shadow-sm bg-white">
-                <CardHeader className="pb-3 border-b border-[#EAE3D8]">
-                  <CardTitle className="text-sm font-bold text-[#362A22]">
+              <Card className="border-[#E8DDD8] shadow-sm bg-white">
+                <CardHeader className="pb-3 border-b border-[#E8DDD8]">
+                  <CardTitle className="text-sm font-bold text-[#59283A]">
                     Operating Expenses Breakdown
                   </CardTitle>
-                  <CardDescription className="text-xs text-[#79695B]">
+                  <CardDescription className="text-xs text-[#82747A]">
                     Hotel disbursements by category (Electricity, Water, Groceries, Maintenance, Staff, Operations)
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-4">
                   {executiveData.financials.expensesByCategory.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-[#948779]">
+                    <div className="p-8 text-center text-xs text-[#8E7079]">
                       No operating expenses recorded in the selected date range.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {executiveData.financials.expensesByCategory.map((ec) => (
-                        <div key={ec.category} className="p-3 bg-[#FAF6F0] rounded-xl border border-[#EAE3D8] text-xs">
-                          <span className="font-bold text-[#362A22] block text-sm">{ec.category}</span>
-                          <span className="text-[11px] text-[#948779] block mb-2">{ec.count} expense receipts</span>
+                        <div key={ec.category} className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] text-xs">
+                          <span className="font-bold text-[#59283A] block text-sm">{ec.category}</span>
+                          <span className="text-[11px] text-[#8E7079] block mb-2">{ec.count} expense receipts</span>
                           <span className="font-mono font-bold text-rose-600 text-base">
                             ₹{Number(ec.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                           </span>
@@ -783,40 +783,40 @@ export default function ReportsPage() {
         <div className="space-y-6">
           {reportLoading ? (
             <div className="p-20 flex flex-col justify-center items-center gap-3">
-              <LoadingSpinner className="w-8 h-8 text-[#B08A60]" />
-              <span className="text-xs font-mono text-[#79695B]">Compiling Ledger Records...</span>
+              <LoadingSpinner className="w-8 h-8 text-[#C4A06A]" />
+              <span className="text-xs font-mono text-[#82747A]">Compiling Ledger Records...</span>
             </div>
           ) : reportData ? (
             <>
               {/* Selected Report Header Card */}
-              <div className="bg-white p-4 sm:p-5 rounded-xl border border-[#E3D9CA] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="bg-white p-4 sm:p-5 rounded-xl border border-[#E8DDD8] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="p-1.5 rounded-lg bg-[#FAF6F0] text-[#B08A60] border border-[#E3D9CA]">
+                    <span className="p-1.5 rounded-lg bg-[#F5F0EA] text-[#C4A06A] border border-[#E8DDD8]">
                       {getReportIcon(reportData.reportType)}
                     </span>
-                    <h2 className="text-xl font-serif font-bold text-[#362A22]">
+                    <h2 className="text-xl font-serif font-bold text-[#59283A]">
                       {reportData.reportTitle}
                     </h2>
-                    <Badge variant="outline" className="text-[10px] font-mono uppercase bg-[#FAF6F0] text-[#79695B] border-[#D6C7B2]">
+                    <Badge variant="outline" className="text-[10px] font-mono uppercase bg-[#F5F0EA] text-[#82747A] border-[#E8DDD8]">
                       {reportData.category}
                     </Badge>
                   </div>
-                  <p className="text-xs text-[#79695B] max-w-2xl">
+                  <p className="text-xs text-[#82747A] max-w-2xl">
                     {reportData.description}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs text-[#79695B] border-t md:border-t-0 md:border-l border-[#EAE3D8] pt-2 md:pt-0 md:pl-4">
+                <div className="flex items-center gap-3 text-xs text-[#82747A] border-t md:border-t-0 md:border-l border-[#E8DDD8] pt-2 md:pt-0 md:pl-4">
                   <div>
-                    <span className="block text-[10px] uppercase font-semibold text-[#948779]">Audit Period</span>
-                    <span className="font-mono font-medium text-[#362A22]">
+                    <span className="block text-[10px] uppercase font-semibold text-[#8E7079]">Audit Period</span>
+                    <span className="font-mono font-medium text-[#59283A]">
                       {reportData.dateRange?.startDate} to {reportData.dateRange?.endDate}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="block text-[10px] uppercase font-semibold text-[#948779]">Matched Rows</span>
-                    <span className="font-mono font-bold text-[#362A22]">
+                    <span className="block text-[10px] uppercase font-semibold text-[#8E7079]">Matched Rows</span>
+                    <span className="font-mono font-bold text-[#59283A]">
                       {filteredRows.length} / {reportData.rows?.length || 0}
                     </span>
                   </div>
@@ -831,12 +831,12 @@ export default function ReportsPage() {
                     return (
                       <div
                         key={key}
-                        className="bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm text-center flex flex-col justify-center"
+                        className="bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm text-center flex flex-col justify-center"
                       >
-                        <span className="text-[10px] uppercase font-semibold tracking-wider text-[#948779] truncate" title={key}>
+                        <span className="text-[10px] uppercase font-semibold tracking-wider text-[#8E7079] truncate" title={key}>
                           {key.replace(/([A-Z])/g, " $1").trim()}
                         </span>
-                        <span className="text-base sm:text-lg font-bold font-mono text-[#362A22] mt-0.5 truncate">
+                        <span className="text-base sm:text-lg font-bold font-mono text-[#59283A] mt-0.5 truncate">
                           {isCurrency
                             ? `₹${Number(val).toLocaleString("en-IN", { minimumFractionDigits: 0 })}`
                             : String(val)}
@@ -848,12 +848,12 @@ export default function ReportsPage() {
               )}
 
               {/* Ledger Data Table */}
-              <div className="bg-white rounded-xl border border-[#E3D9CA] shadow-sm overflow-hidden">
+              <div className="bg-white rounded-xl border border-[#E8DDD8] shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-[#FAF6F0] border-b border-[#E3D9CA] text-[11px] font-bold text-[#5D493D] uppercase tracking-wider">
-                        <th className="py-3 px-4 w-12 text-center text-[#948779]">#</th>
+                      <tr className="bg-[#F5F0EA] border-b border-[#E8DDD8] text-[11px] font-bold text-[#7A4652] uppercase tracking-wider">
+                        <th className="py-3 px-4 w-12 text-center text-[#8E7079]">#</th>
                         {reportData.columns.map((col) => (
                           <th key={col.key} className="py-3 px-4 font-semibold">
                             {col.label}
@@ -861,14 +861,14 @@ export default function ReportsPage() {
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EAE3D8] text-xs">
+                    <tbody className="divide-y divide-[#E8DDD8] text-xs">
                       {filteredRows.length === 0 ? (
                         <tr>
                           <td
                             colSpan={reportData.columns.length + 1}
-                            className="py-12 text-center text-[#948779]"
+                            className="py-12 text-center text-[#8E7079]"
                           >
-                            <AlertCircle className="w-6 h-6 mx-auto mb-2 text-[#B08A60]" />
+                            <AlertCircle className="w-6 h-6 mx-auto mb-2 text-[#C4A06A]" />
                             <span className="block font-medium">No records found for this period.</span>
                             <span className="text-[11px]">Try adjusting the date range or clearing the search query.</span>
                           </td>
@@ -877,9 +877,9 @@ export default function ReportsPage() {
                         filteredRows.map((row, idx) => (
                           <tr
                             key={row.id || idx}
-                            className="hover:bg-[#FAF6F0]/60 transition-colors"
+                            className="hover:bg-[#F5F0EA]/60 transition-colors"
                           >
-                            <td className="py-3 px-4 text-center font-mono text-[11px] text-[#948779]">
+                            <td className="py-3 px-4 text-center font-mono text-[11px] text-[#8E7079]">
                               {idx + 1}
                             </td>
                             {reportData.columns.map((col) => (
@@ -895,18 +895,18 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Table Footer */}
-                <div className="p-3 bg-[#FAF6F0] border-t border-[#E3D9CA] flex items-center justify-between text-xs text-[#79695B]">
+                <div className="p-3 bg-[#F5F0EA] border-t border-[#E8DDD8] flex items-center justify-between text-xs text-[#82747A]">
                   <span className="font-medium">
                     Showing {filteredRows.length} of {reportData.rows?.length || 0} records
                   </span>
-                  <span className="text-[11px] font-mono text-[#948779]">
+                  <span className="text-[11px] font-mono text-[#8E7079]">
                     Grand Horizon Audit Engine • Compliant
                   </span>
                 </div>
               </div>
             </>
           ) : (
-            <div className="p-16 text-center text-xs text-[#948779]">
+            <div className="p-16 text-center text-xs text-[#8E7079]">
               Select a report from the menu above to generate records.
             </div>
           )}

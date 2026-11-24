@@ -199,26 +199,26 @@ export default function InvoicesPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-[#362A22]">
+          <h2 className="text-2xl font-bold tracking-tight text-[#59283A]">
             Billing & Invoices
           </h2>
-          <p className="text-xs text-[#79695B] mt-0.5">
+          <p className="text-xs text-[#82747A] mt-0.5">
             Generate GST-compliant checkout bills, manage tax and discount snapshots, and record payment settlements.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <a
             href="/billing"
-            className="border border-[#E3D9CA] bg-[#EEE7DA] hover:bg-[#E3D9CA] text-[#362A22] flex items-center gap-1.5 shadow-sm text-xs px-3 py-2 rounded-md font-medium transition-colors"
+            className="border border-[#E8DDD8] bg-[#F5F0EA] hover:bg-[#E8DDD8] text-[#59283A] flex items-center gap-1.5 shadow-sm text-xs px-3 py-2 rounded-md font-medium transition-colors"
           >
             <Receipt className="w-3.5 h-3.5" />
             <span>Automatic Guest Folios</span>
           </a>
           <Button
             onClick={() => handleOpenGenerate()}
-            className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm text-xs"
+            className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 shadow-sm text-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Generate Invoice</span>
@@ -227,9 +227,9 @@ export default function InvoicesPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-xs font-semibold text-[#79695B] mr-1">Status:</span>
+          <span className="text-xs font-semibold text-[#82747A] mr-1">Status:</span>
           {["ALL", "FINALIZED", "PARTIALLY_PAID", "PAID", "CANCELLED"].map((st) => (
             <button
               key={st}
@@ -240,7 +240,7 @@ export default function InvoicesPage() {
               className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                 statusFilter === st
                   ? "bg-slate-900 text-white font-semibold"
-                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-slate-100 border border-[#E3D9CA]"
+                  : "bg-[#F5F0EA] text-[#82747A] hover:bg-slate-100 border border-[#E8DDD8]"
               }`}
             >
               {st}
@@ -249,7 +249,7 @@ export default function InvoicesPage() {
         </div>
 
         <div className="relative w-64">
-          <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-[#8E7079] absolute left-2.5 top-2.5" />
           <Input
             type="text"
             placeholder="Search invoice # or guest..."
@@ -264,19 +264,19 @@ export default function InvoicesPage() {
       </div>
 
       {/* Invoices Table */}
-      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden">
+      <Card className="border-[#E8DDD8] shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {loading ? (
             <div className="p-12 flex justify-center items-center">
-              <LoadingSpinner className="w-6 h-6 text-[#B08A60]" />
+              <LoadingSpinner className="w-6 h-6 text-[#C4A06A]" />
             </div>
           ) : invoices.length === 0 ? (
-            <div className="p-12 text-center text-xs text-[#948779]">
+            <div className="p-12 text-center text-xs text-[#8E7079]">
               No invoices generated yet. Click &quot;Generate Invoice&quot; to bill a stay.
             </div>
           ) : (
             <table className="w-full text-xs text-left">
-              <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+              <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                 <tr>
                   <th className="px-4 py-3">Invoice #</th>
                   <th className="px-4 py-3">Guest & Room</th>
@@ -289,26 +289,26 @@ export default function InvoicesPage() {
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAE3D8]">
+              <tbody className="divide-y divide-[#E8DDD8]">
                 {invoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
-                    <td className="px-4 py-3 font-mono font-medium text-[#B08A60]">
+                  <tr key={inv.id} className="hover:bg-[#F5F0EA]/70 transition-colors">
+                    <td className="px-4 py-3 font-mono font-medium text-[#C4A06A]">
                       {inv.invoiceNumber}
                     </td>
-                    <td className="px-4 py-3 font-medium text-[#362A22]">
+                    <td className="px-4 py-3 font-medium text-[#59283A]">
                       <div>{inv.booking?.primaryGuest?.fullName}</div>
-                      <div className="text-[10px] text-[#948779]">Room {inv.booking?.room?.roomNumber}</div>
+                      <div className="text-[10px] text-[#8E7079]">Room {inv.booking?.room?.roomNumber}</div>
                     </td>
-                    <td className="px-4 py-3 text-[#79695B]">
+                    <td className="px-4 py-3 text-[#82747A]">
                       {new Date(inv.invoiceDate).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 font-mono">
                       ₹{Number(inv.subtotal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
-                    <td className="px-4 py-3 font-mono text-[#79695B]">
+                    <td className="px-4 py-3 font-mono text-[#82747A]">
                       ₹{Number(inv.taxAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })} ({Number(inv.taxPercentage)}%)
                     </td>
-                    <td className="px-4 py-3 font-mono font-bold text-[#362A22]">
+                    <td className="px-4 py-3 font-mono font-bold text-[#59283A]">
                       ₹{Number(inv.totalAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-4 py-3 font-mono font-bold">
@@ -330,7 +330,7 @@ export default function InvoicesPage() {
                             ? "bg-amber-50 text-amber-700 border-amber-200"
                             : inv.invoiceStatus === "FINALIZED"
                             ? "bg-blue-50 text-blue-700 border-blue-200"
-                            : "bg-slate-100 text-[#5D493D] border-slate-300"
+                            : "bg-slate-100 text-[#7A4652] border-slate-300"
                         }`}
                       >
                         {inv.invoiceStatus}
@@ -341,7 +341,7 @@ export default function InvoicesPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleViewInvoice(inv.id)}
-                        className="h-7 px-2 text-[#79695B] hover:text-[#B08A60]"
+                        className="h-7 px-2 text-[#82747A] hover:text-[#C4A06A]"
                         title="View / Print Bill"
                       >
                         <Eye className="w-3.5 h-3.5" />
@@ -368,22 +368,22 @@ export default function InvoicesPage() {
       <Dialog open={generateModalOpen} onOpenChange={setGenerateModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-[#362A22]">
+            <DialogTitle className="text-base font-bold text-[#59283A]">
               Generate Checkout Invoice
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Compiles room charges and extra orders with GST tax snapshot.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleConfirmGenerate} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Select Stay Booking *</label>
+              <label className="font-semibold text-[#7A4652]">Select Stay Booking *</label>
               <select
                 required
                 value={generateForm.bookingId}
                 onChange={(e) => setGenerateForm({ ...generateForm, bookingId: e.target.value })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white"
               >
                 {bookings.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -395,11 +395,11 @@ export default function InvoicesPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Discount Type</label>
+                <label className="font-semibold text-[#7A4652]">Discount Type</label>
                 <select
                   value={generateForm.discountType}
                   onChange={(e) => setGenerateForm({ ...generateForm, discountType: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white"
                 >
                   <option value="NONE">No Discount</option>
                   <option value="PERCENTAGE">Percentage (%)</option>
@@ -409,7 +409,7 @@ export default function InvoicesPage() {
 
               {generateForm.discountType !== "NONE" && (
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#5D493D]">Discount Value</label>
+                  <label className="font-semibold text-[#7A4652]">Discount Value</label>
                   <Input
                     type="number"
                     min="0"
@@ -424,7 +424,7 @@ export default function InvoicesPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">GST Tax %</label>
+                <label className="font-semibold text-[#7A4652]">GST Tax %</label>
                 <Input
                   type="number"
                   min="0"
@@ -437,7 +437,7 @@ export default function InvoicesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Invoice Date</label>
+                <label className="font-semibold text-[#7A4652]">Invoice Date</label>
                 <Input
                   type="date"
                   value={generateForm.invoiceDate}
@@ -447,11 +447,11 @@ export default function InvoicesPage() {
               </div>
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setGenerateModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#59283A] hover:bg-[#472130] text-white">
                 {submitting ? "Calculating..." : "Generate Final Bill"}
               </Button>
             </DialogFooter>
@@ -465,47 +465,47 @@ export default function InvoicesPage() {
           {selectedInvoice && (
             <div className="space-y-6 pt-2 text-xs">
               {/* Hotel Header */}
-              <div className="flex items-start justify-between pb-4 border-b border-[#E3D9CA]">
+              <div className="flex items-start justify-between pb-4 border-b border-[#E8DDD8]">
                 <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-lg bg-[#362A22] text-white flex items-center justify-center font-bold">
+                  <div className="w-10 h-10 rounded-lg bg-[#59283A] text-white flex items-center justify-center font-bold">
                     <Building2 className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-[#362A22]">Grand Horizon Hotel & Suites</h3>
-                    <p className="text-[11px] text-[#79695B]">100 Beach Road, Civil Lines • GSTIN: 27AAAAA0000A1Z5</p>
+                    <h3 className="font-bold text-base text-[#59283A]">Grand Horizon Hotel & Suites</h3>
+                    <p className="text-[11px] text-[#82747A]">100 Beach Road, Civil Lines • GSTIN: 27AAAAA0000A1Z5</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <Badge variant="outline" className="text-xs font-bold font-mono bg-[#F7F4EE]">
+                  <Badge variant="outline" className="text-xs font-bold font-mono bg-[#F5F0EA]">
                     {selectedInvoice.invoiceNumber}
                   </Badge>
-                  <p className="text-[11px] text-[#79695B] mt-1">
+                  <p className="text-[11px] text-[#82747A] mt-1">
                     Date: {new Date(selectedInvoice.invoiceDate).toLocaleDateString()}
                   </p>
                 </div>
               </div>
 
               {/* Guest & Stay Details */}
-              <div className="grid grid-cols-2 gap-4 p-3 bg-[#F7F4EE] rounded-xl">
+              <div className="grid grid-cols-2 gap-4 p-3 bg-[#F5F0EA] rounded-xl">
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-semibold">Billed To</span>
-                  <span className="font-bold text-[#362A22]">{selectedInvoice.booking?.primaryGuest?.fullName}</span>
-                  <span className="text-[11px] text-[#79695B] block font-mono">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-semibold">Billed To</span>
+                  <span className="font-bold text-[#59283A]">{selectedInvoice.booking?.primaryGuest?.fullName}</span>
+                  <span className="text-[11px] text-[#82747A] block font-mono">
                     {selectedInvoice.booking?.primaryGuest?.mobileNumber}
                   </span>
-                  <span className="text-[11px] text-[#79695B] block">
+                  <span className="text-[11px] text-[#82747A] block">
                     {selectedInvoice.booking?.primaryGuest?.city}, {selectedInvoice.booking?.primaryGuest?.country}
                   </span>
                 </div>
                 <div className="text-right sm:text-left">
-                  <span className="text-[#948779] block text-[10px] uppercase font-semibold">Stay Information</span>
-                  <span className="font-bold text-[#362A22]">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-semibold">Stay Information</span>
+                  <span className="font-bold text-[#59283A]">
                     Room {selectedInvoice.booking?.room?.roomNumber} ({selectedInvoice.booking?.room?.roomType?.name})
                   </span>
-                  <span className="text-[11px] text-[#79695B] block">
+                  <span className="text-[11px] text-[#82747A] block">
                     Duration: {selectedInvoice.booking?.numberOfNights} Nights
                   </span>
-                  <span className="text-[11px] text-[#79695B] block">
+                  <span className="text-[11px] text-[#82747A] block">
                     Booking Ref: {selectedInvoice.booking?.bookingNumber}
                   </span>
                 </div>
@@ -513,9 +513,9 @@ export default function InvoicesPage() {
 
               {/* Line Items Breakdown */}
               <div className="space-y-2">
-                <span className="text-xs font-bold text-[#362A22] uppercase tracking-wider block">Charges Breakdown</span>
+                <span className="text-xs font-bold text-[#59283A] uppercase tracking-wider block">Charges Breakdown</span>
                 <table className="w-full text-xs">
-                  <thead className="bg-slate-100 text-[#5D493D]">
+                  <thead className="bg-slate-100 text-[#7A4652]">
                     <tr>
                       <th className="py-2 px-3 text-left">Description</th>
                       <th className="py-2 px-3 text-center">Qty / Nights</th>
@@ -523,33 +523,33 @@ export default function InvoicesPage() {
                       <th className="py-2 px-3 text-right">Amount</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EAE3D8]">
+                  <tbody className="divide-y divide-[#E8DDD8]">
                     <tr>
-                      <td className="py-2.5 px-3 font-medium text-[#362A22]">
+                      <td className="py-2.5 px-3 font-medium text-[#59283A]">
                         Room Accommodation (Room {selectedInvoice.booking?.room?.roomNumber})
                       </td>
-                      <td className="py-2.5 px-3 text-center text-[#79695B]">
+                      <td className="py-2.5 px-3 text-center text-[#82747A]">
                         {selectedInvoice.booking?.numberOfNights} Nights
                       </td>
-                      <td className="py-2.5 px-3 text-right font-mono text-[#79695B]">
+                      <td className="py-2.5 px-3 text-right font-mono text-[#82747A]">
                         ₹{Number(selectedInvoice.booking?.roomRatePerNight)}
                       </td>
-                      <td className="py-2.5 px-3 text-right font-mono font-bold text-[#362A22]">
+                      <td className="py-2.5 px-3 text-right font-mono font-bold text-[#59283A]">
                         ₹{Number(selectedInvoice.roomCharges).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </td>
                     </tr>
                     {selectedInvoice.booking?.bookingItems?.map((item: any) => (
                       <tr key={item.id}>
-                        <td className="py-2.5 px-3 text-[#5D493D]">
+                        <td className="py-2.5 px-3 text-[#7A4652]">
                           {item.itemNameSnapshot}
                         </td>
-                        <td className="py-2.5 px-3 text-center text-[#79695B]">
+                        <td className="py-2.5 px-3 text-center text-[#82747A]">
                           {item.quantity}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-[#79695B]">
+                        <td className="py-2.5 px-3 text-right font-mono text-[#82747A]">
                           ₹{Number(item.unitPrice)}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-[#362A22]">
+                        <td className="py-2.5 px-3 text-right font-mono text-[#59283A]">
                           ₹{Number(item.totalAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </td>
                       </tr>
@@ -559,8 +559,8 @@ export default function InvoicesPage() {
               </div>
 
               {/* Total Calculation Grid */}
-              <div className="p-4 bg-[#F7F4EE] rounded-xl space-y-1.5 font-mono text-xs max-w-sm ml-auto">
-                <div className="flex justify-between text-[#79695B]">
+              <div className="p-4 bg-[#F5F0EA] rounded-xl space-y-1.5 font-mono text-xs max-w-sm ml-auto">
+                <div className="flex justify-between text-[#82747A]">
                   <span>Subtotal:</span>
                   <span>₹{Number(selectedInvoice.subtotal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>
@@ -570,11 +570,11 @@ export default function InvoicesPage() {
                     <span>-₹{Number(selectedInvoice.discountAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-[#79695B]">
+                <div className="flex justify-between text-[#82747A]">
                   <span>GST Tax ({Number(selectedInvoice.taxPercentage)}%):</span>
                   <span>₹{Number(selectedInvoice.taxAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>
-                <div className="flex justify-between font-bold text-sm text-[#362A22] pt-2 border-t border-[#E3D9CA]">
+                <div className="flex justify-between font-bold text-sm text-[#59283A] pt-2 border-t border-[#E8DDD8]">
                   <span>Total Amount:</span>
                   <span>₹{Number(selectedInvoice.totalAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>
@@ -582,13 +582,13 @@ export default function InvoicesPage() {
                   <span>Total Paid / Advance:</span>
                   <span>₹{Number(selectedInvoice.totalPaid).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>
-                <div className="flex justify-between font-bold text-sm text-rose-600 pt-1 border-t border-[#E3D9CA]">
+                <div className="flex justify-between font-bold text-sm text-rose-600 pt-1 border-t border-[#E8DDD8]">
                   <span>Balance Due:</span>
                   <span>₹{Number(selectedInvoice.balanceAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
 
-              <DialogFooter className="pt-3 border-t border-[#EAE3D8] flex items-center justify-between">
+              <DialogFooter className="pt-3 border-t border-[#E8DDD8] flex items-center justify-between">
                 <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs">
                   <Printer className="w-3.5 h-3.5 mr-1" /> Print Bill
                 </Button>
@@ -614,17 +614,17 @@ export default function InvoicesPage() {
       <Dialog open={payModalOpen} onOpenChange={setPayModalOpen}>
         <DialogContent className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-[#362A22]">
+            <DialogTitle className="text-base font-bold text-[#59283A]">
               Record Bill Payment
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Posting payment to invoice {selectedInvoice?.invoiceNumber}.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleConfirmPayment} className="space-y-3 pt-2 text-xs">
-            <div className="p-3 bg-[#F7F4EE] rounded-xl space-y-1">
-              <div className="flex justify-between text-[#79695B]">
+            <div className="p-3 bg-[#F5F0EA] rounded-xl space-y-1">
+              <div className="flex justify-between text-[#82747A]">
                 <span>Invoice Total:</span>
                 <span className="font-mono font-semibold">₹{Number(selectedInvoice?.totalAmount || 0)}</span>
               </div>
@@ -635,7 +635,7 @@ export default function InvoicesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Payment Amount (₹) *</label>
+              <label className="font-semibold text-[#7A4652]">Payment Amount (₹) *</label>
               <Input
                 type="number"
                 required
@@ -650,11 +650,11 @@ export default function InvoicesPage() {
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Payment Method</label>
+                <label className="font-semibold text-[#7A4652]">Payment Method</label>
                 <select
                   value={payForm.paymentMethod}
                   onChange={(e) => setPayForm({ ...payForm, paymentMethod: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white"
                 >
                   <option value="UPI">UPI / QR Code</option>
                   <option value="CASH">Cash</option>
@@ -664,11 +664,11 @@ export default function InvoicesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#5D493D]">Payment Type</label>
+                <label className="font-semibold text-[#7A4652]">Payment Type</label>
                 <select
                   value={payForm.paymentType}
                   onChange={(e) => setPayForm({ ...payForm, paymentType: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white"
                 >
                   <option value="FINAL">Final Settlement</option>
                   <option value="PARTIAL">Partial Payment</option>
@@ -677,7 +677,7 @@ export default function InvoicesPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#5D493D]">Notes / Reference</label>
+              <label className="font-semibold text-[#7A4652]">Notes / Reference</label>
               <Input
                 value={payForm.notes}
                 onChange={(e) => setPayForm({ ...payForm, notes: e.target.value })}
@@ -686,7 +686,7 @@ export default function InvoicesPage() {
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setPayModalOpen(false)}>
                 Cancel
               </Button>

@@ -77,8 +77,8 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <LoadingSpinner className="w-8 h-8 text-[#B08A60]" />
-        <p className="text-sm font-medium text-[#79695B]">
+        <LoadingSpinner className="w-8 h-8 text-[#C4A06A]" />
+        <p className="text-sm font-medium text-[#82747A]">
           Querying live Neon PostgreSQL database...
         </p>
       </div>
@@ -90,18 +90,18 @@ export default function AdminDashboardPage() {
       {/* =====================================================================
           1. TOP EXECUTIVE WELCOME & OPERATIONS BANNER
           ===================================================================== */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold text-[#B08A60] tracking-widest uppercase bg-[#FAF6F0] px-2.5 py-0.5 rounded-full border border-[#B08A60]/30">
+            <span className="text-[10px] font-bold text-[#C4A06A] tracking-widest uppercase bg-[#F5F0EA] px-2.5 py-0.5 rounded-full border border-[#C4A06A]/30">
               Executive Hotel Console
             </span>
-            <span className="text-xs text-[#79695B]">• Live Operations Overview</span>
+            <span className="text-xs text-[#82747A]">• Live Operations Overview</span>
           </div>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#362A22]">
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#59283A]">
             Hotel Operations &amp; Business Dashboard
           </h2>
-          <p className="text-xs text-[#79695B] mt-1">
+          <p className="text-xs text-[#82747A] mt-1">
             Complete executive overview of room inventory, front desk flows, revenue analytics, hotel expenses, and workforce payroll.
           </p>
         </div>
@@ -111,15 +111,15 @@ export default function AdminDashboardPage() {
             size="sm"
             onClick={fetchDashboardData}
             disabled={refreshing}
-            className="flex items-center gap-2 border-[#E3D9CA] text-[#362A22] hover:bg-[#F2EADF]"
+            className="flex items-center gap-2 border-[#E8DDD8] text-[#59283A] hover:bg-[#EFE8E0]"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-[#B08A60]" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-[#C4A06A]" : ""}`} />
             <span>Refresh Live Data</span>
           </Button>
           <Link href="/bookings">
-            <Button size="sm" className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm">
+            <Button size="sm" className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 shadow-sm">
               <span>New Reservation</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#B08A60]" />
+              <ArrowUpRight className="w-3.5 h-3.5 text-[#C4A06A]" />
             </Button>
           </Link>
         </div>
@@ -130,39 +130,39 @@ export default function AdminDashboardPage() {
           ===================================================================== */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-serif text-base font-bold text-[#362A22] flex items-center gap-2">
-            <Hotel className="w-4 h-4 text-[#B08A60]" />
+          <h3 className="font-serif text-base font-bold text-[#59283A] flex items-center gap-2">
+            <Hotel className="w-4 h-4 text-[#C4A06A]" />
             <span>Core Operational &amp; Financial Information</span>
           </h3>
-          <span className="text-[11px] text-[#79695B]">13 Live Database Indicators</span>
+          <span className="text-[11px] text-[#82747A]">13 Live Database Indicators</span>
         </div>
 
         {/* Row 1: Rooms & Guest Capacity (4 Cards) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           {/* 1. Total Rooms */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 1. Total Rooms
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-[#FAF6F0] text-[#B08A60] border border-[#B08A60]/20 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#F5F0EA] text-[#C4A06A] border border-[#C4A06A]/20 flex items-center justify-center">
                 <BedDouble className="w-4 h-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-3xl font-bold text-[#362A22]">
+              <div className="font-serif text-3xl font-bold text-[#59283A]">
                 {stats?.rooms.total || 0}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Physical property room count
               </p>
             </CardContent>
           </Card>
 
           {/* 2. Available Rooms */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 2. Available Rooms
               </CardTitle>
               <div className="w-8 h-8 rounded-lg bg-[#E7F1E9] text-[#32765B] border border-[#32765B]/20 flex items-center justify-center">
@@ -183,17 +183,17 @@ export default function AdminDashboardPage() {
           </Card>
 
           {/* 3. Occupied Rooms */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 3. Occupied Rooms
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-[#FAF6F0] text-[#362A22] border border-[#E3D9CA] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#F5F0EA] text-[#59283A] border border-[#E8DDD8] flex items-center justify-center">
                 <DoorOpen className="w-4 h-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-3xl font-bold text-[#362A22]">
+              <div className="font-serif text-3xl font-bold text-[#59283A]">
                 {stats?.rooms.occupied || 0}
               </div>
               <div className="flex items-center gap-1.5 mt-1">
@@ -205,9 +205,9 @@ export default function AdminDashboardPage() {
           </Card>
 
           {/* 4. Currently Staying Guests */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 4. In-House Guests
               </CardTitle>
               <div className="w-8 h-8 rounded-lg bg-[#E9EFF3] text-[#627D91] border border-[#627D91]/20 flex items-center justify-center">
@@ -215,10 +215,10 @@ export default function AdminDashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-3xl font-bold text-[#362A22]">
+              <div className="font-serif text-3xl font-bold text-[#59283A]">
                 {stats?.stays.currentlyStayingGuests || 0}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Currently staying guests
               </p>
             </CardContent>
@@ -228,9 +228,9 @@ export default function AdminDashboardPage() {
         {/* Row 2: Front Desk Check-in / Out & Revenue & Expenses (5 Cards) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
           {/* 5. Today's Check-ins */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 5. Today&apos;s Check-ins
               </CardTitle>
               <div className="w-8 h-8 rounded-lg bg-[#E7F1E9] text-[#32765B] flex items-center justify-center">
@@ -241,36 +241,36 @@ export default function AdminDashboardPage() {
               <div className="font-serif text-2xl font-bold text-[#32765B]">
                 +{stats?.stays.todayCheckIns || 0}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Scheduled arrivals today
               </p>
             </CardContent>
           </Card>
 
           {/* 6. Today's Check-outs */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 6. Today&apos;s Check-outs
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-[#FAF6F0] text-[#79695B] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#F5F0EA] text-[#82747A] flex items-center justify-center">
                 <ArrowUpRight className="w-4 h-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-2xl font-bold text-[#362A22]">
+              <div className="font-serif text-2xl font-bold text-[#59283A]">
                 {stats?.stays.todayCheckOuts || 0}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Expected departures today
               </p>
             </CardContent>
           </Card>
 
           {/* 7. Today's Revenue */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 7. Today&apos;s Revenue
               </CardTitle>
               <div className="w-8 h-8 rounded-lg bg-[#F6EDDC] text-[#A97832] flex items-center justify-center">
@@ -278,7 +278,7 @@ export default function AdminDashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-xl sm:text-2xl font-bold text-[#362A22]">
+              <div className="font-serif text-xl sm:text-2xl font-bold text-[#59283A]">
                 ₹{(stats?.revenue.today || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
               <p className="text-[11px] text-[#32765B] mt-1 font-semibold">
@@ -288,29 +288,29 @@ export default function AdminDashboardPage() {
           </Card>
 
           {/* 8. Monthly Revenue */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 8. Monthly Revenue
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-[#FAF6F0] text-[#B08A60] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#F5F0EA] text-[#C4A06A] flex items-center justify-center">
                 <TrendingUp className="w-4 h-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-xl sm:text-2xl font-bold text-[#362A22]">
+              <div className="font-serif text-xl sm:text-2xl font-bold text-[#59283A]">
                 ₹{(stats?.revenue.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Month-to-date inflows
               </p>
             </CardContent>
           </Card>
 
           {/* 9. Pending Guest Payments */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 9. Pending Invoices
               </CardTitle>
               <div className="w-8 h-8 rounded-lg bg-[#F8E8E5] text-[#B54C44] flex items-center justify-center">
@@ -321,7 +321,7 @@ export default function AdminDashboardPage() {
               <div className="font-serif text-xl sm:text-2xl font-bold text-[#B54C44]">
                 ₹{(stats?.revenue.pendingBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Uncollected guest dues
               </p>
             </CardContent>
@@ -331,49 +331,49 @@ export default function AdminDashboardPage() {
         {/* Row 3: Expenses, Staff & Payroll (4 Cards) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* 10. Total Hotel Expenses */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 10. Total Expenses
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-[#FAF6F0] text-[#79695B] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#F5F0EA] text-[#82747A] flex items-center justify-center">
                 <WalletCards className="w-4 h-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-2xl font-bold text-[#362A22]">
+              <div className="font-serif text-2xl font-bold text-[#59283A]">
                 ₹{(stats?.expenses.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 This month (All-time: ₹{(stats?.expenses.total || 0).toLocaleString("en-IN")})
               </p>
             </CardContent>
           </Card>
 
           {/* 11. Total Staff Members */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 11. Total Staff
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-[#FAF6F0] text-[#B08A60] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#F5F0EA] text-[#C4A06A] flex items-center justify-center">
                 <UserCheck className="w-4 h-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-2xl font-bold text-[#362A22]">
+              <div className="font-serif text-2xl font-bold text-[#59283A]">
                 {stats?.staff.total || 0}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Active hotel personnel
               </p>
             </CardContent>
           </Card>
 
           {/* 12. Today's Staff Attendance */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 12. Today&apos;s Attendance
               </CardTitle>
               <div className="w-8 h-8 rounded-lg bg-[#E7F1E9] text-[#32765B] flex items-center justify-center">
@@ -385,7 +385,7 @@ export default function AdminDashboardPage() {
                 <span className="font-serif text-2xl font-bold text-[#32765B]">
                   {stats?.staff.todayAttendance.present || 0}
                 </span>
-                <span className="text-xs text-[#79695B]">
+                <span className="text-xs text-[#82747A]">
                   / {stats?.staff.total || 0} Present ({stats?.staff.todayAttendance.attendanceRate || 0}%)
                 </span>
               </div>
@@ -400,20 +400,20 @@ export default function AdminDashboardPage() {
           </Card>
 
           {/* 13. Monthly Salary Summary */}
-          <Card className="hover:border-[#B08A60]/60 transition-all">
+          <Card className="hover:border-[#C4A06A]/60 transition-all">
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#79695B] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
                 13. Salary Summary
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-[#FAF6F0] text-[#B08A60] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#F5F0EA] text-[#C4A06A] flex items-center justify-center">
                 <Banknote className="w-4 h-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-2xl font-bold text-[#362A22]">
+              <div className="font-serif text-2xl font-bold text-[#59283A]">
                 ₹{(stats?.payroll.monthlyNetSalary || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </div>
-              <p className="text-[11px] text-[#79695B] mt-1 font-medium">
+              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Paid: ₹{(stats?.payroll.monthlyDisbursed || 0).toLocaleString("en-IN")} • Due: ₹{(stats?.payroll.pendingBalance || 0).toLocaleString("en-IN")}
               </p>
             </CardContent>
@@ -425,17 +425,17 @@ export default function AdminDashboardPage() {
           3. DEDICATED ANALYTICS SECTION (6 MANDATORY ANALYTICS BREAKDOWNS)
           ===================================================================== */}
       <div className="pt-2">
-        <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E3D9CA]">
+        <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E8DDD8]">
           <div>
-            <h3 className="font-serif text-lg font-bold text-[#362A22] flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-[#B08A60]" />
+            <h3 className="font-serif text-lg font-bold text-[#59283A] flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-[#C4A06A]" />
               <span>Operational &amp; Financial Analytics</span>
             </h3>
-            <p className="text-xs text-[#79695B] mt-0.5">
+            <p className="text-xs text-[#82747A] mt-0.5">
               Deep operational intelligence, historical revenue trends, income/expense ratio, and attendance compliance.
             </p>
           </div>
-          <span className="text-xs bg-[#FAF6F0] text-[#7A5935] border border-[#B08A60]/30 px-3 py-1 rounded-full font-bold">
+          <span className="text-xs bg-[#F5F0EA] text-[#8B6A3D] border border-[#C4A06A]/30 px-3 py-1 rounded-full font-bold">
             6 Specialized Analytics Panels
           </span>
         </div>
@@ -444,7 +444,7 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* ANALYTICS 1: Daily Revenue Overview */}
           <Card>
-            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+            <CardHeader className="pb-3 border-b border-[#E8DDD8]">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base font-bold">
@@ -465,19 +465,19 @@ export default function AdminDashboardPage() {
                   return (
                     <div key={d.date} className="space-y-1">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-[#362A22] w-24">
+                        <span className="font-semibold text-[#59283A] w-24">
                           {d.day}, {d.date}
                         </span>
-                        <span className="text-[11px] text-[#79695B]">
+                        <span className="text-[11px] text-[#82747A]">
                           {d.transactions} {d.transactions === 1 ? "txn" : "txns"}
                         </span>
-                        <span className="font-bold text-[#362A22] font-mono">
+                        <span className="font-bold text-[#59283A] font-mono">
                           ₹{d.revenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </span>
                       </div>
-                      <div className="w-full bg-[#EAE3D8] h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-[#E8DDD8] h-2 rounded-full overflow-hidden">
                         <div
-                          className="bg-[#B08A60] h-full rounded-full transition-all duration-500"
+                          className="bg-[#C4A06A] h-full rounded-full transition-all duration-500"
                           style={{ width: `${Math.max(pct, d.revenue > 0 ? 5 : 0)}%` }}
                         />
                       </div>
@@ -490,7 +490,7 @@ export default function AdminDashboardPage() {
 
           {/* ANALYTICS 2: Monthly Revenue Overview */}
           <Card>
-            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+            <CardHeader className="pb-3 border-b border-[#E8DDD8]">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base font-bold">
@@ -504,24 +504,24 @@ export default function AdminDashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="pt-4">
-              <div className="divide-y divide-[#EAE3D8]">
+              <div className="divide-y divide-[#E8DDD8]">
                 {analytics?.monthlyRevenue.map((m) => (
                   <div key={m.month} className="py-2.5 flex items-center justify-between text-xs first:pt-0 last:pb-0">
-                    <span className="font-bold text-[#362A22] w-20">{m.month}</span>
+                    <span className="font-bold text-[#59283A] w-20">{m.month}</span>
                     <div className="text-center">
-                      <span className="text-[10px] text-[#79695B] uppercase block">Revenue</span>
+                      <span className="text-[10px] text-[#82747A] uppercase block">Revenue</span>
                       <span className="font-bold text-[#32765B] font-mono">
                         ₹{m.revenue.toLocaleString("en-IN")}
                       </span>
                     </div>
                     <div className="text-center">
-                      <span className="text-[10px] text-[#79695B] uppercase block">Expenses</span>
+                      <span className="text-[10px] text-[#82747A] uppercase block">Expenses</span>
                       <span className="font-bold text-[#B54C44] font-mono">
                         ₹{m.expenses.toLocaleString("en-IN")}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-[#79695B] uppercase block">Net Margin</span>
+                      <span className="text-[10px] text-[#82747A] uppercase block">Net Margin</span>
                       <span
                         className={`font-bold font-mono ${
                           m.netProfit >= 0 ? "text-[#32765B]" : "text-[#B54C44]"
@@ -541,7 +541,7 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* ANALYTICS 3: Room Occupancy Statistics */}
           <Card>
-            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+            <CardHeader className="pb-3 border-b border-[#E8DDD8]">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base font-bold">
@@ -559,25 +559,25 @@ export default function AdminDashboardPage() {
             <CardContent className="pt-4">
               <div className="space-y-4">
                 {analytics?.roomOccupancy.map((ro) => (
-                  <div key={ro.roomTypeId} className="p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA]">
+                  <div key={ro.roomTypeId} className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
                     <div className="flex items-center justify-between mb-1.5 text-xs">
                       <div>
-                        <span className="font-bold text-[#362A22]">{ro.roomTypeName}</span>
-                        <span className="text-[11px] text-[#79695B] ml-1.5">({ro.capacity} Pax Max)</span>
+                        <span className="font-bold text-[#59283A]">{ro.roomTypeName}</span>
+                        <span className="text-[11px] text-[#82747A] ml-1.5">({ro.capacity} Pax Max)</span>
                       </div>
-                      <span className="font-bold text-[#362A22] font-mono">
+                      <span className="font-bold text-[#59283A] font-mono">
                         {ro.occupied} / {ro.total} Rooms ({ro.occupancyRate}%)
                       </span>
                     </div>
-                    <div className="w-full bg-[#EAE3D8] h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-[#E8DDD8] h-2 rounded-full overflow-hidden">
                       <div
-                        className="bg-[#B08A60] h-full rounded-full transition-all duration-500"
+                        className="bg-[#C4A06A] h-full rounded-full transition-all duration-500"
                         style={{ width: `${ro.occupancyRate}%` }}
                       />
                     </div>
-                    <div className="flex items-center justify-between mt-2 text-[11px] text-[#79695B]">
+                    <div className="flex items-center justify-between mt-2 text-[11px] text-[#82747A]">
                       <span className="text-[#32765B] font-medium">• {ro.available} Available</span>
-                      <span className="text-[#362A22] font-medium">• {ro.occupied} Occupied</span>
+                      <span className="text-[#59283A] font-medium">• {ro.occupied} Occupied</span>
                       <span className="text-[#A97832] font-medium">• {ro.maintenance} Maintenance</span>
                     </div>
                   </div>
@@ -588,7 +588,7 @@ export default function AdminDashboardPage() {
 
           {/* ANALYTICS 4: Guest Statistics */}
           <Card>
-            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+            <CardHeader className="pb-3 border-b border-[#E8DDD8]">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base font-bold">
@@ -603,14 +603,14 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3.5 bg-[#FAF6F0] rounded-xl border border-[#B08A60]/30 text-center">
-                  <span className="text-[10px] uppercase font-bold text-[#79695B] block">
+                <div className="p-3.5 bg-[#F5F0EA] rounded-xl border border-[#C4A06A]/30 text-center">
+                  <span className="text-[10px] uppercase font-bold text-[#82747A] block">
                     Total Registered Guests
                   </span>
-                  <span className="font-serif text-3xl font-bold text-[#362A22]">
+                  <span className="font-serif text-3xl font-bold text-[#59283A]">
                     {analytics?.guestStats.totalGuests || 0}
                   </span>
-                  <span className="text-[10px] text-[#B08A60] font-semibold mt-0.5 block">
+                  <span className="text-[10px] text-[#C4A06A] font-semibold mt-0.5 block">
                     Lifetime Directory
                   </span>
                 </div>
@@ -628,14 +628,14 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="p-3.5 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] space-y-2 text-xs">
+              <div className="p-3.5 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] space-y-2 text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="text-[#79695B] font-medium">Guests with Identity (KYC) Docs:</span>
-                  <span className="font-bold text-[#362A22]">
+                  <span className="text-[#82747A] font-medium">Guests with Identity (KYC) Docs:</span>
+                  <span className="font-bold text-[#59283A]">
                     {analytics?.guestStats.withDocuments || 0} / {analytics?.guestStats.totalGuests || 0}
                   </span>
                 </div>
-                <div className="w-full bg-[#EAE3D8] h-1.5 rounded-full overflow-hidden">
+                <div className="w-full bg-[#E8DDD8] h-1.5 rounded-full overflow-hidden">
                   <div
                     className="bg-[#32765B] h-full rounded-full"
                     style={{
@@ -652,8 +652,8 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div className="flex justify-between items-center text-[11px] pt-1">
-                  <span className="text-[#79695B]">New Guest Registrations this month:</span>
-                  <span className="font-bold text-[#B08A60]">
+                  <span className="text-[#82747A]">New Guest Registrations this month:</span>
+                  <span className="font-bold text-[#C4A06A]">
                     +{analytics?.guestStats.newThisMonth || 0}
                   </span>
                 </div>
@@ -666,7 +666,7 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* ANALYTICS 5: Income and Expense Analysis */}
           <Card>
-            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+            <CardHeader className="pb-3 border-b border-[#E8DDD8]">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base font-bold">
@@ -696,19 +696,19 @@ export default function AdminDashboardPage() {
                 </span>
               </div>
 
-              <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#FAF6F0] border border-[#B08A60]/30">
-                <span className="font-bold text-[#7A5935]">(-) Staff Payroll Disbursals:</span>
-                <span className="font-mono font-bold text-sm text-[#7A5935]">
+              <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F5F0EA] border border-[#C4A06A]/30">
+                <span className="font-bold text-[#8B6A3D]">(-) Staff Payroll Disbursals:</span>
+                <span className="font-mono font-bold text-sm text-[#8B6A3D]">
                   ₹{(analytics?.incomeExpenseAnalysis.payroll || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="pt-2 border-t border-[#EAE3D8] flex justify-between items-center">
+              <div className="pt-2 border-t border-[#E8DDD8] flex justify-between items-center">
                 <div>
-                  <span className="text-xs uppercase font-bold text-[#362A22] block">
+                  <span className="text-xs uppercase font-bold text-[#59283A] block">
                     Net Operating Cash Flow
                   </span>
-                  <span className="text-[10px] text-[#79695B]">
+                  <span className="text-[10px] text-[#82747A]">
                     Operating Margin: {analytics?.incomeExpenseAnalysis.operatingMargin || 0}%
                   </span>
                 </div>
@@ -727,7 +727,7 @@ export default function AdminDashboardPage() {
 
           {/* ANALYTICS 6: Staff Attendance Summary */}
           <Card>
-            <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+            <CardHeader className="pb-3 border-b border-[#E8DDD8]">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base font-bold">
@@ -770,20 +770,20 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] text-xs space-y-2">
-                <div className="flex justify-between items-center text-[#79695B]">
+              <div className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] text-xs space-y-2">
+                <div className="flex justify-between items-center text-[#82747A]">
                   <span>Total Active Personnel:</span>
-                  <span className="font-bold text-[#362A22]">
+                  <span className="font-bold text-[#59283A]">
                     {analytics?.staffAttendanceSummary.activeStaff || 0} Staff
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-[#79695B]">
+                <div className="flex justify-between items-center text-[#82747A]">
                   <span>Unmarked in Roster:</span>
                   <span className="font-bold text-[#A97832]">
                     {analytics?.staffAttendanceSummary.unmarked || 0} Staff
                   </span>
                 </div>
-                <div className="w-full bg-[#EAE3D8] h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-[#E8DDD8] h-2 rounded-full overflow-hidden">
                   <div
                     className="bg-[#32765B] h-full rounded-full transition-all"
                     style={{ width: `${analytics?.staffAttendanceSummary.presentPercentage || 0}%` }}
@@ -801,7 +801,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
         {/* Recent Bookings Table */}
         <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#EAE3D8]">
+          <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-[#E8DDD8]">
             <div>
               <CardTitle>Recent Reservations</CardTitle>
               <CardDescription>
@@ -809,20 +809,20 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </div>
             <Link href="/bookings">
-              <Button variant="ghost" size="sm" className="text-xs text-[#B08A60] hover:text-[#362A22]">
+              <Button variant="ghost" size="sm" className="text-xs text-[#C4A06A] hover:text-[#59283A]">
                 View All
               </Button>
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             {recentBookings.length === 0 ? (
-              <div className="text-center py-12 text-xs text-[#79695B]">
+              <div className="text-center py-12 text-xs text-[#82747A]">
                 No bookings recorded yet in the database.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="text-[11px] text-[#79695B] uppercase bg-[#F7F4EE] border-b border-[#E3D9CA]">
+                  <thead className="text-[11px] text-[#82747A] uppercase bg-[#F5F0EA] border-b border-[#E8DDD8]">
                     <tr>
                       <th className="px-5 py-3 font-semibold">Booking #</th>
                       <th className="px-5 py-3 font-semibold">Guest</th>
@@ -832,21 +832,21 @@ export default function AdminDashboardPage() {
                       <th className="px-5 py-3 font-semibold text-right">Total</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#EAE3D8]">
+                  <tbody className="divide-y divide-[#E8DDD8]">
                     {recentBookings.map((b) => (
-                      <tr key={b.id} className="hover:bg-[#F2EADF]/60 transition-colors">
-                        <td className="px-5 py-3.5 font-bold text-[#B08A60]">
+                      <tr key={b.id} className="hover:bg-[#EFE8E0]/60 transition-colors">
+                        <td className="px-5 py-3.5 font-bold text-[#C4A06A]">
                           {b.bookingNumber}
                         </td>
-                        <td className="px-5 py-3.5 font-medium text-[#362A22]">
+                        <td className="px-5 py-3.5 font-medium text-[#59283A]">
                           <div className="font-bold">{b.guestName}</div>
-                          <div className="text-[10px] text-[#79695B]">{b.mobileNumber}</div>
+                          <div className="text-[10px] text-[#82747A]">{b.mobileNumber}</div>
                         </td>
                         <td className="px-5 py-3.5">
-                          <span className="font-semibold text-[#362A22]">Room {b.roomNumber}</span>
-                          <span className="text-[10px] text-[#79695B] block">{b.roomType}</span>
+                          <span className="font-semibold text-[#59283A]">Room {b.roomNumber}</span>
+                          <span className="text-[10px] text-[#82747A] block">{b.roomType}</span>
                         </td>
-                        <td className="px-5 py-3.5 text-[#79695B] whitespace-nowrap">
+                        <td className="px-5 py-3.5 text-[#82747A] whitespace-nowrap">
                           {new Date(b.checkInDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })} -{" "}
                           {new Date(b.expectedCheckOutDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                         </td>
@@ -865,7 +865,7 @@ export default function AdminDashboardPage() {
                             {b.bookingStatus}
                           </Badge>
                         </td>
-                        <td className="px-5 py-3.5 text-right font-bold text-[#362A22]">
+                        <td className="px-5 py-3.5 text-right font-bold text-[#59283A]">
                           ₹{b.totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </td>
                       </tr>
@@ -879,9 +879,9 @@ export default function AdminDashboardPage() {
 
         {/* Live System Activity Audit Trail */}
         <Card>
-          <CardHeader className="pb-3 border-b border-[#EAE3D8]">
+          <CardHeader className="pb-3 border-b border-[#E8DDD8]">
             <CardTitle className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#B08A60]" />
+              <Activity className="w-4 h-4 text-[#C4A06A]" />
               <span>Live Audit Stream</span>
             </CardTitle>
             <CardDescription>
@@ -890,19 +890,19 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent className="pt-4">
             {recentActivities.length === 0 ? (
-              <div className="text-center py-12 text-xs text-[#79695B]">
+              <div className="text-center py-12 text-xs text-[#82747A]">
                 No recent system activity recorded.
               </div>
             ) : (
               <div className="space-y-3">
                 {recentActivities.map((act) => (
-                  <div key={act.id} className="flex items-start gap-2.5 text-xs pb-2.5 border-b border-[#EAE3D8] last:border-0 last:pb-0">
-                    <span className="w-2 h-2 rounded-full bg-[#B08A60] mt-1.5 flex-shrink-0" />
+                  <div key={act.id} className="flex items-start gap-2.5 text-xs pb-2.5 border-b border-[#E8DDD8] last:border-0 last:pb-0">
+                    <span className="w-2 h-2 rounded-full bg-[#C4A06A] mt-1.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-[#362A22] text-[11px] truncate">
+                      <p className="font-semibold text-[#59283A] text-[11px] truncate">
                         {act.description || `${act.action} ${act.entityType}`}
                       </p>
-                      <span className="text-[10px] text-[#79695B]">
+                      <span className="text-[10px] text-[#82747A]">
                         {new Date(act.changedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>

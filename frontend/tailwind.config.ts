@@ -41,51 +41,97 @@ const config: Config = {
         ],
       },
       colors: {
-        // IVORY & ESPRESSO — Primary Luxury Palette
+        // ROYAL BURGUNDY & PEARL — Exact Theme Tokens
+        burgundy: {
+          DEFAULT: "#59283A", // Primary Royal Burgundy
+          deep: "#472130",    // Deep Wine
+          muted: "#7A4652",   // Muted Burgundy
+          hover: "#4D2232",
+          50: "#FAF5F7",
+          100: "#F3E8EC",
+          200: "#E5CCD6",
+          300: "#D3AAB9",
+          400: "#A96277",
+          500: "#7A4652",
+          600: "#59283A",
+          700: "#472130",
+          800: "#381926",
+          900: "#2A121D",
+        },
+        champagne: {
+          DEFAULT: "#C4A06A", // Champagne Gold
+          light: "#D8BC8F",
+          dark: "#A8834F",
+          hover: "#B8935D",
+          50: "#FCF9F4",
+          100: "#F7F1E7",
+          200: "#EFE2CD",
+          300: "#E3CFA9",
+          400: "#D4B988",
+          500: "#C4A06A",
+          600: "#AB8652",
+          700: "#8B6A3D",
+        },
+        pearl: {
+          DEFAULT: "#F5F0EA", // Pearl Background
+          light: "#FAF7F3",
+          dark: "#EFE8E0",
+          surface: "#FFFFFF", // Warm White
+          border: "#E8DDD8",  // Soft Border
+        },
+        rose: {
+          DEFAULT: "#8E7079", // Muted Rose
+          muted: "#8E7079",
+        },
+        ink: {
+          main: "#352630",      // Main Text
+          secondary: "#82747A", // Secondary Text
+        },
+        // Backward-compatibility aliases for existing utility classes
         espresso: {
-          DEFAULT: "#362A22",
-          50: "#F7F5F3",
-          100: "#EFEBE7",
-          200: "#DDD4CE",
-          300: "#C4B5AC",
-          400: "#8D786C",
-          500: "#5D493D",
-          600: "#43352B",
-          700: "#362A22",
-          800: "#2A201A",
-          900: "#1E1611",
+          DEFAULT: "#59283A",
+          50: "#FAF5F7",
+          100: "#F3E8EC",
+          200: "#E5CCD6",
+          300: "#D3AAB9",
+          400: "#7A4652",
+          500: "#59283A",
+          600: "#472130",
+          700: "#381926",
+          800: "#2A121D",
+          900: "#1D0B14",
         },
         mocha: {
-          DEFAULT: "#79695B",
-          light: "#948779",
-          dark: "#5F5145",
+          DEFAULT: "#82747A",
+          light: "#8E7079",
+          dark: "#59283A",
         },
         "antique-gold": {
-          DEFAULT: "#B08A60",
-          light: "#C9A781",
-          dark: "#96724A",
-          50: "#FAF6F0",
-          100: "#F3ECE1",
-          200: "#E6D8C2",
-          300: "#D6C0A0",
-          400: "#C4A77E",
-          500: "#B08A60",
-          600: "#987248",
-          700: "#7A5935",
+          DEFAULT: "#C4A06A",
+          light: "#D8BC8F",
+          dark: "#A8834F",
+          50: "#FCF9F4",
+          100: "#F7F1E7",
+          200: "#EFE2CD",
+          300: "#E3CFA9",
+          400: "#D4B988",
+          500: "#C4A06A",
+          600: "#AB8652",
+          700: "#8B6A3D",
         },
         "warm-ivory": {
-          DEFAULT: "#EEE7DA",
-          light: "#F7F4EE",
-          dark: "#E3D9CA",
+          DEFAULT: "#F5F0EA",
+          light: "#FAF7F3",
+          dark: "#E8DDD8",
         },
         ivory: {
-          bg: "#F7F4EE",
+          bg: "#F5F0EA",
           surface: "#FFFFFF",
-          border: "#E3D9CA",
-          divider: "#EAE3D8",
-          hover: "#F2EADF",
-          selected: "#E9DFD0",
-          disabled: "#E8E2D9",
+          border: "#E8DDD8",
+          divider: "#E8DDD8",
+          hover: "#FAF7F3",
+          selected: "#EFE8E0",
+          disabled: "#E8DDD8",
         },
         // Semantic Hospitality Status Colors
         status: {

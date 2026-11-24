@@ -3,20 +3,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold tracking-wide transition-colors focus:outline-none focus:ring-2 focus:ring-[#B08A60]",
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold tracking-wide transition-colors focus:outline-none focus:ring-2 focus:ring-[#C4A06A]",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-[#362A22] text-[#FFFFFF] shadow-sm",
+          "border-transparent bg-[#59283A] text-white shadow-xs",
         secondary:
-          "border-transparent bg-[#EEE7DA] text-[#362A22]",
+          "border-[#E8DDD8] bg-[#F5F0EA] text-[#59283A]",
         destructive:
           "border-[#B54C44]/30 bg-[#F8E8E5] text-[#B54C44]",
         danger:
           "border-[#B54C44]/30 bg-[#F8E8E5] text-[#B54C44]",
         outline:
-          "border-[#E3D9CA] text-[#79695B] bg-white",
+          "border-[#E8DDD8] text-[#82747A] bg-white",
         success:
           "border-[#32765B]/30 bg-[#E7F1E9] text-[#32765B]",
         warning:
@@ -24,7 +24,7 @@ const badgeVariants = cva(
         info:
           "border-[#627D91]/30 bg-[#E9EFF3] text-[#627D91]",
         gold:
-          "border-[#B08A60]/40 bg-[#FAF6F0] text-[#7A5935]",
+          "border-[#C4A06A]/40 bg-[#F5F0EA] text-[#A8834F]",
       },
     },
     defaultVariants: {

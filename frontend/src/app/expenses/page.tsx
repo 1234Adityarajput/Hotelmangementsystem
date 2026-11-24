@@ -302,21 +302,21 @@ export default function ExpensesPage() {
       PAGE HEADER & ACTION BAR
       =======================================================================
       */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#E3D9CA]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#E8DDD8]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase font-bold text-[#362A22] bg-[#EEE7DA] px-2 py-0.5 rounded tracking-wider">
+            <span className="text-[10px] uppercase font-bold text-[#59283A] bg-[#F5F0EA] px-2 py-0.5 rounded tracking-wider">
               Financial Operations • Module 13
             </span>
-            <Badge variant="outline" className="text-[10px] border-[#B08A60] text-[#362A22] bg-white">
+            <Badge variant="outline" className="text-[10px] border-[#C4A06A] text-[#59283A] bg-white">
               Hotel Expense Ledger
             </Badge>
           </div>
-          <h1 className="text-2xl font-serif font-bold text-[#362A22] mt-1 flex items-center gap-2">
-            <Receipt className="w-6 h-6 text-[#B08A60]" />
+          <h1 className="text-2xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+            <Receipt className="w-6 h-6 text-[#C4A06A]" />
             Hotel Expense Management
           </h1>
-          <p className="text-xs text-[#79695B] max-w-3xl mt-0.5">
+          <p className="text-xs text-[#82747A] max-w-3xl mt-0.5">
             Maintain complete records of all hotel-related expenses: Electricity Bills, Water Bills, Grocery Expenses,
             Maintenance Expenses, Staff-Related Expenses, and Other Operational Expenses.
           </p>
@@ -328,9 +328,9 @@ export default function ExpensesPage() {
             variant="outline"
             size="sm"
             onClick={handleExportCSV}
-            className="h-8 text-xs border-[#E3D9CA] hover:bg-[#F7F4EE] text-[#362A22] flex items-center gap-1.5 shadow-sm"
+            className="h-8 text-xs border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#59283A] flex items-center gap-1.5 shadow-sm"
           >
-            <Download className="w-3.5 h-3.5 text-[#B08A60]" />
+            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Export CSV</span>
           </Button>
 
@@ -338,18 +338,18 @@ export default function ExpensesPage() {
             variant="outline"
             size="sm"
             onClick={() => setCategoryModalOpen(true)}
-            className="h-8 text-xs border-[#E3D9CA] hover:bg-[#F7F4EE] text-[#362A22] flex items-center gap-1.5 shadow-sm"
+            className="h-8 text-xs border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#59283A] flex items-center gap-1.5 shadow-sm"
           >
-            <Tag className="w-3.5 h-3.5 text-[#B08A60]" />
+            <Tag className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Manage Categories</span>
           </Button>
 
           <Button
             size="sm"
             onClick={handleOpenAdd}
-            className="h-8 bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 shadow-sm text-xs"
+            className="h-8 bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 shadow-sm text-xs"
           >
-            <Plus className="w-4 h-4 text-[#B08A60]" />
+            <Plus className="w-4 h-4 text-[#C4A06A]" />
             <span>Record New Expense</span>
           </Button>
         </div>
@@ -361,24 +361,24 @@ export default function ExpensesPage() {
       =======================================================================
       */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-[#E3D9CA] shadow-sm bg-white">
+        <Card className="border-[#E8DDD8] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
               Today&apos;s Expenses
             </CardTitle>
-            <Receipt className="w-4 h-4 text-[#B08A60]" />
+            <Receipt className="w-4 h-4 text-[#C4A06A]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-serif font-bold text-[#362A22]">
+            <div className="text-2xl font-serif font-bold text-[#59283A]">
               ₹{(stats?.todayAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-[#948779] mt-1">{stats?.todayCount || 0} disbursements recorded today</p>
+            <p className="text-[11px] text-[#8E7079] mt-1">{stats?.todayCount || 0} disbursements recorded today</p>
           </CardContent>
         </Card>
 
-        <Card className="border-[#E3D9CA] shadow-sm bg-white">
+        <Card className="border-[#E8DDD8] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
               This Month&apos;s Expenses
             </CardTitle>
             <Calendar className="w-4 h-4 text-emerald-600" />
@@ -387,37 +387,37 @@ export default function ExpensesPage() {
             <div className="text-2xl font-serif font-bold text-emerald-700">
               ₹{(stats?.monthAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-[#948779] mt-1">{stats?.monthCount || 0} transactions this month</p>
+            <p className="text-[11px] text-[#8E7079] mt-1">{stats?.monthCount || 0} transactions this month</p>
           </CardContent>
         </Card>
 
-        <Card className="border-[#E3D9CA] shadow-sm bg-white">
+        <Card className="border-[#E8DDD8] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
               Year-to-Date Total Outflow
             </CardTitle>
             <TrendingDown className="w-4 h-4 text-rose-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-serif font-bold text-[#362A22]">
+            <div className="text-2xl font-serif font-bold text-[#59283A]">
               ₹{(stats?.yearAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </div>
-            <p className="text-[11px] text-[#948779] mt-1">{stats?.yearCount || 0} total operating expense vouchers</p>
+            <p className="text-[11px] text-[#8E7079] mt-1">{stats?.yearCount || 0} total operating expense vouchers</p>
           </CardContent>
         </Card>
 
-        <Card className="border-[#E3D9CA] shadow-sm bg-white">
+        <Card className="border-[#E8DDD8] shadow-sm bg-white">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-semibold text-[#79695B] uppercase tracking-wider">
+            <CardTitle className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
               Active Categories
             </CardTitle>
             <Building className="w-4 h-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-serif font-bold text-[#362A22]">
+            <div className="text-2xl font-serif font-bold text-[#59283A]">
               {categories.length}
             </div>
-            <p className="text-[11px] text-[#948779] mt-1">Classification budget heads</p>
+            <p className="text-[11px] text-[#8E7079] mt-1">Classification budget heads</p>
           </CardContent>
         </Card>
       </div>
@@ -427,8 +427,8 @@ export default function ExpensesPage() {
       6 CORE EXPENSE CATEGORIES QUICK SELECTOR STRIP
       =======================================================================
       */}
-      <div className="bg-[#F7F4EE] p-3.5 rounded-xl border border-[#E3D9CA] shadow-xs space-y-2">
-        <span className="text-[10px] font-bold text-[#79695B] uppercase tracking-wider block">
+      <div className="bg-[#F5F0EA] p-3.5 rounded-xl border border-[#E8DDD8] shadow-xs space-y-2">
+        <span className="text-[10px] font-bold text-[#82747A] uppercase tracking-wider block">
           Primary Hotel Expense Heads (Click to Filter):
         </span>
         <div className="flex flex-wrap gap-2">
@@ -439,8 +439,8 @@ export default function ExpensesPage() {
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
               categoryId === "ALL"
-                ? "bg-[#362A22] text-white border-[#362A22] shadow-xs"
-                : "bg-white text-[#5D493D] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
+                : "bg-white text-[#7A4652] hover:bg-[#F5F0EA] border-[#E8DDD8]"
             }`}
           >
             All Categories ({total})
@@ -458,14 +458,14 @@ export default function ExpensesPage() {
                 }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
                   isSelected
-                    ? "bg-[#362A22] text-white border-[#362A22] shadow-xs"
-                    : "bg-white text-[#5D493D] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                    ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
+                    : "bg-white text-[#7A4652] hover:bg-[#F5F0EA] border-[#E8DDD8]"
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-[#B08A60]" : "text-[#79695B]"}`} />
+                <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-[#C4A06A]" : "text-[#82747A]"}`} />
                 <span>{cat.name}</span>
                 {cat._count?.expenses !== undefined && (
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? "bg-white/20 text-white" : "bg-[#EEE7DA] text-[#79695B]"}`}>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? "bg-white/20 text-white" : "bg-[#F5F0EA] text-[#82747A]"}`}>
                     {cat._count.expenses}
                   </span>
                 )}
@@ -480,11 +480,11 @@ export default function ExpensesPage() {
       FILTER AND SEARCH TOOLBAR (Date Range, Payment Method, Search Query)
       =======================================================================
       */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E3D9CA] shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E8DDD8] shadow-sm">
         {/* Date Range & Presets */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-[#362A22] flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5 text-[#B08A60]" />
+          <span className="text-xs font-semibold text-[#59283A] flex items-center gap-1">
+            <Calendar className="w-3.5 h-3.5 text-[#C4A06A]" />
             Date:
           </span>
           <Input
@@ -494,9 +494,9 @@ export default function ExpensesPage() {
               setStartDate(e.target.value);
               setPage(1);
             }}
-            className="h-8 text-xs w-36 border-[#E3D9CA]"
+            className="h-8 text-xs w-36 border-[#E8DDD8]"
           />
-          <span className="text-xs text-[#79695B]">to</span>
+          <span className="text-xs text-[#82747A]">to</span>
           <Input
             type="date"
             value={endDate}
@@ -504,19 +504,19 @@ export default function ExpensesPage() {
               setEndDate(e.target.value);
               setPage(1);
             }}
-            className="h-8 text-xs w-36 border-[#E3D9CA]"
+            className="h-8 text-xs w-36 border-[#E8DDD8]"
           />
 
-          <div className="flex items-center gap-1 border-l border-[#EEE7DA] pl-2">
+          <div className="flex items-center gap-1 border-l border-[#F5F0EA] pl-2">
             <button
               onClick={() => setPresetDates("today")}
-              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F7F4EE] hover:bg-[#EEE7DA] text-[#362A22]"
+              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F5F0EA] hover:bg-[#F5F0EA] text-[#59283A]"
             >
               Today
             </button>
             <button
               onClick={() => setPresetDates("month")}
-              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F7F4EE] hover:bg-[#EEE7DA] text-[#362A22]"
+              className="text-[10px] font-semibold px-2 py-1 rounded bg-[#F5F0EA] hover:bg-[#F5F0EA] text-[#59283A]"
             >
               This Month
             </button>
@@ -533,7 +533,7 @@ export default function ExpensesPage() {
 
         {/* Channel & Search Query */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-[#79695B]">Channel:</span>
+          <span className="text-xs font-semibold text-[#82747A]">Channel:</span>
           {["ALL", "CASH", "UPI", "BANK_TRANSFER"].map((ch) => (
             <button
               key={ch}
@@ -543,8 +543,8 @@ export default function ExpensesPage() {
               }}
               className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors border ${
                 paymentMethod === ch
-                  ? "bg-[#362A22] text-white border-[#362A22]"
-                  : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                  ? "bg-[#59283A] text-white border-[#59283A]"
+                  : "bg-[#F5F0EA] text-[#82747A] hover:bg-[#F5F0EA] border-[#E8DDD8]"
               }`}
             >
               {ch}
@@ -552,7 +552,7 @@ export default function ExpensesPage() {
           ))}
 
           <div className="relative w-64 ml-2">
-            <Search className="w-3.5 h-3.5 text-[#79695B] absolute left-2.5 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-[#82747A] absolute left-2.5 top-2.5" />
             <Input
               type="text"
               placeholder="Search description, bill ref, notes..."
@@ -561,7 +561,7 @@ export default function ExpensesPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="pl-8 h-8 text-xs border-[#E3D9CA]"
+              className="pl-8 h-8 text-xs border-[#E8DDD8]"
             />
           </div>
         </div>
@@ -572,17 +572,17 @@ export default function ExpensesPage() {
       EXPENSES DATA TABLE (With Complete Expense Information)
       =======================================================================
       */}
-      <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
-        <CardHeader className="bg-[#F7F4EE] border-b border-[#E3D9CA] py-3 px-4">
+      <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
+        <CardHeader className="bg-[#F5F0EA] border-b border-[#E8DDD8] py-3 px-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-sm font-bold text-[#362A22] flex items-center gap-2">
+              <CardTitle className="text-sm font-bold text-[#59283A] flex items-center gap-2">
                 <span>Hotel Expense Ledger</span>
-                <span className="text-xs font-normal text-[#79695B]">
+                <span className="text-xs font-normal text-[#82747A]">
                   ({total} operational expense entries found)
                 </span>
               </CardTitle>
-              <CardDescription className="text-xs text-[#79695B]">
+              <CardDescription className="text-xs text-[#82747A]">
                 Categorized hotel outflows with verified audit vouchers and payment channels.
               </CardDescription>
             </div>
@@ -592,29 +592,29 @@ export default function ExpensesPage() {
         <CardContent className="p-0">
           {loading ? (
             <div className="p-16 flex flex-col justify-center items-center gap-2">
-              <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-              <span className="text-xs text-[#79695B]">Querying expense records...</span>
+              <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+              <span className="text-xs text-[#82747A]">Querying expense records...</span>
             </div>
           ) : expenses.length === 0 ? (
-            <div className="p-16 text-center text-xs text-[#79695B] space-y-2">
-              <Receipt className="w-8 h-8 text-[#B08A60] mx-auto opacity-60 mb-2" />
-              <p className="font-semibold text-[#362A22]">No hotel expenses recorded matching criteria</p>
-              <p className="text-[11px] text-[#948779] max-w-sm mx-auto">
+            <div className="p-16 text-center text-xs text-[#82747A] space-y-2">
+              <Receipt className="w-8 h-8 text-[#C4A06A] mx-auto opacity-60 mb-2" />
+              <p className="font-semibold text-[#59283A]">No hotel expenses recorded matching criteria</p>
+              <p className="text-[11px] text-[#8E7079] max-w-sm mx-auto">
                 Click &quot;Record New Expense&quot; above to log electricity bills, water bills, grocery supplies, maintenance, or staff payouts.
               </p>
               <Button
                 size="sm"
                 onClick={handleOpenAdd}
-                className="mt-2 bg-[#362A22] hover:bg-[#43352B] text-white text-xs"
+                className="mt-2 bg-[#59283A] hover:bg-[#472130] text-white text-xs"
               >
-                <Plus className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                <Plus className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                 Record First Expense
               </Button>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-[#F7F4EE] text-[#5D493D] uppercase text-[10px] font-bold border-b border-[#E3D9CA] tracking-wider">
+                <thead className="bg-[#F5F0EA] text-[#7A4652] uppercase text-[10px] font-bold border-b border-[#E8DDD8] tracking-wider">
                   <tr>
                     <th className="px-4 py-3">Expense Ref</th>
                     <th className="px-4 py-3">Payment Date</th>
@@ -627,41 +627,41 @@ export default function ExpensesPage() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#EAE3D8]">
+                <tbody className="divide-y divide-[#E8DDD8]">
                   {expenses.map((exp) => (
-                    <tr key={exp.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
-                      <td className="px-4 py-3 font-mono font-bold text-[#B08A60]">
+                    <tr key={exp.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
+                      <td className="px-4 py-3 font-mono font-bold text-[#C4A06A]">
                         {exp.expenseReference}
                       </td>
-                      <td className="px-4 py-3 text-[#5D493D] whitespace-nowrap font-medium">
+                      <td className="px-4 py-3 text-[#7A4652] whitespace-nowrap font-medium">
                         {new Date(exp.paymentDate).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
                         <Badge
                           variant="outline"
-                          className="text-[10px] font-semibold bg-[#EEE7DA] text-[#362A22] border-[#E3D9CA] flex items-center gap-1 w-fit"
+                          className="text-[10px] font-semibold bg-[#F5F0EA] text-[#59283A] border-[#E8DDD8] flex items-center gap-1 w-fit"
                         >
                           {React.createElement(getCategoryIcon(exp.category?.name || ""), {
-                            className: "w-3 h-3 text-[#B08A60]",
+                            className: "w-3 h-3 text-[#C4A06A]",
                           })}
                           <span>{exp.category?.name || "Uncategorized"}</span>
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 font-medium text-[#362A22] max-w-xs truncate">
+                      <td className="px-4 py-3 font-medium text-[#59283A] max-w-xs truncate">
                         {exp.description}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="font-semibold text-[11px] px-2 py-0.5 rounded bg-slate-100 text-[#362A22]">
+                        <span className="font-semibold text-[11px] px-2 py-0.5 rounded bg-slate-100 text-[#59283A]">
                           {exp.paymentMethod}
                         </span>
                       </td>
                       <td className="px-4 py-3 font-mono font-bold text-rose-700 text-sm">
                         ₹{Number(exp.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-4 py-3 font-mono text-[11px] text-[#79695B]">
+                      <td className="px-4 py-3 font-mono text-[11px] text-[#82747A]">
                         {exp.transactionReference || "-"}
                       </td>
-                      <td className="px-4 py-3 text-[11px] text-[#79695B] max-w-xs truncate">
+                      <td className="px-4 py-3 text-[11px] text-[#82747A] max-w-xs truncate">
                         {exp.notes || "-"}
                       </td>
                       <td className="px-4 py-3 text-right space-x-1 whitespace-nowrap">
@@ -669,7 +669,7 @@ export default function ExpensesPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenDetails(exp)}
-                          className="h-7 px-2 text-[#79695B] hover:text-[#B08A60] hover:bg-[#F2EADF]"
+                          className="h-7 px-2 text-[#82747A] hover:text-[#C4A06A] hover:bg-[#EFE8E0]"
                           title="View Details"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -678,7 +678,7 @@ export default function ExpensesPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleOpenEdit(exp)}
-                          className="h-7 px-2 text-[#79695B] hover:text-amber-600 hover:bg-amber-50"
+                          className="h-7 px-2 text-[#82747A] hover:text-amber-600 hover:bg-amber-50"
                           title="Edit Expense"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -702,9 +702,9 @@ export default function ExpensesPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="p-3.5 border-t border-[#EAE3D8] flex items-center justify-between text-xs text-[#79695B] bg-[#F7F4EE]/50">
+            <div className="p-3.5 border-t border-[#E8DDD8] flex items-center justify-between text-xs text-[#82747A] bg-[#F5F0EA]/50">
               <span>
-                Showing page <strong className="text-[#362A22]">{page}</strong> of <strong className="text-[#362A22]">{totalPages}</strong> ({total} total expenses)
+                Showing page <strong className="text-[#59283A]">{page}</strong> of <strong className="text-[#59283A]">{totalPages}</strong> ({total} total expenses)
               </span>
               <div className="flex items-center gap-1.5">
                 <Button
@@ -712,7 +712,7 @@ export default function ExpensesPage() {
                   size="sm"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => p - 1)}
-                  className="h-7 px-3 text-xs border-[#E3D9CA] hover:bg-white"
+                  className="h-7 px-3 text-xs border-[#E8DDD8] hover:bg-white"
                 >
                   Previous
                 </Button>
@@ -721,7 +721,7 @@ export default function ExpensesPage() {
                   size="sm"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => p + 1)}
-                  className="h-7 px-3 text-xs border-[#E3D9CA] hover:bg-white"
+                  className="h-7 px-3 text-xs border-[#E8DDD8] hover:bg-white"
                 >
                   Next
                 </Button>
@@ -737,15 +737,15 @@ export default function ExpensesPage() {
       =======================================================================
       */}
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <span className="text-[10px] uppercase font-bold text-[#362A22] bg-[#EEE7DA] px-2 py-0.5 rounded w-fit">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <span className="text-[10px] uppercase font-bold text-[#59283A] bg-[#F5F0EA] px-2 py-0.5 rounded w-fit">
               Hotel Operational Outflow
             </span>
-            <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
+            <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
               Record Hotel Expense
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Enter all expense details including category, description, amount, payment method, and notes.
             </DialogDescription>
           </DialogHeader>
@@ -753,12 +753,12 @@ export default function ExpensesPage() {
           <form onSubmit={handleCreateExpense} className="space-y-3.5 pt-2 text-xs">
             {/* Category Select */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Expense Category *</label>
+              <label className="font-semibold text-[#59283A]">Expense Category *</label>
               <select
                 required
                 value={formData.expenseCategoryId}
                 onChange={(e) => setFormData({ ...formData, expenseCategoryId: e.target.value })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -770,20 +770,20 @@ export default function ExpensesPage() {
 
             {/* Description */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Expense Description *</label>
+              <label className="font-semibold text-[#59283A]">Expense Description *</label>
               <Input
                 required
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="e.g. Electricity bill for November, Vegetables & dairy provisions..."
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
             {/* Amount & Date */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Amount (₹) *</label>
+                <label className="font-semibold text-[#59283A]">Amount (₹) *</label>
                 <Input
                   type="number"
                   min="0.01"
@@ -791,18 +791,18 @@ export default function ExpensesPage() {
                   required
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
-                  className="h-8 text-xs font-mono font-bold border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono font-bold border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Payment Date *</label>
+                <label className="font-semibold text-[#59283A]">Payment Date *</label>
                 <Input
                   type="date"
                   required
                   value={formData.paymentDate}
                   onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
             </div>
@@ -810,11 +810,11 @@ export default function ExpensesPage() {
             {/* Payment Method & Ref */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Payment Method *</label>
+                <label className="font-semibold text-[#59283A]">Payment Method *</label>
                 <select
                   value={formData.paymentMethod}
                   onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                 >
                   <option value="CASH">CASH</option>
                   <option value="UPI">UPI / QR</option>
@@ -824,32 +824,32 @@ export default function ExpensesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Bill / Transaction Ref #</label>
+                <label className="font-semibold text-[#59283A]">Bill / Transaction Ref #</label>
                 <Input
                   value={formData.transactionReference}
                   onChange={(e) => setFormData({ ...formData, transactionReference: e.target.value })}
                   placeholder="Invoice # or UTR Ref"
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
             </div>
 
             {/* Additional Notes */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Additional Notes</label>
+              <label className="font-semibold text-[#59283A]">Additional Notes</label>
               <Input
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Vendor name, warranty, remarks, approval details..."
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setAddModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#59283A] hover:bg-[#472130] text-white">
                 {submitting ? "Recording..." : "Save Expense Record"}
               </Button>
             </DialogFooter>
@@ -863,15 +863,15 @@ export default function ExpensesPage() {
       =======================================================================
       */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
             <span className="text-[10px] uppercase font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded w-fit">
               Update Expense Record
             </span>
-            <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
+            <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
               Edit Expense: {selectedExpense?.expenseReference}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Modify category, description, amount, payment method, or notes for this record.
             </DialogDescription>
           </DialogHeader>
@@ -879,12 +879,12 @@ export default function ExpensesPage() {
           <form onSubmit={handleUpdateExpense} className="space-y-3.5 pt-2 text-xs">
             {/* Category Select */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Expense Category *</label>
+              <label className="font-semibold text-[#59283A]">Expense Category *</label>
               <select
                 required
                 value={formData.expenseCategoryId}
                 onChange={(e) => setFormData({ ...formData, expenseCategoryId: e.target.value })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -896,19 +896,19 @@ export default function ExpensesPage() {
 
             {/* Description */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Description *</label>
+              <label className="font-semibold text-[#59283A]">Description *</label>
               <Input
                 required
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
             {/* Amount & Date */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Amount (₹) *</label>
+                <label className="font-semibold text-[#59283A]">Amount (₹) *</label>
                 <Input
                   type="number"
                   min="0.01"
@@ -916,18 +916,18 @@ export default function ExpensesPage() {
                   required
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: Number(e.target.value) })}
-                  className="h-8 text-xs font-mono font-bold border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono font-bold border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Payment Date *</label>
+                <label className="font-semibold text-[#59283A]">Payment Date *</label>
                 <Input
                   type="date"
                   required
                   value={formData.paymentDate}
                   onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
             </div>
@@ -935,11 +935,11 @@ export default function ExpensesPage() {
             {/* Payment Method & Ref */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Payment Method *</label>
+                <label className="font-semibold text-[#59283A]">Payment Method *</label>
                 <select
                   value={formData.paymentMethod}
                   onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as any })}
-                  className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                  className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                 >
                   <option value="CASH">CASH</option>
                   <option value="UPI">UPI / QR</option>
@@ -949,30 +949,30 @@ export default function ExpensesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Bill / Transaction Ref #</label>
+                <label className="font-semibold text-[#59283A]">Bill / Transaction Ref #</label>
                 <Input
                   value={formData.transactionReference}
                   onChange={(e) => setFormData({ ...formData, transactionReference: e.target.value })}
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
             </div>
 
             {/* Additional Notes */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Additional Notes</label>
+              <label className="font-semibold text-[#59283A]">Additional Notes</label>
               <Input
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setEditModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#59283A] hover:bg-[#472130] text-white">
                 {submitting ? "Updating..." : "Save Changes"}
               </Button>
             </DialogFooter>
@@ -986,44 +986,44 @@ export default function ExpensesPage() {
       =======================================================================
       */}
       <Dialog open={detailsModalOpen} onOpenChange={setDetailsModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <span className="text-[10px] uppercase font-bold text-[#362A22] bg-[#EEE7DA] px-2 py-0.5 rounded w-fit">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <span className="text-[10px] uppercase font-bold text-[#59283A] bg-[#F5F0EA] px-2 py-0.5 rounded w-fit">
               Official Expense Voucher
             </span>
-            <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1 font-mono">
+            <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 font-mono">
               {selectedExpense?.expenseReference}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Recorded on {selectedExpense ? new Date(selectedExpense.paymentDate).toLocaleDateString() : ""}
             </DialogDescription>
           </DialogHeader>
 
           {selectedExpense && (
             <div className="space-y-3.5 pt-2 text-xs">
-              <div className="p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA] space-y-1">
-                <span className="text-[10px] uppercase font-bold text-[#79695B] block">Category Head</span>
-                <span className="font-semibold text-[#362A22] text-sm block">{selectedExpense.category?.name}</span>
-                <p className="text-[#79695B] text-xs mt-1">{selectedExpense.description}</p>
+              <div className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] space-y-1">
+                <span className="text-[10px] uppercase font-bold text-[#82747A] block">Category Head</span>
+                <span className="font-semibold text-[#59283A] text-sm block">{selectedExpense.category?.name}</span>
+                <p className="text-[#82747A] text-xs mt-1">{selectedExpense.description}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 p-3 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA]">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
                 <div>
-                  <span className="text-[#79695B] text-[10px] uppercase block font-semibold">Amount Paid</span>
+                  <span className="text-[#82747A] text-[10px] uppercase block font-semibold">Amount Paid</span>
                   <span className="font-mono font-bold text-rose-700 text-base">
                     ₹{Number(selectedExpense.amount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#79695B] text-[10px] uppercase block font-semibold">Payment Channel</span>
-                  <span className="font-semibold text-[#362A22] bg-white px-2 py-0.5 rounded border border-[#E3D9CA] inline-block">
+                  <span className="text-[#82747A] text-[10px] uppercase block font-semibold">Payment Channel</span>
+                  <span className="font-semibold text-[#59283A] bg-white px-2 py-0.5 rounded border border-[#E8DDD8] inline-block">
                     {selectedExpense.paymentMethod}
                   </span>
                 </div>
                 {selectedExpense.transactionReference && (
-                  <div className="col-span-2 pt-1 border-t border-[#EAE3D8]">
-                    <span className="text-[#79695B] text-[10px] uppercase block font-semibold">Bill / Reference Number</span>
-                    <span className="font-mono text-[#362A22] font-semibold">{selectedExpense.transactionReference}</span>
+                  <div className="col-span-2 pt-1 border-t border-[#E8DDD8]">
+                    <span className="text-[#82747A] text-[10px] uppercase block font-semibold">Bill / Reference Number</span>
+                    <span className="font-mono text-[#59283A] font-semibold">{selectedExpense.transactionReference}</span>
                   </div>
                 )}
               </div>
@@ -1037,7 +1037,7 @@ export default function ExpensesPage() {
             </div>
           )}
 
-          <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+          <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
             <Button variant="outline" size="sm" onClick={() => setDetailsModalOpen(false)}>
               Close
             </Button>
@@ -1051,43 +1051,43 @@ export default function ExpensesPage() {
       =======================================================================
       */}
       <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <DialogTitle className="text-xl font-serif font-bold text-[#362A22]">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <DialogTitle className="text-xl font-serif font-bold text-[#59283A]">
               Create Expense Category
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Add a new budget head for categorizing hotel operating expenses.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateCategory} className="space-y-3.5 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Category Name *</label>
+              <label className="font-semibold text-[#59283A]">Category Name *</label>
               <Input
                 required
                 value={catName}
                 onChange={(e) => setCatName(e.target.value)}
                 placeholder="e.g. Laundry Chemicals, Generator Diesel, Signage..."
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Description</label>
+              <label className="font-semibold text-[#59283A]">Description</label>
               <Input
                 value={catDesc}
                 onChange={(e) => setCatDesc(e.target.value)}
                 placeholder="Brief description of expenditures under this category..."
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button type="button" variant="outline" size="sm" onClick={() => setCategoryModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#362A22] hover:bg-[#43352B] text-white">
+              <Button type="submit" size="sm" disabled={submitting} className="bg-[#59283A] hover:bg-[#472130] text-white">
                 {submitting ? "Creating..." : "Create Category"}
               </Button>
             </DialogFooter>
@@ -1101,18 +1101,18 @@ export default function ExpensesPage() {
       =======================================================================
       */}
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
             <DialogTitle className="text-xl font-serif font-bold text-rose-700">
               Confirm Delete Expense
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
-              Are you sure you want to delete expense record <strong className="text-[#362A22]">{selectedExpense?.expenseReference}</strong> (₹{Number(selectedExpense?.amount || 0).toLocaleString()})?
+            <DialogDescription className="text-xs text-[#82747A]">
+              Are you sure you want to delete expense record <strong className="text-[#59283A]">{selectedExpense?.expenseReference}</strong> (₹{Number(selectedExpense?.amount || 0).toLocaleString()})?
               This action will remove the record from financial accounts.
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+          <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
             <Button type="button" variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
               Cancel
             </Button>

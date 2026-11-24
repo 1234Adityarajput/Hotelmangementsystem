@@ -376,18 +376,18 @@ export default function RoomsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Editorial Luxury Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[#E3D9CA]">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold tracking-wider text-[#B08A60] uppercase bg-[#EEE7DA] px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold tracking-wider text-[#C4A06A] uppercase bg-[#F5F0EA] px-2.5 py-0.5 rounded-full">
               Hospitality Operations • Room Management
             </span>
-            <span className="text-[11px] text-[#79695B]">• Live Inventory & Availability</span>
+            <span className="text-[11px] text-[#82747A]">• Live Inventory & Availability</span>
           </div>
-          <h2 className="text-3xl font-serif font-bold tracking-tight text-[#362A22] mt-1">
+          <h2 className="text-3xl font-serif font-bold tracking-tight text-[#59283A] mt-1">
             Room Inventory & Status Control
           </h2>
-          <p className="text-xs text-[#79695B] mt-1 max-w-2xl">
+          <p className="text-xs text-[#82747A] mt-1 max-w-2xl">
             Maintain complete hotel room details: room numbers, room types, descriptions, nightly prices, live room statuses (Available, Occupied, Under Maintenance), and check room availability.
           </p>
         </div>
@@ -396,26 +396,26 @@ export default function RoomsPage() {
           <Button
             variant="outline"
             onClick={() => setAvailabilityExplorerOpen(!availabilityExplorerOpen)}
-            className="border-[#B08A60] text-[#362A22] hover:bg-[#EEE7DA] flex items-center gap-1.5 text-xs h-9"
+            className="border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5 text-xs h-9"
           >
-            <Calendar className="w-4 h-4 text-[#B08A60]" />
+            <Calendar className="w-4 h-4 text-[#C4A06A]" />
             <span>Check Room Availability</span>
           </Button>
 
           {activeTab === "rooms" ? (
             <Button
               onClick={handleOpenAddRoom}
-              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-2 shadow-sm font-medium px-4 h-9"
+              className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-2 shadow-sm font-medium px-4 h-9"
             >
-              <Plus className="w-4 h-4 text-[#B08A60]" />
+              <Plus className="w-4 h-4 text-[#C4A06A]" />
               <span>Add Room</span>
             </Button>
           ) : (
             <Button
               onClick={handleOpenAddType}
-              className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-2 shadow-sm font-medium px-4 h-9"
+              className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-2 shadow-sm font-medium px-4 h-9"
             >
-              <Plus className="w-4 h-4 text-[#B08A60]" />
+              <Plus className="w-4 h-4 text-[#C4A06A]" />
               <span>Add Room Type</span>
             </Button>
           )}
@@ -425,14 +425,14 @@ export default function RoomsPage() {
       {/* KPI Room Availability & Status Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
         {/* Total Rooms */}
-        <Card className="bg-white border-[#E3D9CA] shadow-sm">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#EEE7DA] flex items-center justify-center text-[#362A22]">
-              <BedDouble className="w-5 h-5 text-[#B08A60]" />
+            <div className="w-10 h-10 rounded-xl bg-[#F5F0EA] flex items-center justify-center text-[#59283A]">
+              <BedDouble className="w-5 h-5 text-[#C4A06A]" />
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold text-[#948779] tracking-wider">Total Rooms</p>
-              <h3 className="text-xl font-serif font-bold text-[#362A22]">{totalRoomsCount}</h3>
+              <p className="text-[10px] uppercase font-bold text-[#8E7079] tracking-wider">Total Rooms</p>
+              <h3 className="text-xl font-serif font-bold text-[#59283A]">{totalRoomsCount}</h3>
             </div>
           </CardContent>
         </Card>
@@ -440,7 +440,7 @@ export default function RoomsPage() {
         {/* Available Rooms */}
         <Card
           onClick={() => setStatusFilter("AVAILABLE")}
-          className="bg-white border-[#E3D9CA] shadow-sm cursor-pointer hover:border-[#32765B] transition-colors"
+          className="bg-white border-[#E8DDD8] shadow-sm cursor-pointer hover:border-[#32765B] transition-colors"
         >
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#E7F1E9] flex items-center justify-center text-[#32765B]">
@@ -459,7 +459,7 @@ export default function RoomsPage() {
         {/* Occupied Rooms */}
         <Card
           onClick={() => setStatusFilter("OCCUPIED")}
-          className="bg-white border-[#E3D9CA] shadow-sm cursor-pointer hover:border-[#627D91] transition-colors"
+          className="bg-white border-[#E8DDD8] shadow-sm cursor-pointer hover:border-[#627D91] transition-colors"
         >
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#E9EFF3] flex items-center justify-center text-[#627D91]">
@@ -467,7 +467,7 @@ export default function RoomsPage() {
             </div>
             <div>
               <p className="text-[10px] uppercase font-bold text-[#627D91] tracking-wider">Occupied</p>
-              <h3 className="text-xl font-serif font-bold text-[#362A22]">{occupiedRoomsCount}</h3>
+              <h3 className="text-xl font-serif font-bold text-[#59283A]">{occupiedRoomsCount}</h3>
             </div>
           </CardContent>
         </Card>
@@ -475,7 +475,7 @@ export default function RoomsPage() {
         {/* Under Maintenance */}
         <Card
           onClick={() => setStatusFilter("MAINTENANCE")}
-          className="bg-white border-[#E3D9CA] shadow-sm cursor-pointer hover:border-[#A97832] transition-colors"
+          className="bg-white border-[#E8DDD8] shadow-sm cursor-pointer hover:border-[#A97832] transition-colors"
         >
           <CardContent className="p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#F6EDDC] flex items-center justify-center text-[#A97832]">
@@ -491,14 +491,14 @@ export default function RoomsPage() {
         </Card>
 
         {/* Occupancy Rate */}
-        <Card className="bg-white border-[#E3D9CA] shadow-sm col-span-2 sm:col-span-1">
+        <Card className="bg-white border-[#E8DDD8] shadow-sm col-span-2 sm:col-span-1">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#EEE7DA] flex items-center justify-center text-[#362A22]">
-              <DoorOpen className="w-5 h-5 text-[#B08A60]" />
+            <div className="w-10 h-10 rounded-xl bg-[#F5F0EA] flex items-center justify-center text-[#59283A]">
+              <DoorOpen className="w-5 h-5 text-[#C4A06A]" />
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold text-[#948779] tracking-wider">Live Occupancy</p>
-              <h3 className="text-xl font-serif font-bold text-[#362A22]">{occupancyPercentage}%</h3>
+              <p className="text-[10px] uppercase font-bold text-[#8E7079] tracking-wider">Live Occupancy</p>
+              <h3 className="text-xl font-serif font-bold text-[#59283A]">{occupancyPercentage}%</h3>
             </div>
           </CardContent>
         </Card>
@@ -506,12 +506,12 @@ export default function RoomsPage() {
 
       {/* Date Range Room Availability Explorer Panel */}
       {availabilityExplorerOpen && (
-        <Card className="bg-[#F7F4EE] border-[#B08A60] shadow-md animate-in fade-in slide-in-from-top-2 duration-200">
+        <Card className="bg-[#F5F0EA] border-[#C4A06A] shadow-md animate-in fade-in slide-in-from-top-2 duration-200">
           <CardContent className="p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-[#E3D9CA] pb-2">
+            <div className="flex items-center justify-between border-b border-[#E8DDD8] pb-2">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#B08A60]" />
-                <h4 className="text-sm font-bold text-[#362A22]">
+                <Calendar className="w-4 h-4 text-[#C4A06A]" />
+                <h4 className="text-sm font-bold text-[#59283A]">
                   Check Room Availability for Stay Dates
                 </h4>
               </div>
@@ -519,7 +519,7 @@ export default function RoomsPage() {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearAvailabilityFilter}
-                className="h-7 text-xs text-[#79695B] hover:text-[#362A22]"
+                className="h-7 text-xs text-[#82747A] hover:text-[#59283A]"
               >
                 <X className="w-3.5 h-3.5 mr-1" />
                 Close Explorer
@@ -531,33 +531,33 @@ export default function RoomsPage() {
               className="flex flex-wrap items-end gap-3 text-xs"
             >
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Check-In Date *</label>
+                <label className="font-semibold text-[#59283A]">Check-In Date *</label>
                 <Input
                   type="date"
                   required
                   value={availCheckIn}
                   onChange={(e) => setAvailCheckIn(e.target.value)}
-                  className="h-8 text-xs bg-white border-[#E3D9CA] w-40"
+                  className="h-8 text-xs bg-white border-[#E8DDD8] w-40"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Check-Out Date *</label>
+                <label className="font-semibold text-[#59283A]">Check-Out Date *</label>
                 <Input
                   type="date"
                   required
                   value={availCheckOut}
                   onChange={(e) => setAvailCheckOut(e.target.value)}
-                  className="h-8 text-xs bg-white border-[#E3D9CA] w-40"
+                  className="h-8 text-xs bg-white border-[#E8DDD8] w-40"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Room Type (Optional)</label>
+                <label className="font-semibold text-[#59283A]">Room Type (Optional)</label>
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22] w-44"
+                  className="h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A] w-44"
                 >
                   <option value="ALL">All Categories</option>
                   {roomTypes.map((t) => (
@@ -572,12 +572,12 @@ export default function RoomsPage() {
                 type="submit"
                 disabled={checkingAvailability}
                 size="sm"
-                className="h-8 text-xs bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5"
+                className="h-8 text-xs bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5"
               >
                 {checkingAvailability ? (
                   <LoadingSpinner className="w-3.5 h-3.5" />
                 ) : (
-                  <Search className="w-3.5 h-3.5 text-[#B08A60]" />
+                  <Search className="w-3.5 h-3.5 text-[#C4A06A]" />
                 )}
                 <span>Check Availability</span>
               </Button>
@@ -588,7 +588,7 @@ export default function RoomsPage() {
                   variant="outline"
                   size="sm"
                   onClick={handleClearAvailabilityFilter}
-                  className="h-8 text-xs border-[#E3D9CA] text-[#79695B]"
+                  className="h-8 text-xs border-[#E8DDD8] text-[#82747A]"
                 >
                   Reset Filter
                 </Button>
@@ -612,42 +612,42 @@ export default function RoomsPage() {
       )}
 
       {/* Tabs & View Controls Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-[#E3D9CA] pb-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-[#E8DDD8] pb-2">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab("rooms")}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
               activeTab === "rooms"
-                ? "bg-[#362A22] text-white shadow-sm"
-                : "text-[#79695B] hover:bg-[#EEE7DA]"
+                ? "bg-[#59283A] text-white shadow-sm"
+                : "text-[#82747A] hover:bg-[#F5F0EA]"
             }`}
           >
-            <BedDouble className="w-3.5 h-3.5 text-[#B08A60]" />
+            <BedDouble className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Rooms Directory ({rooms.length})</span>
           </button>
           <button
             onClick={() => setActiveTab("types")}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 ${
               activeTab === "types"
-                ? "bg-[#362A22] text-white shadow-sm"
-                : "text-[#79695B] hover:bg-[#EEE7DA]"
+                ? "bg-[#59283A] text-white shadow-sm"
+                : "text-[#82747A] hover:bg-[#F5F0EA]"
             }`}
           >
-            <Layers className="w-3.5 h-3.5 text-[#B08A60]" />
+            <Layers className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Room Categories & Pricing ({roomTypes.length})</span>
           </button>
         </div>
 
         {activeTab === "rooms" && (
-          <div className="flex items-center gap-1.5 bg-[#F7F4EE] p-1 rounded-lg border border-[#E3D9CA]">
+          <div className="flex items-center gap-1.5 bg-[#F5F0EA] p-1 rounded-lg border border-[#E8DDD8]">
             <Button
               variant={viewMode === "grid" ? "default" : "ghost"}
               size="sm"
               onClick={() => setViewMode("grid")}
               className={`h-7 px-2.5 text-xs ${
                 viewMode === "grid"
-                  ? "bg-[#362A22] text-white hover:bg-[#43352B]"
-                  : "text-[#79695B] hover:text-[#362A22]"
+                  ? "bg-[#59283A] text-white hover:bg-[#472130]"
+                  : "text-[#82747A] hover:text-[#59283A]"
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5 mr-1" />
@@ -659,8 +659,8 @@ export default function RoomsPage() {
               onClick={() => setViewMode("table")}
               className={`h-7 px-2.5 text-xs ${
                 viewMode === "table"
-                  ? "bg-[#362A22] text-white hover:bg-[#43352B]"
-                  : "text-[#79695B] hover:text-[#362A22]"
+                  ? "bg-[#59283A] text-white hover:bg-[#472130]"
+                  : "text-[#82747A] hover:text-[#59283A]"
               }`}
             >
               <List className="w-3.5 h-3.5 mr-1" />
@@ -674,10 +674,10 @@ export default function RoomsPage() {
       {activeTab === "rooms" && (
         <>
           {/* Filters & Search Toolbar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E3D9CA] shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm">
             {/* Status Filter Pills */}
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs font-semibold text-[#79695B] mr-1">Status:</span>
+              <span className="text-xs font-semibold text-[#82747A] mr-1">Status:</span>
               {[
                 { key: "ALL", label: "All Rooms" },
                 { key: "AVAILABLE", label: "Available" },
@@ -689,8 +689,8 @@ export default function RoomsPage() {
                   onClick={() => setStatusFilter(st.key)}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
                     statusFilter === st.key
-                      ? "bg-[#362A22] text-white shadow-sm"
-                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
+                      ? "bg-[#59283A] text-white shadow-sm"
+                      : "bg-[#F5F0EA] text-[#82747A] hover:bg-[#F5F0EA] border border-[#E8DDD8]"
                   }`}
                 >
                   {st.label}
@@ -704,7 +704,7 @@ export default function RoomsPage() {
               <select
                 value={floorFilter}
                 onChange={(e) => setFloorFilter(e.target.value)}
-                className="h-8 text-xs border border-[#E3D9CA] rounded-lg px-2 bg-[#F7F4EE] text-[#362A22]"
+                className="h-8 text-xs border border-[#E8DDD8] rounded-lg px-2 bg-[#F5F0EA] text-[#59283A]"
               >
                 <option value="ALL">All Floors</option>
                 {uniqueFloors.map((f) => (
@@ -718,7 +718,7 @@ export default function RoomsPage() {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="h-8 text-xs border border-[#E3D9CA] rounded-lg px-2 bg-[#F7F4EE] text-[#362A22]"
+                className="h-8 text-xs border border-[#E8DDD8] rounded-lg px-2 bg-[#F5F0EA] text-[#59283A]"
               >
                 <option value="ALL">All Categories</option>
                 {roomTypes.map((t) => (
@@ -730,13 +730,13 @@ export default function RoomsPage() {
 
               {/* Search Box */}
               <div className="relative w-44 sm:w-52">
-                <Search className="w-3.5 h-3.5 text-[#948779] absolute left-2.5 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-[#8E7079] absolute left-2.5 top-2.5" />
                 <Input
                   type="text"
                   placeholder="Search room number..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-xs bg-[#F7F4EE] border-[#E3D9CA]"
+                  className="pl-8 h-8 text-xs bg-[#F5F0EA] border-[#E8DDD8]"
                 />
               </div>
             </div>
@@ -746,23 +746,23 @@ export default function RoomsPage() {
           {viewMode === "grid" && (
             <>
               {loading ? (
-                <div className="p-16 flex flex-col justify-center items-center gap-3 bg-white rounded-xl border border-[#E3D9CA]">
-                  <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-                  <p className="text-xs text-[#79695B]">Loading room inventory from database...</p>
+                <div className="p-16 flex flex-col justify-center items-center gap-3 bg-white rounded-xl border border-[#E8DDD8]">
+                  <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                  <p className="text-xs text-[#82747A]">Loading room inventory from database...</p>
                 </div>
               ) : displayRooms.length === 0 ? (
-                <div className="p-16 text-center text-xs text-[#79695B] bg-white rounded-xl border border-[#E3D9CA] space-y-3">
-                  <BedDouble className="w-10 h-10 text-[#B08A60] mx-auto opacity-60" />
-                  <p className="font-medium text-[#362A22]">
+                <div className="p-16 text-center text-xs text-[#82747A] bg-white rounded-xl border border-[#E8DDD8] space-y-3">
+                  <BedDouble className="w-10 h-10 text-[#C4A06A] mx-auto opacity-60" />
+                  <p className="font-medium text-[#59283A]">
                     No rooms found matching your active filter criteria.
                   </p>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleOpenAddRoom}
-                    className="border-[#B08A60] text-[#362A22] hover:bg-[#EEE7DA]"
+                    className="border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA]"
                   >
-                    <Plus className="w-3.5 h-3.5 mr-1 text-[#B08A60]" /> Add New Room
+                    <Plus className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" /> Add New Room
                   </Button>
                 </div>
               ) : (
@@ -799,11 +799,11 @@ export default function RoomsPage() {
                           <div className="flex items-start justify-between">
                             <div>
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xl font-serif font-bold text-[#362A22]">
+                                <span className="text-xl font-serif font-bold text-[#59283A]">
                                   Room {r.roomNumber}
                                 </span>
                               </div>
-                              <span className="text-[11px] font-mono text-[#79695B] block">
+                              <span className="text-[11px] font-mono text-[#82747A] block">
                                 Floor {r.floor} • Cap: {r.roomType?.capacity || 2}
                               </span>
                             </div>
@@ -828,17 +828,17 @@ export default function RoomsPage() {
 
                           {/* Room Type & Description */}
                           <div className="space-y-1.5 text-xs">
-                            <div className="flex justify-between items-center text-[#79695B]">
-                              <span className="text-[#948779] text-[11px] uppercase font-semibold">
+                            <div className="flex justify-between items-center text-[#82747A]">
+                              <span className="text-[#8E7079] text-[11px] uppercase font-semibold">
                                 Category:
                               </span>
-                              <span className="font-semibold text-[#362A22]">{r.roomType?.name}</span>
+                              <span className="font-semibold text-[#59283A]">{r.roomType?.name}</span>
                             </div>
 
                             {/* Room Description */}
-                            <div className="text-[11px] text-[#79695B] bg-[#F7F4EE] p-2 rounded-lg border border-[#E3D9CA]/60 min-h-[42px] line-clamp-2">
+                            <div className="text-[11px] text-[#82747A] bg-[#F5F0EA] p-2 rounded-lg border border-[#E8DDD8]/60 min-h-[42px] line-clamp-2">
                               {r.description || (
-                                <span className="italic text-[#948779]">
+                                <span className="italic text-[#8E7079]">
                                   {r.roomType?.description || "Standard room with premium hospitality amenities."}
                                 </span>
                               )}
@@ -846,17 +846,17 @@ export default function RoomsPage() {
 
                             {/* Price Per Night with Quick Update Action */}
                             <div className="flex justify-between items-center pt-1">
-                              <span className="text-[#948779] text-[11px] uppercase font-semibold">
+                              <span className="text-[#8E7079] text-[11px] uppercase font-semibold">
                                 Price Per Night:
                               </span>
                               <div className="flex items-center gap-1.5">
-                                <span className="font-mono font-bold text-sm text-[#362A22]">
+                                <span className="font-mono font-bold text-sm text-[#59283A]">
                                   ₹{Number(r.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleOpenQuickPrice(r)}
-                                  className="text-[#B08A60] hover:text-[#362A22] p-0.5"
+                                  className="text-[#C4A06A] hover:text-[#59283A] p-0.5"
                                   title="Update Price"
                                 >
                                   <Edit2 className="w-3 h-3" />
@@ -866,7 +866,7 @@ export default function RoomsPage() {
 
                             {/* Active Occupant Details if Occupied */}
                             {r.currentBooking && (
-                              <div className="p-2 bg-[#E9EFF3]/60 rounded-lg border border-[#627D91]/20 text-[11px] text-[#362A22] mt-1 space-y-0.5">
+                              <div className="p-2 bg-[#E9EFF3]/60 rounded-lg border border-[#627D91]/20 text-[11px] text-[#59283A] mt-1 space-y-0.5">
                                 <div className="flex items-center justify-between font-semibold">
                                   <span className="truncate">
                                     {r.currentBooking.primaryGuest?.fullName}
@@ -875,7 +875,7 @@ export default function RoomsPage() {
                                     {r.currentBooking.bookingStatus}
                                   </Badge>
                                 </div>
-                                <div className="text-[10px] text-[#79695B] font-mono">
+                                <div className="text-[10px] text-[#82747A] font-mono">
                                   {r.currentBooking.primaryGuest?.mobileNumber}
                                 </div>
                               </div>
@@ -883,15 +883,15 @@ export default function RoomsPage() {
                           </div>
 
                           {/* Action Buttons Footer */}
-                          <div className="pt-2 border-t border-[#EAE3D8] flex items-center justify-between gap-1.5">
+                          <div className="pt-2 border-t border-[#E8DDD8] flex items-center justify-between gap-1.5">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenDetails(r.id)}
-                              className="h-7 text-[11px] px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                              className="h-7 text-[11px] px-2 text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA] border-[#E8DDD8]"
                               title="View Room Dossier"
                             >
-                              <Eye className="w-3 h-3 mr-1 text-[#B08A60]" />
+                              <Eye className="w-3 h-3 mr-1 text-[#C4A06A]" />
                               Dossier
                             </Button>
 
@@ -899,7 +899,7 @@ export default function RoomsPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenEditRoom(r)}
-                              className="h-7 text-[11px] px-2 text-[#5D493D] hover:bg-[#EEE7DA] border-[#E3D9CA]"
+                              className="h-7 text-[11px] px-2 text-[#7A4652] hover:bg-[#F5F0EA] border-[#E8DDD8]"
                               title="Edit Room Details"
                             >
                               <Edit2 className="w-3 h-3 mr-1" />
@@ -953,21 +953,21 @@ export default function RoomsPage() {
 
           {/* TABLE VIEW */}
           {viewMode === "table" && (
-            <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
+            <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
               <CardContent className="p-0">
                 {loading ? (
                   <div className="p-16 flex flex-col justify-center items-center gap-3">
-                    <LoadingSpinner className="w-7 h-7 text-[#B08A60]" />
-                    <p className="text-xs text-[#79695B]">Loading room inventory...</p>
+                    <LoadingSpinner className="w-7 h-7 text-[#C4A06A]" />
+                    <p className="text-xs text-[#82747A]">Loading room inventory...</p>
                   </div>
                 ) : displayRooms.length === 0 ? (
-                  <div className="p-16 text-center text-xs text-[#79695B]">
+                  <div className="p-16 text-center text-xs text-[#82747A]">
                     No rooms matching your active filters.
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs text-left">
-                      <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                      <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                         <tr>
                           <th className="px-4 py-3.5">Room Number</th>
                           <th className="px-4 py-3.5">Room Type</th>
@@ -979,34 +979,34 @@ export default function RoomsPage() {
                           <th className="px-4 py-3.5 text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#EAE3D8]">
+                      <tbody className="divide-y divide-[#E8DDD8]">
                         {displayRooms.map((r) => {
                           const isAvailable = r.roomStatus === "AVAILABLE";
                           const isOccupied = r.roomStatus === "OCCUPIED";
                           const isMaintenance = r.roomStatus === "MAINTENANCE";
 
                           return (
-                            <tr key={r.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
+                            <tr key={r.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
                               {/* Room Number */}
-                              <td className="px-4 py-3.5 font-serif font-bold text-sm text-[#362A22]">
+                              <td className="px-4 py-3.5 font-serif font-bold text-sm text-[#59283A]">
                                 Room {r.roomNumber}
                               </td>
 
                               {/* Room Type */}
                               <td className="px-4 py-3.5">
-                                <span className="font-semibold text-[#362A22] block">
+                                <span className="font-semibold text-[#59283A] block">
                                   {r.roomType?.name}
                                 </span>
-                                <span className="text-[11px] text-[#79695B]">
+                                <span className="text-[11px] text-[#82747A]">
                                   Capacity: {r.roomType?.capacity || 2} Guests
                                 </span>
                               </td>
 
                               {/* Room Description */}
-                              <td className="px-4 py-3.5 text-[#79695B] max-w-xs">
+                              <td className="px-4 py-3.5 text-[#82747A] max-w-xs">
                                 <span className="truncate block" title={r.description || ""}>
                                   {r.description || (
-                                    <span className="italic text-[#948779]">
+                                    <span className="italic text-[#8E7079]">
                                       {r.roomType?.description || "Standard boutique amenities"}
                                     </span>
                                   )}
@@ -1014,12 +1014,12 @@ export default function RoomsPage() {
                               </td>
 
                               {/* Floor */}
-                              <td className="px-4 py-3.5 font-mono text-[#362A22]">
+                              <td className="px-4 py-3.5 font-mono text-[#59283A]">
                                 Floor {r.floor}
                               </td>
 
                               {/* Price Per Night */}
-                              <td className="px-4 py-3.5 font-mono font-bold text-[#362A22]">
+                              <td className="px-4 py-3.5 font-mono font-bold text-[#59283A]">
                                 <div className="flex items-center gap-1.5">
                                   <span>
                                     ₹{Number(r.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
@@ -1027,7 +1027,7 @@ export default function RoomsPage() {
                                   <button
                                     type="button"
                                     onClick={() => handleOpenQuickPrice(r)}
-                                    className="text-[#B08A60] hover:text-[#362A22]"
+                                    className="text-[#C4A06A] hover:text-[#59283A]"
                                     title="Quick Price Update"
                                   >
                                     <Edit2 className="w-3 h-3" />
@@ -1056,18 +1056,18 @@ export default function RoomsPage() {
                               </td>
 
                               {/* Current Occupant */}
-                              <td className="px-4 py-3.5 text-[#79695B]">
+                              <td className="px-4 py-3.5 text-[#82747A]">
                                 {r.currentBooking ? (
                                   <div>
-                                    <span className="font-semibold text-[#362A22] block">
+                                    <span className="font-semibold text-[#59283A] block">
                                       {r.currentBooking.primaryGuest?.fullName}
                                     </span>
-                                    <span className="font-mono text-[10px] text-[#948779]">
+                                    <span className="font-mono text-[10px] text-[#8E7079]">
                                       {r.currentBooking.primaryGuest?.mobileNumber}
                                     </span>
                                   </div>
                                 ) : (
-                                  <span className="text-[#948779] italic">—</span>
+                                  <span className="text-[#8E7079] italic">—</span>
                                 )}
                               </td>
 
@@ -1077,10 +1077,10 @@ export default function RoomsPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleOpenDetails(r.id)}
-                                  className="h-7 px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]"
+                                  className="h-7 px-2 text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA]"
                                   title="View Details"
                                 >
-                                  <Eye className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+                                  <Eye className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                                   Dossier
                                 </Button>
 
@@ -1088,7 +1088,7 @@ export default function RoomsPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => handleOpenEditRoom(r)}
-                                  className="h-7 px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]"
+                                  className="h-7 px-2 text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA]"
                                   title="Edit Room"
                                 >
                                   <Edit2 className="w-3.5 h-3.5 mr-1" />
@@ -1130,28 +1130,28 @@ export default function RoomsPage() {
 
       {/* ROOM CATEGORIES & PRICING TAB */}
       {activeTab === "types" && (
-        <Card className="border-[#E3D9CA] shadow-sm bg-white overflow-hidden">
-          <CardHeader className="border-b border-[#E3D9CA] pb-4">
+        <Card className="border-[#E8DDD8] shadow-sm bg-white overflow-hidden">
+          <CardHeader className="border-b border-[#E8DDD8] pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-serif font-bold text-[#362A22]">
+                <CardTitle className="text-lg font-serif font-bold text-[#59283A]">
                   Room Types & Pricing Rules
                 </CardTitle>
-                <CardDescription className="text-xs text-[#79695B]">
+                <CardDescription className="text-xs text-[#82747A]">
                   Define base nightly rates and default guest capacities across categories.
                 </CardDescription>
               </div>
               <Button
                 onClick={handleOpenAddType}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs h-8"
+                className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-8"
               >
-                <Plus className="w-3.5 h-3.5 mr-1 text-[#B08A60]" /> Add Room Type
+                <Plus className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" /> Add Room Type
               </Button>
             </div>
           </CardHeader>
           <CardContent className="p-0">
             <table className="w-full text-xs text-left">
-              <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+              <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                 <tr>
                   <th className="px-4 py-3.5">Category Name</th>
                   <th className="px-4 py-3.5">Description</th>
@@ -1161,26 +1161,26 @@ export default function RoomsPage() {
                   <th className="px-4 py-3.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAE3D8]">
+              <tbody className="divide-y divide-[#E8DDD8]">
                 {roomTypes.map((t) => (
-                  <tr key={t.id} className="hover:bg-[#F7F4EE]/70 transition-colors">
-                    <td className="px-4 py-3.5 font-semibold text-[#362A22]">
+                  <tr key={t.id} className="hover:bg-[#F5F0EA]/70 transition-colors">
+                    <td className="px-4 py-3.5 font-semibold text-[#59283A]">
                       {t.name}
                     </td>
-                    <td className="px-4 py-3.5 text-[#79695B] max-w-sm">
+                    <td className="px-4 py-3.5 text-[#82747A] max-w-sm">
                       {t.description || "—"}
                     </td>
-                    <td className="px-4 py-3.5 text-[#79695B] font-medium">
+                    <td className="px-4 py-3.5 text-[#82747A] font-medium">
                       <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 text-[#B08A60]" />
+                        <Users className="w-3.5 h-3.5 text-[#C4A06A]" />
                         {t.capacity} Guests
                       </span>
                     </td>
-                    <td className="px-4 py-3.5 font-mono font-bold text-[#362A22]">
+                    <td className="px-4 py-3.5 font-mono font-bold text-[#59283A]">
                       ₹{Number(t.defaultPricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-4 py-3.5">
-                      <Badge variant="outline" className="text-[10px] bg-[#EEE7DA] text-[#362A22]">
+                      <Badge variant="outline" className="text-[10px] bg-[#F5F0EA] text-[#59283A]">
                         {t._count?.rooms || 0} Rooms
                       </Badge>
                     </td>
@@ -1189,7 +1189,7 @@ export default function RoomsPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenEditType(t)}
-                        className="h-7 px-2 text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]"
+                        className="h-7 px-2 text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA]"
                       >
                         <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
                       </Button>
@@ -1206,15 +1206,15 @@ export default function RoomsPage() {
       {/* ADD / EDIT ROOM MODAL (WITH ROOM NUMBER, TYPE, DESCRIPTION, PRICE, STATUS)  */}
       {/* ========================================================================= */}
       <Dialog open={roomModalOpen} onOpenChange={setRoomModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <span className="text-[10px] uppercase font-bold text-[#B08A60] bg-[#EEE7DA] px-2 py-0.5 rounded w-fit">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <span className="text-[10px] uppercase font-bold text-[#C4A06A] bg-[#F5F0EA] px-2 py-0.5 rounded w-fit">
               {editingRoom ? "Inventory Update" : "New Inventory Item"}
             </span>
-            <DialogTitle className="text-xl font-serif font-bold text-[#362A22] mt-1">
+            <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
               {editingRoom ? `Edit Room ${editingRoom.roomNumber}` : "Add New Room"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Configure room number, room type, description, price per night, and status.
             </DialogDescription>
           </DialogHeader>
@@ -1222,19 +1222,19 @@ export default function RoomsPage() {
           <form onSubmit={handleSaveRoom} className="space-y-3.5 pt-2 text-xs">
             {/* 1. Room Number */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Room Number *</label>
+              <label className="font-semibold text-[#59283A]">Room Number *</label>
               <Input
                 required
                 value={roomForm.roomNumber}
                 onChange={(e) => setRoomForm({ ...roomForm, roomNumber: e.target.value })}
                 placeholder="e.g. 101, 204, or PH-1"
-                className="h-8 text-xs font-mono border-[#E3D9CA]"
+                className="h-8 text-xs font-mono border-[#E8DDD8]"
               />
             </div>
 
             {/* 2. Room Type */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Room Type / Category *</label>
+              <label className="font-semibold text-[#59283A]">Room Type / Category *</label>
               <select
                 required
                 value={roomForm.roomTypeId}
@@ -1246,7 +1246,7 @@ export default function RoomsPage() {
                     pricePerNight: sel ? Number(sel.defaultPricePerNight) : roomForm.pricePerNight,
                   });
                 }}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 {roomTypes.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -1258,32 +1258,32 @@ export default function RoomsPage() {
 
             {/* 3. Room Description */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Room Description</label>
+              <label className="font-semibold text-[#59283A]">Room Description</label>
               <textarea
                 rows={2}
                 value={roomForm.description}
                 onChange={(e) => setRoomForm({ ...roomForm, description: e.target.value })}
                 placeholder="Corner room with king bed, balcony, garden view, premium minibar..."
-                className="w-full text-xs border border-[#E3D9CA] rounded-md p-2 bg-white text-[#362A22] focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
+                className="w-full text-xs border border-[#E8DDD8] rounded-md p-2 bg-white text-[#59283A] focus:outline-none focus:ring-1 focus:ring-[#C4A06A]"
               />
             </div>
 
             {/* 4. Floor & Price Per Night */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Floor</label>
+                <label className="font-semibold text-[#59283A]">Floor</label>
                 <Input
                   type="number"
                   min="0"
                   max="50"
                   value={roomForm.floor}
                   onChange={(e) => setRoomForm({ ...roomForm, floor: Number(e.target.value) })}
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Price Per Night (₹) *</label>
+                <label className="font-semibold text-[#59283A]">Price Per Night (₹) *</label>
                 <Input
                   type="number"
                   required
@@ -1293,20 +1293,20 @@ export default function RoomsPage() {
                   onChange={(e) =>
                     setRoomForm({ ...roomForm, pricePerNight: Number(e.target.value) })
                   }
-                  className="h-8 text-xs font-mono border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono border-[#E8DDD8]"
                 />
               </div>
             </div>
 
             {/* 5. Room Status */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Room Status *</label>
+              <label className="font-semibold text-[#59283A]">Room Status *</label>
               <select
                 value={roomForm.roomStatus}
                 onChange={(e) =>
                   setRoomForm({ ...roomForm, roomStatus: e.target.value as any })
                 }
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 <option value="AVAILABLE">Available</option>
                 <option value="MAINTENANCE">Under Maintenance</option>
@@ -1314,13 +1314,13 @@ export default function RoomsPage() {
               </select>
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setRoomModalOpen(false)}
-                className="text-xs border-[#E3D9CA]"
+                className="text-xs border-[#E8DDD8]"
               >
                 Cancel
               </Button>
@@ -1328,7 +1328,7 @@ export default function RoomsPage() {
                 type="submit"
                 size="sm"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs"
+                className="bg-[#59283A] hover:bg-[#472130] text-white text-xs"
               >
                 {submitting ? "Saving..." : editingRoom ? "Save Room Details" : "Create Room"}
               </Button>
@@ -1341,26 +1341,26 @@ export default function RoomsPage() {
       {/* QUICK PRICE UPDATE MODAL                                                  */}
       {/* ========================================================================= */}
       <Dialog open={quickPriceModalOpen} onOpenChange={setQuickPriceModalOpen}>
-        <DialogContent className="max-w-sm bg-white border-[#E3D9CA] shadow-2xl p-5">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-2.5">
-            <DialogTitle className="text-base font-serif font-bold text-[#362A22]">
+        <DialogContent className="max-w-sm bg-white border-[#E8DDD8] shadow-2xl p-5">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-2.5">
+            <DialogTitle className="text-base font-serif font-bold text-[#59283A]">
               Update Nightly Rate • Room {priceRoom?.roomNumber}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Category: {priceRoom?.roomType?.name}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveQuickPrice} className="space-y-3 pt-2 text-xs">
-            <div className="p-3 bg-[#F7F4EE] rounded-lg border border-[#E3D9CA] flex justify-between items-center">
-              <span className="text-[#79695B]">Current Rate:</span>
-              <span className="font-mono font-bold text-[#362A22]">
+            <div className="p-3 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8] flex justify-between items-center">
+              <span className="text-[#82747A]">Current Rate:</span>
+              <span className="font-mono font-bold text-[#59283A]">
                 ₹{Number(priceRoom?.pricePerNight || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </span>
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">New Nightly Price (₹) *</label>
+              <label className="font-semibold text-[#59283A]">New Nightly Price (₹) *</label>
               <Input
                 type="number"
                 required
@@ -1368,7 +1368,7 @@ export default function RoomsPage() {
                 step="50"
                 value={newPrice}
                 onChange={(e) => setNewPrice(Number(e.target.value))}
-                className="h-9 text-sm font-mono border-[#E3D9CA]"
+                className="h-9 text-sm font-mono border-[#E8DDD8]"
                 autoFocus
               />
             </div>
@@ -1386,7 +1386,7 @@ export default function RoomsPage() {
                 type="submit"
                 size="sm"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white"
+                className="bg-[#59283A] hover:bg-[#472130] text-white"
               >
                 {submitting ? "Updating..." : "Save New Price"}
               </Button>
@@ -1399,17 +1399,17 @@ export default function RoomsPage() {
       {/* ROOM DOSSIER / VIEW DETAILS MODAL                                         */}
       {/* ========================================================================= */}
       <Dialog open={detailsModalOpen} onOpenChange={setDetailsModalOpen}>
-        <DialogContent className="max-w-xl bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+        <DialogContent className="max-w-xl bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold text-[#B08A60] bg-[#EEE7DA] px-2 py-0.5 rounded">
+                <span className="text-[10px] font-mono font-bold text-[#C4A06A] bg-[#F5F0EA] px-2 py-0.5 rounded">
                   Floor {selectedRoomDetails?.floor}
                 </span>
-                <DialogTitle className="text-2xl font-serif font-bold text-[#362A22] mt-1">
+                <DialogTitle className="text-2xl font-serif font-bold text-[#59283A] mt-1">
                   Room {selectedRoomDetails?.roomNumber}
                 </DialogTitle>
-                <DialogDescription className="text-xs text-[#79695B]">
+                <DialogDescription className="text-xs text-[#82747A]">
                   {selectedRoomDetails?.roomType?.name} • Detailed Room Dossier
                 </DialogDescription>
               </div>
@@ -1436,41 +1436,41 @@ export default function RoomsPage() {
           {selectedRoomDetails && (
             <div className="space-y-4 pt-2 text-xs">
               {/* Specs Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3.5 bg-[#F7F4EE] rounded-xl border border-[#E3D9CA]">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3.5 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold tracking-wider">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold tracking-wider">
                     Room Type
                   </span>
-                  <span className="font-semibold text-[#362A22]">
+                  <span className="font-semibold text-[#59283A]">
                     {selectedRoomDetails.roomType?.name}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold tracking-wider">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold tracking-wider">
                     Guest Capacity
                   </span>
-                  <span className="font-medium text-[#362A22]">
+                  <span className="font-medium text-[#59283A]">
                     {selectedRoomDetails.roomType?.capacity || 2} Persons
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#948779] block text-[10px] uppercase font-bold tracking-wider">
+                  <span className="text-[#8E7079] block text-[10px] uppercase font-bold tracking-wider">
                     Nightly Rate
                   </span>
-                  <span className="font-mono font-bold text-[#362A22]">
+                  <span className="font-mono font-bold text-[#59283A]">
                     ₹{Number(selectedRoomDetails.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
 
               {/* Description */}
-              <div className="p-3 bg-white rounded-xl border border-[#E3D9CA] space-y-1">
-                <span className="text-[10px] uppercase font-bold text-[#948779] tracking-wider block">
+              <div className="p-3 bg-white rounded-xl border border-[#E8DDD8] space-y-1">
+                <span className="text-[10px] uppercase font-bold text-[#8E7079] tracking-wider block">
                   Room Description & Amenities
                 </span>
-                <p className="text-xs text-[#362A22]">
+                <p className="text-xs text-[#59283A]">
                   {selectedRoomDetails.description || (
-                    <span className="italic text-[#948779]">
+                    <span className="italic text-[#8E7079]">
                       {selectedRoomDetails.roomType?.description || "No custom room description recorded."}
                     </span>
                   )}
@@ -1481,7 +1481,7 @@ export default function RoomsPage() {
               {selectedRoomDetails.roomStatus === "OCCUPIED" && (
                 <div className="p-3.5 bg-[#E9EFF3] rounded-xl border border-[#627D91]/30 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-[#362A22] flex items-center gap-1.5">
+                    <span className="font-bold text-xs text-[#59283A] flex items-center gap-1.5">
                       <UserCheck className="w-3.5 h-3.5 text-[#627D91]" />
                       <span>Current Occupant Information</span>
                     </span>
@@ -1494,28 +1494,28 @@ export default function RoomsPage() {
                       return (
                         <div className="grid grid-cols-2 gap-2 text-xs pt-1">
                           <div>
-                            <span className="text-[#79695B] block text-[10px]">Guest Name:</span>
-                            <span className="font-semibold text-[#362A22]">
+                            <span className="text-[#82747A] block text-[10px]">Guest Name:</span>
+                            <span className="font-semibold text-[#59283A]">
                               {activeBooking.primaryGuest?.fullName || "Primary Guest"}
                             </span>
                           </div>
                           <div>
-                            <span className="text-[#79695B] block text-[10px]">Contact Mobile:</span>
-                            <span className="font-mono text-[#362A22]">
+                            <span className="text-[#82747A] block text-[10px]">Contact Mobile:</span>
+                            <span className="font-mono text-[#59283A]">
                               {activeBooking.primaryGuest?.mobileNumber || "—"}
                             </span>
                           </div>
                           <div>
-                            <span className="text-[#79695B] block text-[10px]">Check-In Date:</span>
-                            <span className="text-[#362A22]">
+                            <span className="text-[#82747A] block text-[10px]">Check-In Date:</span>
+                            <span className="text-[#59283A]">
                               {activeBooking.checkInDate
                                 ? new Date(activeBooking.checkInDate).toLocaleDateString("en-IN")
                                 : "—"}
                             </span>
                           </div>
                           <div>
-                            <span className="text-[#79695B] block text-[10px]">Expected Check-Out:</span>
-                            <span className="text-[#362A22]">
+                            <span className="text-[#82747A] block text-[10px]">Expected Check-Out:</span>
+                            <span className="text-[#59283A]">
                               {activeBooking.expectedCheckOutDate
                                 ? new Date(activeBooking.expectedCheckOutDate).toLocaleDateString("en-IN")
                                 : "—"}
@@ -1525,13 +1525,13 @@ export default function RoomsPage() {
                       );
                     })()
                   ) : (
-                    <p className="text-xs text-[#79695B]">Room is marked occupied.</p>
+                    <p className="text-xs text-[#82747A]">Room is marked occupied.</p>
                   )}
                 </div>
               )}
 
               {/* Actions Footer */}
-              <div className="flex items-center justify-between pt-2 border-t border-[#EAE3D8]">
+              <div className="flex items-center justify-between pt-2 border-t border-[#E8DDD8]">
                 <Button
                   variant="outline"
                   size="sm"
@@ -1550,7 +1550,7 @@ export default function RoomsPage() {
                       setDetailsModalOpen(false);
                       handleOpenEditRoom(selectedRoomDetails);
                     }}
-                    className="text-xs border-[#E3D9CA]"
+                    className="text-xs border-[#E8DDD8]"
                   >
                     <Edit2 className="w-3.5 h-3.5 mr-1" />
                     Edit Details
@@ -1558,7 +1558,7 @@ export default function RoomsPage() {
                   <Button
                     size="sm"
                     onClick={() => setDetailsModalOpen(false)}
-                    className="text-xs bg-[#362A22] hover:bg-[#43352B] text-white"
+                    className="text-xs bg-[#59283A] hover:bg-[#472130] text-white"
                   >
                     Close
                   </Button>
@@ -1573,43 +1573,43 @@ export default function RoomsPage() {
       {/* ADD / EDIT ROOM TYPE MODAL                                                */}
       {/* ========================================================================= */}
       <Dialog open={typeModalOpen} onOpenChange={setTypeModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <DialogTitle className="text-base font-serif font-bold text-[#362A22]">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <DialogTitle className="text-base font-serif font-bold text-[#59283A]">
               {editingType ? `Edit Category: ${editingType.name}` : "New Room Category"}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Configure category pricing and guest capacity.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSaveType} className="space-y-3 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Category Name *</label>
+              <label className="font-semibold text-[#59283A]">Category Name *</label>
               <Input
                 required
                 value={typeForm.name}
                 onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })}
                 placeholder="e.g. Deluxe Double Suite"
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Guest Capacity</label>
+                <label className="font-semibold text-[#59283A]">Guest Capacity</label>
                 <Input
                   type="number"
                   min="1"
                   max="10"
                   value={typeForm.capacity}
                   onChange={(e) => setTypeForm({ ...typeForm, capacity: Number(e.target.value) })}
-                  className="h-8 text-xs border-[#E3D9CA]"
+                  className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-[#362A22]">Default Nightly Rate (₹)</label>
+                <label className="font-semibold text-[#59283A]">Default Nightly Rate (₹)</label>
                 <Input
                   type="number"
                   min="0"
@@ -1618,23 +1618,23 @@ export default function RoomsPage() {
                   onChange={(e) =>
                     setTypeForm({ ...typeForm, defaultPricePerNight: Number(e.target.value) })
                   }
-                  className="h-8 text-xs font-mono border-[#E3D9CA]"
+                  className="h-8 text-xs font-mono border-[#E8DDD8]"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Description</label>
+              <label className="font-semibold text-[#59283A]">Description</label>
               <textarea
                 rows={2}
                 value={typeForm.description}
                 onChange={(e) => setTypeForm({ ...typeForm, description: e.target.value })}
                 placeholder="Category amenities, king size bed, view, etc."
-                className="w-full text-xs border border-[#E3D9CA] rounded-md p-2 bg-white text-[#362A22] focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
+                className="w-full text-xs border border-[#E8DDD8] rounded-md p-2 bg-white text-[#59283A] focus:outline-none focus:ring-1 focus:ring-[#C4A06A]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
@@ -1647,7 +1647,7 @@ export default function RoomsPage() {
                 type="submit"
                 size="sm"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white"
+                className="bg-[#59283A] hover:bg-[#472130] text-white"
               >
                 {submitting ? "Saving..." : editingType ? "Update Category" : "Create Category"}
               </Button>

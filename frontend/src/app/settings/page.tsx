@@ -16,6 +16,7 @@ import {
   FileCheck,
   CheckCircle2,
   AlertCircle,
+  Download,
 } from "lucide-react";
 import { settingsService, SystemHealthData } from "@/services/settings.service";
 import { HotelSetting } from "@/types";
@@ -30,6 +31,29 @@ export default function SettingsPage() {
   const [health, setHealth] = useState<SystemHealthData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [downloadingBackup, setDownloadingBackup] = useState(false);
+
+  const handleDownloadBackup = async () => {
+    try {
+      setDownloadingBackup(true);
+      const data = await settingsService.downloadBackup();
+      const jsonStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `grand-horizon-db-backup-${timestamp}.json`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Full database snapshot backup generated and downloaded successfully!");
+    } catch (err) {
+      toast.error("Failed to generate database backup");
+    } finally {
+      setDownloadingBackup(false);
+    }
+  };
 
   const [form, setForm] = useState({
     hotelName: "",
@@ -335,15 +359,45 @@ export default function SettingsPage() {
                   Your database is hosted on <strong>Neon Serverless PostgreSQL</strong> on AWS. Data is protected by continuous Write-Ahead Log (WAL) streaming and instant branch copy-on-write snapshots.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
-                  <div className="flex items-center gap-1.5 text-[#5D493D]">
+                  <div className="flex items-center gap-1.5 text-[#7A4652]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Point-in-Time Recovery (PITR) up to minute precision</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[#5D493D]">
+                  <div className="flex items-center gap-1.5 text-[#7A4652]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Zero-impact instantaneous database branching</span>
                   </div>
                 </div>
+              </div>
+
+              {/* On-Demand Full Database Backup Trigger */}
+              <div className="p-4 bg-gradient-to-r from-[#FAF5F7] to-[#F5F0EA] rounded-xl border border-[#C4A06A]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1 rounded bg-[#59283A] text-[#C4A06A]">
+                      <Database className="w-4 h-4" />
+                    </span>
+                    <span className="font-bold text-[#59283A] text-sm">
+                      On-Demand Full Database Backup (JSON Snapshot)
+                    </span>
+                    <Badge variant="outline" className="text-[10px] bg-white border-[#C4A06A]/50 text-[#C4A06A] font-bold">
+                      1-Click Export
+                    </Badge>
+                  </div>
+                  <p className="text-[#82747A] text-[11px] leading-relaxed max-w-xl">
+                    Export a complete digital snapshot of all rooms, guests, bookings, stays, items, invoices, payments, staff, payroll, expenses, and audit registers into a single portable backup file.
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={handleDownloadBackup}
+                  disabled={downloadingBackup}
+                  className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-2 text-xs h-9 px-4 shadow-sm flex-shrink-0"
+                >
+                  <Download className={`w-3.5 h-3.5 ${downloadingBackup ? "animate-bounce" : "text-[#C4A06A]"}`} />
+                  <span>{downloadingBackup ? "Exporting Snapshot..." : "Download DB Backup"}</span>
+                </Button>
               </div>
             </CardContent>
           </Card>

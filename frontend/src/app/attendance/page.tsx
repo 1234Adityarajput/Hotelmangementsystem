@@ -394,18 +394,18 @@ export default function AttendancePage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#E3D9CA]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#E8DDD8]">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-[#B08A60] bg-[#EEE7DA] px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#C4A06A] bg-[#F5F0EA] px-2.5 py-0.5 rounded-full">
               Workforce Operations • Module 10
             </span>
-            <span className="text-xs text-[#79695B]">• Daily & Monthly Staff Attendance</span>
+            <span className="text-xs text-[#82747A]">• Daily & Monthly Staff Attendance</span>
           </div>
-          <h2 className="text-2xl font-serif font-bold tracking-tight text-[#362A22] mt-1">
+          <h2 className="text-2xl font-serif font-bold tracking-tight text-[#59283A] mt-1">
             Staff Attendance Management
           </h2>
-          <p className="text-xs text-[#79695B] mt-0.5">
+          <p className="text-xs text-[#82747A] mt-0.5">
             Admin manual attendance management, daily check-in / check-out times, overtime tracking, and full monthly records.
           </p>
         </div>
@@ -420,9 +420,9 @@ export default function AttendancePage() {
               }));
               setBulkModalOpen(true);
             }}
-            className="bg-[#362A22] hover:bg-[#43352B] text-white flex items-center gap-1.5 text-xs h-9 px-3.5 shadow-sm"
+            className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 text-xs h-9 px-3.5 shadow-sm"
           >
-            <CheckCheck className="w-3.5 h-3.5 text-[#B08A60]" />
+            <CheckCheck className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Bulk Mark Attendance</span>
           </Button>
 
@@ -430,26 +430,26 @@ export default function AttendancePage() {
             variant="outline"
             size="sm"
             onClick={() => window.print()}
-            className="h-9 px-3 text-xs border-[#E3D9CA] text-[#79695B] hover:text-[#362A22]"
+            className="h-9 px-3 text-xs border-[#E8DDD8] text-[#82747A] hover:text-[#59283A]"
           >
-            <Printer className="w-3.5 h-3.5 mr-1 text-[#B08A60]" />
+            <Printer className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
             <span>Print Sheet</span>
           </Button>
         </div>
       </div>
 
       {/* Navigation Tabs Bar */}
-      <div className="flex items-center justify-between border-b border-[#E3D9CA] pb-1 gap-2 flex-wrap">
+      <div className="flex items-center justify-between border-b border-[#E8DDD8] pb-1 gap-2 flex-wrap">
         <div className="flex items-center gap-1">
           <button
             onClick={() => setActiveTab("daily")}
             className={`px-4 py-2 text-xs font-semibold rounded-t-lg transition-all flex items-center gap-1.5 ${
               activeTab === "daily"
-                ? "bg-[#362A22] text-white shadow-sm border-b-2 border-[#B08A60]"
-                : "text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]/50"
+                ? "bg-[#59283A] text-white shadow-sm border-b-2 border-[#C4A06A]"
+                : "text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA]/50"
             }`}
           >
-            <CalendarCheck className="w-3.5 h-3.5 text-[#B08A60]" />
+            <CalendarCheck className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Daily Attendance Register</span>
           </button>
 
@@ -457,11 +457,11 @@ export default function AttendancePage() {
             onClick={() => setActiveTab("monthly")}
             className={`px-4 py-2 text-xs font-semibold rounded-t-lg transition-all flex items-center gap-1.5 ${
               activeTab === "monthly"
-                ? "bg-[#362A22] text-white shadow-sm border-b-2 border-[#B08A60]"
-                : "text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]/50"
+                ? "bg-[#59283A] text-white shadow-sm border-b-2 border-[#C4A06A]"
+                : "text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA]/50"
             }`}
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-[#B08A60]" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Monthly Records & Matrix</span>
           </button>
 
@@ -469,18 +469,18 @@ export default function AttendancePage() {
             onClick={() => setActiveTab("history")}
             className={`px-4 py-2 text-xs font-semibold rounded-t-lg transition-all flex items-center gap-1.5 ${
               activeTab === "history"
-                ? "bg-[#362A22] text-white shadow-sm border-b-2 border-[#B08A60]"
-                : "text-[#79695B] hover:text-[#362A22] hover:bg-[#EEE7DA]/50"
+                ? "bg-[#59283A] text-white shadow-sm border-b-2 border-[#C4A06A]"
+                : "text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA]/50"
             }`}
           >
-            <Users className="w-3.5 h-3.5 text-[#B08A60]" />
+            <Users className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Employee Attendance Dossier</span>
           </button>
         </div>
 
         {/* Status Legend */}
-        <div className="hidden lg:flex items-center gap-2 text-[11px] text-[#79695B]">
-          <span className="font-semibold text-[#362A22]">Legend:</span>
+        <div className="hidden lg:flex items-center gap-2 text-[11px] text-[#82747A]">
+          <span className="font-semibold text-[#59283A]">Legend:</span>
           {Object.entries(STATUS_CONFIG).map(([k, cfg]) => (
             <span key={k} className="flex items-center gap-1">
               <span
@@ -499,42 +499,42 @@ export default function AttendancePage() {
       {activeTab === "daily" && (
         <div className="space-y-5">
           {/* Daily Date Selector & Filters Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E3D9CA] shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E8DDD8] shadow-sm">
             {/* Date Nav Controls */}
             <div className="flex items-center gap-1.5">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleDateShift(-1)}
-                className="h-8 w-8 p-0 border-[#E3D9CA]"
+                className="h-8 w-8 p-0 border-[#E8DDD8]"
                 title="Previous Day"
               >
-                <ChevronLeft className="w-3.5 h-3.5 text-[#79695B]" />
+                <ChevronLeft className="w-3.5 h-3.5 text-[#82747A]" />
               </Button>
               <Input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-40 h-8 text-xs font-mono font-medium border-[#E3D9CA] bg-[#F7F4EE]/50 focus:bg-white"
+                className="w-40 h-8 text-xs font-mono font-medium border-[#E8DDD8] bg-[#F5F0EA]/50 focus:bg-white"
               />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleDateShift(1)}
-                className="h-8 w-8 p-0 border-[#E3D9CA]"
+                className="h-8 w-8 p-0 border-[#E8DDD8]"
                 title="Next Day"
               >
-                <ChevronRight className="w-3.5 h-3.5 text-[#79695B]" />
+                <ChevronRight className="w-3.5 h-3.5 text-[#82747A]" />
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setSelectedDate(new Date().toISOString().split("T")[0])}
-                className="h-8 px-2.5 text-xs border-[#E3D9CA] text-[#362A22]"
+                className="h-8 px-2.5 text-xs border-[#E8DDD8] text-[#59283A]"
               >
                 Today
               </Button>
-              <span className="text-xs font-serif font-bold text-[#362A22] ml-2 hidden sm:inline">
+              <span className="text-xs font-serif font-bold text-[#59283A] ml-2 hidden sm:inline">
                 {new Date(selectedDate).toLocaleDateString("en-US", {
                   weekday: "short",
                   month: "short",
@@ -546,11 +546,11 @@ export default function AttendancePage() {
 
             {/* Department Filter & Search */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold text-[#79695B]">Dept:</span>
+              <span className="text-xs font-semibold text-[#82747A]">Dept:</span>
               <select
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                className="text-xs border border-[#E3D9CA] rounded-md px-2.5 py-1.5 bg-[#F7F4EE] text-[#362A22] focus:outline-none focus:ring-1 focus:ring-[#B08A60]"
+                className="text-xs border border-[#E8DDD8] rounded-md px-2.5 py-1.5 bg-[#F5F0EA] text-[#59283A] focus:outline-none focus:ring-1 focus:ring-[#C4A06A]"
               >
                 {DEPARTMENTS.map((d) => (
                   <option key={d} value={d}>
@@ -560,13 +560,13 @@ export default function AttendancePage() {
               </select>
 
               <div className="relative w-48 sm:w-60">
-                <Search className="w-3.5 h-3.5 text-[#79695B] absolute left-2.5 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-[#82747A] absolute left-2.5 top-2.5" />
                 <Input
                   type="text"
                   placeholder="Search staff name or code..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-xs border-[#E3D9CA]"
+                  className="pl-8 h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
             </div>
@@ -574,13 +574,13 @@ export default function AttendancePage() {
 
           {/* 6 KPI Stat Badges */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <Card className="border-[#E3D9CA] shadow-sm bg-white">
+            <Card className="border-[#E8DDD8] shadow-sm bg-white">
               <CardContent className="p-3 text-center">
-                <span className="text-[10px] uppercase font-bold text-[#79695B] block">Total Staff</span>
-                <span className="text-2xl font-bold font-serif text-[#362A22]">
+                <span className="text-[10px] uppercase font-bold text-[#82747A] block">Total Staff</span>
+                <span className="text-2xl font-bold font-serif text-[#59283A]">
                   {dailyData?.stats.totalStaff || 0}
                 </span>
-                <span className="text-[10px] text-[#948779] block mt-0.5">Active Workforce</span>
+                <span className="text-[10px] text-[#8E7079] block mt-0.5">Active Workforce</span>
               </CardContent>
             </Card>
 
@@ -636,13 +636,13 @@ export default function AttendancePage() {
           </div>
 
           {/* Daily Attendance Register Table */}
-          <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
-            <CardHeader className="p-4 border-b border-[#EAE3D8] bg-[#F7F4EE]/40 flex flex-row items-center justify-between">
+          <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
+            <CardHeader className="p-4 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-serif font-bold text-[#362A22]">
+                <CardTitle className="text-sm font-serif font-bold text-[#59283A]">
                   Daily Roster for {selectedDate}
                 </CardTitle>
-                <CardDescription className="text-xs text-[#79695B]">
+                <CardDescription className="text-xs text-[#82747A]">
                   Click on any status pill to quick-mark attendance or edit individual shift hours.
                 </CardDescription>
               </div>
@@ -657,19 +657,19 @@ export default function AttendancePage() {
             <CardContent className="p-0">
               {loadingDaily ? (
                 <div className="p-16 flex flex-col justify-center items-center">
-                  <LoadingSpinner className="w-8 h-8 text-[#B08A60] mb-2" />
-                  <span className="text-xs text-[#79695B]">Loading daily staff register...</span>
+                  <LoadingSpinner className="w-8 h-8 text-[#C4A06A] mb-2" />
+                  <span className="text-xs text-[#82747A]">Loading daily staff register...</span>
                 </div>
               ) : filteredDailyRegister.length === 0 ? (
-                <div className="p-16 text-center text-xs text-[#79695B] space-y-2">
-                  <Users className="w-8 h-8 mx-auto text-[#B08A60] opacity-40" />
-                  <p className="font-semibold text-[#362A22]">No staff members found matching criteria.</p>
+                <div className="p-16 text-center text-xs text-[#82747A] space-y-2">
+                  <Users className="w-8 h-8 mx-auto text-[#C4A06A] opacity-40" />
+                  <p className="font-semibold text-[#59283A]">No staff members found matching criteria.</p>
                   <p>Check your department or search filters.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                    <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                       <tr>
                         <th className="px-4 py-3">Employee</th>
                         <th className="px-4 py-3">Role & Dept</th>
@@ -681,22 +681,22 @@ export default function AttendancePage() {
                         <th className="px-4 py-3 text-right">Edit</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EAE3D8]">
+                    <tbody className="divide-y divide-[#E8DDD8]">
                       {filteredDailyRegister.map((item) => {
                         const att = item.attendance;
                         const cfg = att ? STATUS_CONFIG[att.attendanceStatus] : null;
 
                         return (
-                          <tr key={item.staff.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
-                            <td className="px-4 py-3 font-medium text-[#362A22]">
+                          <tr key={item.staff.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
+                            <td className="px-4 py-3 font-medium text-[#59283A]">
                               <div className="font-semibold">{item.staff.fullName}</div>
-                              <div className="text-[11px] text-[#B08A60] font-mono">
+                              <div className="text-[11px] text-[#C4A06A] font-mono">
                                 {item.staff.employeeCode}
                               </div>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="font-medium text-[#362A22]">{item.staff.designation}</div>
-                              <div className="text-[11px] text-[#79695B]">{item.staff.department}</div>
+                              <div className="font-medium text-[#59283A]">{item.staff.designation}</div>
+                              <div className="text-[11px] text-[#82747A]">{item.staff.department}</div>
                             </td>
                             <td className="px-4 py-3">
                               {cfg ? (
@@ -709,7 +709,7 @@ export default function AttendancePage() {
                               ) : (
                                 <Badge
                                   variant="outline"
-                                  className="text-[10px] text-[#79695B] bg-[#F7F4EE] border-[#E3D9CA]"
+                                  className="text-[10px] text-[#82747A] bg-[#F5F0EA] border-[#E8DDD8]"
                                 >
                                   UNMARKED
                                 </Badge>
@@ -726,8 +726,8 @@ export default function AttendancePage() {
                                       onClick={() => handleQuickStatus(item.staff, st)}
                                       className={`h-6 px-2 rounded text-[10px] font-bold border transition-all ${
                                         isCurrent
-                                          ? "bg-[#362A22] text-white border-[#362A22] shadow-xs"
-                                          : "bg-white hover:bg-[#EEE7DA] text-[#79695B] border-[#E3D9CA]"
+                                          ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
+                                          : "bg-white hover:bg-[#F5F0EA] text-[#82747A] border-[#E8DDD8]"
                                       }`}
                                       title={`Mark as ${statusCfg.label}`}
                                     >
@@ -740,7 +740,7 @@ export default function AttendancePage() {
                             <td className="px-4 py-3 font-mono">
                               {att ? (
                                 <span>
-                                  <strong className="text-[#362A22]">{Number(att.workingHours || 0)}h</strong>
+                                  <strong className="text-[#59283A]">{Number(att.workingHours || 0)}h</strong>
                                   {Number(att.overtimeHours) > 0 && (
                                     <span className="text-amber-700 font-semibold ml-1.5 bg-amber-50 px-1 py-0.5 rounded text-[10px]">
                                       +{Number(att.overtimeHours)}h OT
@@ -748,19 +748,19 @@ export default function AttendancePage() {
                                   )}
                                 </span>
                               ) : (
-                                <span className="text-[#948779]">-</span>
+                                <span className="text-[#8E7079]">-</span>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-[#79695B] text-[11px]">
+                            <td className="px-4 py-3 text-[#82747A] text-[11px]">
                               {att && att.checkInTime ? (
                                 <span className="font-mono">
                                   {att.checkInTime} → {att.checkOutTime || "Pending"}
                                 </span>
                               ) : (
-                                <span className="text-[#948779]">Not recorded</span>
+                                <span className="text-[#8E7079]">Not recorded</span>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-[#79695B] text-[11px] max-w-[150px] truncate">
+                            <td className="px-4 py-3 text-[#82747A] text-[11px] max-w-[150px] truncate">
                               {att?.notes || "-"}
                             </td>
                             <td className="px-4 py-3 text-right">
@@ -768,7 +768,7 @@ export default function AttendancePage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleOpenDetailedModal(item.staff, att, selectedDate)}
-                                className="h-7 px-2 text-[#79695B] hover:text-[#B08A60] hover:bg-[#F2EADF]"
+                                className="h-7 px-2 text-[#82747A] hover:text-[#C4A06A] hover:bg-[#EFE8E0]"
                                 title="Edit Check-In, Check-Out, and Hours"
                               >
                                 <Edit2 className="w-3.5 h-3.5 mr-1" />
@@ -793,22 +793,22 @@ export default function AttendancePage() {
       {activeTab === "monthly" && (
         <div className="space-y-5">
           {/* Month & Department Selector Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E3D9CA] shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E8DDD8] shadow-sm">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleMonthShift(-1)}
-                className="h-8 w-8 p-0 border-[#E3D9CA]"
+                className="h-8 w-8 p-0 border-[#E8DDD8]"
                 title="Previous Month"
               >
-                <ChevronLeft className="w-3.5 h-3.5 text-[#79695B]" />
+                <ChevronLeft className="w-3.5 h-3.5 text-[#82747A]" />
               </Button>
 
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                className="h-8 text-xs font-semibold border border-[#E3D9CA] rounded-md px-2.5 bg-[#F7F4EE] text-[#362A22]"
+                className="h-8 text-xs font-semibold border border-[#E8DDD8] rounded-md px-2.5 bg-[#F5F0EA] text-[#59283A]"
               >
                 {MONTH_NAMES.map((name, i) => (
                   <option key={name} value={i + 1}>
@@ -820,7 +820,7 @@ export default function AttendancePage() {
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="h-8 text-xs font-mono font-semibold border border-[#E3D9CA] rounded-md px-2 bg-[#F7F4EE] text-[#362A22]"
+                className="h-8 text-xs font-mono font-semibold border border-[#E8DDD8] rounded-md px-2 bg-[#F5F0EA] text-[#59283A]"
               >
                 {[2024, 2025, 2026, 2027].map((yr) => (
                   <option key={yr} value={yr}>
@@ -833,10 +833,10 @@ export default function AttendancePage() {
                 variant="outline"
                 size="sm"
                 onClick={() => handleMonthShift(1)}
-                className="h-8 w-8 p-0 border-[#E3D9CA]"
+                className="h-8 w-8 p-0 border-[#E8DDD8]"
                 title="Next Month"
               >
-                <ChevronRight className="w-3.5 h-3.5 text-[#79695B]" />
+                <ChevronRight className="w-3.5 h-3.5 text-[#82747A]" />
               </Button>
 
               <Button
@@ -846,18 +846,18 @@ export default function AttendancePage() {
                   setSelectedMonth(new Date().getMonth() + 1);
                   setSelectedYear(new Date().getFullYear());
                 }}
-                className="h-8 px-2.5 text-xs border-[#E3D9CA] text-[#362A22]"
+                className="h-8 px-2.5 text-xs border-[#E8DDD8] text-[#59283A]"
               >
                 Current Month
               </Button>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-[#79695B]">Department:</span>
+              <span className="text-xs font-semibold text-[#82747A]">Department:</span>
               <select
                 value={monthlyDepartment}
                 onChange={(e) => setMonthlyDepartment(e.target.value)}
-                className="text-xs border border-[#E3D9CA] rounded-md px-2.5 py-1.5 bg-[#F7F4EE] text-[#362A22] focus:outline-none"
+                className="text-xs border border-[#E8DDD8] rounded-md px-2.5 py-1.5 bg-[#F5F0EA] text-[#59283A] focus:outline-none"
               >
                 {DEPARTMENTS.map((d) => (
                   <option key={d} value={d}>
@@ -871,13 +871,13 @@ export default function AttendancePage() {
           {/* Monthly KPI Stats Strip */}
           {monthlyData && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <Card className="border-[#E3D9CA] shadow-sm bg-white">
+              <Card className="border-[#E8DDD8] shadow-sm bg-white">
                 <CardContent className="p-3 text-center">
-                  <span className="text-[10px] uppercase font-bold text-[#79695B] block">Staff Enrolled</span>
-                  <span className="text-2xl font-bold font-serif text-[#362A22]">
+                  <span className="text-[10px] uppercase font-bold text-[#82747A] block">Staff Enrolled</span>
+                  <span className="text-2xl font-bold font-serif text-[#59283A]">
                     {monthlyData.overallStats.totalStaff}
                   </span>
-                  <span className="text-[10px] text-[#948779] block mt-0.5">
+                  <span className="text-[10px] text-[#8E7079] block mt-0.5">
                     {monthlyData.daysInMonth} Days in Month
                   </span>
                 </CardContent>
@@ -923,13 +923,13 @@ export default function AttendancePage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-[#E3D9CA] shadow-sm bg-[#F7F4EE]">
+              <Card className="border-[#E8DDD8] shadow-sm bg-[#F5F0EA]">
                 <CardContent className="p-3 text-center">
-                  <span className="text-[10px] uppercase font-bold text-[#79695B] block">Total Overtime</span>
-                  <span className="text-2xl font-bold font-serif text-[#362A22]">
+                  <span className="text-[10px] uppercase font-bold text-[#82747A] block">Total Overtime</span>
+                  <span className="text-2xl font-bold font-serif text-[#59283A]">
                     {monthlyData.overallStats.totalOvertimeHours}h
                   </span>
-                  <span className="text-[10px] text-[#79695B] block mt-0.5">
+                  <span className="text-[10px] text-[#82747A] block mt-0.5">
                     {monthlyData.overallStats.totalWorkingHours}h total worked
                   </span>
                 </CardContent>
@@ -938,18 +938,18 @@ export default function AttendancePage() {
           )}
 
           {/* Monthly Attendance Matrix Grid */}
-          <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
-            <CardHeader className="p-4 border-b border-[#EAE3D8] bg-[#F7F4EE]/40 flex flex-row items-center justify-between">
+          <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
+            <CardHeader className="p-4 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-serif font-bold text-[#362A22]">
+                <CardTitle className="text-sm font-serif font-bold text-[#59283A]">
                   Monthly Matrix: {MONTH_NAMES[selectedMonth - 1]} {selectedYear}
                 </CardTitle>
-                <CardDescription className="text-xs text-[#79695B]">
+                <CardDescription className="text-xs text-[#82747A]">
                   Click on any day cell to view or modify an employee&apos;s record for that specific date.
                 </CardDescription>
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-[#79695B]">
+              <div className="flex items-center gap-1.5 text-xs text-[#82747A]">
                 <span className="w-2 h-2 rounded-full bg-emerald-600" /> P: Present
                 <span className="w-2 h-2 rounded-full bg-rose-600 ml-2" /> A: Absent
                 <span className="w-2 h-2 rounded-full bg-amber-600 ml-2" /> HD: Half Day
@@ -961,24 +961,24 @@ export default function AttendancePage() {
             <CardContent className="p-0">
               {loadingMonthly ? (
                 <div className="p-16 flex flex-col justify-center items-center">
-                  <LoadingSpinner className="w-8 h-8 text-[#B08A60] mb-2" />
-                  <span className="text-xs text-[#79695B]">Generating monthly attendance matrix...</span>
+                  <LoadingSpinner className="w-8 h-8 text-[#C4A06A] mb-2" />
+                  <span className="text-xs text-[#82747A]">Generating monthly attendance matrix...</span>
                 </div>
               ) : !monthlyData || monthlyData.staffRows.length === 0 ? (
-                <div className="p-16 text-center text-xs text-[#79695B] space-y-2">
-                  <FileSpreadsheet className="w-8 h-8 mx-auto text-[#B08A60] opacity-40" />
-                  <p className="font-semibold text-[#362A22]">No staff attendance data found for this month.</p>
+                <div className="p-16 text-center text-xs text-[#82747A] space-y-2">
+                  <FileSpreadsheet className="w-8 h-8 mx-auto text-[#C4A06A] opacity-40" />
+                  <p className="font-semibold text-[#59283A]">No staff attendance data found for this month.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
                   <table className="w-full text-xs text-left border-collapse">
-                    <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[10px] font-semibold sticky top-0 z-20 shadow-xs border-b border-[#E3D9CA]">
+                    <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[10px] font-semibold sticky top-0 z-20 shadow-xs border-b border-[#E8DDD8]">
                       <tr>
-                        <th className="px-3 py-2.5 sticky left-0 bg-[#F7F4EE] z-30 min-w-[160px] border-r border-[#E3D9CA]">
+                        <th className="px-3 py-2.5 sticky left-0 bg-[#F5F0EA] z-30 min-w-[160px] border-r border-[#E8DDD8]">
                           Staff Member
                         </th>
                         {Array.from({ length: monthlyData.daysInMonth }, (_, i) => i + 1).map((d) => (
-                          <th key={d} className="px-1.5 py-2 text-center min-w-[28px] border-r border-[#EAE3D8]">
+                          <th key={d} className="px-1.5 py-2 text-center min-w-[28px] border-r border-[#E8DDD8]">
                             {d}
                           </th>
                         ))}
@@ -987,21 +987,21 @@ export default function AttendancePage() {
                         <th className="px-2 py-2 text-center text-amber-800 bg-amber-50/50">HD</th>
                         <th className="px-2 py-2 text-center text-blue-800 bg-blue-50/50">L</th>
                         <th className="px-2 py-2 text-center text-purple-800 bg-purple-50/50">WO</th>
-                        <th className="px-2.5 py-2 text-center font-bold text-[#362A22]">Hours</th>
+                        <th className="px-2.5 py-2 text-center font-bold text-[#59283A]">Hours</th>
                         <th className="px-2.5 py-2 text-center font-bold text-amber-700">OT</th>
-                        <th className="px-3 py-2 text-center font-bold text-[#362A22]">Rate %</th>
+                        <th className="px-3 py-2 text-center font-bold text-[#59283A]">Rate %</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EAE3D8]">
+                    <tbody className="divide-y divide-[#E8DDD8]">
                       {monthlyData.staffRows.map((row) => (
-                        <tr key={row.staff.id} className="hover:bg-[#F7F4EE]/50 transition-colors">
+                        <tr key={row.staff.id} className="hover:bg-[#F5F0EA]/50 transition-colors">
                           {/* Frozen Left Staff Info */}
-                          <td className="px-3 py-2 sticky left-0 bg-white hover:bg-[#F7F4EE]/50 z-10 border-r border-[#E3D9CA]">
-                            <div className="font-semibold text-[#362A22] truncate max-w-[150px]">
+                          <td className="px-3 py-2 sticky left-0 bg-white hover:bg-[#F5F0EA]/50 z-10 border-r border-[#E8DDD8]">
+                            <div className="font-semibold text-[#59283A] truncate max-w-[150px]">
                               {row.staff.fullName}
                             </div>
-                            <div className="text-[10px] text-[#79695B] font-mono flex items-center gap-1">
-                              <span className="text-[#B08A60] font-bold">{row.staff.employeeCode}</span>
+                            <div className="text-[10px] text-[#82747A] font-mono flex items-center gap-1">
+                              <span className="text-[#C4A06A] font-bold">{row.staff.employeeCode}</span>
                               <span>• {row.staff.department}</span>
                             </div>
                           </td>
@@ -1016,7 +1016,7 @@ export default function AttendancePage() {
                               <td
                                 key={d}
                                 onClick={() => handleOpenDetailedModal(row.staff, rec as any, targetDateStr)}
-                                className="px-0.5 py-1 text-center cursor-pointer border-r border-[#EAE3D8] hover:bg-[#EEE7DA]"
+                                className="px-0.5 py-1 text-center cursor-pointer border-r border-[#E8DDD8] hover:bg-[#F5F0EA]"
                                 title={`${row.staff.fullName} - Day ${d}: ${cfg ? cfg.label : "Unmarked"}`}
                               >
                                 {cfg ? (
@@ -1050,7 +1050,7 @@ export default function AttendancePage() {
                           <td className="px-2 py-2 text-center font-bold font-mono text-purple-700 bg-purple-50/30">
                             {row.summary.weeklyOffCount}
                           </td>
-                          <td className="px-2.5 py-2 text-center font-mono font-bold text-[#362A22]">
+                          <td className="px-2.5 py-2 text-center font-mono font-bold text-[#59283A]">
                             {row.summary.totalWorkingHours}h
                           </td>
                           <td className="px-2.5 py-2 text-center font-mono font-bold text-amber-700">
@@ -1087,13 +1087,13 @@ export default function AttendancePage() {
       {activeTab === "history" && (
         <div className="space-y-5">
           {/* Employee & Date Filter Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E3D9CA] shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-xl border border-[#E8DDD8] shadow-sm">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold text-[#79695B]">Select Staff:</span>
+              <span className="text-xs font-semibold text-[#82747A]">Select Staff:</span>
               <select
                 value={selectedStaffId}
                 onChange={(e) => setSelectedStaffId(e.target.value)}
-                className="text-xs font-semibold border border-[#E3D9CA] rounded-md px-2.5 py-1.5 bg-[#F7F4EE] text-[#362A22] min-w-[220px]"
+                className="text-xs font-semibold border border-[#E8DDD8] rounded-md px-2.5 py-1.5 bg-[#F5F0EA] text-[#59283A] min-w-[220px]"
               >
                 {allStaff.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -1102,37 +1102,37 @@ export default function AttendancePage() {
                 ))}
               </select>
 
-              <span className="text-xs font-semibold text-[#79695B] ml-2">From:</span>
+              <span className="text-xs font-semibold text-[#82747A] ml-2">From:</span>
               <Input
                 type="date"
                 value={staffHistoryDateRange.startDate}
                 onChange={(e) =>
                   setStaffHistoryDateRange((prev) => ({ ...prev, startDate: e.target.value }))
                 }
-                className="w-36 h-8 text-xs border-[#E3D9CA]"
+                className="w-36 h-8 text-xs border-[#E8DDD8]"
               />
 
-              <span className="text-xs font-semibold text-[#79695B]">To:</span>
+              <span className="text-xs font-semibold text-[#82747A]">To:</span>
               <Input
                 type="date"
                 value={staffHistoryDateRange.endDate}
                 onChange={(e) =>
                   setStaffHistoryDateRange((prev) => ({ ...prev, endDate: e.target.value }))
                 }
-                className="w-36 h-8 text-xs border-[#E3D9CA]"
+                className="w-36 h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-[#79695B]">Status:</span>
+              <span className="text-xs font-semibold text-[#82747A]">Status:</span>
               {["ALL", "PRESENT", "ABSENT", "HALF_DAY", "LEAVE", "WEEKLY_OFF"].map((st) => (
                 <button
                   key={st}
                   onClick={() => setHistoryStatusFilter(st)}
                   className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                     historyStatusFilter === st
-                      ? "bg-[#362A22] text-white font-semibold"
-                      : "bg-[#F7F4EE] text-[#79695B] hover:bg-[#EEE7DA] border border-[#E3D9CA]"
+                      ? "bg-[#59283A] text-white font-semibold"
+                      : "bg-[#F5F0EA] text-[#82747A] hover:bg-[#F5F0EA] border border-[#E8DDD8]"
                   }`}
                 >
                   {st}
@@ -1155,10 +1155,10 @@ export default function AttendancePage() {
 
             return (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="border-[#E3D9CA] shadow-sm bg-white md:col-span-1">
+                <Card className="border-[#E8DDD8] shadow-sm bg-white md:col-span-1">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-[#362A22] text-[#EEE7DA] flex items-center justify-center font-serif font-bold text-base shadow-inner">
+                      <div className="w-12 h-12 rounded-full bg-[#59283A] text-[#F5F0EA] flex items-center justify-center font-serif font-bold text-base shadow-inner">
                         {currentStaff.fullName
                           .split(" ")
                           .map((n) => n[0])
@@ -1167,33 +1167,33 @@ export default function AttendancePage() {
                           .toUpperCase()}
                       </div>
                       <div>
-                        <h3 className="font-serif font-bold text-sm text-[#362A22]">
+                        <h3 className="font-serif font-bold text-sm text-[#59283A]">
                           {currentStaff.fullName}
                         </h3>
-                        <p className="font-mono text-[11px] text-[#B08A60] font-semibold">
+                        <p className="font-mono text-[11px] text-[#C4A06A] font-semibold">
                           {currentStaff.employeeCode}
                         </p>
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t border-[#F2EADF] text-xs space-y-1.5 text-[#79695B]">
+                    <div className="pt-2 border-t border-[#EFE8E0] text-xs space-y-1.5 text-[#82747A]">
                       <div className="flex justify-between">
                         <span>Department:</span>
-                        <strong className="text-[#362A22]">{currentStaff.department}</strong>
+                        <strong className="text-[#59283A]">{currentStaff.department}</strong>
                       </div>
                       <div className="flex justify-between">
                         <span>Designation:</span>
-                        <strong className="text-[#362A22]">{currentStaff.designation}</strong>
+                        <strong className="text-[#59283A]">{currentStaff.designation}</strong>
                       </div>
                       <div className="flex justify-between">
                         <span>Monthly Salary:</span>
-                        <strong className="text-[#362A22] font-mono">
+                        <strong className="text-[#59283A] font-mono">
                           ₹{Number(currentStaff.monthlySalary).toLocaleString("en-IN")}
                         </strong>
                       </div>
                       <div className="flex justify-between">
                         <span>Mobile:</span>
-                        <span className="font-mono text-[#362A22]">{currentStaff.mobileNumber}</span>
+                        <span className="font-mono text-[#59283A]">{currentStaff.mobileNumber}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -1232,11 +1232,11 @@ export default function AttendancePage() {
                     </CardContent>
                   </Card>
 
-                  <Card className="border-[#E3D9CA] shadow-sm bg-[#F7F4EE]">
+                  <Card className="border-[#E8DDD8] shadow-sm bg-[#F5F0EA]">
                     <CardContent className="p-3 text-center">
-                      <span className="text-[10px] uppercase font-bold text-[#79695B] block">Total Overtime</span>
-                      <span className="text-2xl font-bold font-serif text-[#362A22]">{totalOT}h</span>
-                      <span className="text-[10px] text-[#79695B] block mt-0.5">{totalHours}h worked</span>
+                      <span className="text-[10px] uppercase font-bold text-[#82747A] block">Total Overtime</span>
+                      <span className="text-2xl font-bold font-serif text-[#59283A]">{totalOT}h</span>
+                      <span className="text-[10px] text-[#82747A] block mt-0.5">{totalHours}h worked</span>
                     </CardContent>
                   </Card>
                 </div>
@@ -1245,13 +1245,13 @@ export default function AttendancePage() {
           })()}
 
           {/* History Ledger Table */}
-          <Card className="border-[#E3D9CA] shadow-sm overflow-hidden bg-white">
-            <CardHeader className="p-4 border-b border-[#EAE3D8] bg-[#F7F4EE]/40 flex flex-row items-center justify-between">
+          <Card className="border-[#E8DDD8] shadow-sm overflow-hidden bg-white">
+            <CardHeader className="p-4 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-serif font-bold text-[#362A22]">
+                <CardTitle className="text-sm font-serif font-bold text-[#59283A]">
                   Attendance History Log ({staffHistory.length} records)
                 </CardTitle>
-                <CardDescription className="text-xs text-[#79695B]">
+                <CardDescription className="text-xs text-[#82747A]">
                   Chronological log of check-in, check-out, working hours, and notes.
                 </CardDescription>
               </div>
@@ -1260,18 +1260,18 @@ export default function AttendancePage() {
             <CardContent className="p-0">
               {loadingHistory ? (
                 <div className="p-16 flex flex-col justify-center items-center">
-                  <LoadingSpinner className="w-8 h-8 text-[#B08A60] mb-2" />
-                  <span className="text-xs text-[#79695B]">Loading attendance history...</span>
+                  <LoadingSpinner className="w-8 h-8 text-[#C4A06A] mb-2" />
+                  <span className="text-xs text-[#82747A]">Loading attendance history...</span>
                 </div>
               ) : staffHistory.length === 0 ? (
-                <div className="p-16 text-center text-xs text-[#79695B] space-y-2">
-                  <Calendar className="w-8 h-8 mx-auto text-[#B08A60] opacity-40" />
-                  <p className="font-semibold text-[#362A22]">No attendance records found for this period.</p>
+                <div className="p-16 text-center text-xs text-[#82747A] space-y-2">
+                  <Calendar className="w-8 h-8 mx-auto text-[#C4A06A] opacity-40" />
+                  <p className="font-semibold text-[#59283A]">No attendance records found for this period.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs text-left">
-                    <thead className="bg-[#F7F4EE] text-[#79695B] uppercase text-[11px] font-semibold border-b border-[#E3D9CA]">
+                    <thead className="bg-[#F5F0EA] text-[#82747A] uppercase text-[11px] font-semibold border-b border-[#E8DDD8]">
                       <tr>
                         <th className="px-4 py-3">Date</th>
                         <th className="px-4 py-3">Status</th>
@@ -1283,7 +1283,7 @@ export default function AttendancePage() {
                         <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#EAE3D8]">
+                    <tbody className="divide-y divide-[#E8DDD8]">
                       {staffHistory.map((h) => {
                         const cfg = STATUS_CONFIG[h.attendanceStatus];
                         const dateFormatted = new Date(h.attendanceDate).toLocaleDateString("en-IN", {
@@ -1295,8 +1295,8 @@ export default function AttendancePage() {
                         const currentStaff = allStaff.find((s) => s.id === selectedStaffId);
 
                         return (
-                          <tr key={h.id} className="hover:bg-[#F7F4EE]/60 transition-colors">
-                            <td className="px-4 py-3 font-semibold text-[#362A22] font-mono">
+                          <tr key={h.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
+                            <td className="px-4 py-3 font-semibold text-[#59283A] font-mono">
                               {dateFormatted}
                             </td>
                             <td className="px-4 py-3">
@@ -1309,13 +1309,13 @@ export default function AttendancePage() {
                                 </Badge>
                               )}
                             </td>
-                            <td className="px-4 py-3 font-mono text-[#362A22]">
+                            <td className="px-4 py-3 font-mono text-[#59283A]">
                               {h.checkInTime || "-"}
                             </td>
-                            <td className="px-4 py-3 font-mono text-[#362A22]">
+                            <td className="px-4 py-3 font-mono text-[#59283A]">
                               {h.checkOutTime || "-"}
                             </td>
-                            <td className="px-4 py-3 font-mono font-bold text-[#362A22]">
+                            <td className="px-4 py-3 font-mono font-bold text-[#59283A]">
                               {Number(h.workingHours || 0)}h
                             </td>
                             <td className="px-4 py-3 font-mono">
@@ -1324,10 +1324,10 @@ export default function AttendancePage() {
                                   +{Number(h.overtimeHours)}h OT
                                 </span>
                               ) : (
-                                <span className="text-[#948779]">-</span>
+                                <span className="text-[#8E7079]">-</span>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-[#79695B] max-w-[200px] truncate">
+                            <td className="px-4 py-3 text-[#82747A] max-w-[200px] truncate">
                               {h.notes || "-"}
                             </td>
                             <td className="px-4 py-3 text-right">
@@ -1342,7 +1342,7 @@ export default function AttendancePage() {
                                       new Date(h.attendanceDate).toISOString().split("T")[0],
                                     )
                                   }
-                                  className="h-7 px-2 text-[#79695B] hover:text-[#B08A60] hover:bg-[#F2EADF]"
+                                  className="h-7 px-2 text-[#82747A] hover:text-[#C4A06A] hover:bg-[#EFE8E0]"
                                 >
                                   <Edit2 className="w-3.5 h-3.5 mr-1" /> Edit
                                 </Button>
@@ -1364,15 +1364,15 @@ export default function AttendancePage() {
       {/* DETAILED ATTENDANCE MODAL (CHECK-IN / OUT / HOURS / NOTES)                */}
       {/* ========================================================================= */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
-            <span className="text-[10px] uppercase font-bold text-[#362A22] bg-[#EEE7DA] px-2 py-0.5 rounded w-fit">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+            <span className="text-[10px] uppercase font-bold text-[#59283A] bg-[#F5F0EA] px-2 py-0.5 rounded w-fit">
               Attendance Record Correction
             </span>
-            <DialogTitle className="text-lg font-serif font-bold text-[#362A22] mt-1">
+            <DialogTitle className="text-lg font-serif font-bold text-[#59283A] mt-1">
               {activeStaff?.fullName}
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#79695B] font-mono">
+            <DialogDescription className="text-xs text-[#82747A] font-mono">
               {activeStaff?.employeeCode} • Date: {activeAttendanceDate || selectedDate}
             </DialogDescription>
           </DialogHeader>
@@ -1380,7 +1380,7 @@ export default function AttendancePage() {
           <form onSubmit={handleSaveDetailed} className="space-y-3.5 pt-2 text-xs">
             {/* Status Selection */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Attendance Status *</label>
+              <label className="font-semibold text-[#59283A]">Attendance Status *</label>
               <select
                 value={editForm.status}
                 onChange={(e) => {
@@ -1394,7 +1394,7 @@ export default function AttendancePage() {
                     checkOutTime: newStatus === "PRESENT" ? prev.checkOutTime || "06:00 PM" : newStatus === "HALF_DAY" ? "01:00 PM" : "",
                   }));
                 }}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 <option value="PRESENT">PRESENT (Full Duty)</option>
                 <option value="ABSENT">ABSENT (Unexcused)</option>
@@ -1409,28 +1409,28 @@ export default function AttendancePage() {
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="font-semibold text-[#362A22]">Check-In Time</label>
+                    <label className="font-semibold text-[#59283A]">Check-In Time</label>
                     <Input
                       value={editForm.checkInTime}
                       onChange={(e) => setEditForm({ ...editForm, checkInTime: e.target.value })}
                       placeholder="09:00 AM"
-                      className="h-8 text-xs font-mono border-[#E3D9CA]"
+                      className="h-8 text-xs font-mono border-[#E8DDD8]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="font-semibold text-[#362A22]">Check-Out Time</label>
+                    <label className="font-semibold text-[#59283A]">Check-Out Time</label>
                     <Input
                       value={editForm.checkOutTime}
                       onChange={(e) => setEditForm({ ...editForm, checkOutTime: e.target.value })}
                       placeholder="06:00 PM"
-                      className="h-8 text-xs font-mono border-[#E3D9CA]"
+                      className="h-8 text-xs font-mono border-[#E8DDD8]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="font-semibold text-[#362A22]">Working Hours</label>
+                    <label className="font-semibold text-[#59283A]">Working Hours</label>
                     <Input
                       type="number"
                       step="0.5"
@@ -1438,11 +1438,11 @@ export default function AttendancePage() {
                       max="24"
                       value={editForm.workingHours}
                       onChange={(e) => setEditForm({ ...editForm, workingHours: Number(e.target.value) })}
-                      className="h-8 text-xs font-mono font-bold text-[#362A22] border-[#E3D9CA]"
+                      className="h-8 text-xs font-mono font-bold text-[#59283A] border-[#E8DDD8]"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="font-semibold text-[#362A22]">Overtime Hours (OT)</label>
+                    <label className="font-semibold text-[#59283A]">Overtime Hours (OT)</label>
                     <Input
                       type="number"
                       step="0.5"
@@ -1450,7 +1450,7 @@ export default function AttendancePage() {
                       max="16"
                       value={editForm.overtimeHours}
                       onChange={(e) => setEditForm({ ...editForm, overtimeHours: Number(e.target.value) })}
-                      className="h-8 text-xs font-mono font-bold text-amber-700 border-[#E3D9CA]"
+                      className="h-8 text-xs font-mono font-bold text-amber-700 border-[#E8DDD8]"
                     />
                   </div>
                 </div>
@@ -1459,22 +1459,22 @@ export default function AttendancePage() {
 
             {/* Remarks / Reason */}
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Remarks / Reason for Leave</label>
+              <label className="font-semibold text-[#59283A]">Remarks / Reason for Leave</label>
               <Input
                 value={editForm.notes}
                 onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
                 placeholder="e.g. Approved medical leave / late entry with manager approval"
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setEditModalOpen(false)}
-                className="text-xs border-[#E3D9CA]"
+                className="text-xs border-[#E8DDD8]"
               >
                 Cancel
               </Button>
@@ -1482,7 +1482,7 @@ export default function AttendancePage() {
                 type="submit"
                 size="sm"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs"
+                className="bg-[#59283A] hover:bg-[#472130] text-white text-xs"
               >
                 {submitting ? "Saving Record..." : "Save Attendance"}
               </Button>
@@ -1495,37 +1495,37 @@ export default function AttendancePage() {
       {/* BULK ATTENDANCE MODAL                                                     */}
       {/* ========================================================================= */}
       <Dialog open={bulkModalOpen} onOpenChange={setBulkModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E3D9CA] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E3D9CA] pb-3">
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
             <div className="flex items-center gap-2">
-              <CheckCheck className="w-4 h-4 text-[#B08A60]" />
-              <DialogTitle className="text-lg font-serif font-bold text-[#362A22]">
+              <CheckCheck className="w-4 h-4 text-[#C4A06A]" />
+              <DialogTitle className="text-lg font-serif font-bold text-[#59283A]">
                 Bulk Mark Staff Attendance
               </DialogTitle>
             </div>
-            <DialogDescription className="text-xs text-[#79695B]">
+            <DialogDescription className="text-xs text-[#82747A]">
               Quickly mark attendance for all employees or a selected department on a given date.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleConfirmBulkMark} className="space-y-3.5 pt-2 text-xs">
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Attendance Date *</label>
+              <label className="font-semibold text-[#59283A]">Attendance Date *</label>
               <Input
                 type="date"
                 required
                 value={bulkForm.attendanceDate}
                 onChange={(e) => setBulkForm({ ...bulkForm, attendanceDate: e.target.value })}
-                className="h-8 text-xs font-mono border-[#E3D9CA]"
+                className="h-8 text-xs font-mono border-[#E8DDD8]"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Apply to Department *</label>
+              <label className="font-semibold text-[#59283A]">Apply to Department *</label>
               <select
                 value={bulkForm.department}
                 onChange={(e) => setBulkForm({ ...bulkForm, department: e.target.value })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 {DEPARTMENTS.map((d) => (
                   <option key={d} value={d}>
@@ -1536,11 +1536,11 @@ export default function AttendancePage() {
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Status to Mark *</label>
+              <label className="font-semibold text-[#59283A]">Status to Mark *</label>
               <select
                 value={bulkForm.attendanceStatus}
                 onChange={(e) => setBulkForm({ ...bulkForm, attendanceStatus: e.target.value as any })}
-                className="w-full h-8 text-xs border border-[#E3D9CA] rounded-md px-2 bg-white text-[#362A22]"
+                className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 <option value="PRESENT">PRESENT (Standard 8h Shift)</option>
                 <option value="ABSENT">ABSENT</option>
@@ -1553,40 +1553,40 @@ export default function AttendancePage() {
             {bulkForm.attendanceStatus === "PRESENT" && (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#362A22]">Default Check-In</label>
+                  <label className="font-semibold text-[#59283A]">Default Check-In</label>
                   <Input
                     value={bulkForm.checkInTime}
                     onChange={(e) => setBulkForm({ ...bulkForm, checkInTime: e.target.value })}
-                    className="h-8 text-xs font-mono border-[#E3D9CA]"
+                    className="h-8 text-xs font-mono border-[#E8DDD8]"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#362A22]">Default Check-Out</label>
+                  <label className="font-semibold text-[#59283A]">Default Check-Out</label>
                   <Input
                     value={bulkForm.checkOutTime}
                     onChange={(e) => setBulkForm({ ...bulkForm, checkOutTime: e.target.value })}
-                    className="h-8 text-xs font-mono border-[#E3D9CA]"
+                    className="h-8 text-xs font-mono border-[#E8DDD8]"
                   />
                 </div>
               </div>
             )}
 
             <div className="space-y-1">
-              <label className="font-semibold text-[#362A22]">Internal Notes</label>
+              <label className="font-semibold text-[#59283A]">Internal Notes</label>
               <Input
                 value={bulkForm.notes}
                 onChange={(e) => setBulkForm({ ...bulkForm, notes: e.target.value })}
-                className="h-8 text-xs border-[#E3D9CA]"
+                className="h-8 text-xs border-[#E8DDD8]"
               />
             </div>
 
-            <DialogFooter className="pt-3 border-t border-[#EAE3D8]">
+            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setBulkModalOpen(false)}
-                className="text-xs border-[#E3D9CA]"
+                className="text-xs border-[#E8DDD8]"
               >
                 Cancel
               </Button>
@@ -1594,7 +1594,7 @@ export default function AttendancePage() {
                 type="submit"
                 size="sm"
                 disabled={submitting}
-                className="bg-[#362A22] hover:bg-[#43352B] text-white text-xs"
+                className="bg-[#59283A] hover:bg-[#472130] text-white text-xs"
               >
                 {submitting ? "Processing Bulk..." : "Confirm & Apply Bulk"}
               </Button>
