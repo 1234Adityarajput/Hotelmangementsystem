@@ -3,7 +3,7 @@ import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "ax
 const getBaseUrl = (): string => {
   const envUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
   if (!envUrl) {
-    return "http://localhost:4000/api/v1";
+    return "https://hotelmangementsystem-vi4c.onrender.com/api/v1";
   }
   const cleanUrl = envUrl.replace(/\/+$/, "");
   return cleanUrl.endsWith("/api/v1") ? cleanUrl : `${cleanUrl}/api/v1`;

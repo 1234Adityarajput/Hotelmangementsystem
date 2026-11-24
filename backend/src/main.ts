@@ -21,14 +21,9 @@ async function bootstrap() {
     contentSecurityPolicy: nodeEnv === 'production',
   }));
 
-  // CORS Configuration
+  // CORS Configuration (Allow Vercel, localhost, Render)
   app.enableCors({
-    origin: [
-      frontendUrl,
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      /\.vercel\.app$/,
-    ],
+    origin: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
