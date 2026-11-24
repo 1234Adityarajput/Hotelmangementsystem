@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { GeneratePayrollDto } from './dto/generate-payroll.dto';
+import { GenerateAllPayrollDto } from './dto/generate-all-payroll.dto';
 import { RecordSalaryPaymentDto } from './dto/record-salary-payment.dto';
 import { QueryPayrollDto } from './dto/query-payroll.dto';
 
@@ -74,23 +75,35 @@ export class PayrollService {
     let halfDays = 0;
     let paidLeaves = 0;
     let unpaidLeaves = 0;
+    let weeklyOffDays = 0;
     let overtimeHours = 0;
 
     attendances.forEach((a) => {
       if (a.attendanceStatus === 'PRESENT') presentDays += 1;
-      else if (a.attendanceStatus === 'ABSENT') absentDays += 1;
-      else if (a.attendanceStatus === 'HALF_DAY') halfDays += 1;
-      else if (a.attendanceStatus === 'LEAVE') paidLeaves += 1;
+      else if (a.attendanceStatus === 'ABSENT') {
+        absentDays += 1;
+        unpaidLeaves += 1;
+      } else if (a.attendanceStatus === 'HALF_DAY') {
+        halfDays += 1;
+      } else if (a.attendanceStatus === 'LEAVE') {
+        paidLeaves += 1;
+      } else if (a.attendanceStatus === 'WEEKLY_OFF') {
+        weeklyOffDays += 1;
+      }
       overtimeHours += Number(a.overtimeHours || 0);
     });
 
+    if (dto.overtimeHours !== undefined) {
+      overtimeHours = Number(dto.overtimeHours);
+    }
+
     const configuredSalaryDays = dto.configuredSalaryDays || 30;
 
-    // Payable days calculation
+    // Payable days calculation: Present + 0.5 * HalfDay + Paid Leaves + Weekly Offs
     let payableDays =
       dto.payableDays !== undefined
         ? Number(dto.payableDays)
-        : presentDays + halfDays * 0.5 + paidLeaves;
+        : presentDays + halfDays * 0.5 + paidLeaves + weeklyOffDays;
 
     // If no attendance recorded yet (e.g. at month end), default to configured days if full month
     if (attendances.length === 0 && dto.payableDays === undefined) {
@@ -215,6 +228,60 @@ export class PayrollService {
 
       return record;
     });
+  }
+
+  async generateAllPayroll(dto: GenerateAllPayrollDto) {
+    const staffWhere: any = { employmentStatus: 'ACTIVE' };
+    if (dto.department && dto.department !== 'ALL') {
+      staffWhere.department = dto.department;
+    }
+
+    const allStaff = await this.prisma.staff.findMany({
+      where: staffWhere,
+      orderBy: { fullName: 'asc' },
+    });
+
+    const generated: any[] = [];
+    const skipped: any[] = [];
+
+    for (const staff of allStaff) {
+      const existing = await this.prisma.salaryRecord.findUnique({
+        where: {
+          staffId_payrollMonth_payrollYear: {
+            staffId: staff.id,
+            payrollMonth: dto.payrollMonth,
+            payrollYear: dto.payrollYear,
+          },
+        },
+      });
+
+      if (existing) {
+        skipped.push({ staffId: staff.id, name: staff.fullName, reason: 'Already generated' });
+        continue;
+      }
+
+      try {
+        const record = await this.generatePayroll({
+          staffId: staff.id,
+          payrollMonth: dto.payrollMonth,
+          payrollYear: dto.payrollYear,
+          configuredSalaryDays: dto.configuredSalaryDays || 30,
+        });
+        generated.push(record);
+      } catch (err: any) {
+        skipped.push({ staffId: staff.id, name: staff.fullName, reason: err.message });
+      }
+    }
+
+    return {
+      success: true,
+      month: dto.payrollMonth,
+      year: dto.payrollYear,
+      generatedCount: generated.length,
+      skippedCount: skipped.length,
+      generated,
+      skipped,
+    };
   }
 
   async recordSalaryPayment(dto: RecordSalaryPaymentDto) {

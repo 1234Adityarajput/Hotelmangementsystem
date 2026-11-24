@@ -58,6 +58,25 @@ export const payrollService = {
     return res.data.data;
   },
 
+  async generateAllPayroll(data: {
+    payrollMonth: number;
+    payrollYear: number;
+    configuredSalaryDays?: number;
+    department?: string;
+    autoDeductAdvances?: boolean;
+  }): Promise<{
+    success: boolean;
+    month: number;
+    year: number;
+    generatedCount: number;
+    skippedCount: number;
+    generated: SalaryRecord[];
+    skipped: any[];
+  }> {
+    const res = await apiClient.post<ApiResponse<any>>("/payroll/generate-all", data);
+    return res.data.data;
+  },
+
   async recordSalaryPayment(data: {
     salaryRecordId: string;
     paymentAmount: number;

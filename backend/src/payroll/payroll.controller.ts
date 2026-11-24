@@ -9,6 +9,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { PayrollService } from './payroll.service';
 import { GeneratePayrollDto } from './dto/generate-payroll.dto';
+import { GenerateAllPayrollDto } from './dto/generate-all-payroll.dto';
 import { RecordSalaryPaymentDto } from './dto/record-salary-payment.dto';
 import { QueryPayrollDto } from './dto/query-payroll.dto';
 
@@ -44,6 +45,13 @@ export class PayrollController {
   @ApiResponse({ status: 201, description: 'Payroll slip generated successfully' })
   async generatePayroll(@Body() dto: GeneratePayrollDto) {
     return this.payrollService.generatePayroll(dto);
+  }
+
+  @Post('generate-all')
+  @ApiOperation({ summary: 'Bulk calculate & generate payroll for all active employees for the month' })
+  @ApiResponse({ status: 201, description: 'Bulk payroll calculated successfully' })
+  async generateAllPayroll(@Body() dto: GenerateAllPayrollDto) {
+    return this.payrollService.generateAllPayroll(dto);
   }
 
   @Post('disburse')

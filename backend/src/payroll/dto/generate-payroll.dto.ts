@@ -63,4 +63,16 @@ export class GeneratePayrollDto {
   @IsOptional()
   @IsString()
   staffAdvanceId?: string;
+
+  @ApiPropertyOptional({ example: 8, description: 'Manual override for overtime hours' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  overtimeHours?: number;
+
+  @ApiPropertyOptional({ example: 'Approved monthly salary calculation', description: 'Internal payroll notes' })
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }
