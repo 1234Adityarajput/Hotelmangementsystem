@@ -10,6 +10,18 @@ import { QueryPaymentDto } from './dto/query-payment.dto';
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
+  @Get('stats')
+  @ApiOperation({ summary: 'Get aggregated payment statistics and channel breakdown' })
+  async getStats() {
+    return this.paymentsService.getStats();
+  }
+
+  @Get('pending')
+  @ApiOperation({ summary: 'List all pending payments and active folios with outstanding balance' })
+  async getPendingPayments() {
+    return this.paymentsService.getPendingPayments();
+  }
+
   @Get()
   @ApiOperation({ summary: 'List all payments with filters for method, status, booking or invoice' })
   async findAll(@Query() query: QueryPaymentDto) {
@@ -19,6 +31,12 @@ export class PaymentsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get single payment details' })
   async findOne(@Param('id') id: string) {
+    if (id === 'stats') {
+      return this.paymentsService.getStats();
+    }
+    if (id === 'pending') {
+      return this.paymentsService.getPendingPayments();
+    }
     return this.paymentsService.findOne(id);
   }
 
