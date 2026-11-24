@@ -20,10 +20,74 @@ export interface DailyRegisterResponse {
   }[];
 }
 
+export interface MonthlyStaffRow {
+  staff: Staff;
+  dailyRecords: Record<
+    number,
+    {
+      id: string;
+      status: 'PRESENT' | 'ABSENT' | 'HALF_DAY' | 'LEAVE' | 'WEEKLY_OFF';
+      checkInTime?: string;
+      checkOutTime?: string;
+      workingHours: number;
+      overtimeHours: number;
+      notes?: string;
+    } | null
+  >;
+  summary: {
+    presentCount: number;
+    absentCount: number;
+    halfDayCount: number;
+    leaveCount: number;
+    weeklyOffCount: number;
+    totalRecordedDays: number;
+    totalWorkingHours: number;
+    totalOvertimeHours: number;
+    attendanceRate: number;
+  };
+}
+
+export interface MonthlyMatrixResponse {
+  year: number;
+  month: number;
+  daysInMonth: number;
+  overallStats: {
+    year: number;
+    month: number;
+    daysInMonth: number;
+    totalStaff: number;
+    totalPresent: number;
+    totalAbsent: number;
+    totalHalfDay: number;
+    totalLeave: number;
+    totalWeeklyOff: number;
+    totalWorkingHours: number;
+    totalOvertimeHours: number;
+  };
+  staffRows: MonthlyStaffRow[];
+}
+
+export interface BulkMarkAttendancePayload {
+  attendanceDate: string;
+  attendanceStatus: 'PRESENT' | 'ABSENT' | 'HALF_DAY' | 'LEAVE' | 'WEEKLY_OFF';
+  staffIds?: string[];
+  department?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  notes?: string;
+}
+
 export const attendanceService = {
   async getDailyRegister(date?: string, department?: string): Promise<DailyRegisterResponse> {
     const res = await apiClient.get<ApiResponse<DailyRegisterResponse>>("/attendance/daily", {
       params: { date, department },
+    });
+    return res.data.data;
+  },
+
+  async getMonthlyMatrix(year: number, month: number, department?: string): Promise<MonthlyMatrixResponse> {
+    const res = await apiClient.get<ApiResponse<MonthlyMatrixResponse>>("/attendance/matrix", {
+      params: { year, month, department },
     });
     return res.data.data;
   },
@@ -57,6 +121,16 @@ export const attendanceService = {
     notes?: string;
   }): Promise<Attendance> {
     const res = await apiClient.post<ApiResponse<Attendance>>("/attendance", data);
+    return res.data.data;
+  },
+
+  async bulkMarkAttendance(data: BulkMarkAttendancePayload): Promise<{
+    success: boolean;
+    count: number;
+    attendanceDate: string;
+    attendanceStatus: string;
+  }> {
+    const res = await apiClient.post<ApiResponse<any>>("/attendance/bulk", data);
     return res.data.data;
   },
 

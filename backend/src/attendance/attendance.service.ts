@@ -8,10 +8,20 @@ import { PrismaService } from '../database/prisma.service';
 import { MarkAttendanceDto } from './dto/mark-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { QueryAttendanceDto } from './dto/query-attendance.dto';
+import { BulkMarkAttendanceDto } from './dto/bulk-attendance.dto';
 
 @Injectable()
 export class AttendanceService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private parseDateOnly(dateStr?: string): Date {
+    if (!dateStr) {
+      const now = new Date();
+      return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    }
+    const parts = dateStr.split('T')[0].split('-').map(Number);
+    return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+  }
 
   private parseTimeToHours(timeStr?: string | null): number | null {
     if (!timeStr) return null;
@@ -80,7 +90,7 @@ export class AttendanceService {
       );
     }
 
-    const attDate = new Date(dto.attendanceDate);
+    const attDate = this.parseDateOnly(dto.attendanceDate);
 
     const { workingHours, overtimeHours } = this.calculateHours(
       dto.attendanceStatus,
@@ -161,8 +171,7 @@ export class AttendanceService {
   }
 
   async getDailyRegister(dateStr?: string, department?: string) {
-    const targetDate = dateStr ? new Date(dateStr) : new Date();
-    targetDate.setHours(0, 0, 0, 0);
+    const targetDate = this.parseDateOnly(dateStr);
 
     const staffWhere: any = { employmentStatus: 'ACTIVE' };
     if (department && department !== 'ALL') {
@@ -264,6 +273,212 @@ export class AttendanceService {
       page,
       limit,
       totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async bulkMark(dto: BulkMarkAttendanceDto) {
+    const attDate = this.parseDateOnly(dto.attendanceDate);
+
+    const staffWhere: any = { employmentStatus: 'ACTIVE' };
+    if (dto.staffIds && dto.staffIds.length > 0) {
+      staffWhere.id = { in: dto.staffIds };
+    } else if (dto.department && dto.department !== 'ALL') {
+      staffWhere.department = dto.department;
+    }
+
+    const targetStaff = await this.prisma.staff.findMany({
+      where: staffWhere,
+      select: { id: true, fullName: true, employeeCode: true },
+    });
+
+    if (targetStaff.length === 0) {
+      return { success: true, count: 0, message: 'No active staff found matching criteria' };
+    }
+
+    const { workingHours, overtimeHours } = this.calculateHours(
+      dto.attendanceStatus,
+      dto.checkInTime,
+      dto.checkOutTime,
+    );
+
+    // Upsert attendance for all selected staff
+    const results = await Promise.all(
+      targetStaff.map((s) =>
+        this.prisma.attendance.upsert({
+          where: {
+            staffId_attendanceDate: {
+              staffId: s.id,
+              attendanceDate: attDate,
+            },
+          },
+          update: {
+            attendanceStatus: dto.attendanceStatus,
+            checkInTime: dto.checkInTime,
+            checkOutTime: dto.checkOutTime,
+            workingHours,
+            overtimeHours,
+            notes: dto.notes || `Bulk marked as ${dto.attendanceStatus}`,
+          },
+          create: {
+            staffId: s.id,
+            attendanceDate: attDate,
+            attendanceStatus: dto.attendanceStatus,
+            checkInTime: dto.checkInTime,
+            checkOutTime: dto.checkOutTime,
+            workingHours,
+            overtimeHours,
+            notes: dto.notes || `Bulk marked as ${dto.attendanceStatus}`,
+          },
+        }),
+      ),
+    );
+
+    // Audit Log
+    await this.prisma.auditLog.create({
+      data: {
+        entityType: 'ATTENDANCE',
+        entityId: dto.attendanceDate,
+        action: 'UPDATE',
+        description: `Bulk marked attendance for ${results.length} staff as ${dto.attendanceStatus} on ${dto.attendanceDate}`,
+      },
+    });
+
+    return {
+      success: true,
+      count: results.length,
+      attendanceDate: dto.attendanceDate,
+      attendanceStatus: dto.attendanceStatus,
+    };
+  }
+
+  async getMonthlyMatrix(year: number, month: number, department?: string) {
+    const y = Number(year) || new Date().getFullYear();
+    const m = Number(month) || new Date().getMonth() + 1;
+
+    // Number of days in the month
+    const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    const startDate = new Date(Date.UTC(y, m - 1, 1));
+    const endDate = new Date(Date.UTC(y, m, 1));
+
+    const staffWhere: any = { employmentStatus: 'ACTIVE' };
+    if (department && department !== 'ALL') {
+      staffWhere.department = department;
+    }
+
+    const allStaff = await this.prisma.staff.findMany({
+      where: staffWhere,
+      orderBy: [{ department: 'asc' }, { fullName: 'asc' }],
+    });
+
+    const attendances = await this.prisma.attendance.findMany({
+      where: {
+        staffId: { in: allStaff.map((s) => s.id) },
+        attendanceDate: {
+          gte: startDate,
+          lt: endDate,
+        },
+      },
+      orderBy: { attendanceDate: 'asc' },
+    });
+
+    // Map by staffId -> dayNumber (1..daysInMonth) -> record
+    const staffDayMap = new Map<string, Map<number, any>>();
+    allStaff.forEach((s) => staffDayMap.set(s.id, new Map<number, any>()));
+
+    attendances.forEach((a) => {
+      const recDate = new Date(a.attendanceDate);
+      const day = recDate.getUTCDate();
+      const sMap = staffDayMap.get(a.staffId);
+      if (sMap) {
+        sMap.set(day, a);
+      }
+    });
+
+    // Compute row for each staff member
+    const staffRows = allStaff.map((s) => {
+      const dayMap = staffDayMap.get(s.id) || new Map<number, any>();
+      const dailyRecords: Record<number, any> = {};
+
+      let presentCount = 0;
+      let absentCount = 0;
+      let halfDayCount = 0;
+      let leaveCount = 0;
+      let weeklyOffCount = 0;
+      let totalWorkingHours = 0;
+      let totalOvertimeHours = 0;
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const rec = dayMap.get(d) || null;
+        if (rec) {
+          dailyRecords[d] = {
+            id: rec.id,
+            status: rec.attendanceStatus,
+            checkInTime: rec.checkInTime,
+            checkOutTime: rec.checkOutTime,
+            workingHours: Number(rec.workingHours || 0),
+            overtimeHours: Number(rec.overtimeHours || 0),
+            notes: rec.notes,
+          };
+
+          if (rec.attendanceStatus === 'PRESENT') presentCount++;
+          else if (rec.attendanceStatus === 'ABSENT') absentCount++;
+          else if (rec.attendanceStatus === 'HALF_DAY') halfDayCount++;
+          else if (rec.attendanceStatus === 'LEAVE') leaveCount++;
+          else if (rec.attendanceStatus === 'WEEKLY_OFF') weeklyOffCount++;
+
+          totalWorkingHours += Number(rec.workingHours || 0);
+          totalOvertimeHours += Number(rec.overtimeHours || 0);
+        } else {
+          dailyRecords[d] = null;
+        }
+      }
+
+      const totalRecordedDays = presentCount + absentCount + halfDayCount + leaveCount + weeklyOffCount;
+      const workingDaysDenominator = presentCount + absentCount + halfDayCount + leaveCount;
+      const attendanceRate =
+        workingDaysDenominator > 0
+          ? Math.round(((presentCount + halfDayCount * 0.5) / workingDaysDenominator) * 100)
+          : 0;
+
+      return {
+        staff: s,
+        dailyRecords,
+        summary: {
+          presentCount,
+          absentCount,
+          halfDayCount,
+          leaveCount,
+          weeklyOffCount,
+          totalRecordedDays,
+          totalWorkingHours: Math.round(totalWorkingHours * 100) / 100,
+          totalOvertimeHours: Math.round(totalOvertimeHours * 100) / 100,
+          attendanceRate,
+        },
+      };
+    });
+
+    // Overall summary across the entire hotel for this month
+    const totalStaff = allStaff.length;
+    const overallStats = {
+      year: y,
+      month: m,
+      daysInMonth,
+      totalStaff,
+      totalPresent: staffRows.reduce((sum, r) => sum + r.summary.presentCount, 0),
+      totalAbsent: staffRows.reduce((sum, r) => sum + r.summary.absentCount, 0),
+      totalHalfDay: staffRows.reduce((sum, r) => sum + r.summary.halfDayCount, 0),
+      totalLeave: staffRows.reduce((sum, r) => sum + r.summary.leaveCount, 0),
+      totalWeeklyOff: staffRows.reduce((sum, r) => sum + r.summary.weeklyOffCount, 0),
+      totalWorkingHours: Math.round(staffRows.reduce((sum, r) => sum + r.summary.totalWorkingHours, 0) * 100) / 100,
+      totalOvertimeHours: Math.round(staffRows.reduce((sum, r) => sum + r.summary.totalOvertimeHours, 0) * 100) / 100,
+    };
+
+    return {
+      year: y,
+      month: m,
+      daysInMonth,
+      overallStats,
+      staffRows,
     };
   }
 }
