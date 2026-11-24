@@ -59,15 +59,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(storedUser);
       setIsLoading(false);
     } else {
-      // If user is on the login page, don't auto-login so they can pick Owner or Manager
-      if (typeof window !== "undefined" && window.location.pathname.startsWith("/login")) {
-        setIsLoading(false);
-      } else {
-        // Attempt auto-login with default admin if local development
-        autoLoginDefault();
+      setToken(null);
+      setUser(null);
+      setIsLoading(false);
+      if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+        router.replace("/login");
       }
     }
-  }, []);
+  }, [router]);
 
   // Role-based route guard: block Manager from accessing restricted pages
   useEffect(() => {
@@ -82,29 +81,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [pathname, user, isLoading, router]);
-
-  const autoLoginDefault = async () => {
-    try {
-      const res = await authService.login("admin", "Admin@Hotel2026!");
-      setToken(res.accessToken);
-      setUser(res.admin);
-    } catch (_) {
-      // Retry once after 1 second in case Neon DB had a cold-start sleep
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const retryRes = await authService.login("admin", "Admin@Hotel2026!");
-        setToken(retryRes.accessToken);
-        setUser(retryRes.admin);
-      } catch (err) {
-        // Not able to auto-login, redirect to /login if on protected page
-        if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
-          router.push("/login");
-        }
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
