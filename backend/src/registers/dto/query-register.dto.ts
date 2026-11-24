@@ -4,63 +4,87 @@ import { Type } from 'class-transformer';
 
 export type RegisterType =
   | 'guests'
+  | 'check-ins'
+  | 'check-outs'
   | 'rooms'
+  | 'billing'
+  | 'payments'
+  | 'cash-book'
+  | 'services'
+  | 'staff'
+  | 'attendance'
+  | 'salaries'
+  | 'expenses'
+  | 'business'
+  // Backward-compatible aliases
   | 'bookings'
   | 'arrivals'
   | 'inhouse'
   | 'departures'
   | 'items'
   | 'invoices'
-  | 'payments'
-  | 'staff'
-  | 'attendance'
-  | 'advances'
-  | 'salaries'
-  | 'expenses';
+  | 'advances';
 
 export class QueryRegisterDto {
   @ApiProperty({
     enum: [
       'guests',
+      'check-ins',
+      'check-outs',
       'rooms',
+      'billing',
+      'payments',
+      'cash-book',
+      'services',
+      'staff',
+      'attendance',
+      'salaries',
+      'expenses',
+      'business',
       'bookings',
       'arrivals',
       'inhouse',
       'departures',
       'items',
       'invoices',
-      'payments',
-      'staff',
-      'attendance',
       'advances',
-      'salaries',
-      'expenses',
     ],
-    example: 'bookings',
-    description: 'Target digital register name',
+    example: 'check-ins',
+    description: 'Target digital register name (13 Core Hotel Registers)',
   })
   @IsEnum([
     'guests',
+    'check-ins',
+    'check-outs',
     'rooms',
+    'billing',
+    'payments',
+    'cash-book',
+    'services',
+    'staff',
+    'attendance',
+    'salaries',
+    'expenses',
+    'business',
     'bookings',
     'arrivals',
     'inhouse',
     'departures',
     'items',
     'invoices',
-    'payments',
-    'staff',
-    'attendance',
     'advances',
-    'salaries',
-    'expenses',
   ])
   type: RegisterType;
 
-  @ApiPropertyOptional({ description: 'Text search query' })
+  @ApiPropertyOptional({ description: 'Text search query (name, code, reference, mobile)' })
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by specific room number' })
+  @IsOptional()
+  @IsString()
+  roomNumber?: string;
 
   @ApiPropertyOptional({ description: 'Start date filter (YYYY-MM-DD)' })
   @IsOptional()
