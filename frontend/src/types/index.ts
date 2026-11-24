@@ -27,10 +27,13 @@ export interface ApiResponse<T> {
   timestamp: string;
 }
 
+export type UserRole = 'OWNER' | 'MANAGER';
+
 export interface AdminUser {
   id: string;
   username: string;
   email: string | null;
+  role: UserRole;
 }
 
 export interface AuthLoginResponse {

@@ -1,14 +1,17 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { authService } from "@/services/auth.service";
-import { AdminUser } from "@/types";
+import { AdminUser, UserRole } from "@/types";
 
 interface AuthContextType {
   user: AdminUser | null;
   token: string | null;
+  role: UserRole;
+  isOwner: boolean;
+  isManager: boolean;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<boolean>;
@@ -18,11 +21,26 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   token: null,
+  role: "OWNER",
+  isOwner: true,
+  isManager: false,
   isAuthenticated: false,
   isLoading: true,
   login: async () => false,
   logout: () => {},
 });
+
+const RESTRICTED_MANAGER_PATHS = [
+  "/payments",
+  "/advances",
+  "/payroll",
+  "/expenses",
+  "/reports",
+  "/registers",
+  "/audit-logs",
+  "/settings",
+  "/setup",
+];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AdminUser | null>(null);
@@ -41,10 +59,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(storedUser);
       setIsLoading(false);
     } else {
-      // Attempt auto-login with default admin if local development
-      autoLoginDefault();
+      // If user is on the login page, don't auto-login so they can pick Owner or Manager
+      if (typeof window !== "undefined" && window.location.pathname.startsWith("/login")) {
+        setIsLoading(false);
+      } else {
+        // Attempt auto-login with default admin if local development
+        autoLoginDefault();
+      }
     }
   }, []);
+
+  // Role-based route guard: block Manager from accessing restricted pages
+  useEffect(() => {
+    if (isLoading || !user) return;
+    if (user.role === "MANAGER") {
+      const isRestricted = RESTRICTED_MANAGER_PATHS.some((path) =>
+        pathname.startsWith(path)
+      );
+      if (isRestricted) {
+        toast.error("Restricted Access: Manager account does not have permission for this module.");
+        router.replace("/");
+      }
+    }
+  }, [pathname, user, isLoading, router]);
 
   const autoLoginDefault = async () => {
     try {
@@ -75,7 +112,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await authService.login(username, password);
       setToken(res.accessToken);
       setUser(res.admin);
-      toast.success(`Welcome back, ${res.admin.username}!`);
+      const roleLabel = res.admin.role === "MANAGER" ? "Hotel Manager" : "Hotel Owner";
+      toast.success(`Welcome, ${res.admin.username} (${roleLabel})!`);
       router.push("/");
       return true;
     } catch (err: any) {
@@ -95,11 +133,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login");
   };
 
+  const role: UserRole = user?.role || "OWNER";
+  const isOwner = role === "OWNER";
+  const isManager = role === "MANAGER";
+
   return (
     <AuthContext.Provider
       value={{
         user,
         token,
+        role,
+        isOwner,
+        isManager,
         isAuthenticated: Boolean(token),
         isLoading,
         login,

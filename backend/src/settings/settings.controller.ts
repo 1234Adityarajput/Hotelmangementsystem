@@ -2,9 +2,11 @@ import { Controller, Get, Patch, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SettingsService } from './settings.service';
 import { UpdateHotelSettingDto } from './dto/update-settings.dto';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Hotel Settings')
 @ApiBearerAuth('JWT-auth')
+@Roles('OWNER')
 @Controller('settings')
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}

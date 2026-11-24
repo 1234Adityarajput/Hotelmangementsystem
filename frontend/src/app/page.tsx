@@ -40,8 +40,11 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
+import { useAuth } from "@/providers/auth-provider";
 
 export default function AdminDashboardPage() {
+  const { user } = useAuth();
+  const isManager = user?.role === "MANAGER";
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
   const [recentBookings, setRecentBookings] = useState<RecentBookingItem[]>([]);
@@ -95,9 +98,9 @@ export default function AdminDashboardPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-[10px] font-bold text-[#C4A06A] tracking-widest uppercase bg-[#F5F0EA] px-2.5 py-0.5 rounded-full border border-[#C4A06A]/30">
-              Executive Hotel Console
+              {isManager ? "👔 Hotel Manager Operations Console" : "👑 Executive Hotel Console"}
             </span>
-            <span className="text-xs text-[#82747A]">• Live Operations Overview</span>
+            <span className="text-xs text-[#82747A]">• {isManager ? "Front Office & Workforce" : "Live Operations Overview"}</span>
           </div>
           <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#59283A]">
             Hotel Operations &amp; Business Dashboard
@@ -280,10 +283,10 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-xl sm:text-2xl font-bold text-[#59283A]">
-                ₹{(stats?.revenue.today || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                {isManager ? "••••••" : `₹${(stats?.revenue.today || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#32765B] mt-1 font-semibold">
-                Live payments collected
+                {isManager ? "Owner Confidential" : "Live payments collected"}
               </p>
             </CardContent>
           </Card>
@@ -300,10 +303,10 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-xl sm:text-2xl font-bold text-[#59283A]">
-                ₹{(stats?.revenue.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                {isManager ? "••••••" : `₹${(stats?.revenue.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
-                Month-to-date inflows
+                {isManager ? "Owner Confidential" : "Month-to-date inflows"}
               </p>
             </CardContent>
           </Card>
@@ -320,10 +323,10 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-xl sm:text-2xl font-bold text-[#B54C44]">
-                ₹{(stats?.revenue.pendingBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                {isManager ? "••••••" : `₹${(stats?.revenue.pendingBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
-                Uncollected guest dues
+                {isManager ? "Owner Confidential" : "Uncollected guest dues"}
               </p>
             </CardContent>
           </Card>
@@ -343,10 +346,10 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-2xl font-bold text-[#59283A]">
-                ₹{(stats?.expenses.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                {isManager ? "••••••" : `₹${(stats?.expenses.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
-                This month (All-time: ₹{(stats?.expenses.total || 0).toLocaleString("en-IN")})
+                {isManager ? "Owner Confidential" : `This month (All-time: ₹${(stats?.expenses.total || 0).toLocaleString("en-IN")})`}
               </p>
             </CardContent>
           </Card>
@@ -412,10 +415,10 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-2xl font-bold text-[#59283A]">
-                ₹{(stats?.payroll.monthlyNetSalary || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                {isManager ? "••••••" : `₹${(stats?.payroll.monthlyNetSalary || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
-                Paid: ₹{(stats?.payroll.monthlyDisbursed || 0).toLocaleString("en-IN")} • Due: ₹{(stats?.payroll.pendingBalance || 0).toLocaleString("en-IN")}
+                {isManager ? "Owner Confidential" : `Paid: ₹${(stats?.payroll.monthlyDisbursed || 0).toLocaleString("en-IN")} • Due: ₹${(stats?.payroll.pendingBalance || 0).toLocaleString("en-IN")}`}
               </p>
             </CardContent>
           </Card>

@@ -205,8 +205,8 @@ export function Header({ onOpenMobile }: HeaderProps) {
             <span className="text-xs font-bold text-[#352630] leading-none">
               {user?.username || "admin"}
             </span>
-            <span className="text-[10px] text-[#82747A] font-medium leading-tight">
-              Single Admin
+            <span className="text-[10px] font-semibold leading-tight text-[#59283A]">
+              {user?.role === "MANAGER" ? "👔 Hotel Manager" : "👑 Hotel Owner"}
             </span>
           </div>
         </div>

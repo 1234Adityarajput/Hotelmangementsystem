@@ -42,6 +42,7 @@ export class AuthService {
       sub: admin.id,
       username: admin.username,
       email: admin.email,
+      role: admin.role,
     };
 
     return {
@@ -50,15 +51,17 @@ export class AuthService {
         id: admin.id,
         username: admin.username,
         email: admin.email,
+        role: admin.role,
       },
     };
   }
 
   async getAuthStatus() {
     return {
-      authMode: 'single_admin',
+      authMode: 'rbac_two_tier',
       jwtConfigured: true,
-      rbacEnabled: false,
+      rbacEnabled: true,
+      roles: ['OWNER', 'MANAGER'],
       status: 'ready',
     };
   }

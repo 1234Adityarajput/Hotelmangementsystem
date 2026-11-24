@@ -12,9 +12,11 @@ import { StaffAdvancesService } from './staff-advances.service';
 import { IssueAdvanceDto } from './dto/issue-advance.dto';
 import { RepayAdvanceDto } from './dto/repay-advance.dto';
 import { QueryAdvanceDto } from './dto/query-advance.dto';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Staff Advances')
 @ApiBearerAuth('JWT-auth')
+@Roles('OWNER')
 @Controller('advances')
 export class StaffAdvancesController {
   constructor(private readonly advancesService: StaffAdvancesService) {}

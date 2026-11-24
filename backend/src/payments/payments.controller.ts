@@ -3,9 +3,11 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { RecordPaymentDto } from './dto/record-payment.dto';
 import { QueryPaymentDto } from './dto/query-payment.dto';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Payments Management')
 @ApiBearerAuth('JWT-auth')
+@Roles('OWNER')
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}

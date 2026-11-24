@@ -12,9 +12,11 @@ import { GeneratePayrollDto } from './dto/generate-payroll.dto';
 import { GenerateAllPayrollDto } from './dto/generate-all-payroll.dto';
 import { RecordSalaryPaymentDto } from './dto/record-salary-payment.dto';
 import { QueryPayrollDto } from './dto/query-payroll.dto';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Payroll & Salary')
 @ApiBearerAuth('JWT-auth')
+@Roles('OWNER')
 @Controller('payroll')
 export class PayrollController {
   constructor(private readonly payrollService: PayrollService) {}

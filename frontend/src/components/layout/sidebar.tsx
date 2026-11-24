@@ -32,6 +32,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/providers/auth-provider";
 
 interface SidebarProps {
   mobileOpen?: boolean;
@@ -47,6 +48,8 @@ export function Sidebar({
   onToggleCollapse,
 }: SidebarProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const isManager = user?.role === "MANAGER";
 
   if (pathname === "/login") {
     return null;
@@ -204,6 +207,91 @@ export function Sidebar({
     },
   ];
 
+  const filteredNavGroups = !isManager
+    ? navGroups
+    : [
+        {
+          title: "OVERVIEW",
+          items: [
+            {
+              name: "Dashboard",
+              href: "/",
+              icon: LayoutDashboard,
+              active: pathname === "/",
+            },
+          ],
+        },
+        {
+          title: "FRONT OFFICE",
+          items: [
+            {
+              name: "Guests",
+              href: "/guests",
+              icon: Users,
+              active: pathname.startsWith("/guests"),
+            },
+            {
+              name: "Rooms",
+              href: "/rooms",
+              icon: BedDouble,
+              active: pathname.startsWith("/rooms"),
+            },
+            {
+              name: "Bookings",
+              href: "/bookings",
+              icon: CalendarDays,
+              active: pathname.startsWith("/bookings"),
+            },
+            {
+              name: "Stays",
+              href: "/stays",
+              icon: DoorOpen,
+              active: pathname.startsWith("/stays"),
+            },
+          ],
+        },
+        {
+          title: "OPERATIONS",
+          items: [
+            {
+              name: "Automatic Billing",
+              href: "/billing",
+              icon: Calculator,
+              active: pathname.startsWith("/billing"),
+            },
+            {
+              name: "Items & Services",
+              href: "/items",
+              icon: UtensilsCrossed,
+              active: pathname.startsWith("/items"),
+            },
+            {
+              name: "Invoices",
+              href: "/invoices",
+              icon: Receipt,
+              active: pathname.startsWith("/invoices"),
+            },
+          ],
+        },
+        {
+          title: "WORKFORCE",
+          items: [
+            {
+              name: "Staff",
+              href: "/staff",
+              icon: UserCheck,
+              active: pathname.startsWith("/staff"),
+            },
+            {
+              name: "Attendance",
+              href: "/attendance",
+              icon: CalendarCheck2,
+              active: pathname.startsWith("/attendance"),
+            },
+          ],
+        },
+      ];
+
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#59283A] text-white select-none">
       {/* Brand Header */}
@@ -258,10 +346,10 @@ export function Sidebar({
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-1.5 text-[#8E7079]">
               <Shield className="w-3.5 h-3.5 text-[#C4A06A]" />
-              <span className="text-[11px] font-medium text-white/80">System Access:</span>
+              <span className="text-[11px] font-medium text-white/80">Role:</span>
             </div>
             <span className="text-[10px] bg-[#472130] text-[#C4A06A] border border-[#C4A06A]/30 px-2 py-0.5 rounded-full font-semibold">
-              Admin Verified
+              {isManager ? "👔 Hotel Manager" : "👑 Hotel Owner"}
             </span>
           </div>
         </div>
@@ -269,7 +357,7 @@ export function Sidebar({
 
       {/* Navigation Groups */}
       <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
-        {navGroups.map((group) => (
+        {filteredNavGroups.map((group) => (
           <div key={group.title} className="space-y-1">
             {!collapsed && (
               <div className="px-3 text-[10px] font-bold text-[#8E7079] tracking-wider uppercase">

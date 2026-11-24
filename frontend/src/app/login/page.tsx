@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("Admin@Hotel2026!");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<"OWNER" | "MANAGER">("OWNER");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,9 +29,15 @@ export default function LoginPage() {
     setSubmitting(false);
   };
 
-  const handleFillDemo = () => {
-    setUsername("admin");
-    setPassword("Admin@Hotel2026!");
+  const handleSelectRole = (role: "OWNER" | "MANAGER") => {
+    setSelectedRole(role);
+    if (role === "OWNER") {
+      setUsername("admin");
+      setPassword("Admin@Hotel2026!");
+    } else {
+      setUsername("manager");
+      setPassword("Manager@Hotel2026!");
+    }
   };
 
   return (
@@ -121,11 +128,48 @@ export default function LoginPage() {
           {/* Heading */}
           <div className="mt-8">
             <h2 className="font-serif text-2xl font-bold text-[#59283A] tracking-tight">
-              Welcome Administrator
+              Hospitality Portal Login
             </h2>
             <p className="text-xs text-[#82747A] mt-1.5 leading-relaxed">
-              Sign in using your Username or Email with your Admin Password or PIN
+              Select your hotel role or enter credentials to access your console
             </p>
+          </div>
+
+          {/* Quick Role Selection Tabs */}
+          <div className="mt-5 grid grid-cols-2 gap-2 p-1.5 bg-[#F5F0EA] rounded-2xl border border-[#E8DDD8]">
+            <button
+              type="button"
+              onClick={() => handleSelectRole("OWNER")}
+              className={`flex flex-col items-center justify-center p-2.5 rounded-xl transition-all text-xs font-semibold ${
+                selectedRole === "OWNER"
+                  ? "bg-[#59283A] text-white shadow-md"
+                  : "text-[#59283A] hover:bg-white/60"
+              }`}
+            >
+              <span className="flex items-center gap-1.5 font-bold">
+                <span>👑 Hotel Owner</span>
+              </span>
+              <span className={`text-[10px] mt-0.5 ${selectedRole === "OWNER" ? "text-[#C4A06A]" : "text-[#82747A]"}`}>
+                Full 18 Modules Access
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSelectRole("MANAGER")}
+              className={`flex flex-col items-center justify-center p-2.5 rounded-xl transition-all text-xs font-semibold ${
+                selectedRole === "MANAGER"
+                  ? "bg-[#59283A] text-white shadow-md"
+                  : "text-[#59283A] hover:bg-white/60"
+              }`}
+            >
+              <span className="flex items-center gap-1.5 font-bold">
+                <span>👔 Hotel Manager</span>
+              </span>
+              <span className={`text-[10px] mt-0.5 ${selectedRole === "MANAGER" ? "text-[#C4A06A]" : "text-[#82747A]"}`}>
+                Front Office Operations
+              </span>
+            </button>
           </div>
 
           {/* Form */}
@@ -205,19 +249,19 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Quick Demo Helper */}
-            <div className="pt-1 flex items-center justify-between text-[11px] text-[#82747A]">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#32765B]" />
-                Single Admin Security
-              </span>
-              <button
-                type="button"
-                onClick={handleFillDemo}
-                className="text-[#C4A06A] hover:text-[#59283A] font-semibold underline underline-offset-2"
-              >
-                Auto-fill credentials
-              </button>
+            {/* Role Credential Summary Box */}
+            <div className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] text-xs space-y-1.5">
+              <div className="flex items-center justify-between font-semibold text-[#59283A]">
+                <span>Active Role: {selectedRole === "OWNER" ? "👑 Hotel Owner" : "👔 Hotel Manager"}</span>
+                <span className="text-[10px] bg-[#E7F1E9] text-[#32765B] px-2 py-0.5 rounded-full font-bold">
+                  {selectedRole === "OWNER" ? "Unrestricted" : "Operations"}
+                </span>
+              </div>
+              <p className="text-[11px] text-[#82747A] leading-relaxed">
+                {selectedRole === "OWNER"
+                  ? "Login: admin / Admin@Hotel2026! — Full access to all 18 modules (Financials, Payments, Payroll, Reports, Settings)."
+                  : "Login: manager / Manager@Hotel2026! — Front desk access (Guests, Rooms, Bookings, Stays, Billing, Items, Invoices, Staff & Attendance). Financials, Payments, Payroll, and Reports are protected."}
+              </p>
             </div>
           </form>
 

@@ -2,9 +2,11 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ReportsService } from './reports.service';
 import { QueryReportsDto } from './dto/query-reports.dto';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Reports and Analytics')
 @ApiBearerAuth('JWT-auth')
+@Roles('OWNER')
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}

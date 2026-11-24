@@ -14,9 +14,11 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { CreateExpenseCategoryDto } from './dto/create-category.dto';
 import { QueryExpenseDto } from './dto/query-expense.dto';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Expense Management')
 @ApiBearerAuth('JWT-auth')
+@Roles('OWNER')
 @Controller('expenses')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
