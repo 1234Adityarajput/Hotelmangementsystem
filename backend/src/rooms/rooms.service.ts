@@ -6,7 +6,7 @@ import { QueryRoomDto } from './dto/query-room.dto';
 
 @Injectable()
 export class RoomsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findAll(query: QueryRoomDto) {
     const page = query.page || 1;
