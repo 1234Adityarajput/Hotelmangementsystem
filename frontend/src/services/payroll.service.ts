@@ -13,6 +13,45 @@ export interface PayrollStats {
   };
 }
 
+export interface PayrollHistoryItem {
+  id: string;
+  staffId: string;
+  staffName: string;
+  employeeCode: string;
+  department: string;
+  designation: string;
+  payrollMonth: number;
+  payrollYear: number;
+  monthlyBasicSalary: number;
+  payableDays: number;
+  configuredSalaryDays: number;
+  grossSalary: number;
+  overtimeHours: number;
+  overtimeAmount: number;
+  totalDeductions: number;
+  advanceDeductions: number;
+  netSalary: number;
+  totalPaid: number;
+  balanceAmount: number;
+  payrollStatus: string;
+  paymentMode?: string;
+  createdAt: string;
+  deletedAt?: string;
+  isDeleted: boolean;
+}
+
+export interface MonthlyPayrollHistoryResponse {
+  month: number;
+  year: number;
+  monthName: string;
+  totalCount: number;
+  activeCount: number;
+  deletedCount: number;
+  totalNetPayable: number;
+  totalPaid: number;
+  items: PayrollHistoryItem[];
+}
+
 export const payrollService = {
   async getStats(month?: number, year?: number): Promise<PayrollStats> {
     const res = await apiClient.get<ApiResponse<PayrollStats>>("/payroll/stats", {
@@ -86,6 +125,16 @@ export const payrollService = {
     notes?: string;
   }): Promise<{ payment: SalaryPayment; salaryRecord: SalaryRecord }> {
     const res = await apiClient.post<ApiResponse<any>>("/payroll/disburse", data);
+    return res.data.data;
+  },
+
+  async delete(id: string): Promise<{ success: boolean; message: string }> {
+    const res = await apiClient.delete<ApiResponse<{ success: boolean; message: string }>>(`/payroll/${id}`);
+    return res.data.data;
+  },
+
+  async getHistory(params?: { month?: number; year?: number }): Promise<MonthlyPayrollHistoryResponse> {
+    const res = await apiClient.get<ApiResponse<MonthlyPayrollHistoryResponse>>("/payroll/history", { params });
     return res.data.data;
   },
 };

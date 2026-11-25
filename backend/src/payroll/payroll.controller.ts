@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Delete,
   Body,
   Param,
   Query,
@@ -28,6 +29,15 @@ export class PayrollController {
     @Query('year') year?: number,
   ) {
     return this.payrollService.getStats(month, year);
+  }
+
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly payroll history including deleted audit logs' })
+  async getHistory(
+    @Query('month') month?: string,
+    @Query('year') year?: string,
+  ) {
+    return this.payrollService.getHistory(month, year);
   }
 
   @Get()
@@ -61,5 +71,11 @@ export class PayrollController {
   @ApiResponse({ status: 201, description: 'Salary payment recorded successfully' })
   async recordSalaryPayment(@Body() dto: RecordSalaryPaymentDto) {
     return this.payrollService.recordSalaryPayment(dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete salary record and archive to audit log' })
+  async remove(@Param('id') id: string) {
+    return this.payrollService.delete(id);
   }
 }

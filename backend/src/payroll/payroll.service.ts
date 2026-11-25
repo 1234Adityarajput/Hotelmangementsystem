@@ -451,4 +451,172 @@ export class PayrollService {
       statusCounts,
     };
   }
+
+  async delete(id: string) {
+    const existing = await this.prisma.salaryRecord.findUnique({
+      where: { id },
+      include: {
+        staff: true,
+        salaryPayments: true,
+        staffAdvances: true,
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Salary record with ID ${id} not found`);
+    }
+
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Snapshot full salary record into AuditLog for permanent history preservation
+      await tx.auditLog.create({
+        data: {
+          entityType: 'PAYROLL',
+          entityId: id,
+          action: 'DELETE',
+          previousValues: {
+            ...existing,
+            staffName: existing.staff.fullName,
+            employeeCode: existing.staff.employeeCode,
+            department: existing.staff.department,
+            designation: existing.staff.designation,
+            payments: existing.salaryPayments,
+            deletedAt: new Date().toISOString(),
+          } as any,
+          description: `Deleted salary payroll record for ${existing.staff.fullName} (${existing.staff.employeeCode}) for period ${existing.payrollMonth}/${existing.payrollYear} (Net Salary: ₹${existing.netSalary}). Preserved in audit history.`,
+        },
+      });
+
+      // 2. Unlink any staff advances tied to this salary record
+      await tx.staffAdvance.updateMany({
+        where: { salaryRecordId: id },
+        data: { salaryRecordId: null },
+      });
+
+      // 3. Delete linked salary payments
+      await tx.salaryPayment.deleteMany({
+        where: { salaryRecordId: id },
+      });
+
+      // 4. Delete the salary record itself
+      await tx.salaryRecord.delete({
+        where: { id },
+      });
+
+      return {
+        success: true,
+        message: `Payroll record for ${existing.staff.fullName} (${existing.payrollMonth}/${existing.payrollYear}) deleted and archived in Monthly History.`,
+        recordId: id,
+        staffName: existing.staff.fullName,
+      };
+    });
+  }
+
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
+    const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
+
+    const startDate = new Date(year, month - 1, 1);
+
+    // 1. Fetch active salary records for this month & year
+    const activeRecords = await this.prisma.salaryRecord.findMany({
+      where: {
+        payrollMonth: month,
+        payrollYear: year,
+      },
+      include: {
+        staff: true,
+        salaryPayments: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const enrichedActive = activeRecords.map((r) => ({
+      id: r.id,
+      staffId: r.staffId,
+      staffName: r.staff.fullName,
+      employeeCode: r.staff.employeeCode,
+      department: r.staff.department,
+      designation: r.staff.designation,
+      payrollMonth: r.payrollMonth,
+      payrollYear: r.payrollYear,
+      monthlyBasicSalary: Number(r.monthlyBasicSalary),
+      payableDays: Number(r.payableDays),
+      configuredSalaryDays: r.configuredSalaryDays,
+      grossSalary: Number(r.grossSalary),
+      overtimeHours: Number(r.overtimeHours || 0),
+      overtimeAmount: Number(r.overtimeAmount || 0),
+      totalDeductions: Number(r.deductions || 0),
+      advanceDeductions: Number(r.advanceDeductions || 0),
+      netSalary: Number(r.netSalary),
+      totalPaid: Number(r.totalPaid),
+      balanceAmount: Number(r.balanceAmount),
+      payrollStatus: r.payrollStatus,
+      createdAt: r.createdAt,
+      isDeleted: false,
+    }));
+
+    // 2. Fetch deleted salary records from AuditLog
+    const deletedLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'PAYROLL',
+        action: 'DELETE',
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedMatching = deletedLogs.filter((log) => {
+      const prev: any = log.previousValues || {};
+      return (
+        (prev.payrollMonth === month && prev.payrollYear === year) ||
+        (new Date(log.changedAt).getMonth() + 1 === month && new Date(log.changedAt).getFullYear() === year)
+      );
+    });
+
+    const deletedItems = deletedMatching.map((log) => {
+      const prev: any = log.previousValues || {};
+      return {
+        id: log.entityId,
+        staffId: prev.staffId,
+        staffName: prev.staffName || 'Archived Employee',
+        employeeCode: prev.employeeCode || 'EMP-ARCHIVED',
+        department: prev.department || 'General',
+        designation: prev.designation || 'Staff',
+        payrollMonth: prev.payrollMonth || month,
+        payrollYear: prev.payrollYear || year,
+        monthlyBasicSalary: Number(prev.monthlyBasicSalary || 0),
+        payableDays: Number(prev.payableDays || 0),
+        configuredSalaryDays: prev.configuredSalaryDays || 30,
+        grossSalary: Number(prev.grossSalary || 0),
+        overtimeHours: Number(prev.overtimeHours || 0),
+        overtimeAmount: Number(prev.overtimeAmount || 0),
+        totalDeductions: Number(prev.totalDeductions || 0),
+        advanceDeductions: Number(prev.advanceDeductions || 0),
+        netSalary: Number(prev.netSalary || 0),
+        totalPaid: Number(prev.totalPaid || 0),
+        balanceAmount: Number(prev.balanceAmount || 0),
+        payrollStatus: 'CANCELLED',
+        paymentMode: prev.paymentMode || 'BANK_TRANSFER',
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+        isDeleted: true,
+      };
+    });
+
+    const allHistory = [...enrichedActive, ...deletedItems].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedItems.length,
+      totalNetPayable: allHistory.reduce((sum, r) => sum + (r.netSalary || 0), 0),
+      totalPaid: allHistory.reduce((sum, r) => sum + (r.totalPaid || 0), 0),
+      items: allHistory,
+    };
+  }
 }

@@ -31,8 +31,19 @@ import {
   Wallet,
   Receipt,
   Download,
+  History,
+  Trash2,
+  Archive,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
-import { payrollService, PayrollStats } from "@/services/payroll.service";
+import ExcelJS from "exceljs";
+import {
+  payrollService,
+  PayrollStats,
+  PayrollHistoryItem,
+  MonthlyPayrollHistoryResponse,
+} from "@/services/payroll.service";
 import { staffService } from "@/services/staff.service";
 import { attendanceService } from "@/services/attendance.service";
 import { SalaryRecord, SalaryPayment, Staff } from "@/types";
@@ -118,6 +129,21 @@ export default function PayrollPage() {
     transactionReference: "",
     notes: "",
   });
+
+  // Delete Payroll State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<SalaryRecord | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Monthly History & Archive Modal State
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyMonth, setHistoryMonth] = useState(currentDate.getMonth() + 1);
+  const [historyYear, setHistoryYear] = useState(currentDate.getFullYear());
+  const [historyData, setHistoryData] = useState<MonthlyPayrollHistoryResponse | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACTIVE" | "DELETED">("ALL");
+  const [historySearch, setHistorySearch] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch all live payroll data
   const fetchData = async () => {
@@ -281,6 +307,261 @@ export default function PayrollPage() {
     window.print();
   };
 
+  const handleOpenDelete = (rec: SalaryRecord) => {
+    setRecordToDelete(rec);
+    setDeleteModalOpen(true);
+  };
+
+  const handleExecuteDelete = async () => {
+    if (!recordToDelete) return;
+    try {
+      setIsDeleting(true);
+      const res = await payrollService.delete(recordToDelete.id);
+      toast.success(res.message || `Payroll record for ${recordToDelete.staff?.fullName} deleted and archived`);
+      setDeleteModalOpen(false);
+      setRecordToDelete(null);
+      fetchData();
+      if (historyModalOpen) fetchHistory(historyMonth, historyYear);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to delete payroll record");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const fetchHistory = async (m?: number, y?: number) => {
+    try {
+      setHistoryLoading(true);
+      const res = await payrollService.getHistory({
+        month: m || historyMonth,
+        year: y || historyYear,
+      });
+      setHistoryData(res);
+    } catch (err: any) {
+      toast.error("Failed to load payroll history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleOpenHistoryModal = () => {
+    setHistoryMonth(selectedMonth);
+    setHistoryYear(selectedYear);
+    setHistoryModalOpen(true);
+    fetchHistory(selectedMonth, selectedYear);
+  };
+
+  const handlePrevMonth = () => {
+    let newM = historyMonth - 1;
+    let newY = historyYear;
+    if (newM < 1) {
+      newM = 12;
+      newY -= 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleNextMonth = () => {
+    let newM = historyMonth + 1;
+    let newY = historyYear;
+    if (newM > 12) {
+      newM = 1;
+      newY += 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleExportExcel = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating Excel report for Staff Salary & Payroll Management...");
+
+      let exportItems: PayrollHistoryItem[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await payrollService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTHS[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const histRes = await payrollService.getHistory({
+          month: selectedMonth,
+          year: selectedYear,
+        });
+        exportItems = histRes.items || [];
+        scopeTitle = `${MONTHS[selectedMonth - 1]}_${selectedYear}`;
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No payroll records found to export for selected scope");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "Hotel Radha Palace";
+      workbook.created = new Date();
+
+      const worksheet = workbook.addWorksheet("Payroll Register");
+
+      // Title Banner
+      worksheet.mergeCells("A1:P1");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "HOTEL RADHA PALACE — STAFF SALARY & PAYROLL REGISTER";
+      titleCell.font = { name: "Georgia", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF59283A" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(1).height = 32;
+
+      worksheet.mergeCells("A2:P2");
+      const subCell = worksheet.getCell("A2");
+      subCell.value = `Export Scope: ${scopeTitle} | Total Records: ${exportItems.length} | Generated: ${new Date().toLocaleString("en-IN")}`;
+      subCell.font = { name: "Arial", size: 10, italic: true, color: { argb: "FF59283A" } };
+      subCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF5F0EA" } };
+      subCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(2).height = 20;
+
+      // Headers
+      const headers = [
+        "S.No",
+        "Employee Code",
+        "Staff Name",
+        "Department",
+        "Designation",
+        "Period",
+        "Basic Salary (₹)",
+        "Attendance Days",
+        "Earned Gross (₹)",
+        "Overtime (₹)",
+        "Deductions (₹)",
+        "Advance Deductions (₹)",
+        "Net Payable (₹)",
+        "Disbursed / Paid (₹)",
+        "Balance Due (₹)",
+        "Status",
+      ];
+
+      const headerRow = worksheet.addRow(headers);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7A4652" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE8DDD8" } },
+          bottom: { style: "medium", color: { argb: "FF59283A" } },
+          left: { style: "thin", color: { argb: "FFE8DDD8" } },
+          right: { style: "thin", color: { argb: "FFE8DDD8" } },
+        };
+      });
+
+      exportItems.forEach((r: PayrollHistoryItem, idx: number) => {
+        const periodStr = `${MONTHS[(r.payrollMonth || 1) - 1]} ${r.payrollYear}`;
+        const row = worksheet.addRow([
+          idx + 1,
+          r.employeeCode || "—",
+          r.staffName || "—",
+          r.department || "—",
+          r.designation || "—",
+          periodStr,
+          Number(r.monthlyBasicSalary || 0),
+          `${Number(r.payableDays || 0)} / ${r.configuredSalaryDays || 30}d`,
+          Number(r.grossSalary || 0),
+          Number(r.overtimeAmount || 0),
+          Number(r.totalDeductions || 0),
+          Number(r.advanceDeductions || 0),
+          Number(r.netSalary || 0),
+          Number(r.totalPaid || 0),
+          Number(r.balanceAmount || 0),
+          r.isDeleted ? "DELETED / ARCHIVED" : r.payrollStatus || "FINALIZED",
+        ]);
+        row.height = 22;
+
+        const isEven = idx % 2 === 0;
+        const isDeletedRow = r.isDeleted;
+
+        row.eachCell((cell, colNum) => {
+          cell.font = { name: "Arial", size: 9 };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE8DDD8" } },
+            bottom: { style: "thin", color: { argb: "FFE8DDD8" } },
+            left: { style: "thin", color: { argb: "FFE8DDD8" } },
+            right: { style: "thin", color: { argb: "FFE8DDD8" } },
+          };
+
+          if (isDeletedRow) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8E8E5" } };
+          } else if (!isEven) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDFBF9" } };
+          }
+
+          if (colNum === 1 || colNum === 2 || colNum === 6 || colNum === 8 || colNum === 16) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else if (colNum >= 7 && colNum <= 15 && colNum !== 8) {
+            cell.alignment = { vertical: "middle", horizontal: "right" };
+            cell.numFmt = "₹#,##0.00";
+          } else {
+            cell.alignment = { vertical: "middle", horizontal: "left" };
+          }
+        });
+      });
+
+      worksheet.columns = [
+        { width: 8 },  // S.No
+        { width: 16 }, // Employee Code
+        { width: 22 }, // Staff Name
+        { width: 18 }, // Department
+        { width: 22 }, // Designation
+        { width: 16 }, // Period
+        { width: 16 }, // Basic Salary
+        { width: 16 }, // Attendance Days
+        { width: 16 }, // Earned Gross
+        { width: 14 }, // Overtime
+        { width: 14 }, // Deductions
+        { width: 20 }, // Advance Deductions
+        { width: 16 }, // Net Payable
+        { width: 18 }, // Total Paid
+        { width: 16 }, // Balance Due
+        { width: 18 }, // Status
+      ];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `Hotel_Radha_Palace_Payroll_${scopeTitle.replace(/\s+/g, "_")}.xlsx`;
+      anchor.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`Payroll report exported successfully (${exportItems.length} records)`);
+    } catch (err: any) {
+      console.error("Export error:", err);
+      toast.error("Failed to generate Excel export");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const filteredHistoryItems = (historyData?.items || []).filter((item) => {
+    if (historyFilter === "ACTIVE" && item.isDeleted) return false;
+    if (historyFilter === "DELETED" && !item.isDeleted) return false;
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase();
+    return (
+      (item.staffName && item.staffName.toLowerCase().includes(q)) ||
+      (item.employeeCode && item.employeeCode.toLowerCase().includes(q)) ||
+      (item.department && item.department.toLowerCase().includes(q)) ||
+      (item.designation && item.designation.toLowerCase().includes(q)) ||
+      (item.payrollStatus && item.payrollStatus.toLowerCase().includes(q))
+    );
+  });
+
   // Selected Staff info for Live Single Generation Preview
   const selectedStaffForGen = staffList.find((s) => s.id === genForm.staffId);
   const monthlySalary = selectedStaffForGen ? Number(selectedStaffForGen.monthlySalary) : 0;
@@ -359,6 +640,28 @@ export default function PayrollPage() {
           >
             <Plus className="w-3.5 h-3.5 text-white" />
             <span>Generate Single Slip</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenHistoryModal}
+            className="h-9 px-3 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5"
+          >
+            <History className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>Payroll History</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleExportExcel("ALL")}
+            disabled={isExporting}
+            className="h-9 px-3 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5"
+            title="Download complete payroll register as Excel spreadsheet"
+          >
+            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>{isExporting ? "Exporting..." : "Export"}</span>
           </Button>
 
           <Button
@@ -769,6 +1072,15 @@ export default function PayrollPage() {
                               title="View Salary Slip & Print"
                             >
                               <Eye className="w-3.5 h-3.5 mr-1" /> Slip
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenDelete(rec)}
+                              className="h-7 px-2 text-[#B54C44] hover:bg-rose-50 hover:text-rose-700"
+                              title="Delete Payroll Record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
                             </Button>
                           </td>
                         </tr>
@@ -1503,6 +1815,357 @@ export default function PayrollPage() {
               Close Payslip
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* DELETE CONFIRMATION MODAL (AUDIT ARCHIVED)                                */}
+      {/* ========================================================================= */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="text-center sm:text-center pb-2">
+            <div className="w-12 h-12 rounded-full bg-[#F8E8E5] border border-[#F2D1CB] text-[#B54C44] flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <DialogTitle className="text-lg font-serif font-bold text-[#59283A]">
+              Delete Staff Payroll Record?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#82747A] mt-1">
+              Are you sure you want to delete the payroll slip for{" "}
+              <strong className="text-[#59283A] font-semibold">
+                {recordToDelete?.staff?.fullName}
+              </strong>
+              {recordToDelete?.staff?.employeeCode && ` (${recordToDelete.staff.employeeCode})`}
+              {recordToDelete?.payrollMonth && recordToDelete?.payrollYear && ` for ${MONTHS[recordToDelete.payrollMonth - 1]} ${recordToDelete.payrollYear}`}?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-3.5 bg-[#F5F0EA]/70 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2.5 my-1">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#2E5E44]">Permanent History Preserved:</strong> Complete salary computation, earned gross, advance recoveries, deductions, and payment ledger receipts will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#963730]">Active Register Removal:</strong> The record will be permanently removed from this month&apos;s active payroll register and salary obligations.
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-row items-center justify-end gap-2 pt-4 border-t border-[#E8DDD8]/60 mt-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => {
+                setDeleteModalOpen(false);
+                setRecordToDelete(null);
+              }}
+              className="text-xs h-9 px-4 font-medium border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleExecuteDelete}
+              className="text-xs h-9 px-4 font-semibold bg-[#B54C44] hover:bg-[#923832] text-white flex items-center justify-center gap-1.5 min-w-[130px] rounded-lg transition-colors"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white shrink-0" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Yes, Delete Payroll</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* FULL MONTH PAYROLL HISTORY & ARCHIVE MODAL                                */}
+      {/* ========================================================================= */}
+      <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace Archive
+                  </span>
+                  <span className="text-xs text-[#82747A]">• Full Month Staff Payroll &amp; Salary Audit Logs</span>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Payroll History &amp; Monthly Records</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Review complete month employee salary slips, earned gross, advance deductions, and deleted payroll archives.
+                </DialogDescription>
+              </div>
+
+              {/* Month Selector Controls */}
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
+                  {historyData?.monthName || `${MONTHS[historyMonth - 1]} ${historyYear}`}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Next Month"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Summary Strip */}
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#8E7079]">Total Slips</div>
+                  <div className="text-lg font-serif font-bold text-[#59283A]">
+                    {historyData?.totalCount || 0}
+                  </div>
+                </div>
+                <Banknote className="w-5 h-5 text-[#C4A06A]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#32765B]">Active / Finalized</div>
+                  <div className="text-lg font-serif font-bold text-[#32765B]">
+                    {historyData?.activeCount || 0}
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-[#32765B]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#B54C44]">Deleted / Cancelled</div>
+                  <div className="text-lg font-serif font-bold text-[#B54C44]">
+                    {historyData?.deletedCount || 0}
+                  </div>
+                </div>
+                <Archive className="w-5 h-5 text-[#B54C44]" />
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Filter Toolbar inside History */}
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search history by employee code, name, department, role, status..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="pl-8 h-8 text-xs border-[#E8DDD8]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant={historyFilter === "ALL" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ALL")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ALL" ? "bg-[#59283A] text-white" : "border-[#E8DDD8] text-[#59283A]"}`}
+              >
+                All ({historyData?.totalCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "ACTIVE" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ACTIVE")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ACTIVE" ? "bg-[#32765B] text-white" : "border-[#E8DDD8] text-[#32765B]"}`}
+              >
+                Active ({historyData?.activeCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "DELETED" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("DELETED")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "DELETED" ? "bg-[#B54C44] text-white" : "border-[#E8DDD8] text-[#B54C44]"}`}
+              >
+                Deleted ({historyData?.deletedCount || 0})
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleExportExcel("MONTH")}
+                disabled={isExporting}
+                className="h-7 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] ml-1 flex items-center gap-1"
+                title="Download this month's complete payroll records"
+              >
+                <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Export Month</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* History Records Table */}
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+            {historyLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center">
+                <LoadingSpinner size="md" text="Loading payroll history records..." />
+              </div>
+            ) : filteredHistoryItems.length === 0 ? (
+              <div className="text-center py-12 text-[#82747A] text-xs">
+                No staff payroll records or deletion activity found for {historyData?.monthName || "this month"}.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredHistoryItems.map((item: any, idx: number) => {
+                  return (
+                    <div
+                      key={item.id || idx}
+                      className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                        item.isDeleted
+                          ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
+                          : "border-[#E8DDD8] hover:border-[#C4A06A]"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-9 h-9 rounded-lg flex items-center justify-center font-serif font-bold text-xs shrink-0 ${
+                            item.isDeleted
+                              ? "bg-[#B54C44]/10 text-[#B54C44]"
+                              : "bg-[#59283A]/10 text-[#59283A]"
+                          }`}
+                        >
+                          {item.staffName ? item.staffName.substring(0, 2).toUpperCase() : "PR"}
+                        </div>
+
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-sm text-[#59283A]">
+                              {item.staffName}
+                            </span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#F5F0EA] text-[#C4A06A] border border-[#E8DDD8]">
+                              {item.employeeCode}
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className={`text-[9px] font-semibold px-2 py-0.5 ${
+                                item.payrollStatus === "PAID"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : "bg-blue-50 text-blue-700 border-blue-200"
+                              }`}
+                            >
+                              {item.payrollStatus}
+                            </Badge>
+                          </div>
+
+                          <div className="text-xs text-[#82747A] mt-0.5 flex items-center gap-2 flex-wrap">
+                            <span>{item.department}</span>
+                            <span>•</span>
+                            <span>{item.designation}</span>
+                            <span>•</span>
+                            <span className="font-medium text-[#59283A]">
+                              Period: {MONTHS[(item.payrollMonth || 1) - 1]} {item.payrollYear}
+                            </span>
+                            <span>•</span>
+                            <span>Att: {item.payableDays} / {item.configuredSalaryDays || 30}d</span>
+                          </div>
+
+                          <div className="text-[11px] text-[#8E7079] mt-1 flex items-center gap-2 flex-wrap">
+                            <span className="font-mono">
+                              Basic: ₹{Number(item.monthlyBasicSalary).toLocaleString("en-IN")}
+                            </span>
+                            <span>•</span>
+                            <span className="font-mono">
+                              Earned Gross: ₹{Number(item.grossSalary).toLocaleString("en-IN")}
+                            </span>
+                            <span>•</span>
+                            <span className="font-mono text-emerald-800 font-bold">
+                              Net Payable: ₹{Number(item.netSalary).toLocaleString("en-IN")}
+                            </span>
+                            <span>•</span>
+                            <span className="font-mono text-emerald-600">
+                              Paid: ₹{Number(item.totalPaid).toLocaleString("en-IN")}
+                            </span>
+                            <span>•</span>
+                            <span className="font-mono text-amber-700 font-semibold">
+                              Balance: ₹{Number(item.balanceAmount).toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex sm:flex-col items-end justify-between sm:justify-center gap-1.5 shrink-0">
+                        {item.isDeleted ? (
+                          <div className="text-right">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#B54C44]/10 text-[#B54C44] border border-[#B54C44]/20">
+                              <Archive className="w-3 h-3" />
+                              DELETED / ARCHIVED
+                            </span>
+                            {item.deletedAt && (
+                              <div className="text-[10px] text-[#8E7079] mt-0.5">
+                                {new Date(item.deletedAt).toLocaleString("en-IN")}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#32765B]/10 text-[#32765B] border border-[#32765B]/20">
+                              <CheckCircle2 className="w-3 h-3" />
+                              ACTIVE RECORD
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                handleOpenDelete({
+                                  id: item.id,
+                                  payrollMonth: item.payrollMonth,
+                                  payrollYear: item.payrollYear,
+                                  netSalary: item.netSalary,
+                                  staff: {
+                                    id: item.staffId,
+                                    fullName: item.staffName,
+                                    employeeCode: item.employeeCode,
+                                    department: item.department,
+                                  } as any,
+                                } as any);
+                              }}
+                              className="h-7 px-2 text-xs text-[#B54C44] hover:bg-rose-50 hover:text-rose-700"
+                              title="Delete this payroll record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
