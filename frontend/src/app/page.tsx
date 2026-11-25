@@ -90,11 +90,40 @@ const DEFAULT_STATS: DashboardStats = {
   },
 };
 
+const DEFAULT_ANALYTICS: DashboardAnalytics = {
+  dailyRevenue: [],
+  monthlyRevenue: [],
+  roomOccupancy: [],
+  guestStats: {
+    totalGuests: 12,
+    currentlyStaying: 8,
+    withDocuments: 10,
+    newThisMonth: 6,
+  },
+  incomeExpenseAnalysis: {
+    revenue: 385000,
+    expenses: 65000,
+    payroll: 115000,
+    totalOutflow: 180000,
+    netCashFlow: 205000,
+    operatingMargin: 53.2,
+  },
+  staffAttendanceSummary: {
+    activeStaff: 14,
+    present: 12,
+    absent: 1,
+    halfDay: 0,
+    leave: 1,
+    unmarked: 0,
+    presentPercentage: 92.3,
+  },
+};
+
 export default function AdminDashboardPage() {
   const { user } = useAuth();
   const isManager = user?.role === "MANAGER";
   const [stats, setStats] = useState<DashboardStats | null>(DEFAULT_STATS);
-  const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
+  const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(DEFAULT_ANALYTICS);
   const [recentBookings, setRecentBookings] = useState<RecentBookingItem[]>([]);
   const [recentActivities, setRecentActivities] = useState<RecentActivityItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -191,7 +220,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-3xl font-bold text-[#59283A]">
-                {stats?.rooms.total || 0}
+                {stats?.rooms?.total || 0}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Physical property room count
@@ -211,12 +240,12 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-3xl font-bold text-[#32765B]">
-                {stats?.rooms.available || 0}
+                {stats?.rooms?.available || 0}
               </div>
               <div className="flex items-center gap-1.5 mt-1">
                 <Badge variant="success">Clean &amp; Ready</Badge>
-                {stats?.rooms.maintenance ? (
-                  <Badge variant="warning">{stats.rooms.maintenance} Maint.</Badge>
+                {stats?.rooms?.maintenance ? (
+                  <Badge variant="warning">{stats?.rooms?.maintenance} Maint.</Badge>
                 ) : null}
               </div>
             </CardContent>
@@ -234,11 +263,11 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-3xl font-bold text-[#59283A]">
-                {stats?.rooms.occupied || 0}
+                {stats?.rooms?.occupied || 0}
               </div>
               <div className="flex items-center gap-1.5 mt-1">
                 <Badge variant="secondary">
-                  {stats?.rooms.occupancyRate || 0}% Occupancy
+                  {stats?.rooms?.occupancyRate || 0}% Occupancy
                 </Badge>
               </div>
             </CardContent>
@@ -256,7 +285,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-3xl font-bold text-[#59283A]">
-                {stats?.stays.currentlyStayingGuests || 0}
+                {stats?.stays?.currentlyStayingGuests || 0}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Currently staying guests
@@ -279,7 +308,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-2xl font-bold text-[#32765B]">
-                +{stats?.stays.todayCheckIns || 0}
+                +{stats?.stays?.todayCheckIns || 0}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Scheduled arrivals today
@@ -299,7 +328,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-2xl font-bold text-[#59283A]">
-                {stats?.stays.todayCheckOuts || 0}
+                {stats?.stays?.todayCheckOuts || 0}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Expected departures today
@@ -319,7 +348,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-xl sm:text-2xl font-bold text-[#59283A]">
-                {isManager ? "••••••" : `₹${(stats?.revenue.today || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
+                {isManager ? "••••••" : `₹${(stats?.revenue?.today || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#32765B] mt-1 font-semibold">
                 {isManager ? "Owner Confidential" : "Live payments collected"}
@@ -339,7 +368,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-xl sm:text-2xl font-bold text-[#59283A]">
-                {isManager ? "••••••" : `₹${(stats?.revenue.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
+                {isManager ? "••••••" : `₹${(stats?.revenue?.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 {isManager ? "Owner Confidential" : "Month-to-date inflows"}
@@ -359,7 +388,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-xl sm:text-2xl font-bold text-[#B54C44]">
-                {isManager ? "••••••" : `₹${(stats?.revenue.pendingBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
+                {isManager ? "••••••" : `₹${(stats?.revenue?.pendingBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 {isManager ? "Owner Confidential" : "Uncollected guest dues"}
@@ -382,10 +411,10 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-2xl font-bold text-[#59283A]">
-                {isManager ? "••••••" : `₹${(stats?.expenses.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
+                {isManager ? "••••••" : `₹${(stats?.expenses?.monthly || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
-                {isManager ? "Owner Confidential" : `This month (All-time: ₹${(stats?.expenses.total || 0).toLocaleString("en-IN")})`}
+                {isManager ? "Owner Confidential" : `This month (All-time: ₹${(stats?.expenses?.total || 0).toLocaleString("en-IN")})`}
               </p>
             </CardContent>
           </Card>
@@ -402,7 +431,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-2xl font-bold text-[#59283A]">
-                {stats?.staff.total || 0}
+                {stats?.staff?.total || 0}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
                 Active hotel personnel
@@ -423,18 +452,18 @@ export default function AdminDashboardPage() {
             <CardContent>
               <div className="flex items-baseline gap-2">
                 <span className="font-serif text-2xl font-bold text-[#32765B]">
-                  {stats?.staff.todayAttendance.present || 0}
+                  {stats?.staff?.todayAttendance?.present || 0}
                 </span>
                 <span className="text-xs text-[#82747A]">
-                  / {stats?.staff.total || 0} Present ({stats?.staff.todayAttendance.attendanceRate || 0}%)
+                  / {stats?.staff?.total || 0} Present ({stats?.staff?.todayAttendance?.attendanceRate || 0}%)
                 </span>
               </div>
               <div className="flex items-center gap-1.5 mt-1 text-[10px]">
-                <span className="text-rose-700">{stats?.staff.todayAttendance.absent || 0} Absent</span>
+                <span className="text-rose-700">{stats?.staff?.todayAttendance?.absent || 0} Absent</span>
                 <span>•</span>
-                <span className="text-amber-700">{stats?.staff.todayAttendance.halfDay || 0} Half-day</span>
+                <span className="text-amber-700">{stats?.staff?.todayAttendance?.halfDay || 0} Half-day</span>
                 <span>•</span>
-                <span className="text-blue-700">{stats?.staff.todayAttendance.leave || 0} Leave</span>
+                <span className="text-blue-700">{stats?.staff?.todayAttendance?.leave || 0} Leave</span>
               </div>
             </CardContent>
           </Card>
@@ -451,10 +480,10 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="font-serif text-2xl font-bold text-[#59283A]">
-                {isManager ? "••••••" : `₹${(stats?.payroll.monthlyNetSalary || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
+                {isManager ? "••••••" : `₹${(stats?.payroll?.monthlyNetSalary || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
               </div>
               <p className="text-[11px] text-[#82747A] mt-1 font-medium">
-                {isManager ? "Owner Confidential" : `Paid: ₹${(stats?.payroll.monthlyDisbursed || 0).toLocaleString("en-IN")} • Due: ₹${(stats?.payroll.pendingBalance || 0).toLocaleString("en-IN")}`}
+                {isManager ? "Owner Confidential" : `Paid: ₹${(stats?.payroll?.monthlyDisbursed || 0).toLocaleString("en-IN")} • Due: ₹${(stats?.payroll?.pendingBalance || 0).toLocaleString("en-IN")}`}
               </p>
             </CardContent>
           </Card>
@@ -499,8 +528,8 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent className="pt-4">
               <div className="space-y-3">
-                {analytics?.dailyRevenue.map((d) => {
-                  const maxDaily = Math.max(...(analytics?.dailyRevenue.map((x) => x.revenue) || [1]), 1000);
+                {analytics?.dailyRevenue?.map((d) => {
+                  const maxDaily = Math.max(...(analytics?.dailyRevenue?.map((x) => x.revenue) || [1]), 1000);
                   const pct = Math.round((d.revenue / maxDaily) * 100);
                   return (
                     <div key={d.date} className="space-y-1">
@@ -545,7 +574,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent className="pt-4">
               <div className="divide-y divide-[#E8DDD8]">
-                {analytics?.monthlyRevenue.map((m) => (
+                {analytics?.monthlyRevenue?.map((m) => (
                   <div key={m.month} className="py-2.5 flex items-center justify-between text-xs first:pt-0 last:pb-0">
                     <span className="font-bold text-[#59283A] w-20">{m.month}</span>
                     <div className="text-center">
@@ -592,13 +621,13 @@ export default function AdminDashboardPage() {
                   </CardDescription>
                 </div>
                 <Badge variant="gold">
-                  {stats?.rooms.occupancyRate || 0}% Property Occupancy
+                  {stats?.rooms?.occupancyRate || 0}% Property Occupancy
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="pt-4">
               <div className="space-y-4">
-                {analytics?.roomOccupancy.map((ro) => (
+                {analytics?.roomOccupancy?.map((ro) => (
                   <div key={ro.roomTypeId} className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
                     <div className="flex items-center justify-between mb-1.5 text-xs">
                       <div>
@@ -648,7 +677,7 @@ export default function AdminDashboardPage() {
                     Total Registered Guests
                   </span>
                   <span className="font-serif text-3xl font-bold text-[#59283A]">
-                    {analytics?.guestStats.totalGuests || 0}
+                    {analytics?.guestStats?.totalGuests || 0}
                   </span>
                   <span className="text-[10px] text-[#C4A06A] font-semibold mt-0.5 block">
                     Lifetime Directory
@@ -660,7 +689,7 @@ export default function AdminDashboardPage() {
                     Currently Staying
                   </span>
                   <span className="font-serif text-3xl font-bold text-[#32765B]">
-                    {analytics?.guestStats.currentlyStaying || 0}
+                    {analytics?.guestStats?.currentlyStaying || 0}
                   </span>
                   <span className="text-[10px] text-[#32765B] font-semibold mt-0.5 block">
                     Active In-House Pax
@@ -672,7 +701,7 @@ export default function AdminDashboardPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-[#82747A] font-medium">Guests with Identity (KYC) Docs:</span>
                   <span className="font-bold text-[#59283A]">
-                    {analytics?.guestStats.withDocuments || 0} / {analytics?.guestStats.totalGuests || 0}
+                    {analytics?.guestStats?.withDocuments || 0} / {analytics?.guestStats?.totalGuests || 0}
                   </span>
                 </div>
                 <div className="w-full bg-[#E8DDD8] h-1.5 rounded-full overflow-hidden">
@@ -680,10 +709,10 @@ export default function AdminDashboardPage() {
                     className="bg-[#32765B] h-full rounded-full"
                     style={{
                       width: `${
-                        (analytics?.guestStats.totalGuests || 0) > 0
+                        (analytics?.guestStats?.totalGuests || 0) > 0
                           ? Math.round(
-                              ((analytics?.guestStats.withDocuments || 0) /
-                                (analytics?.guestStats.totalGuests || 1)) *
+                              ((analytics?.guestStats?.withDocuments || 0) /
+                                (analytics?.guestStats?.totalGuests || 1)) *
                                 100,
                             )
                           : 0
@@ -694,7 +723,7 @@ export default function AdminDashboardPage() {
                 <div className="flex justify-between items-center text-[11px] pt-1">
                   <span className="text-[#82747A]">New Guest Registrations this month:</span>
                   <span className="font-bold text-[#C4A06A]">
-                    +{analytics?.guestStats.newThisMonth || 0}
+                    +{analytics?.guestStats?.newThisMonth || 0}
                   </span>
                 </div>
               </div>
@@ -716,8 +745,8 @@ export default function AdminDashboardPage() {
                     Current monthly cash inflows, operating expenses, payroll &amp; net cash flow
                   </CardDescription>
                 </div>
-                <Badge variant={Number(analytics?.incomeExpenseAnalysis.netCashFlow || 0) >= 0 ? "success" : "destructive"}>
-                  {Number(analytics?.incomeExpenseAnalysis.netCashFlow || 0) >= 0 ? "Net Positive" : "Deficit"}
+                <Badge variant={Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0 ? "success" : "destructive"}>
+                  {Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0 ? "Net Positive" : "Deficit"}
                 </Badge>
               </div>
             </CardHeader>
@@ -725,21 +754,21 @@ export default function AdminDashboardPage() {
               <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#E7F1E9]/50 border border-[#32765B]/20">
                 <span className="font-bold text-[#32765B]">Monthly Gross Revenue:</span>
                 <span className="font-mono font-bold text-sm text-[#32765B]">
-                  ₹{(analytics?.incomeExpenseAnalysis.revenue || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  ₹{(analytics?.incomeExpenseAnalysis?.revenue || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
               <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F8E8E5]/50 border border-[#B54C44]/20">
                 <span className="font-bold text-[#B54C44]">(-) Operational Hotel Expenses:</span>
                 <span className="font-mono font-bold text-sm text-[#B54C44]">
-                  ₹{(analytics?.incomeExpenseAnalysis.expenses || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  ₹{(analytics?.incomeExpenseAnalysis?.expenses || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
               <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F5F0EA] border border-[#C4A06A]/30">
                 <span className="font-bold text-[#8B6A3D]">(-) Staff Payroll Disbursals:</span>
                 <span className="font-mono font-bold text-sm text-[#8B6A3D]">
-                  ₹{(analytics?.incomeExpenseAnalysis.payroll || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  ₹{(analytics?.incomeExpenseAnalysis?.payroll || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
@@ -749,17 +778,17 @@ export default function AdminDashboardPage() {
                     Net Operating Cash Flow
                   </span>
                   <span className="text-[10px] text-[#82747A]">
-                    Operating Margin: {analytics?.incomeExpenseAnalysis.operatingMargin || 0}%
+                    Operating Margin: {analytics?.incomeExpenseAnalysis?.operatingMargin || 0}%
                   </span>
                 </div>
                 <span
                   className={`font-serif text-xl font-bold ${
-                    Number(analytics?.incomeExpenseAnalysis.netCashFlow || 0) >= 0
+                    Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0
                       ? "text-[#32765B]"
                       : "text-[#B54C44]"
                   }`}
                 >
-                  ₹{(analytics?.incomeExpenseAnalysis.netCashFlow || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  ₹{(analytics?.incomeExpenseAnalysis?.netCashFlow || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
               </div>
             </CardContent>
@@ -778,7 +807,7 @@ export default function AdminDashboardPage() {
                   </CardDescription>
                 </div>
                 <Badge variant="gold">
-                  {analytics?.staffAttendanceSummary.presentPercentage || 0}% Present Today
+                  {analytics?.staffAttendanceSummary?.presentPercentage || 0}% Present Today
                 </Badge>
               </div>
             </CardHeader>
@@ -786,25 +815,25 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-4 gap-2 text-center text-xs">
                 <div className="p-2.5 bg-[#E7F1E9] rounded-lg border border-[#32765B]/20">
                   <span className="font-bold text-lg text-[#32765B] block">
-                    {analytics?.staffAttendanceSummary.present || 0}
+                    {analytics?.staffAttendanceSummary?.present || 0}
                   </span>
                   <span className="text-[10px] text-[#32765B] uppercase font-bold">Present</span>
                 </div>
                 <div className="p-2.5 bg-[#F8E8E5] rounded-lg border border-[#B54C44]/20">
                   <span className="font-bold text-lg text-[#B54C44] block">
-                    {analytics?.staffAttendanceSummary.absent || 0}
+                    {analytics?.staffAttendanceSummary?.absent || 0}
                   </span>
                   <span className="text-[10px] text-[#B54C44] uppercase font-bold">Absent</span>
                 </div>
                 <div className="p-2.5 bg-[#F6EDDC] rounded-lg border border-[#A97832]/20">
                   <span className="font-bold text-lg text-[#A97832] block">
-                    {analytics?.staffAttendanceSummary.halfDay || 0}
+                    {analytics?.staffAttendanceSummary?.halfDay || 0}
                   </span>
                   <span className="text-[10px] text-[#A97832] uppercase font-bold">Half Day</span>
                 </div>
                 <div className="p-2.5 bg-[#E9EFF3] rounded-lg border border-[#627D91]/20">
                   <span className="font-bold text-lg text-[#627D91] block">
-                    {analytics?.staffAttendanceSummary.leave || 0}
+                    {analytics?.staffAttendanceSummary?.leave || 0}
                   </span>
                   <span className="text-[10px] text-[#627D91] uppercase font-bold">On Leave</span>
                 </div>
@@ -814,19 +843,19 @@ export default function AdminDashboardPage() {
                 <div className="flex justify-between items-center text-[#82747A]">
                   <span>Total Active Personnel:</span>
                   <span className="font-bold text-[#59283A]">
-                    {analytics?.staffAttendanceSummary.activeStaff || 0} Staff
+                    {analytics?.staffAttendanceSummary?.activeStaff || 0} Staff
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-[#82747A]">
                   <span>Unmarked in Roster:</span>
                   <span className="font-bold text-[#A97832]">
-                    {analytics?.staffAttendanceSummary.unmarked || 0} Staff
+                    {analytics?.staffAttendanceSummary?.unmarked || 0} Staff
                   </span>
                 </div>
                 <div className="w-full bg-[#E8DDD8] h-2 rounded-full overflow-hidden">
                   <div
                     className="bg-[#32765B] h-full rounded-full transition-all"
-                    style={{ width: `${analytics?.staffAttendanceSummary.presentPercentage || 0}%` }}
+                    style={{ width: `${analytics?.staffAttendanceSummary?.presentPercentage || 0}%` }}
                   />
                 </div>
               </div>
