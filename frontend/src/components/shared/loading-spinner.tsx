@@ -59,15 +59,18 @@ export function LoadingSpinner({
         {/* Center Royal Hotel Crest Emblem */}
         <div
           className={cn(
-            "absolute flex items-center justify-center rounded-xl overflow-hidden shadow-md border border-[#C4A06A] bg-[#59283A]",
-            size === "sm" ? "w-6 h-6" : size === "lg" || size === "xl" ? "w-11 h-11" : "w-8 h-8"
+            "absolute flex items-center justify-center rounded-xl bg-gradient-to-br from-[#59283A] to-[#472130] text-[#C4A06A] shadow-md border border-[#C4A06A]/40",
+            size === "sm" ? "w-5 h-5" : size === "lg" || size === "xl" ? "w-9 h-9" : "w-7 h-7"
           )}
         >
-          <Image
-            src="/radha-krishna-logo.jpg"
-            alt="Hotel Radha Palace"
-            fill
-            className="object-cover"
+          <Hotel
+            className={
+              size === "sm"
+                ? "w-3 h-3 text-[#C4A06A]"
+                : size === "lg" || size === "xl"
+                ? "w-5 h-5 text-[#C4A06A]"
+                : "w-4 h-4 text-[#C4A06A]"
+            }
           />
         </div>
       </div>

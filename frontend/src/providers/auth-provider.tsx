@@ -90,7 +90,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(res.admin);
       const roleLabel = res.admin.role === "MANAGER" ? "Hotel Manager" : "Hotel Owner";
       toast.success(`Welcome, ${res.admin.username} (${roleLabel})!`);
-      router.push("/");
+      setIsLoading(false);
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      } else {
+        router.push("/");
+      }
       return true;
     } catch (err: any) {
       const msg = err.response?.data?.message || "Invalid credentials";

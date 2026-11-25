@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { Sidebar } from "./sidebar";
@@ -9,6 +9,7 @@ import { Header } from "./header";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, isLoading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -18,18 +19,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // If still checking authentication or user is not logged in, show royal loading screen
-  // (Prevents any flash of dashboard or protected content to unauthenticated users)
-  if (isLoading || !user) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#F5F0EA]">
-        <LoadingSpinner
-          size="lg"
-          text="Hotel Radha Palace"
-          subtext="Verifying authorized session..."
-        />
-      </div>
-    );
+  // If unauthenticated and not loading, redirect to login
+  if (!isLoading && !user) {
+    if (typeof window !== "undefined") {
+      router.replace("/login");
+    }
+    return null;
   }
 
   return (
