@@ -32,7 +32,15 @@ import {
   XCircle,
   Sparkles,
   Award,
+  Download,
+  History,
+  Archive,
+  ChevronLeft,
+  ChevronRight,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
+import ExcelJS from "exceljs";
 import { staffService, StaffStats } from "@/services/staff.service";
 import { Staff } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -85,6 +93,21 @@ export default function StaffPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // History modal state
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyMonth, setHistoryMonth] = useState<number>(new Date().getMonth() + 1);
+  const [historyYear, setHistoryYear] = useState<number>(new Date().getFullYear());
+  const [historyData, setHistoryData] = useState<any>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACTIVE" | "DELETED">("ALL");
+  const [historySearch, setHistorySearch] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const MONTH_NAMES = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
 
   // 13 Field Form State
   const initialForm = {
@@ -239,15 +262,257 @@ export default function StaffPage() {
     try {
       setSubmitting(true);
       const res = await staffService.delete(selectedStaff.id);
-      toast.success(res.message);
+      toast.success(res.message || `Employee ${selectedStaff.fullName} deleted and archived`);
       setDeleteModalOpen(false);
-      fetchStaffData();
+      setSelectedStaff(null);
+      await fetchStaffData();
+      if (historyModalOpen) {
+        fetchHistory(historyMonth, historyYear);
+      }
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to delete employee");
     } finally {
       setSubmitting(false);
     }
   };
+
+  const fetchHistory = async (m?: number, y?: number) => {
+    try {
+      setHistoryLoading(true);
+      const res = await staffService.getHistory({
+        month: m || historyMonth,
+        year: y || historyYear,
+      });
+      setHistoryData(res);
+    } catch (err: any) {
+      toast.error("Failed to load staff history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleOpenHistoryModal = () => {
+    setHistoryModalOpen(true);
+    fetchHistory(historyMonth, historyYear);
+  };
+
+  const handlePrevMonth = () => {
+    let newM = historyMonth - 1;
+    let newY = historyYear;
+    if (newM < 1) {
+      newM = 12;
+      newY -= 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleNextMonth = () => {
+    let newM = historyMonth + 1;
+    let newY = historyYear;
+    if (newM > 12) {
+      newM = 1;
+      newY += 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleExportExcel = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating Excel report for Staff & Workforce...");
+
+      let exportItems: any[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await staffService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTH_NAMES[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const allStaff = await staffService.findAll({ limit: 1000 }).catch(() => ({ items: [] }));
+        exportItems = allStaff.items || [];
+        scopeTitle = "All_Staff";
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No staff records found to export for selected scope");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "Hotel Radha Palace";
+      workbook.created = new Date();
+
+      const worksheet = workbook.addWorksheet("Staff Directory");
+
+      // Title Banner
+      worksheet.mergeCells("A1:O1");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "HOTEL RADHA PALACE — STAFF & WORKFORCE DIRECTORY REGISTER";
+      titleCell.font = { name: "Georgia", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF59283A" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(1).height = 32;
+
+      worksheet.mergeCells("A2:O2");
+      const subCell = worksheet.getCell("A2");
+      subCell.value = `Export Scope: ${scopeTitle} | Total Records: ${exportItems.length} | Generated: ${new Date().toLocaleString("en-IN")}`;
+      subCell.font = { name: "Arial", size: 10, italic: true, color: { argb: "FF59283A" } };
+      subCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF5F0EA" } };
+      subCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(2).height = 20;
+
+      // Headers
+      const headers = [
+        "S.No",
+        "Employee Code",
+        "Full Name",
+        "Department",
+        "Designation",
+        "Mobile Number",
+        "Email Address",
+        "Monthly Salary (₹)",
+        "Joining Date",
+        "Bank Account Holder",
+        "Bank Account #",
+        "IFSC Code",
+        "Status",
+        "Lifecycle",
+        "Archived Date",
+      ];
+
+      const headerRow = worksheet.addRow(headers);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7A4652" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE8DDD8" } },
+          bottom: { style: "medium", color: { argb: "FF59283A" } },
+          left: { style: "thin", color: { argb: "FFE8DDD8" } },
+          right: { style: "thin", color: { argb: "FFE8DDD8" } },
+        };
+      });
+
+      exportItems.forEach((s: any, idx: number) => {
+        const joinStr = s.joiningDate ? new Date(s.joiningDate).toLocaleDateString("en-IN") : "—";
+        const salaryNum = Number(s.monthlySalary || 0);
+
+        const row = worksheet.addRow([
+          idx + 1,
+          s.employeeCode || "—",
+          s.fullName || "—",
+          s.department || "—",
+          s.designation || "—",
+          s.mobileNumber || "—",
+          s.email || "—",
+          salaryNum,
+          joinStr,
+          s.bankAccountHolder || "—",
+          s.bankAccountNumber || "—",
+          s.bankIfscCode || "—",
+          s.employmentStatus || "ACTIVE",
+          s.isDeleted ? "DELETED / ARCHIVED" : "ACTIVE EMPLOYEE",
+          s.deletedAt ? new Date(s.deletedAt).toLocaleDateString("en-IN") : "—",
+        ]);
+        row.height = 22;
+
+        const isEven = idx % 2 === 0;
+        const isDeletedRow = s.isDeleted;
+
+        row.eachCell((cell, colNum) => {
+          cell.font = { name: "Arial", size: 9 };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE8DDD8" } },
+            bottom: { style: "thin", color: { argb: "FFE8DDD8" } },
+            left: { style: "thin", color: { argb: "FFE8DDD8" } },
+            right: { style: "thin", color: { argb: "FFE8DDD8" } },
+          };
+
+          if (isDeletedRow) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8E8E5" } };
+          } else if (!isEven) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDFBF9" } };
+          }
+
+          if (
+            colNum === 1 ||
+            colNum === 2 ||
+            colNum === 6 ||
+            colNum === 9 ||
+            colNum === 10 ||
+            colNum === 11 ||
+            colNum === 12 ||
+            colNum === 13 ||
+            colNum === 14 ||
+            colNum === 15
+          ) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else if (colNum === 8) {
+            cell.alignment = { vertical: "middle", horizontal: "right" };
+            cell.numFmt = "₹#,##0.00";
+          } else {
+            cell.alignment = { vertical: "middle", horizontal: "left" };
+          }
+        });
+      });
+
+      worksheet.columns = [
+        { width: 6 },
+        { width: 18 },
+        { width: 24 },
+        { width: 22 },
+        { width: 24 },
+        { width: 16 },
+        { width: 22 },
+        { width: 18 },
+        { width: 16 },
+        { width: 22 },
+        { width: 20 },
+        { width: 16 },
+        { width: 16 },
+        { width: 20 },
+        { width: 16 },
+      ];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Hotel_Radha_Palace_Staff_${scopeTitle}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`Export completed successfully (${exportItems.length} staff records)`);
+    } catch (err: any) {
+      console.error("Export error:", err);
+      toast.error(err.message || "Failed to generate staff Excel report");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const filteredHistoryItems = (historyData?.items || []).filter((item: any) => {
+    if (historyFilter === "ACTIVE" && item.isDeleted) return false;
+    if (historyFilter === "DELETED" && !item.isDeleted) return false;
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase();
+    return (
+      item.employeeCode?.toLowerCase().includes(q) ||
+      item.fullName?.toLowerCase().includes(q) ||
+      item.department?.toLowerCase().includes(q) ||
+      item.designation?.toLowerCase().includes(q) ||
+      item.mobileNumber?.includes(q)
+    );
+  });
 
   const handlePrintDossier = () => {
     window.print();
@@ -271,7 +536,30 @@ export default function StaffPage() {
             Complete personal records, employment dossier, bank details, monthly salary benchmarks, and shift administration.
           </p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenHistoryModal}
+            className="border-[#E8DDD8] bg-white text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5 shadow-xs text-xs h-9 px-3"
+            title="Review full month staff history and deleted employee archives"
+          >
+            <History className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>Staff History</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleExportExcel("ALL")}
+            disabled={isExporting}
+            className="border-[#E8DDD8] bg-white text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5 shadow-xs text-xs h-9 px-3"
+            title="Export full staff workforce directory to Excel"
+          >
+            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>Export</span>
+          </Button>
+
           {/* View Mode Toggle */}
           <div className="flex items-center bg-[#F5F0EA] p-0.5 rounded-lg border border-[#E8DDD8]">
             <button
@@ -1433,45 +1721,336 @@ export default function StaffPage() {
       </Dialog>
 
       {/* ========================================================================= */}
-      {/* DELETE / ARCHIVE CONFIRMATION MODAL                                       */}
+      {/* DELETE CONFIRMATION MODAL (AUDIT ARCHIVED)                                */}
       {/* ========================================================================= */}
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
-          <DialogHeader>
-            <DialogTitle className="text-base font-serif font-bold text-[#59283A]">
-              Confirm Staff Deletion / Archival
+          <DialogHeader className="text-center sm:text-center pb-2">
+            <div className="w-12 h-12 rounded-full bg-[#F8E8E5] border border-[#F2D1CB] text-[#B54C44] flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <DialogTitle className="text-lg font-serif font-bold text-[#59283A]">
+              Delete Employee from Staff Directory?
             </DialogTitle>
             <DialogDescription className="text-xs text-[#82747A] mt-1">
-              Are you sure you want to remove{" "}
-              <strong className="text-[#59283A]">{selectedStaff?.fullName}</strong> ({selectedStaff?.employeeCode})?
+              Are you sure you want to delete{" "}
+              <strong className="text-[#59283A] font-semibold">
+                {selectedStaff?.fullName}
+              </strong>
+              {selectedStaff?.employeeCode && ` (${selectedStaff.employeeCode})`}
+              {selectedStaff?.designation && ` • ${selectedStaff.designation}`}?
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1 my-2">
-            <span className="font-bold block">Referential Integrity Protection:</span>
-            <p>
-              If this staff member has linked attendance logs, salary records, or advance disbursements, they will be safely marked as{" "}
-              <strong>TERMINATED</strong> to preserve financial accounting history.
-            </p>
+          <div className="p-3.5 bg-[#F5F0EA]/70 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2.5 my-1">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#2E5E44]">Permanent History Preserved:</strong> This employee&apos;s complete 13-field profile, bank details, designation, salary benchmark, and attendance history will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#963730]">Active Database Removal:</strong> The record will be removed from your active workforce directory and attendance rosters.
+              </div>
+            </div>
           </div>
 
-          <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
+          <DialogFooter className="flex flex-row items-center justify-end gap-2 pt-4 border-t border-[#E8DDD8]/60 mt-3">
             <Button
+              type="button"
               variant="outline"
               size="sm"
-              onClick={() => setDeleteModalOpen(false)}
-              className="text-xs border-[#E8DDD8]"
+              disabled={submitting}
+              onClick={() => {
+                setDeleteModalOpen(false);
+                setSelectedStaff(null);
+              }}
+              className="text-xs h-9 px-4 font-medium border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
             >
               Cancel
             </Button>
             <Button
-              variant="destructive"
+              type="button"
               size="sm"
               disabled={submitting}
               onClick={handleDelete}
-              className="text-xs bg-rose-600 hover:bg-rose-700 text-white"
+              className="text-xs h-9 px-4 font-semibold bg-[#B54C44] hover:bg-[#923832] text-white flex items-center justify-center gap-1.5 min-w-[130px] rounded-lg transition-colors"
             >
-              {submitting ? "Processing..." : "Confirm Delete / Terminate"}
+              {submitting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white shrink-0" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Yes, Delete Employee</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* FULL MONTH STAFF HISTORY & ARCHIVE MODAL                                  */}
+      {/* ========================================================================= */}
+      <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace Archive
+                  </span>
+                  <span className="text-xs text-[#82747A]">• Full Month Workforce Directory &amp; Staff Logs</span>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Staff History &amp; Monthly Records</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Review complete month active workforce members, departmental allocations, and deleted employee archives.
+                </DialogDescription>
+              </div>
+
+              {/* Month Selector Controls */}
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
+                  {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Next Month"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Summary Strip */}
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#8E7079]">Total Staff Records</div>
+                  <div className="text-lg font-serif font-bold text-[#59283A]">
+                    {historyData?.totalCount || 0}
+                  </div>
+                </div>
+                <Users className="w-5 h-5 text-[#C4A06A]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#32765B]">Active / On-Duty</div>
+                  <div className="text-lg font-serif font-bold text-[#32765B]">
+                    {historyData?.activeCount || 0}
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-[#32765B]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#B54C44]">Deleted / Terminated</div>
+                  <div className="text-lg font-serif font-bold text-[#B54C44]">
+                    {historyData?.deletedCount || 0}
+                  </div>
+                </div>
+                <Archive className="w-5 h-5 text-[#B54C44]" />
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Filter Toolbar inside History */}
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search history by employee code, name, department, role, mobile..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="pl-8 h-8 text-xs border-[#E8DDD8]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant={historyFilter === "ALL" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ALL")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ALL" ? "bg-[#59283A] text-white" : "border-[#E8DDD8] text-[#59283A]"}`}
+              >
+                All ({historyData?.totalCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "ACTIVE" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ACTIVE")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ACTIVE" ? "bg-[#32765B] text-white" : "border-[#E8DDD8] text-[#32765B]"}`}
+              >
+                Active ({historyData?.activeCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "DELETED" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("DELETED")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "DELETED" ? "bg-[#B54C44] text-white" : "border-[#E8DDD8] text-[#B54C44]"}`}
+              >
+                Deleted ({historyData?.deletedCount || 0})
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleExportExcel("MONTH")}
+                disabled={isExporting}
+                className="h-7 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] ml-1 flex items-center gap-1"
+                title="Download this month's complete staff records"
+              >
+                <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Export Month</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* History Records Table */}
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+            {historyLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center">
+                <LoadingSpinner size="md" text="Loading staff history records..." />
+              </div>
+            ) : filteredHistoryItems.length === 0 ? (
+              <div className="text-center py-12 text-[#82747A] text-xs">
+                No staff or deletion activity found for {historyData?.monthName || "this month"}.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredHistoryItems.map((item: any, idx: number) => (
+                  <div
+                    key={item.id || idx}
+                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                      item.isDeleted
+                        ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
+                        : "border-[#E8DDD8] hover:border-[#C4A06A]"
+                    }`}
+                  >
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                          item.isDeleted
+                            ? "bg-[#F8E8E5] text-[#B54C44]"
+                            : "bg-[#E7F1E9] text-[#32765B]"
+                        }`}
+                      >
+                        {item.isDeleted ? <Trash2 className="w-4 h-4" /> : <Users className="w-4 h-4" />}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sm text-[#59283A] font-mono">{item.employeeCode}</span>
+                          <span className="font-semibold text-xs text-[#59283A]">
+                            {item.fullName}
+                          </span>
+                          {item.mobileNumber && (
+                            <span className="text-[11px] text-[#8E7079] font-mono">
+                              {item.mobileNumber}
+                            </span>
+                          )}
+                          <span className="text-[11px] bg-[#F5F0EA] text-[#59283A] px-2 py-0.5 rounded font-medium">
+                            {item.designation} • {item.department}
+                          </span>
+                          {item.isDeleted ? (
+                            <Badge className="text-[9px] bg-[#F8E8E5] text-[#B54C44] border-[#B54C44]/30">
+                              Deleted / Archived
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="outline"
+                              className={`text-[9px] font-semibold ${
+                                item.employmentStatus === "ACTIVE"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : item.employmentStatus === "INACTIVE"
+                                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                                  : "bg-rose-50 text-rose-700 border-rose-200"
+                              }`}
+                            >
+                              {item.employmentStatus}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-3 text-[11px] text-[#82747A] mt-1 flex-wrap">
+                          <span>
+                            Salary: <strong className="font-mono text-[#59283A]">₹{Number(item.monthlySalary || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}/mo</strong>
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Joined: <strong>{new Date(item.joiningDate).toLocaleDateString("en-IN")}</strong>
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Bank: <strong>{item.bankAccountNumber ? `Linked (***${item.bankAccountNumber.slice(-4)})` : "Not Configured"}</strong>
+                          </span>
+                          <span>•</span>
+                          {item.isDeleted ? (
+                            <span className="text-[#B54C44] font-medium">
+                              Archived: {item.deletedAt ? new Date(item.deletedAt).toLocaleDateString("en-IN") : "Recorded"}
+                            </span>
+                          ) : (
+                            <span>
+                              Created: {new Date(item.createdAt).toLocaleDateString("en-IN")}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-center">
+                      {!item.isDeleted && item.id && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleOpenDetails(item.id)}
+                          className="h-7 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+                        >
+                          <Eye className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
+                          <span>Dossier</span>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="p-3 border-t border-[#E8DDD8] bg-white flex items-center justify-between flex-shrink-0">
+            <span className="text-[11px] text-[#82747A]">
+              Showing {filteredHistoryItems.length} of {historyData?.totalCount || 0} staff records for {historyData?.monthName || "selected month"}.
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setHistoryModalOpen(false)}
+              className="text-xs border-[#E8DDD8] text-[#59283A]"
+            >
+              Close Archive
             </Button>
           </DialogFooter>
         </DialogContent>

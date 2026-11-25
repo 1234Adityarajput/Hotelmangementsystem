@@ -231,9 +231,9 @@ export class StaffService {
     const existing = await this.prisma.staff.findUnique({
       where: { id },
       include: {
-        _count: {
-          select: { attendanceRecords: true, salaryRecords: true, advances: true },
-        },
+        attendanceRecords: true,
+        salaryRecords: true,
+        advances: true,
       },
     });
 
@@ -241,47 +241,123 @@ export class StaffService {
       throw new NotFoundException(`Staff member with ID ${id} not found`);
     }
 
-    // If records exist, mark TERMINATED instead of hard delete to preserve referential integrity
-    if (
-      existing._count.attendanceRecords > 0 ||
-      existing._count.salaryRecords > 0 ||
-      existing._count.advances > 0
-    ) {
-      const updated = await this.prisma.staff.update({
-        where: { id },
-        data: { employmentStatus: 'TERMINATED' },
-      });
-
-      await this.prisma.auditLog.create({
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Snapshot full employee dossier into AuditLog for permanent history preservation
+      await tx.auditLog.create({
         data: {
           entityType: 'STAFF',
           entityId: id,
-          action: 'UPDATE',
-          previousValues: { employmentStatus: existing.employmentStatus },
-          newValues: { employmentStatus: 'TERMINATED' },
-          description: `Archived/Terminated employee ${existing.fullName} (${existing.employeeCode}) due to existing linked payroll/attendance records`,
+          action: 'DELETE',
+          previousValues: {
+            ...existing,
+            deletedAt: new Date().toISOString(),
+          } as any,
+          description: `Deleted employee profile ${existing.fullName} (${existing.employeeCode}), Department: ${existing.department}, Designation: ${existing.designation}. Complete dossier preserved in history.`,
         },
       });
 
+      // 2. Safely clean up dependent records
+      await tx.attendance.deleteMany({ where: { staffId: id } });
+      await tx.staffAdvance.deleteMany({ where: { staffId: id } });
+      await tx.salaryRecord.deleteMany({ where: { staffId: id } });
+
+      // 3. Delete staff record from active database
+      await tx.staff.delete({ where: { id } });
+
       return {
-        message: `Employee ${existing.fullName} marked as TERMINATED (preserved attendance and payroll audit history)`,
-        staff: updated,
+        success: true,
+        message: `Employee ${existing.fullName} (${existing.employeeCode}) permanently removed from active directory and archived in Monthly History.`,
+        employeeCode: existing.employeeCode,
+        fullName: existing.fullName,
       };
-    }
+    });
+  }
 
-    await this.prisma.staff.delete({ where: { id } });
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
+    const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
 
-    await this.prisma.auditLog.create({
-      data: {
-        entityType: 'STAFF',
-        entityId: id,
-        action: 'DELETE',
-        previousValues: { employeeCode: existing.employeeCode, fullName: existing.fullName },
-        description: `Deleted employee profile ${existing.fullName} (${existing.employeeCode})`,
-      },
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch active staff records
+    const activeStaff = await this.prisma.staff.findMany({
+      orderBy: { createdAt: 'desc' },
     });
 
-    return { message: `Employee ${existing.fullName} deleted successfully` };
+    const enrichedActive = activeStaff.map((s) => ({
+      id: s.id,
+      employeeCode: s.employeeCode,
+      fullName: s.fullName,
+      mobileNumber: s.mobileNumber,
+      alternateMobileNumber: s.alternateMobileNumber,
+      email: s.email,
+      department: s.department,
+      designation: s.designation,
+      joiningDate: s.joiningDate,
+      monthlySalary: Number(s.monthlySalary),
+      employmentStatus: s.employmentStatus,
+      bankAccountHolder: s.bankAccountHolder,
+      bankAccountNumber: s.bankAccountNumber,
+      bankIfscCode: s.bankIfscCode,
+      address: s.address,
+      emergencyContact: s.emergencyContact,
+      createdAt: s.createdAt,
+      isDeleted: false,
+    }));
+
+    // 2. Fetch deleted staff from AuditLog
+    const deletedLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'STAFF',
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedItems = deletedLogs.map((log) => {
+      const prev: any = log.previousValues || {};
+      return {
+        id: log.entityId,
+        employeeCode: prev.employeeCode || 'EMP-ARCHIVED',
+        fullName: prev.fullName || 'Archived Employee',
+        mobileNumber: prev.mobileNumber || '',
+        alternateMobileNumber: prev.alternateMobileNumber,
+        email: prev.email,
+        department: prev.department || 'General',
+        designation: prev.designation || 'Staff',
+        joiningDate: prev.joiningDate || log.changedAt,
+        monthlySalary: Number(prev.monthlySalary || 0),
+        employmentStatus: 'TERMINATED',
+        bankAccountHolder: prev.bankAccountHolder,
+        bankAccountNumber: prev.bankAccountNumber,
+        bankIfscCode: prev.bankIfscCode,
+        address: prev.address,
+        emergencyContact: prev.emergencyContact,
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+        isDeleted: true,
+      };
+    });
+
+    const allHistory = [...enrichedActive, ...deletedItems].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedItems.length,
+      items: allHistory,
+    };
   }
 
   async getStats() {

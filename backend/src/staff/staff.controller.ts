@@ -26,6 +26,12 @@ export class StaffController {
     return this.staffService.getStats();
   }
 
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly staff history and archived records' })
+  async getHistory(@Query('month') month?: string, @Query('year') year?: string) {
+    return this.staffService.getHistory(month, year);
+  }
+
   @Get()
   @ApiOperation({ summary: 'List employees with search, department, and status filters' })
   async findAll(@Query() query: QueryStaffDto) {
@@ -35,6 +41,9 @@ export class StaffController {
   @Get(':id')
   @ApiOperation({ summary: 'Get single staff profile with attendance and payroll summary' })
   async findOne(@Param('id') id: string) {
+    if (id === 'history') {
+      return this.staffService.getHistory();
+    }
     return this.staffService.findOne(id);
   }
 

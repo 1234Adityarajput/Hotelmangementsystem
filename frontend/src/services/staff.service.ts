@@ -52,4 +52,17 @@ export const staffService = {
     const res = await apiClient.delete<ApiResponse<any>>(`/staff/${id}`);
     return res.data.data;
   },
+
+  async getHistory(params?: { month?: number; year?: number }): Promise<{
+    month: number;
+    year: number;
+    monthName: string;
+    totalCount: number;
+    activeCount: number;
+    deletedCount: number;
+    items: any[];
+  }> {
+    const res = await apiClient.get<ApiResponse<any>>("/staff/history", { params });
+    return res.data.data;
+  },
 };
