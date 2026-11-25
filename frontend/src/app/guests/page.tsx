@@ -25,7 +25,14 @@ import {
   UserCheck,
   Building,
   CreditCard,
+  History,
+  FileSpreadsheet,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  Archive,
 } from "lucide-react";
+import ExcelJS from "exceljs";
 import { guestsService } from "@/services/guests.service";
 import { Guest, GuestDocument, AdditionalGuest } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -61,6 +68,21 @@ const RELATIONSHIPS = [
   "Friend",
   "Colleague",
   "Companion",
+];
+
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 export default function GuestsPage() {
@@ -132,6 +154,373 @@ export default function GuestsPage() {
     idProofType: "AADHAAR",
     idProofNumber: "",
     documentFileReference: "",
+  });
+
+  // Delete state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [guestToDelete, setGuestToDelete] = useState<Guest | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // History state
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyMonth, setHistoryMonth] = useState<number>(new Date().getMonth() + 1);
+  const [historyYear, setHistoryYear] = useState<number>(new Date().getFullYear());
+  const [historyData, setHistoryData] = useState<{
+    month: number;
+    year: number;
+    monthName: string;
+    totalCount: number;
+    activeCount: number;
+    deletedCount: number;
+    items: any[];
+  } | null>(null);
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACTIVE" | "DELETED">("ALL");
+
+  // Export state
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportScope, setExportScope] = useState<"MONTH" | "ALL">("MONTH");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const fetchHistory = async (m: number, y: number) => {
+    try {
+      setHistoryLoading(true);
+      const res = await guestsService.getHistory({ month: m, year: y });
+      setHistoryData(res);
+    } catch (err: any) {
+      toast.error("Failed to load monthly guest history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleOpenHistory = () => {
+    setHistoryModalOpen(true);
+    fetchHistory(historyMonth, historyYear);
+  };
+
+  const handlePrevMonth = () => {
+    let newM = historyMonth - 1;
+    let newY = historyYear;
+    if (newM < 1) {
+      newM = 12;
+      newY -= 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleNextMonth = () => {
+    let newM = historyMonth + 1;
+    let newY = historyYear;
+    if (newM > 12) {
+      newM = 1;
+      newY += 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleConfirmDelete = (g: Guest) => {
+    setGuestToDelete(g);
+    setDeleteModalOpen(true);
+  };
+
+  const handleExecuteDelete = async () => {
+    if (!guestToDelete) return;
+    try {
+      setIsDeleting(true);
+      await guestsService.delete(guestToDelete.id);
+      toast.success(
+        `Guest ${guestToDelete.fullName} (${guestToDelete.guestCode}) removed from active directory. Complete record archived in history.`
+      );
+      setDeleteModalOpen(false);
+      setGuestToDelete(null);
+      fetchGuests();
+      if (historyModalOpen) {
+        fetchHistory(historyMonth, historyYear);
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || "Failed to delete guest");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleExportExcel = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating Excel report...");
+
+      let exportItems: any[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await guestsService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTH_NAMES[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const allRes = await guestsService.findAll({ limit: 5000 });
+        exportItems = allRes.items || [];
+        scopeTitle = "All_Registered_Guests";
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No records found to export for selected scope");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "Hotel Radha Palace";
+      workbook.created = new Date();
+
+      const worksheet = workbook.addWorksheet("Guest Directory");
+
+      // Title Banner
+      worksheet.mergeCells("A1:S1");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "HOTEL RADHA PALACE — GUEST DIRECTORY & STATUTORY REGISTER";
+      titleCell.font = { name: "Georgia", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF59283A" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(1).height = 32;
+
+      worksheet.mergeCells("A2:S2");
+      const subCell = worksheet.getCell("A2");
+      subCell.value = `Export Scope: ${scopeTitle} | Total Records: ${exportItems.length} | Generated: ${new Date().toLocaleString("en-IN")}`;
+      subCell.font = { name: "Arial", size: 10, italic: true, color: { argb: "FF59283A" } };
+      subCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF5F0EA" } };
+      subCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(2).height = 20;
+
+      // Table Header Row
+      const headers = [
+        "S.No",
+        "Guest Code",
+        "Full Name",
+        "Gender",
+        "Date of Birth",
+        "Mobile Number",
+        "Alternate Mobile",
+        "Email Address",
+        "City",
+        "State",
+        "Pincode",
+        "Complete Address",
+        "ID Proof Type",
+        "ID Proof Number",
+        "Party Size",
+        "Companions / Co-Guests",
+        "Total Stays",
+        "Registration Date",
+        "Status",
+      ];
+
+      const headerRow = worksheet.addRow(headers);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7A4652" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE8DDD8" } },
+          bottom: { style: "medium", color: { argb: "FF59283A" } },
+          left: { style: "thin", color: { argb: "FFE8DDD8" } },
+          right: { style: "thin", color: { argb: "FFE8DDD8" } },
+        };
+      });
+
+      // Data Rows
+      exportItems.forEach((g, idx) => {
+        const companionsStr = (g.additionalGuests || [])
+          .map((c: any) => `${c.fullName} (${c.relationship || "Companion"}${c.age ? `, ${c.age}y` : ""})`)
+          .join("; ");
+
+        const row = worksheet.addRow([
+          idx + 1,
+          g.guestCode || "",
+          g.fullName || "",
+          g.gender || "",
+          g.dateOfBirth ? new Date(g.dateOfBirth).toLocaleDateString("en-IN") : "",
+          g.mobileNumber || "",
+          g.alternateMobileNumber || "",
+          g.email || "",
+          g.city || "",
+          g.state || "",
+          g.postalCode || "",
+          g.address || "",
+          g.idProofType || "",
+          g.idProofNumber || "",
+          g.numberOfGuests || 1,
+          companionsStr,
+          g.totalStays || 0,
+          g.createdAt ? new Date(g.createdAt).toLocaleDateString("en-IN") : "",
+          g.isDeleted ? "DELETED / ARCHIVED" : "ACTIVE",
+        ]);
+
+        row.height = 20;
+        row.eachCell((cell, colNum) => {
+          cell.font = { name: "Arial", size: 9 };
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: [1, 2, 4, 5, 6, 7, 11, 13, 14, 15, 17, 18, 19].includes(colNum) ? "center" : "left",
+          };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE8DDD8" } },
+            bottom: { style: "thin", color: { argb: "FFE8DDD8" } },
+            left: { style: "thin", color: { argb: "FFE8DDD8" } },
+            right: { style: "thin", color: { argb: "FFE8DDD8" } },
+          };
+          if (g.isDeleted) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDF2F2" } };
+          }
+        });
+      });
+
+      // Adjust column widths
+      worksheet.columns.forEach((col: any) => {
+        col.width = Math.max(12, 16);
+      });
+      worksheet.getColumn(1).width = 6;
+      worksheet.getColumn(2).width = 14;
+      worksheet.getColumn(3).width = 24;
+      worksheet.getColumn(6).width = 16;
+      worksheet.getColumn(8).width = 24;
+      worksheet.getColumn(12).width = 28;
+      worksheet.getColumn(16).width = 30;
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Hotel_Radha_Palace_Guests_${scopeTitle.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("Excel report exported successfully!");
+      setExportModalOpen(false);
+    } catch (err: any) {
+      console.error("Export Excel error:", err);
+      toast.error("Failed to generate Excel export");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportCSV = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating CSV file...");
+
+      let exportItems: any[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await guestsService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTH_NAMES[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const allRes = await guestsService.findAll({ limit: 5000 });
+        exportItems = allRes.items || [];
+        scopeTitle = "All_Registered_Guests";
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No records found to export for selected scope");
+        return;
+      }
+
+      const headers = [
+        "S.No",
+        "Guest Code",
+        "Full Name",
+        "Gender",
+        "DOB",
+        "Mobile Number",
+        "Alternate Mobile",
+        "Email Address",
+        "City",
+        "State",
+        "Pincode",
+        "Address",
+        "ID Proof Type",
+        "ID Proof Number",
+        "Party Size",
+        "Companions",
+        "Total Stays",
+        "Registration Date",
+        "Status",
+      ];
+
+      const rows = exportItems.map((g, idx) => {
+        const companionsStr = (g.additionalGuests || [])
+          .map((c: any) => `${c.fullName} (${c.relationship || "Companion"})`)
+          .join("; ");
+
+        return [
+          idx + 1,
+          `"${g.guestCode || ""}"`,
+          `"${(g.fullName || "").replace(/"/g, '""')}"`,
+          `"${g.gender || ""}"`,
+          `"${g.dateOfBirth ? new Date(g.dateOfBirth).toLocaleDateString("en-IN") : ""}"`,
+          `"${g.mobileNumber || ""}"`,
+          `"${g.alternateMobileNumber || ""}"`,
+          `"${g.email || ""}"`,
+          `"${(g.city || "").replace(/"/g, '""')}"`,
+          `"${(g.state || "").replace(/"/g, '""')}"`,
+          `"${g.postalCode || ""}"`,
+          `"${(g.address || "").replace(/"/g, '""')}"`,
+          `"${g.idProofType || ""}"`,
+          `"${g.idProofNumber || ""}"`,
+          g.numberOfGuests || 1,
+          `"${companionsStr.replace(/"/g, '""')}"`,
+          g.totalStays || 0,
+          `"${g.createdAt ? new Date(g.createdAt).toLocaleDateString("en-IN") : ""}"`,
+          `"${g.isDeleted ? "DELETED" : "ACTIVE"}"`,
+        ].join(",");
+      });
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Hotel_Radha_Palace_Guests_${scopeTitle.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("CSV file exported successfully!");
+      setExportModalOpen(false);
+    } catch (err: any) {
+      console.error("Export CSV error:", err);
+      toast.error("Failed to generate CSV export");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const filteredHistoryItems = (historyData?.items || []).filter((item: any) => {
+    if (historyFilter === "ACTIVE" && item.isDeleted) return false;
+    if (historyFilter === "DELETED" && !item.isDeleted) return false;
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase().trim();
+    return (
+      (item.fullName && item.fullName.toLowerCase().includes(q)) ||
+      (item.mobileNumber && item.mobileNumber.includes(q)) ||
+      (item.guestCode && item.guestCode.toLowerCase().includes(q)) ||
+      (item.idProofNumber && item.idProofNumber.toLowerCase().includes(q)) ||
+      (item.city && item.city.toLowerCase().includes(q))
+    );
   });
 
   const fetchGuests = async () => {
@@ -407,7 +796,27 @@ export default function GuestsPage() {
             Maintain complete records of every guest: personal profiles, verified ID proof documents, party size, accompanying family members, and chronological stay histories.
           </p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button
+            onClick={handleOpenHistory}
+            variant="outline"
+            className="border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-2 shadow-xs font-semibold px-3.5 py-2 text-xs"
+            title="View Full Month Guest History & Deleted Records"
+          >
+            <History className="w-4 h-4 text-[#C4A06A]" />
+            <span>Monthly History</span>
+          </Button>
+
+          <Button
+            onClick={() => setExportModalOpen(true)}
+            variant="outline"
+            className="border-[#E8DDD8] bg-white text-[#59283A] hover:bg-[#F5F0EA] hover:border-[#C4A06A] flex items-center gap-2 shadow-xs font-semibold px-3.5 py-2 text-xs"
+            title="Download guest directory records (Excel & CSV)"
+          >
+            <Download className="w-4 h-4 text-[#C4A06A]" />
+            <span>Export Guests</span>
+          </Button>
+
           <Button
             onClick={handleOpenAdd}
             className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-2 shadow-sm font-medium px-4 py-2"
@@ -707,6 +1116,16 @@ export default function GuestsPage() {
                           >
                             <Edit2 className="w-3.5 h-3.5 mr-1" />
                             <span>Edit</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleConfirmDelete(g)}
+                            className="h-7 px-2 text-[#8E7079] hover:text-[#B54C44] hover:bg-[#F8E8E5]"
+                            title="Delete Guest (Preserved in History Archive)"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 mr-1 text-[#B54C44]" />
+                            <span>Delete</span>
                           </Button>
                         </td>
                       </tr>
@@ -1903,6 +2322,416 @@ export default function GuestsPage() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* DELETE CONFIRMATION MODAL                                                 */}
+      {/* ========================================================================= */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="pb-2">
+            <div className="w-12 h-12 rounded-2xl bg-[#F8E8E5] text-[#B54C44] flex items-center justify-center mb-2 mx-auto">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <DialogTitle className="text-lg font-serif font-bold text-[#59283A] text-center">
+              Delete Guest from Directory?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#82747A] text-center">
+              Are you sure you want to delete{" "}
+              <strong className="text-[#59283A]">{guestToDelete?.fullName}</strong> ({guestToDelete?.guestCode})?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-3.5 bg-[#F5F0EA]/60 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2">
+            <div className="flex items-start gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
+              <span>
+                <strong>Permanent History Preserved:</strong> This guest&apos;s full profile, ID proof, companions, and stay records will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </span>
+            </div>
+            <div className="flex items-start gap-2">
+              <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
+              <span>
+                <strong>Active Database Removal:</strong> The guest record will be removed from your active guests directory table.
+              </span>
+            </div>
+          </div>
+
+          <DialogFooter className="flex items-center justify-end gap-2 pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => {
+                setDeleteModalOpen(false);
+                setGuestToDelete(null);
+              }}
+              className="text-xs border-[#E8DDD8]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleExecuteDelete}
+              className="text-xs bg-[#B54C44] hover:bg-[#923832] text-white flex items-center gap-1.5"
+            >
+              {isDeleting ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Yes, Delete Guest</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* FULL MONTH GUEST HISTORY & ARCHIVE MODAL                                  */}
+      {/* ========================================================================= */}
+      <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace Archive
+                  </span>
+                  <span className="text-xs text-[#82747A]">• Full Month Activity &amp; Records</span>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Guest Registration &amp; Deletion History</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Review full chronological registrations, companion counts, and records deleted from the active directory.
+                </DialogDescription>
+              </div>
+
+              {/* Month Selector Controls */}
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
+                  {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Next Month"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Summary Strip */}
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#8E7079]">Total Records</div>
+                  <div className="text-lg font-serif font-bold text-[#59283A]">
+                    {historyData?.totalCount || 0}
+                  </div>
+                </div>
+                <Users className="w-5 h-5 text-[#C4A06A]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#32765B]">Active Registered</div>
+                  <div className="text-lg font-serif font-bold text-[#32765B]">
+                    {historyData?.activeCount || 0}
+                  </div>
+                </div>
+                <UserCheck className="w-5 h-5 text-[#32765B]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#B54C44]">Deleted / Archived</div>
+                  <div className="text-lg font-serif font-bold text-[#B54C44]">
+                    {historyData?.deletedCount || 0}
+                  </div>
+                </div>
+                <Archive className="w-5 h-5 text-[#B54C44]" />
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Filter Toolbar inside History */}
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search history by name, phone, code or ID..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="pl-8 h-8 text-xs border-[#E8DDD8]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant={historyFilter === "ALL" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ALL")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ALL" ? "bg-[#59283A] text-white" : "border-[#E8DDD8] text-[#59283A]"}`}
+              >
+                All ({historyData?.totalCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "ACTIVE" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ACTIVE")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ACTIVE" ? "bg-[#32765B] text-white" : "border-[#E8DDD8] text-[#32765B]"}`}
+              >
+                Active ({historyData?.activeCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "DELETED" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("DELETED")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "DELETED" ? "bg-[#B54C44] text-white" : "border-[#E8DDD8] text-[#B54C44]"}`}
+              >
+                Deleted ({historyData?.deletedCount || 0})
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleExportExcel("MONTH")}
+                className="h-7 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] ml-1 flex items-center gap-1"
+                title="Download this month's complete record"
+              >
+                <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Export Month</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* History Records Table */}
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+            {historyLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center">
+                <LoadingSpinner size="md" text="Loading guest history records..." />
+              </div>
+            ) : filteredHistoryItems.length === 0 ? (
+              <div className="text-center py-12 text-[#82747A] text-xs">
+                No guest registration or deletion activity found for {historyData?.monthName || "this month"}.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredHistoryItems.map((item, idx) => (
+                  <div
+                    key={item.id || idx}
+                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                      item.isDeleted
+                        ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
+                        : "border-[#E8DDD8] hover:border-[#C4A06A]"
+                    }`}
+                  >
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                          item.isDeleted
+                            ? "bg-[#F8E8E5] text-[#B54C44]"
+                            : "bg-[#E7F1E9] text-[#32765B]"
+                        }`}
+                      >
+                        {item.isDeleted ? <Trash2 className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-[#59283A]">{item.fullName}</span>
+                          <span className="font-mono text-[10px] bg-[#F5F0EA] text-[#82747A] px-1.5 py-0.2 rounded">
+                            {item.guestCode}
+                          </span>
+                          {item.isDeleted ? (
+                            <Badge className="text-[9px] bg-[#F8E8E5] text-[#B54C44] border-[#B54C44]/30">
+                              Deleted from Directory
+                            </Badge>
+                          ) : (
+                            <Badge className="text-[9px] bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30">
+                              Active Directory
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="text-[11px] text-[#82747A] flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 font-mono">
+                          <span>📞 {item.mobileNumber}</span>
+                          {item.email && <span>✉️ {item.email}</span>}
+                          {item.city && <span>📍 {item.city}, {item.state || "India"}</span>}
+                          {item.idProofType && item.idProofNumber && (
+                            <span className="text-[#59283A] font-semibold">
+                              🪪 {item.idProofType}: {item.idProofNumber}
+                            </span>
+                          )}
+                          <span>👥 Party: {item.numberOfGuests || 1}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center sm:flex-col sm:items-end justify-between border-t sm:border-t-0 pt-2 sm:pt-0 border-[#E8DDD8]/60 text-[10px] text-[#8E7079]">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-[#C4A06A]" />
+                        <span>Reg: {item.createdAt ? new Date(item.createdAt).toLocaleDateString("en-IN") : "N/A"}</span>
+                      </div>
+                      {item.isDeleted && item.deletedAt && (
+                        <div className="text-[#B54C44] font-semibold flex items-center gap-1 mt-0.5">
+                          <Trash2 className="w-2.5 h-2.5" />
+                          <span>Del: {new Date(item.deletedAt).toLocaleDateString("en-IN")}</span>
+                        </div>
+                      )}
+                      {item.id && !item.isDeleted && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setHistoryModalOpen(false);
+                            handleOpenDetails(item.id);
+                          }}
+                          className="h-6 px-2 text-[10px] text-[#C4A06A] hover:bg-[#F5F0EA] mt-1"
+                        >
+                          <Eye className="w-3 h-3 mr-1" />
+                          <span>View Dossier</span>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="p-3 border-t border-[#E8DDD8] bg-white flex items-center justify-between flex-shrink-0">
+            <span className="text-xs text-[#82747A]">
+              Showing {filteredHistoryItems.length} records for {historyData?.monthName}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setHistoryModalOpen(false)}
+              className="text-xs border-[#E8DDD8]"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* EXPORT OPTIONS MODAL                                                      */}
+      {/* ========================================================================= */}
+      <Dialog open={exportModalOpen} onOpenChange={setExportModalOpen}>
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="pb-2">
+            <div className="w-12 h-12 rounded-2xl bg-[#F5F0EA] text-[#59283A] flex items-center justify-center mb-2 mx-auto">
+              <Download className="w-6 h-6 text-[#C4A06A]" />
+            </div>
+            <DialogTitle className="text-lg font-serif font-bold text-[#59283A] text-center">
+              Export Guest Directory Records
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#82747A] text-center">
+              Download comprehensive guest profiles, contact books, ID proofs, party sizes, and stay histories.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2">
+            <label className="text-xs font-semibold text-[#59283A] block">Select Export Scope:</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setExportScope("MONTH")}
+                className={`p-3 rounded-xl border text-left transition-all ${
+                  exportScope === "MONTH"
+                    ? "border-[#59283A] bg-[#59283A]/5 font-bold"
+                    : "border-[#E8DDD8] bg-white hover:bg-[#F5F0EA]"
+                }`}
+              >
+                <div className="text-xs text-[#59283A] flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-[#C4A06A]" />
+                  <span>Current Month</span>
+                </div>
+                <div className="text-[10px] text-[#82747A] font-normal mt-0.5">
+                  Full month guest history &amp; records
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setExportScope("ALL")}
+                className={`p-3 rounded-xl border text-left transition-all ${
+                  exportScope === "ALL"
+                    ? "border-[#59283A] bg-[#59283A]/5 font-bold"
+                    : "border-[#E8DDD8] bg-white hover:bg-[#F5F0EA]"
+                }`}
+              >
+                <div className="text-xs text-[#59283A] flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-[#C4A06A]" />
+                  <span>All Active Guests</span>
+                </div>
+                <div className="text-[10px] text-[#82747A] font-normal mt-0.5">
+                  Complete directory ({total} guests)
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <Button
+              type="button"
+              disabled={isExporting}
+              onClick={() => handleExportExcel(exportScope)}
+              className="w-full bg-[#59283A] hover:bg-[#472130] text-white text-xs flex items-center justify-center gap-2 h-10 shadow-sm"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-[#C4A06A]" />
+              <span>Download Formatted Excel (.xlsx)</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isExporting}
+              onClick={() => handleExportCSV(exportScope)}
+              className="w-full border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] text-xs flex items-center justify-center gap-2 h-10"
+            >
+              <Download className="w-4 h-4 text-[#C4A06A]" />
+              <span>Download Standard CSV File</span>
+            </Button>
+          </div>
+
+          <DialogFooter className="pt-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setExportModalOpen(false)}
+              className="text-xs text-[#82747A] mx-auto"
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

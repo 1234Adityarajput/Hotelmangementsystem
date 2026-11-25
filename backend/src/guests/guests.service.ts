@@ -446,4 +446,165 @@ export class GuestsService {
     await this.prisma.guestDocument.delete({ where: { id: coGuestDocId } });
     return this.findOne(guestId);
   }
+
+  async getMonthlyHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1; // 1-12
+
+    if (monthParam) {
+      if (monthParam.includes('-')) {
+        const parts = monthParam.split('-');
+        year = parseInt(parts[0], 10) || year;
+        month = parseInt(parts[1], 10) || month;
+      } else {
+        month = parseInt(monthParam, 10) || month;
+      }
+    }
+    if (yearParam) {
+      year = parseInt(yearParam, 10) || year;
+    }
+
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch active guests registered within this month
+    const activeGuests = await this.prisma.guest.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      include: {
+        documents: true,
+        _count: {
+          select: {
+            stayHistory: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const enrichedActive = activeGuests.map((g) => ({
+      ...this.enrichGuest(g),
+      isDeleted: false,
+      status: 'ACTIVE',
+    }));
+
+    // 2. Fetch deleted guest logs from AuditLog for this month
+    const deleteLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'GUEST',
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedGuests = deleteLogs.map((log) => {
+      const prev = (log.previousValues || {}) as any;
+      return {
+        id: log.entityId || prev.id || `archived-${log.id}`,
+        guestCode: prev.guestCode || 'GST-ARCHIVED',
+        fullName: prev.fullName || 'Deleted Guest',
+        mobileNumber: prev.mobileNumber || '',
+        alternateMobileNumber: prev.alternateMobileNumber || null,
+        email: prev.email || null,
+        address: prev.address || null,
+        city: prev.city || null,
+        state: prev.state || null,
+        postalCode: prev.postalCode || null,
+        country: prev.country || 'India',
+        dateOfBirth: prev.dateOfBirth || null,
+        gender: prev.gender || 'OTHER',
+        idProofType: prev.idProofType || 'AADHAAR',
+        idProofNumber: prev.idProofNumber || '',
+        idProofDocument: prev.idProofDocument || '',
+        numberOfGuests: prev.numberOfGuests || 1,
+        additionalGuests: prev.additionalGuests || [],
+        totalStays: prev.totalStays || 0,
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+        isDeleted: true,
+        status: 'DELETED',
+      };
+    });
+
+    // 3. Combine both lists sorted by registration date descending
+    const allHistory = [...enrichedActive, ...deletedGuests].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedGuests.length,
+      items: allHistory,
+    };
+  }
+
+  async delete(id: string) {
+    const guest = await this.prisma.guest.findUnique({
+      where: { id },
+      include: {
+        documents: true,
+        _count: {
+          select: {
+            stayHistory: true,
+          },
+        },
+      },
+    });
+
+    if (!guest) {
+      throw new NotFoundException(`Guest with ID ${id} not found`);
+    }
+
+    const enriched = this.enrichGuest(guest);
+
+    // 1. Create audit log snapshot for permanent history preservation
+    await this.prisma.auditLog.create({
+      data: {
+        entityType: 'GUEST',
+        entityId: guest.id,
+        action: 'DELETE',
+        previousValues: {
+          ...enriched,
+          deletedAt: new Date().toISOString(),
+        } as any,
+        description: `Deleted guest ${guest.fullName} (${guest.guestCode}) from active database. Complete dossier preserved in history.`,
+      },
+    });
+
+    // 2. Safely clean up child relations
+    await this.prisma.bookingGuest.deleteMany({ where: { guestId: id } });
+
+    const bookings = await this.prisma.booking.findMany({ where: { primaryGuestId: id } });
+    for (const b of bookings) {
+      await this.prisma.bookingItem.deleteMany({ where: { bookingId: b.id } });
+      await this.prisma.payment.deleteMany({ where: { bookingId: b.id } });
+      await this.prisma.invoice.deleteMany({ where: { bookingId: b.id } });
+      await this.prisma.booking.delete({ where: { id: b.id } });
+    }
+
+    await this.prisma.guestDocument.deleteMany({ where: { guestId: id } });
+
+    // 3. Delete from guest table
+    await this.prisma.guest.delete({ where: { id } });
+
+    return {
+      success: true,
+      message: `Guest ${guest.fullName} (${guest.guestCode}) deleted from active database and archived in history.`,
+      guestCode: guest.guestCode,
+      fullName: guest.fullName,
+    };
+  }
 }

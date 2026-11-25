@@ -18,6 +18,12 @@ export class GuestsController {
     return this.guestsService.findAll(query);
   }
 
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly guest registration and deletion history' })
+  async getHistory(@Query('month') month?: string, @Query('year') year?: string) {
+    return this.guestsService.getMonthlyHistory(month, year);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get single guest details with stay history, documents, and co-guests' })
   async findOne(@Param('id') id: string) {
@@ -34,6 +40,12 @@ export class GuestsController {
   @ApiOperation({ summary: 'Update guest details, ID proofs, and companions' })
   async update(@Param('id') id: string, @Body() dto: UpdateGuestDto) {
     return this.guestsService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete guest from active directory while preserving in history archive' })
+  async deleteGuest(@Param('id') id: string) {
+    return this.guestsService.delete(id);
   }
 
   @Post(':id/documents')

@@ -50,4 +50,22 @@ export const guestsService = {
     const res = await apiClient.delete<ApiResponse<Guest>>(`/guests/${guestId}/co-guests/${coGuestId}`);
     return res.data.data;
   },
+
+  async getHistory(params?: { month?: string | number; year?: string | number }): Promise<{
+    month: number;
+    year: number;
+    monthName: string;
+    totalCount: number;
+    activeCount: number;
+    deletedCount: number;
+    items: (Guest & { isDeleted?: boolean; deletedAt?: string; status?: string })[];
+  }> {
+    const res = await apiClient.get<ApiResponse<any>>("/guests/history", { params });
+    return res.data.data;
+  },
+
+  async delete(id: string): Promise<{ success: boolean; message: string; guestCode?: string; fullName?: string }> {
+    const res = await apiClient.delete<ApiResponse<any>>(`/guests/${id}`);
+    return res.data.data;
+  },
 };
