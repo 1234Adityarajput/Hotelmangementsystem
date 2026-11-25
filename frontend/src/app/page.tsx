@@ -569,39 +569,63 @@ export default function AdminDashboardPage() {
                     Historical revenue collections versus operating expenditures
                   </CardDescription>
                 </div>
-                <Badge variant="secondary">Monthly Ledger</Badge>
+                <Badge
+                  variant={isManager ? "outline" : "secondary"}
+                  className={isManager ? "border-[#C4A06A] text-[#8B6A3D] bg-[#F5F0EA]" : ""}
+                >
+                  {isManager ? "Owner Confidential" : "Monthly Ledger"}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="pt-4">
-              <div className="divide-y divide-[#E8DDD8]">
-                {analytics?.monthlyRevenue?.map((m) => (
-                  <div key={m.month} className="py-2.5 flex items-center justify-between text-xs first:pt-0 last:pb-0">
-                    <span className="font-bold text-[#59283A] w-20">{m.month}</span>
-                    <div className="text-center">
-                      <span className="text-[10px] text-[#82747A] uppercase block">Revenue</span>
-                      <span className="font-bold text-[#32765B] font-mono">
-                        ₹{m.revenue.toLocaleString("en-IN")}
-                      </span>
-                    </div>
-                    <div className="text-center">
-                      <span className="text-[10px] text-[#82747A] uppercase block">Expenses</span>
-                      <span className="font-bold text-[#B54C44] font-mono">
-                        ₹{m.expenses.toLocaleString("en-IN")}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] text-[#82747A] uppercase block">Net Margin</span>
-                      <span
-                        className={`font-bold font-mono ${
-                          m.netProfit >= 0 ? "text-[#32765B]" : "text-[#B54C44]"
-                        }`}
-                      >
-                        {m.netProfit >= 0 ? "+" : ""}₹{m.netProfit.toLocaleString("en-IN")}
-                      </span>
-                    </div>
+              {isManager ? (
+                <div className="py-12 px-4 text-center flex flex-col items-center justify-center space-y-3 bg-[#F5F0EA]/40 rounded-xl border border-dashed border-[#C4A06A]/40 my-1">
+                  <div className="w-12 h-12 rounded-full bg-[#59283A]/10 flex items-center justify-center text-[#59283A]">
+                    <ShieldCheck className="w-6 h-6 text-[#C4A06A]" />
                   </div>
-                ))}
-              </div>
+                  <div className="space-y-1">
+                    <div className="font-serif text-2xl font-bold tracking-widest text-[#59283A]">
+                      ••••••••••••
+                    </div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-[#A97832]">
+                      Owner Confidential
+                    </div>
+                    <p className="text-[11px] text-[#82747A] max-w-sm mt-1">
+                      Historical revenue collections and operating expenditures are confidential to Executive Hotel Owner.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="divide-y divide-[#E8DDD8]">
+                  {analytics?.monthlyRevenue?.map((m) => (
+                    <div key={m.month} className="py-2.5 flex items-center justify-between text-xs first:pt-0 last:pb-0">
+                      <span className="font-bold text-[#59283A] w-20">{m.month}</span>
+                      <div className="text-center">
+                        <span className="text-[10px] text-[#82747A] uppercase block">Revenue</span>
+                        <span className="font-bold text-[#32765B] font-mono">
+                          ₹{m.revenue.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-[10px] text-[#82747A] uppercase block">Expenses</span>
+                        <span className="font-bold text-[#B54C44] font-mono">
+                          ₹{m.expenses.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-[#82747A] uppercase block">Net Margin</span>
+                        <span
+                          className={`font-bold font-mono ${
+                            m.netProfit >= 0 ? "text-[#32765B]" : "text-[#B54C44]"
+                          }`}
+                        >
+                          {m.netProfit >= 0 ? "+" : ""}₹{m.netProfit.toLocaleString("en-IN")}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -745,52 +769,86 @@ export default function AdminDashboardPage() {
                     Current monthly cash inflows, operating expenses, payroll &amp; net cash flow
                   </CardDescription>
                 </div>
-                <Badge variant={Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0 ? "success" : "destructive"}>
-                  {Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0 ? "Net Positive" : "Deficit"}
+                <Badge
+                  variant={
+                    isManager
+                      ? "outline"
+                      : Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0
+                      ? "success"
+                      : "destructive"
+                  }
+                  className={isManager ? "border-[#C4A06A] text-[#8B6A3D] bg-[#F5F0EA]" : ""}
+                >
+                  {isManager
+                    ? "Owner Confidential"
+                    : Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0
+                    ? "Net Positive"
+                    : "Deficit"}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="pt-4 space-y-3 text-xs">
-              <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#E7F1E9]/50 border border-[#32765B]/20">
-                <span className="font-bold text-[#32765B]">Monthly Gross Revenue:</span>
-                <span className="font-mono font-bold text-sm text-[#32765B]">
-                  ₹{(analytics?.incomeExpenseAnalysis?.revenue || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F8E8E5]/50 border border-[#B54C44]/20">
-                <span className="font-bold text-[#B54C44]">(-) Operational Hotel Expenses:</span>
-                <span className="font-mono font-bold text-sm text-[#B54C44]">
-                  ₹{(analytics?.incomeExpenseAnalysis?.expenses || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F5F0EA] border border-[#C4A06A]/30">
-                <span className="font-bold text-[#8B6A3D]">(-) Staff Payroll Disbursals:</span>
-                <span className="font-mono font-bold text-sm text-[#8B6A3D]">
-                  ₹{(analytics?.incomeExpenseAnalysis?.payroll || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-
-              <div className="pt-2 border-t border-[#E8DDD8] flex justify-between items-center">
-                <div>
-                  <span className="text-xs uppercase font-bold text-[#59283A] block">
-                    Net Operating Cash Flow
-                  </span>
-                  <span className="text-[10px] text-[#82747A]">
-                    Operating Margin: {analytics?.incomeExpenseAnalysis?.operatingMargin || 0}%
-                  </span>
+              {isManager ? (
+                <div className="py-12 px-4 text-center flex flex-col items-center justify-center space-y-3 bg-[#F5F0EA]/40 rounded-xl border border-dashed border-[#C4A06A]/40 my-1">
+                  <div className="w-12 h-12 rounded-full bg-[#59283A]/10 flex items-center justify-center text-[#59283A]">
+                    <ShieldCheck className="w-6 h-6 text-[#C4A06A]" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="font-serif text-2xl font-bold tracking-widest text-[#59283A]">
+                      ••••••••••••
+                    </div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-[#A97832]">
+                      Owner Confidential
+                    </div>
+                    <p className="text-[11px] text-[#82747A] max-w-sm mt-1">
+                      Current monthly cash inflows, operating expenses, and net cash flow are confidential to Executive Hotel Owner.
+                    </p>
+                  </div>
                 </div>
-                <span
-                  className={`font-serif text-xl font-bold ${
-                    Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0
-                      ? "text-[#32765B]"
-                      : "text-[#B54C44]"
-                  }`}
-                >
-                  ₹{(analytics?.incomeExpenseAnalysis?.netCashFlow || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#E7F1E9]/50 border border-[#32765B]/20">
+                    <span className="font-bold text-[#32765B]">Monthly Gross Revenue:</span>
+                    <span className="font-mono font-bold text-sm text-[#32765B]">
+                      ₹{(analytics?.incomeExpenseAnalysis?.revenue || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F8E8E5]/50 border border-[#B54C44]/20">
+                    <span className="font-bold text-[#B54C44]">(-) Operational Hotel Expenses:</span>
+                    <span className="font-mono font-bold text-sm text-[#B54C44]">
+                      ₹{(analytics?.incomeExpenseAnalysis?.expenses || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center p-2.5 rounded-lg bg-[#F5F0EA] border border-[#C4A06A]/30">
+                    <span className="font-bold text-[#8B6A3D]">(-) Staff Payroll Disbursals:</span>
+                    <span className="font-mono font-bold text-sm text-[#8B6A3D]">
+                      ₹{(analytics?.incomeExpenseAnalysis?.payroll || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#E8DDD8] flex justify-between items-center">
+                    <div>
+                      <span className="text-xs uppercase font-bold text-[#59283A] block">
+                        Net Operating Cash Flow
+                      </span>
+                      <span className="text-[10px] text-[#82747A]">
+                        Operating Margin: {analytics?.incomeExpenseAnalysis?.operatingMargin || 0}%
+                      </span>
+                    </div>
+                    <span
+                      className={`font-serif text-xl font-bold ${
+                        Number(analytics?.incomeExpenseAnalysis?.netCashFlow || 0) >= 0
+                          ? "text-[#32765B]"
+                          : "text-[#B54C44]"
+                      }`}
+                    >
+                      ₹{(analytics?.incomeExpenseAnalysis?.netCashFlow || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
