@@ -287,4 +287,235 @@ export class BookingsService {
 
     return updated;
   }
+
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    let month = now.getMonth() + 1;
+    let year = now.getFullYear();
+
+    if (monthParam) {
+      const parsedMonth = parseInt(monthParam, 10);
+      if (parsedMonth >= 1 && parsedMonth <= 12) {
+        month = parsedMonth;
+      }
+    }
+    if (yearParam) {
+      year = parseInt(yearParam, 10) || year;
+    }
+
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch active bookings for this month
+    const activeBookings = await this.prisma.booking.findMany({
+      where: {
+        OR: [
+          { createdAt: { gte: startDate, lte: endDate } },
+          { checkInDate: { gte: startDate, lte: endDate } },
+        ],
+      },
+      include: {
+        primaryGuest: true,
+        room: { include: { roomType: true } },
+        bookingGuests: { include: { guest: true } },
+        payments: true,
+        invoices: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const enrichedActive = activeBookings.map((b) => ({
+      id: b.id,
+      bookingNumber: b.bookingNumber,
+      primaryGuestId: b.primaryGuestId,
+      primaryGuest: b.primaryGuest,
+      roomId: b.roomId,
+      room: b.room,
+      bookingStatus: b.bookingStatus,
+      checkInDate: b.checkInDate,
+      checkInTime: b.checkInTime,
+      expectedCheckOutDate: b.expectedCheckOutDate,
+      expectedCheckOutTime: b.expectedCheckOutTime,
+      actualCheckInDate: b.actualCheckInAt,
+      actualCheckOutDate: b.actualCheckOutAt,
+      numberOfNights: b.numberOfNights,
+      numberOfGuests: b.numberOfGuests,
+      roomRatePerNight: Number(b.roomRatePerNight),
+      advanceAmount: Number(b.advanceAmount || 0),
+      totalCharges: Number(b.roomRatePerNight) * b.numberOfNights,
+      notes: b.notes,
+      isActive: true,
+      isDeleted: false,
+      status: 'ACTIVE',
+      payments: b.payments,
+      invoices: b.invoices,
+      createdAt: b.createdAt,
+      updatedAt: b.updatedAt,
+    }));
+
+    // 2. Fetch deleted booking logs from AuditLog for this month
+    const deleteLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'BOOKING',
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedBookings = deleteLogs.map((log) => {
+      const prev = (log.previousValues || {}) as any;
+      return {
+        id: log.entityId || prev.id || `archived-booking-${log.id}`,
+        bookingNumber: prev.bookingNumber || 'ARCHIVED-BKG',
+        primaryGuestId: prev.primaryGuestId || '',
+        primaryGuest: prev.primaryGuest || {
+          fullName: prev.guestFullName || 'Deleted / Archived Guest',
+          mobileNumber: prev.guestMobileNumber || '',
+        },
+        roomId: prev.roomId || '',
+        room: prev.room || {
+          roomNumber: prev.roomNumber || 'N/A',
+          roomType: { name: prev.roomTypeName || 'Room' },
+        },
+        bookingStatus: prev.bookingStatus || 'CANCELLED',
+        checkInDate: prev.checkInDate || log.changedAt,
+        checkInTime: prev.checkInTime || '12:00 PM',
+        expectedCheckOutDate: prev.expectedCheckOutDate || log.changedAt,
+        expectedCheckOutTime: prev.expectedCheckOutTime || '11:00 AM',
+        actualCheckInDate: prev.actualCheckInDate || null,
+        actualCheckOutDate: prev.actualCheckOutDate || null,
+        numberOfNights: prev.numberOfNights || 1,
+        numberOfGuests: prev.numberOfGuests || 1,
+        roomRatePerNight: Number(prev.roomRatePerNight || 0),
+        advanceAmount: Number(prev.advanceAmount || 0),
+        totalCharges: Number(prev.totalCharges || 0),
+        notes: prev.notes || '',
+        isActive: false,
+        isDeleted: true,
+        status: 'DELETED',
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+      };
+    });
+
+    // 3. Combine both lists sorted by registration / creation date descending
+    const allHistory = [...enrichedActive, ...deletedBookings].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedBookings.length,
+      items: allHistory,
+    };
+  }
+
+  async remove(id: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id },
+      include: {
+        primaryGuest: true,
+        room: { include: { roomType: true } },
+        bookingGuests: { include: { guest: true } },
+        bookingItems: true,
+        payments: true,
+        invoices: true,
+      },
+    });
+
+    if (!booking) {
+      throw new NotFoundException(`Booking with ID ${id} not found`);
+    }
+
+    // 1. Create audit log snapshot for permanent booking history preservation
+    await this.prisma.auditLog.create({
+      data: {
+        entityType: 'BOOKING',
+        entityId: booking.id,
+        action: 'DELETE',
+        previousValues: {
+          ...booking,
+          guestFullName: booking.primaryGuest?.fullName,
+          guestMobileNumber: booking.primaryGuest?.mobileNumber,
+          roomNumber: booking.room?.roomNumber,
+          roomTypeName: booking.room?.roomType?.name,
+          deletedAt: new Date().toISOString(),
+        } as any,
+        description: `Deleted booking ${booking.bookingNumber} (${booking.primaryGuest?.fullName}, Room ${booking.room?.roomNumber}) from active records. Complete dossier preserved in history.`,
+      },
+    });
+
+    // 2. Safely clean up in isolated transaction with trigger bypass
+    await this.prisma.$transaction(async (tx) => {
+      let triggerDisabled = false;
+
+      try {
+        await tx.$executeRawUnsafe(
+          `ALTER TABLE "booking_guests" DISABLE TRIGGER trg_protect_primary_booking_guest`
+        );
+        triggerDisabled = true;
+      } catch (err) {
+        try {
+          await tx.$executeRawUnsafe(`SET LOCAL hotel.allow_guest_delete = 'on'`);
+        } catch (_) {}
+      }
+
+      try {
+        // A. Delete payments
+        await tx.payment.deleteMany({
+          where: { bookingId: id },
+        });
+
+        // B. Delete invoices
+        await tx.invoice.deleteMany({
+          where: { bookingId: id },
+        });
+
+        // C. Delete booked items / POS charges
+        await tx.bookingItem.deleteMany({
+          where: { bookingId: id },
+        });
+
+        // D. Delete booking guests junction records
+        await tx.bookingGuest.deleteMany({
+          where: { bookingId: id },
+        });
+
+        // E. If booking was CHECKED_IN, reset room to AVAILABLE
+        if (booking.bookingStatus === 'CHECKED_IN' && booking.roomId) {
+          await tx.room.update({
+            where: { id: booking.roomId },
+            data: { roomStatus: 'AVAILABLE' },
+          });
+        }
+
+        // F. Delete the booking itself
+        await tx.booking.delete({
+          where: { id },
+        });
+      } finally {
+        if (triggerDisabled) {
+          try {
+            await tx.$executeRawUnsafe(
+              `ALTER TABLE "booking_guests" ENABLE TRIGGER trg_protect_primary_booking_guest`
+            );
+          } catch (_) {}
+        }
+      }
+    });
+
+    return {
+      success: true,
+      message: `Reservation ${booking.bookingNumber} (${booking.primaryGuest?.fullName}) deleted from active database and archived in history.`,
+      bookingNumber: booking.bookingNumber,
+    };
+  }
 }

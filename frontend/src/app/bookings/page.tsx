@@ -18,7 +18,16 @@ import {
   FileText,
   DoorOpen,
   LogOut,
+  Download,
+  History,
+  Trash2,
+  Archive,
+  ChevronLeft,
+  ChevronRight,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
+import ExcelJS from "exceljs";
 import { bookingsService } from "@/services/bookings.service";
 import { guestsService } from "@/services/guests.service";
 import { roomsService } from "@/services/rooms.service";
@@ -57,6 +66,21 @@ export default function BookingsPage() {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+  // Delete modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // History modal state
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyMonth, setHistoryMonth] = useState<number>(new Date().getMonth() + 1);
+  const [historyYear, setHistoryYear] = useState<number>(new Date().getFullYear());
+  const [historyData, setHistoryData] = useState<any>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACTIVE" | "DELETED">("ALL");
+  const [historySearch, setHistorySearch] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   // Form
   const tomorrow = new Date();
@@ -230,6 +254,293 @@ export default function BookingsPage() {
     }
   };
 
+  const MONTH_NAMES = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const handleConfirmDelete = (b: Booking) => {
+    setBookingToDelete(b);
+    setDeleteModalOpen(true);
+  };
+
+  const handleExecuteDelete = async () => {
+    if (!bookingToDelete) return;
+    try {
+      setIsDeleting(true);
+      const res = await bookingsService.remove(bookingToDelete.id);
+      toast.success(res.message || `Booking ${bookingToDelete.bookingNumber} deleted`);
+      setDeleteModalOpen(false);
+      setBookingToDelete(null);
+      fetchBookings();
+      if (historyModalOpen) {
+        fetchHistory(historyMonth, historyYear);
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to delete booking");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const fetchHistory = async (m?: number, y?: number) => {
+    try {
+      setHistoryLoading(true);
+      const res = await bookingsService.getHistory({
+        month: m || historyMonth,
+        year: y || historyYear,
+      });
+      setHistoryData(res);
+    } catch (err: any) {
+      toast.error("Failed to load booking history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleOpenHistoryModal = () => {
+    setHistoryModalOpen(true);
+    fetchHistory(historyMonth, historyYear);
+  };
+
+  const handlePrevMonth = () => {
+    let newM = historyMonth - 1;
+    let newY = historyYear;
+    if (newM < 1) {
+      newM = 12;
+      newY -= 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleNextMonth = () => {
+    let newM = historyMonth + 1;
+    let newY = historyYear;
+    if (newM > 12) {
+      newM = 1;
+      newY += 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleExportExcel = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating Excel report for Reservations & Bookings...");
+
+      let exportItems: any[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await bookingsService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTH_NAMES[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const allRes = await bookingsService.findAll({ limit: 1000 });
+        exportItems = allRes.items || [];
+        scopeTitle = "All_Reservations";
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No reservation records found to export for selected scope");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "Hotel Radha Palace";
+      workbook.created = new Date();
+
+      const worksheet = workbook.addWorksheet("Booking Register");
+
+      // Title Banner
+      worksheet.mergeCells("A1:T1");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "HOTEL RADHA PALACE — RESERVATIONS & BOOKING REGISTER";
+      titleCell.font = { name: "Georgia", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF59283A" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(1).height = 32;
+
+      worksheet.mergeCells("A2:T2");
+      const subCell = worksheet.getCell("A2");
+      subCell.value = `Export Scope: ${scopeTitle} | Total Reservations: ${exportItems.length} | Generated: ${new Date().toLocaleString("en-IN")}`;
+      subCell.font = { name: "Arial", size: 10, italic: true, color: { argb: "FF59283A" } };
+      subCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF5F0EA" } };
+      subCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(2).height = 20;
+
+      // Headers
+      const headers = [
+        "S.No",
+        "Booking #",
+        "Booking Status",
+        "Primary Guest Name",
+        "Mobile Number",
+        "Allocated Room",
+        "Room Category",
+        "Check-In Date",
+        "Check-In Time",
+        "Check-Out Date",
+        "Check-Out Time",
+        "Nights",
+        "Guests (Pax)",
+        "Rate / Night (₹)",
+        "Advance Paid (₹)",
+        "Total Estimated (₹)",
+        "Special Notes",
+        "Lifecycle Status",
+        "Reservation Date",
+        "Archived / Deletion Date",
+      ];
+
+      const headerRow = worksheet.addRow(headers);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7A4652" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE8DDD8" } },
+          bottom: { style: "medium", color: { argb: "FF59283A" } },
+          left: { style: "thin", color: { argb: "FFE8DDD8" } },
+          right: { style: "thin", color: { argb: "FFE8DDD8" } },
+        };
+      });
+
+      exportItems.forEach((b, idx) => {
+        const nights = b.numberOfNights || 1;
+        const rate = Number(b.roomRatePerNight || 0);
+        const advance = Number(b.advanceAmount || 0);
+        const totalEst = nights * rate;
+
+        const row = worksheet.addRow([
+          idx + 1,
+          b.bookingNumber || "—",
+          b.bookingStatus || "—",
+          b.primaryGuest?.fullName || "—",
+          b.primaryGuest?.mobileNumber || "—",
+          b.room?.roomNumber ? `Room ${b.room.roomNumber}` : "—",
+          b.room?.roomType?.name || "Standard Room",
+          b.checkInDate ? new Date(b.checkInDate).toLocaleDateString("en-IN") : "—",
+          b.checkInTime || "12:00 PM",
+          b.expectedCheckOutDate ? new Date(b.expectedCheckOutDate).toLocaleDateString("en-IN") : "—",
+          b.expectedCheckOutTime || "11:00 AM",
+          nights,
+          b.numberOfGuests || 1,
+          rate,
+          advance,
+          totalEst,
+          b.notes || "—",
+          b.isDeleted ? "DELETED / ARCHIVED" : "ACTIVE RESERVATION",
+          b.createdAt ? new Date(b.createdAt).toLocaleDateString("en-IN") : "—",
+          b.deletedAt ? new Date(b.deletedAt).toLocaleDateString("en-IN") : "—",
+        ]);
+        row.height = 22;
+
+        const isEven = idx % 2 === 0;
+        const isDeletedRow = b.isDeleted;
+
+        row.eachCell((cell, colNum) => {
+          cell.font = { name: "Arial", size: 9 };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE8DDD8" } },
+            bottom: { style: "thin", color: { argb: "FFE8DDD8" } },
+            left: { style: "thin", color: { argb: "FFE8DDD8" } },
+            right: { style: "thin", color: { argb: "FFE8DDD8" } },
+          };
+
+          if (isDeletedRow) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8E8E5" } };
+          } else if (!isEven) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDFBF9" } };
+          }
+
+          if (
+            colNum === 1 ||
+            colNum === 2 ||
+            colNum === 3 ||
+            colNum === 5 ||
+            colNum === 6 ||
+            colNum === 8 ||
+            colNum === 9 ||
+            colNum === 10 ||
+            colNum === 11 ||
+            colNum === 12 ||
+            colNum === 13 ||
+            colNum === 18 ||
+            colNum === 19 ||
+            colNum === 20
+          ) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else if (colNum === 14 || colNum === 15 || colNum === 16) {
+            cell.alignment = { vertical: "middle", horizontal: "right" };
+            cell.numFmt = "₹#,##0.00";
+          } else {
+            cell.alignment = { vertical: "middle", horizontal: "left" };
+          }
+        });
+      });
+
+      worksheet.columns = [
+        { width: 7 },
+        { width: 18 },
+        { width: 16 },
+        { width: 24 },
+        { width: 18 },
+        { width: 16 },
+        { width: 22 },
+        { width: 16 },
+        { width: 14 },
+        { width: 16 },
+        { width: 14 },
+        { width: 10 },
+        { width: 12 },
+        { width: 18 },
+        { width: 18 },
+        { width: 20 },
+        { width: 28 },
+        { width: 22 },
+        { width: 18 },
+        { width: 22 },
+      ];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Hotel_Radha_Palace_Bookings_${scopeTitle}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`Export completed successfully (${exportItems.length} reservations)`);
+    } catch (err: any) {
+      console.error("Export error:", err);
+      toast.error(err.message || "Failed to generate bookings Excel report");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const filteredHistoryItems = (historyData?.items || []).filter((item: any) => {
+    if (historyFilter === "ACTIVE" && item.isDeleted) return false;
+    if (historyFilter === "DELETED" && !item.isDeleted) return false;
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase();
+    return (
+      item.bookingNumber?.toLowerCase().includes(q) ||
+      item.primaryGuest?.fullName?.toLowerCase().includes(q) ||
+      item.primaryGuest?.mobileNumber?.includes(q) ||
+      item.room?.roomNumber?.toLowerCase().includes(q)
+    );
+  });
+
   // Calculate nights
   const calculatedNights = Math.max(
     1,
@@ -253,13 +564,36 @@ export default function BookingsPage() {
             Create new reservations, select rooms, manage advance payments, and review stay records.
           </p>
         </div>
-        <Button
-          onClick={handleOpenCreate}
-          className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 shadow-sm"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Reservation</span>
-        </Button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenHistoryModal}
+            className="h-9 px-3.5 text-xs font-semibold border-[#E8DDD8] text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1.5 shadow-xs transition-all"
+          >
+            <History className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>Booking History</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleExportExcel("ALL")}
+            disabled={isExporting}
+            className="h-9 px-3.5 text-xs font-semibold border-[#C4A06A]/60 text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1.5 shadow-xs transition-all"
+          >
+            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>{isExporting ? "Exporting..." : "Export"}</span>
+          </Button>
+
+          <Button
+            onClick={handleOpenCreate}
+            className="bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 shadow-sm text-xs h-9 px-4 font-semibold"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Reservation</span>
+          </Button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -410,6 +744,15 @@ export default function BookingsPage() {
                             <XCircle className="w-3.5 h-3.5" />
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleConfirmDelete(b)}
+                          className="h-7 px-2 text-[#B54C44] hover:bg-[#F8E8E5] hover:text-[#963730]"
+                          title="Delete Reservation Record"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -771,6 +1114,340 @@ export default function BookingsPage() {
               </DialogFooter>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* DELETE BOOKING CONFIRMATION MODAL                                         */}
+      {/* ========================================================================= */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="space-y-2">
+            <div className="w-12 h-12 rounded-2xl bg-[#F8E8E5] flex items-center justify-center text-[#B54C44] mx-auto mb-1 border border-[#B54C44]/20">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <DialogTitle className="text-center font-serif text-lg font-bold text-[#59283A]">
+              Delete Reservation Record?
+            </DialogTitle>
+            <DialogDescription className="text-center text-xs text-[#82747A]">
+              Are you sure you want to delete reservation{" "}
+              <strong className="text-[#59283A]">{bookingToDelete?.bookingNumber}</strong> for{" "}
+              <strong className="text-[#59283A]">{bookingToDelete?.primaryGuest?.fullName || "Guest"}</strong>?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-3.5 bg-[#F5F0EA]/70 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2.5 my-1">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#2E5E44]">Permanent History Preserved:</strong> This booking&apos;s complete details, guest dossier, payment records, dates, and stay notes will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#963730]">Active Database Removal:</strong> The reservation will be removed from your active reservations list, and the assigned room will be automatically released back to <strong>AVAILABLE</strong> if currently checked in.
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-row items-center justify-end gap-2 pt-4 border-t border-[#E8DDD8]/60 mt-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => {
+                setDeleteModalOpen(false);
+                setBookingToDelete(null);
+              }}
+              className="text-xs h-9 px-4 font-medium border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleExecuteDelete}
+              className="text-xs h-9 px-4 font-semibold bg-[#B54C44] hover:bg-[#923832] text-white flex items-center justify-center gap-1.5 min-w-[140px] rounded-lg transition-colors"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white shrink-0" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Yes, Delete Booking</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* FULL MONTH BOOKING HISTORY & ARCHIVE MODAL                                */}
+      {/* ========================================================================= */}
+      <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace Archive
+                  </span>
+                  <span className="text-xs text-[#82747A]">• Full Month Reservation Activity &amp; Records</span>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Booking History &amp; Monthly Records</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Review complete month reservations, guest check-ins, advance receipts, and deleted or cancelled bookings.
+                </DialogDescription>
+              </div>
+
+              {/* Month Selector Controls */}
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
+                  {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Next Month"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Summary Strip */}
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#8E7079]">Total Reservations</div>
+                  <div className="text-lg font-serif font-bold text-[#59283A]">
+                    {historyData?.totalCount || 0}
+                  </div>
+                </div>
+                <CalendarDays className="w-5 h-5 text-[#C4A06A]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#32765B]">Active Bookings</div>
+                  <div className="text-lg font-serif font-bold text-[#32765B]">
+                    {historyData?.activeCount || 0}
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-[#32765B]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#B54C44]">Deleted / Cancelled</div>
+                  <div className="text-lg font-serif font-bold text-[#B54C44]">
+                    {historyData?.deletedCount || 0}
+                  </div>
+                </div>
+                <Archive className="w-5 h-5 text-[#B54C44]" />
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Filter Toolbar inside History */}
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search history by booking #, guest name, mobile, room..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="pl-8 h-8 text-xs border-[#E8DDD8]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant={historyFilter === "ALL" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ALL")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ALL" ? "bg-[#59283A] text-white" : "border-[#E8DDD8] text-[#59283A]"}`}
+              >
+                All ({historyData?.totalCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "ACTIVE" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ACTIVE")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ACTIVE" ? "bg-[#32765B] text-white" : "border-[#E8DDD8] text-[#32765B]"}`}
+              >
+                Active ({historyData?.activeCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "DELETED" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("DELETED")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "DELETED" ? "bg-[#B54C44] text-white" : "border-[#E8DDD8] text-[#B54C44]"}`}
+              >
+                Deleted ({historyData?.deletedCount || 0})
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleExportExcel("MONTH")}
+                disabled={isExporting}
+                className="h-7 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] ml-1 flex items-center gap-1"
+                title="Download this month's complete record"
+              >
+                <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Export Month</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* History Records Table */}
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+            {historyLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center">
+                <LoadingSpinner size="md" text="Loading booking history records..." />
+              </div>
+            ) : filteredHistoryItems.length === 0 ? (
+              <div className="text-center py-12 text-[#82747A] text-xs">
+                No reservation or deletion activity found for {historyData?.monthName || "this month"}.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredHistoryItems.map((item: any, idx: number) => (
+                  <div
+                    key={item.id || idx}
+                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                      item.isDeleted
+                        ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
+                        : "border-[#E8DDD8] hover:border-[#C4A06A]"
+                    }`}
+                  >
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                          item.isDeleted
+                            ? "bg-[#F8E8E5] text-[#B54C44]"
+                            : "bg-[#E7F1E9] text-[#32765B]"
+                        }`}
+                      >
+                        {item.isDeleted ? <Trash2 className="w-4 h-4" /> : <CalendarDays className="w-4 h-4" />}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sm text-[#59283A] font-mono">{item.bookingNumber}</span>
+                          <span className="font-semibold text-xs text-[#59283A]">
+                            {item.primaryGuest?.fullName || "Guest"}
+                          </span>
+                          <span className="text-[11px] text-[#8E7079] font-mono">
+                            {item.primaryGuest?.mobileNumber}
+                          </span>
+                          <span className="text-[11px] bg-[#F5F0EA] text-[#59283A] px-2 py-0.5 rounded font-medium">
+                            Room {item.room?.roomNumber} ({item.room?.roomType?.name || "Standard"})
+                          </span>
+                          {item.isDeleted ? (
+                            <Badge className="text-[9px] bg-[#F8E8E5] text-[#B54C44] border-[#B54C44]/30">
+                              Deleted / Archived
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="outline"
+                              className={`text-[9px] font-semibold ${
+                                item.bookingStatus === "CHECKED_IN"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : item.bookingStatus === "RESERVED"
+                                  ? "bg-blue-50 text-blue-700 border-blue-200"
+                                  : item.bookingStatus === "CHECKED_OUT"
+                                  ? "bg-slate-100 text-[#7A4652] border-slate-300"
+                                  : "bg-rose-50 text-rose-700 border-rose-200"
+                              }`}
+                            >
+                              {item.bookingStatus}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-3 text-[11px] text-[#82747A] mt-1 flex-wrap">
+                          <span>
+                            Dates: <strong>{new Date(item.checkInDate).toLocaleDateString("en-IN")}</strong> to <strong>{new Date(item.expectedCheckOutDate).toLocaleDateString("en-IN")}</strong> ({item.numberOfNights} Nights)
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Rate: <strong>₹{Number(item.roomRatePerNight || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}/night</strong>
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Advance: <strong className="text-emerald-700">₹{Number(item.advanceAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong>
+                          </span>
+                          <span>•</span>
+                          {item.isDeleted ? (
+                            <span className="text-[#B54C44] font-medium">
+                              Archived: {item.deletedAt ? new Date(item.deletedAt).toLocaleDateString("en-IN") : "Recorded"}
+                            </span>
+                          ) : (
+                            <span>
+                              Created: {new Date(item.createdAt).toLocaleDateString("en-IN")}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-center">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedBooking(item);
+                          setDetailsModalOpen(true);
+                        }}
+                        className="h-7 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+                      >
+                        <Eye className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
+                        <span>Dossier</span>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="p-3 border-t border-[#E8DDD8] bg-white flex items-center justify-between flex-shrink-0">
+            <span className="text-[11px] text-[#82747A]">
+              Showing {filteredHistoryItems.length} of {historyData?.totalCount || 0} booking records for {historyData?.monthName || "selected month"}.
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setHistoryModalOpen(false)}
+              className="text-xs border-[#E8DDD8] text-[#59283A]"
+            >
+              Close Archive
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

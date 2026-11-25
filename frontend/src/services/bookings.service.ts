@@ -33,6 +33,24 @@ export const bookingsService = {
     return res.data.data;
   },
 
+  async remove(id: string): Promise<{ success: boolean; message: string; bookingNumber: string }> {
+    const res = await apiClient.delete<ApiResponse<any>>(`/bookings/${id}`);
+    return res.data.data;
+  },
+
+  async getHistory(params?: { month?: number; year?: number }): Promise<{
+    month: number;
+    year: number;
+    monthName: string;
+    totalCount: number;
+    activeCount: number;
+    deletedCount: number;
+    items: any[];
+  }> {
+    const res = await apiClient.get<ApiResponse<any>>("/bookings/history", { params });
+    return res.data.data;
+  },
+
   // Stays & Operational Check-in / Check-out
   async getTodayCheckIns(): Promise<Booking[]> {
     const res = await apiClient.get<ApiResponse<Booking[]>>("/stays/today-check-ins");
