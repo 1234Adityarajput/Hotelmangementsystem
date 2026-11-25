@@ -1830,7 +1830,7 @@ export default function StaysPage() {
                   {receiptData?.invoice?.invoiceNumber || "Digital Checkout Dossier"}
                 </DialogTitle>
                 <DialogDescription className="text-xs text-[#82747A]">
-                  Archived permanently in Neon PostgreSQL database.
+                  Archived permanently in secure database.
                 </DialogDescription>
               </div>
               <Button

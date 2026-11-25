@@ -24,7 +24,7 @@ export class SettingsController {
   }
 
   @Get('health')
-  @ApiOperation({ summary: 'Get live infrastructure health, Neon database latency, and backup status' })
+  @ApiOperation({ summary: 'Get live infrastructure health, database latency, and backup status' })
   async getSystemHealth() {
     return this.settingsService.getSystemHealth();
   }

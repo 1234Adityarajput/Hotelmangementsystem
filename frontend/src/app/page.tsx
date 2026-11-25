@@ -138,7 +138,7 @@ export default function AdminDashboardPage() {
   if (loading && !stats) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 space-y-4">
-        <LoadingSpinner size="lg" text="Connecting to Neon DB & Loading Live Dashboard..." subtext="Retrieving real-time room inventory, checked-in guests, revenue & staff ledgers..." />
+        <LoadingSpinner size="lg" text="Connecting to Database & Loading Live Dashboard..." subtext="Retrieving real-time room inventory, checked-in guests, revenue & staff ledgers..." />
       </div>
     );
   }

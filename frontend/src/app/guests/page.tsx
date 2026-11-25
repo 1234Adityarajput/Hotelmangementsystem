@@ -929,7 +929,7 @@ export default function GuestsPage() {
           {loading ? (
             <div className="p-16 flex flex-col justify-center items-center gap-3">
               <LoadingSpinner text="Loading Guest Profiles & Identities..." subtext="Retrieving guest directory and stay histories..." />
-              <p className="text-xs text-[#82747A]">Querying Neon PostgreSQL guest records...</p>
+              <p className="text-xs text-[#82747A]">Querying database guest records...</p>
             </div>
           ) : filteredGuests.length === 0 ? (
             <div className="p-16 text-center text-xs text-[#82747A] space-y-3">

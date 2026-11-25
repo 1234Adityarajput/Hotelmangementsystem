@@ -85,7 +85,7 @@ export class SettingsService {
     return {
       status: dbStatus === 'healthy' ? 'ok' : 'degraded',
       database: {
-        provider: 'Neon Serverless PostgreSQL 16+',
+        provider: 'Serverless PostgreSQL 16+',
         status: dbStatus,
         latencyMs: dbLatencyMs,
       },
@@ -96,9 +96,9 @@ export class SettingsService {
         environment: process.env.NODE_ENV || 'development',
       },
       backupStatus: {
-        strategy: 'Continuous Neon Write-Ahead Log (WAL) & Branch Snapshots',
+        strategy: 'Continuous Write-Ahead Log (WAL) & Automated Snapshots',
         pointInTimeRecovery: 'Enabled',
-        automatedDailyRetention: 'Configured via Neon Cloud Console',
+        automatedDailyRetention: 'Configured via Cloud Console',
         onDemandBackup: 'Available via /api/v1/settings/backup',
       },
     };
@@ -158,8 +158,8 @@ export class SettingsService {
       exportTimestamp: new Date().toISOString(),
       generationTimeMs: Date.now() - start,
       database: {
-        provider: 'Neon Serverless PostgreSQL',
-        databaseName: 'neondb',
+        provider: 'Serverless PostgreSQL',
+        databaseName: 'hotel_radha_palace_db',
       },
       summary: {
         hotelSettingsCount: settings.length,

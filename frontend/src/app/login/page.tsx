@@ -101,7 +101,7 @@ export default function LoginPage() {
             </div>
             <div className="flex items-center gap-2 bg-white/95 px-4 py-2 rounded-xl border border-black/15 font-black text-[#1E0B14] shadow-sm backdrop-blur-md">
               <CheckCircle2 className="w-4 h-4 text-[#166534] stroke-[2.5]" />
-              <span>Neon PostgreSQL Live</span>
+              <span>Cloud Database Live</span>
             </div>
             <div className="flex items-center gap-2 bg-white/95 px-4 py-2 rounded-xl border border-black/15 font-black text-[#1E0B14] shadow-sm backdrop-blur-md">
               <CheckCircle2 className="w-4 h-4 text-[#C4A06A] stroke-[2.5]" />
@@ -113,7 +113,7 @@ export default function LoginPage() {
         {/* 5. Bottom 3-Column Highlights (Ultra Dark & Bold) */}
         <div className="relative z-10 pt-8 border-t-2 border-[#1E0B14]/25 grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
-            <div className="font-serif text-3xl lg:text-4xl font-black text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">120+ Rooms</div>
+            <div className="font-serif text-3xl lg:text-4xl font-black text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">33+ Rooms</div>
             <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">Active Across All Floors</div>
           </div>
           <div>
@@ -121,7 +121,7 @@ export default function LoginPage() {
             <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">Front Desk Key Dispatch</div>
           </div>
           <div>
-            <div className="font-serif text-3xl lg:text-4xl font-black text-[#166534] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">Neon DB Live</div>
+            <div className="font-serif text-3xl lg:text-4xl font-black text-[#166534] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">Cloud DB Live</div>
             <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">100% Encrypted &amp; Audited</div>
           </div>
         </div>
@@ -297,7 +297,7 @@ export default function LoginPage() {
           {/* Footer Copyright */}
           <div className="mt-8 pt-5 border-t border-[#E8DDD8] text-center">
             <p className="text-[11px] text-[#82747A]">
-              Hotel Radha Palace © 2026 • Live Neon DB Secure Console
+              Hotel Radha Palace © 2026 • Live Database Secure Console
             </p>
           </div>
         </div>

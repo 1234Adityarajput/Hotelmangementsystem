@@ -15,7 +15,7 @@ export class AppController {
       service: 'Hotel Radha Palace - Management Backend API',
       status: 'Live & Operational',
       version: '1.0.0',
-      database: 'Neon PostgreSQL Connected',
+      database: 'Cloud PostgreSQL Connected',
       hotelName: 'Hotel Radha Palace',
       endpoints: {
         health: '/api/v1/health',

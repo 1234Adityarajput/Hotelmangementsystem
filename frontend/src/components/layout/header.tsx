@@ -201,10 +201,10 @@ export function Header({ onOpenMobile }: HeaderProps) {
 
       {/* Right Controls */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Neon Live Status Indicator */}
+        {/* Live Status Indicator */}
         <div className="hidden md:flex items-center gap-2 bg-[#E7F1E9] text-[#32765B] px-3.5 py-1.5 rounded-full text-xs font-semibold border border-[#32765B]/25 shadow-xs">
           <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
-          <span className="tracking-wide">Neon DB Live</span>
+          <span className="tracking-wide">Database Live</span>
         </div>
 
         {/* Administrator Profile Pill */}

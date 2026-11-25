@@ -326,7 +326,7 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-2">
                   <Database className="w-4 h-4 text-emerald-600" />
                   <CardTitle className="text-sm font-bold text-[#362A22]">
-                    Live Neon PostgreSQL Infrastructure Health
+                    Live PostgreSQL Infrastructure Health
                   </CardTitle>
                 </div>
                 <Badge className="bg-emerald-600 text-white text-[10px]">
@@ -353,10 +353,10 @@ export default function SettingsPage() {
               <div className="p-3 bg-white rounded-lg border border-[#E3D9CA] space-y-2">
                 <div className="flex items-center gap-2 font-bold text-[#362A22]">
                   <HardDrive className="w-4 h-4 text-[#B08A60]" />
-                  <span>Neon Serverless Backup & Recovery Protocol</span>
+                  <span>Serverless Backup &amp; Recovery Protocol</span>
                 </div>
                 <p className="text-[#79695B] leading-relaxed text-[11px]">
-                  Your database is hosted on <strong>Neon Serverless PostgreSQL</strong> on AWS. Data is protected by continuous Write-Ahead Log (WAL) streaming and instant branch copy-on-write snapshots.
+                  Your database is hosted on <strong>Serverless PostgreSQL</strong> on AWS. Data is protected by continuous Write-Ahead Log (WAL) streaming and instant branch copy-on-write snapshots.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
                   <div className="flex items-center gap-1.5 text-[#7A4652]">

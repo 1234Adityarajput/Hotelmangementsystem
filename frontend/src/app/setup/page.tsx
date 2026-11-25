@@ -30,10 +30,10 @@ export default function SetupVerificationPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-[#59283A]">
-            Database & System Verification
+            Database &amp; System Verification
           </h2>
           <p className="text-sm text-[#82747A] mt-1">
-            Live health verification for Neon PostgreSQL and NestJS modular monolith backend.
+            Live health verification for Cloud PostgreSQL and NestJS modular monolith backend.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -83,7 +83,7 @@ export default function SetupVerificationPage() {
             <div className="text-2xl font-bold text-[#59283A]">
               {isLoading ? <LoadingSpinner inline text="Probing DB..." /> : health?.database?.connected ? "Connected" : "Disconnected"}
             </div>
-            <p className="text-xs text-[#82747A] mt-1">Neon PostgreSQL 18.7 • AWS us-east-2</p>
+            <p className="text-xs text-[#82747A] mt-1">Cloud PostgreSQL 18.7 • Secure SSL</p>
             <div className="mt-4 flex items-center gap-2">
               <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
                 Latency: {health?.database?.latencyMs || 0}ms
@@ -113,7 +113,7 @@ export default function SetupVerificationPage() {
       <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
         <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
         <div className="text-sm text-emerald-900">
-          <span className="font-semibold">Neon Database Integration Verified:</span> All 23 tables, triggers, GiST exclusion constraints and live smoke tests passed.
+          <span className="font-semibold">Cloud Database Integration Verified:</span> All 23 tables, triggers, GiST exclusion constraints and live smoke tests passed.
         </div>
       </div>
     </div>

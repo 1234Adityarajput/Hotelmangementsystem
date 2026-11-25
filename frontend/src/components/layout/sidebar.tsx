@@ -424,7 +424,7 @@ export function Sidebar({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[#32765B] animate-pulse" />
-                <span className="text-white font-medium text-[11px]">Neon DB Connected</span>
+                <span className="text-white font-medium text-[11px]">Database Connected</span>
               </div>
               <span className="text-[10px] text-[#C4A06A] font-mono">v2.0</span>
             </div>

@@ -88,7 +88,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes('user:password@localhost:5432')) {
       return {
         connected: false,
-        message: 'DATABASE_URL is using placeholder credentials. Neon PostgreSQL credentials pending.',
+        message: 'DATABASE_URL is using placeholder credentials. PostgreSQL credentials pending.',
       };
     }
 
