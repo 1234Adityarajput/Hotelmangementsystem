@@ -31,6 +31,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Archive,
+  Loader2,
 } from "lucide-react";
 import ExcelJS from "exceljs";
 import { guestsService } from "@/services/guests.service";
@@ -2329,7 +2330,7 @@ export default function GuestsPage() {
       {/* DELETE CONFIRMATION MODAL                                                 */}
       {/* ========================================================================= */}
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+        <DialogContent className="sm:max-w-md w-[95vw] max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6 rounded-2xl overflow-hidden">
           <DialogHeader className="pb-2">
             <div className="w-12 h-12 rounded-2xl bg-[#F8E8E5] text-[#B54C44] flex items-center justify-center mb-2 mx-auto">
               <AlertTriangle className="w-6 h-6" />
@@ -2343,22 +2344,22 @@ export default function GuestsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="p-3.5 bg-[#F5F0EA]/60 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2">
-            <div className="flex items-start gap-2">
+          <div className="p-3.5 bg-[#F5F0EA]/70 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2.5 my-1">
+            <div className="flex items-start gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
-              <span>
-                <strong>Permanent History Preserved:</strong> This guest&apos;s full profile, ID proof, companions, and stay records will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
-              </span>
+              <div className="leading-relaxed">
+                <strong className="text-[#2E5E44]">Permanent History Preserved:</strong> This guest&apos;s full profile, ID proof, companions, and stay records will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </div>
             </div>
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2.5">
               <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
-              <span>
-                <strong>Active Database Removal:</strong> The guest record will be removed from your active guests directory table.
-              </span>
+              <div className="leading-relaxed">
+                <strong className="text-[#963730]">Active Database Removal:</strong> The guest record will be removed from your active guests directory table.
+              </div>
             </div>
           </div>
 
-          <DialogFooter className="flex items-center justify-end gap-2 pt-3">
+          <DialogFooter className="flex flex-row items-center justify-end gap-2 pt-4 border-t border-[#E8DDD8]/60 mt-3">
             <Button
               type="button"
               variant="outline"
@@ -2368,7 +2369,7 @@ export default function GuestsPage() {
                 setDeleteModalOpen(false);
                 setGuestToDelete(null);
               }}
-              className="text-xs border-[#E8DDD8]"
+              className="text-xs h-9 px-4 font-medium border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
             >
               Cancel
             </Button>
@@ -2377,16 +2378,16 @@ export default function GuestsPage() {
               size="sm"
               disabled={isDeleting}
               onClick={handleExecuteDelete}
-              className="text-xs bg-[#B54C44] hover:bg-[#923832] text-white flex items-center gap-1.5"
+              className="text-xs h-9 px-4 font-semibold bg-[#B54C44] hover:bg-[#923832] text-white flex items-center justify-center gap-1.5 min-w-[130px] rounded-lg transition-colors"
             >
               {isDeleting ? (
                 <>
-                  <LoadingSpinner size="sm" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white shrink-0" />
                   <span>Deleting...</span>
                 </>
               ) : (
                 <>
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
                   <span>Yes, Delete Guest</span>
                 </>
               )}
