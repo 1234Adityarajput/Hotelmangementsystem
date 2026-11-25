@@ -104,3 +104,5 @@ export const bookingsService = {
     return res.data.data;
   },
 };
+
+export const staysService = bookingsService;

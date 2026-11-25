@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckInCheckOutService } from './check-in-out.service';
+import { BookingsService } from './bookings.service';
 import { RelocateRoomDto } from './dto/relocate-room.dto';
 import { PerformCheckInDto } from './dto/check-in.dto';
 import { PerformCheckOutDto } from './dto/check-out.dto';
@@ -9,7 +10,16 @@ import { PerformCheckOutDto } from './dto/check-out.dto';
 @ApiBearerAuth('JWT-auth')
 @Controller('stays')
 export class CheckInCheckOutController {
-  constructor(private readonly staysService: CheckInCheckOutService) {}
+  constructor(
+    private readonly staysService: CheckInCheckOutService,
+    private readonly bookingsService: BookingsService,
+  ) {}
+
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly stays history including checked-in, checked-out, and deleted stays' })
+  async getHistory(@Query('month') month?: string, @Query('year') year?: string) {
+    return this.bookingsService.getHistory(month, year);
+  }
 
   @Get('today-check-ins')
   @ApiOperation({ summary: 'Get list of bookings expected to check in today' })
@@ -61,5 +71,11 @@ export class CheckInCheckOutController {
   @ApiOperation({ summary: 'Relocate guest to a different room' })
   async relocateRoom(@Param('id') id: string, @Body() dto: RelocateRoomDto) {
     return this.staysService.relocateRoom(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete stay reservation and archive record in audit history' })
+  async remove(@Param('id') id: string) {
+    return this.bookingsService.remove(id);
   }
 }
