@@ -16,6 +16,33 @@ export interface ExpenseStats {
   }[];
 }
 
+export interface ExpenseHistoryItem {
+  id: string;
+  expenseReference: string;
+  expenseCategoryId: string;
+  categoryName: string;
+  description: string;
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  transactionReference?: string;
+  notes?: string;
+  createdAt: string;
+  deletedAt?: string;
+  isDeleted: boolean;
+}
+
+export interface MonthlyExpenseHistoryResponse {
+  month: number;
+  year: number;
+  monthName: string;
+  totalCount: number;
+  activeCount: number;
+  deletedCount: number;
+  totalAmount: number;
+  items: ExpenseHistoryItem[];
+}
+
 export const expensesService = {
   async getStats(): Promise<ExpenseStats> {
     const res = await apiClient.get<ApiResponse<ExpenseStats>>("/expenses/stats");
@@ -76,6 +103,11 @@ export const expensesService = {
 
   async createCategory(data: { name: string; description?: string }): Promise<ExpenseCategory> {
     const res = await apiClient.post<ApiResponse<ExpenseCategory>>("/expenses/categories", data);
+    return res.data.data;
+  },
+
+  async getHistory(params?: { month?: number; year?: number }): Promise<MonthlyExpenseHistoryResponse> {
+    const res = await apiClient.get<ApiResponse<MonthlyExpenseHistoryResponse>>("/expenses/history", { params });
     return res.data.data;
   },
 };

@@ -35,6 +35,15 @@ export class ExpensesController {
     return this.expensesService.findAllCategories();
   }
 
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly hotel expense history including deleted audit logs' })
+  async getHistory(
+    @Query('month') month?: string,
+    @Query('year') year?: string,
+  ) {
+    return this.expensesService.getHistory(month, year);
+  }
+
   @Post('categories')
   @ApiOperation({ summary: 'Create a new expense category' })
   async createCategory(@Body() dto: CreateExpenseCategoryDto) {

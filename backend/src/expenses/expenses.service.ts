@@ -206,24 +206,128 @@ export class ExpensesService {
   }
 
   async delete(id: string) {
-    const existing = await this.prisma.expense.findUnique({ where: { id } });
+    const existing = await this.prisma.expense.findUnique({
+      where: { id },
+      include: {
+        category: true,
+      },
+    });
+
     if (!existing) {
       throw new NotFoundException(`Expense with ID ${id} not found`);
     }
 
-    await this.prisma.expense.delete({ where: { id } });
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Snapshot full expense into AuditLog
+      await tx.auditLog.create({
+        data: {
+          entityType: 'EXPENSE',
+          entityId: id,
+          action: 'DELETE',
+          previousValues: {
+            ...existing,
+            categoryName: existing.category?.name || 'General Operations',
+            deletedAt: new Date().toISOString(),
+          } as any,
+          description: `Deleted expense record ${existing.expenseReference} (₹${existing.amount}) under ${existing.category?.name || 'General'}. Preserved in audit history.`,
+        },
+      });
 
-    await this.prisma.auditLog.create({
-      data: {
-        entityType: 'EXPENSE',
-        entityId: id,
-        action: 'DELETE',
-        previousValues: { reference: existing.expenseReference, amount: existing.amount },
-        description: `Deleted expense record ${existing.expenseReference} (₹${existing.amount})`,
+      // 2. Delete from database
+      await tx.expense.delete({ where: { id } });
+
+      return {
+        success: true,
+        message: `Expense ${existing.expenseReference} deleted successfully and archived in Monthly History.`,
+        expenseReference: existing.expenseReference,
+      };
+    });
+  }
+
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
+    const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
+
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch active expenses for this month
+    const activeExpenses = await this.prisma.expense.findMany({
+      where: {
+        paymentDate: {
+          gte: startDate,
+          lte: endDate,
+        },
       },
+      include: {
+        category: true,
+      },
+      orderBy: { paymentDate: 'desc' },
     });
 
-    return { message: `Expense ${existing.expenseReference} deleted successfully` };
+    const enrichedActive = activeExpenses.map((e) => ({
+      id: e.id,
+      expenseReference: e.expenseReference,
+      expenseCategoryId: e.expenseCategoryId,
+      categoryName: e.category?.name || 'General Operations',
+      description: e.description,
+      amount: Number(e.amount),
+      paymentMethod: e.paymentMethod,
+      paymentDate: e.paymentDate.toISOString().split('T')[0],
+      transactionReference: e.transactionReference,
+      notes: e.notes,
+      createdAt: e.createdAt,
+      isDeleted: false,
+    }));
+
+    // 2. Fetch deleted expenses from AuditLog
+    const deletedLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'EXPENSE',
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedItems = deletedLogs.map((log) => {
+      const prev: any = log.previousValues || {};
+      const pDate = prev.paymentDate ? new Date(prev.paymentDate).toISOString().split('T')[0] : log.changedAt.toISOString().split('T')[0];
+      return {
+        id: log.entityId,
+        expenseReference: prev.expenseReference || prev.reference || 'EXP-ARCHIVED',
+        expenseCategoryId: prev.expenseCategoryId || '',
+        categoryName: prev.categoryName || prev.category || 'General Operations',
+        description: prev.description || 'Deleted Expense Record',
+        amount: Number(prev.amount || 0),
+        paymentMethod: prev.paymentMethod || 'CASH',
+        paymentDate: pDate,
+        transactionReference: prev.transactionReference || '',
+        notes: prev.notes || '',
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+        isDeleted: true,
+      };
+    });
+
+    const allHistory = [...enrichedActive, ...deletedItems].sort(
+      (a, b) => new Date(b.paymentDate || b.createdAt).getTime() - new Date(a.paymentDate || a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedItems.length,
+      totalAmount: allHistory.reduce((sum, r) => sum + (r.amount || 0), 0),
+      items: allHistory,
+    };
   }
 
   async getStats() {

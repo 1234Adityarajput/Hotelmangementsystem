@@ -29,8 +29,20 @@ import {
   Briefcase,
   CheckCircle2,
   IndianRupee,
+  History,
+  Archive,
+  AlertTriangle,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { expensesService, ExpenseStats } from "@/services/expenses.service";
+import ExcelJS from "exceljs";
+import {
+  expensesService,
+  ExpenseStats,
+  ExpenseHistoryItem,
+  MonthlyExpenseHistoryResponse,
+} from "@/services/expenses.service";
 import { Expense, ExpenseCategory } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +69,11 @@ function getCategoryIcon(name: string) {
   return Building;
 }
 
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
@@ -81,6 +98,16 @@ export default function ExpensesPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Monthly History & Archive Modal State
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyMonth, setHistoryMonth] = useState(new Date().getMonth() + 1);
+  const [historyYear, setHistoryYear] = useState(new Date().getFullYear());
+  const [historyData, setHistoryData] = useState<MonthlyExpenseHistoryResponse | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACTIVE" | "DELETED">("ALL");
+  const [historySearch, setHistorySearch] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   // Form State
   const initialForm = {
@@ -250,16 +277,236 @@ export default function ExpensesPage() {
     if (!selectedExpense) return;
     try {
       setSubmitting(true);
-      await expensesService.delete(selectedExpense.id);
-      toast.success("Expense deleted successfully!");
+      const res = await expensesService.delete(selectedExpense.id);
+      toast.success(res.message || `Expense ${selectedExpense.expenseReference} deleted and archived`);
       setDeleteModalOpen(false);
+      setSelectedExpense(null);
       fetchData();
+      if (historyModalOpen) fetchHistory(historyMonth, historyYear);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to delete expense");
     } finally {
       setSubmitting(false);
     }
   };
+
+  const fetchHistory = async (m?: number, y?: number) => {
+    try {
+      setHistoryLoading(true);
+      const res = await expensesService.getHistory({
+        month: m || historyMonth,
+        year: y || historyYear,
+      });
+      setHistoryData(res);
+    } catch (err: any) {
+      toast.error("Failed to load expense history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleOpenHistoryModal = () => {
+    setHistoryModalOpen(true);
+    fetchHistory(historyMonth, historyYear);
+  };
+
+  const handlePrevMonth = () => {
+    let newM = historyMonth - 1;
+    let newY = historyYear;
+    if (newM < 1) {
+      newM = 12;
+      newY -= 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleNextMonth = () => {
+    let newM = historyMonth + 1;
+    let newY = historyYear;
+    if (newM > 12) {
+      newM = 1;
+      newY += 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleExportExcel = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating Excel report for Hotel Expense Management...");
+
+      let exportItems: ExpenseHistoryItem[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await expensesService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTH_NAMES[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const now = new Date();
+        const histRes = await expensesService.getHistory({
+          month: now.getMonth() + 1,
+          year: now.getFullYear(),
+        });
+        exportItems = histRes.items || [];
+        scopeTitle = `${MONTH_NAMES[now.getMonth()]}_${now.getFullYear()}`;
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No expense records found to export for selected scope");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "Hotel Radha Palace";
+      workbook.created = new Date();
+
+      const worksheet = workbook.addWorksheet("Expense Ledger");
+
+      // Title Banner
+      worksheet.mergeCells("A1:K1");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "HOTEL RADHA PALACE — HOTEL OPERATING EXPENSE REGISTER";
+      titleCell.font = { name: "Georgia", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF59283A" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(1).height = 32;
+
+      worksheet.mergeCells("A2:K2");
+      const subCell = worksheet.getCell("A2");
+      subCell.value = `Export Scope: ${scopeTitle} | Total Records: ${exportItems.length} | Generated: ${new Date().toLocaleString("en-IN")}`;
+      subCell.font = { name: "Arial", size: 10, italic: true, color: { argb: "FF59283A" } };
+      subCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF5F0EA" } };
+      subCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(2).height = 20;
+
+      // Headers
+      const headers = [
+        "S.No",
+        "Expense Ref",
+        "Payment Date",
+        "Category",
+        "Description",
+        "Payment Method",
+        "Amount (₹)",
+        "Bill / Ref #",
+        "Additional Notes",
+        "Lifecycle",
+        "Archived Date",
+      ];
+
+      const headerRow = worksheet.addRow(headers);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7A4652" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE8DDD8" } },
+          bottom: { style: "medium", color: { argb: "FF59283A" } },
+          left: { style: "thin", color: { argb: "FFE8DDD8" } },
+          right: { style: "thin", color: { argb: "FFE8DDD8" } },
+        };
+      });
+
+      exportItems.forEach((exp: ExpenseHistoryItem, idx: number) => {
+        const dateStr = exp.paymentDate ? new Date(exp.paymentDate).toLocaleDateString("en-IN") : "—";
+        const row = worksheet.addRow([
+          idx + 1,
+          exp.expenseReference || "—",
+          dateStr,
+          exp.categoryName || "General",
+          exp.description || "—",
+          exp.paymentMethod || "CASH",
+          Number(exp.amount || 0),
+          exp.transactionReference || "—",
+          exp.notes || "—",
+          exp.isDeleted ? "DELETED / ARCHIVED" : "ACTIVE EXPENSE",
+          exp.deletedAt ? new Date(exp.deletedAt).toLocaleDateString("en-IN") : "—",
+        ]);
+        row.height = 22;
+
+        const isEven = idx % 2 === 0;
+        const isDeletedRow = exp.isDeleted;
+
+        row.eachCell((cell, colNum) => {
+          cell.font = { name: "Arial", size: 9 };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE8DDD8" } },
+            bottom: { style: "thin", color: { argb: "FFE8DDD8" } },
+            left: { style: "thin", color: { argb: "FFE8DDD8" } },
+            right: { style: "thin", color: { argb: "FFE8DDD8" } },
+          };
+
+          if (isDeletedRow) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8E8E5" } };
+          } else if (!isEven) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDFBF9" } };
+          }
+
+          if (colNum === 1 || colNum === 2 || colNum === 3 || colNum === 4 || colNum === 6 || colNum === 8 || colNum === 10 || colNum === 11) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else if (colNum === 7) {
+            cell.alignment = { vertical: "middle", horizontal: "right" };
+            cell.numFmt = "₹#,##0.00";
+          } else {
+            cell.alignment = { vertical: "middle", horizontal: "left" };
+          }
+        });
+      });
+
+      worksheet.columns = [
+        { width: 8 },  // S.No
+        { width: 18 }, // Expense Ref
+        { width: 16 }, // Payment Date
+        { width: 22 }, // Category
+        { width: 26 }, // Description
+        { width: 16 }, // Payment Method
+        { width: 18 }, // Amount
+        { width: 18 }, // Bill / Ref #
+        { width: 26 }, // Notes
+        { width: 20 }, // Lifecycle
+        { width: 18 }, // Archived Date
+      ];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `Hotel_Radha_Palace_Expenses_${scopeTitle.replace(/\s+/g, "_")}.xlsx`;
+      anchor.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`Expense report exported successfully (${exportItems.length} records)`);
+    } catch (err: any) {
+      console.error("Export error:", err);
+      toast.error("Failed to generate Excel export");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const filteredHistoryItems = (historyData?.items || []).filter((item) => {
+    if (historyFilter === "ACTIVE" && item.isDeleted) return false;
+    if (historyFilter === "DELETED" && !item.isDeleted) return false;
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase();
+    return (
+      (item.expenseReference && item.expenseReference.toLowerCase().includes(q)) ||
+      (item.categoryName && item.categoryName.toLowerCase().includes(q)) ||
+      (item.description && item.description.toLowerCase().includes(q)) ||
+      (item.paymentMethod && item.paymentMethod.toLowerCase().includes(q)) ||
+      (item.transactionReference && item.transactionReference.toLowerCase().includes(q)) ||
+      (item.notes && item.notes.toLowerCase().includes(q))
+    );
+  });
 
   const handleExportCSV = () => {
     if (expenses.length === 0) {
@@ -327,10 +574,35 @@ export default function ExpensesPage() {
           <Button
             variant="outline"
             size="sm"
+            onClick={handleOpenHistoryModal}
+            className="h-8 text-xs border-[#59283A]/30 text-[#59283A] hover:bg-[#59283A]/10 flex items-center gap-1.5 shadow-sm font-medium"
+          >
+            <History className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>Expense History</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={isExporting}
+            onClick={() => handleExportExcel("ALL")}
+            className="h-8 text-xs border-[#C4A06A]/40 text-[#59283A] hover:bg-[#C4A06A]/10 flex items-center gap-1.5 shadow-sm font-medium"
+          >
+            {isExporting ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#C4A06A]" />
+            ) : (
+              <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+            )}
+            <span>Export Excel</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleExportCSV}
             className="h-8 text-xs border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#59283A] flex items-center gap-1.5 shadow-sm"
           >
-            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <Download className="w-3.5 h-3.5 text-[#82747A]" />
             <span>Export CSV</span>
           </Button>
 
@@ -347,7 +619,7 @@ export default function ExpensesPage() {
           <Button
             size="sm"
             onClick={handleOpenAdd}
-            className="h-8 bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 shadow-sm text-xs"
+            className="h-8 bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5 shadow-sm text-xs font-semibold"
           >
             <Plus className="w-4 h-4 text-[#C4A06A]" />
             <span>Record New Expense</span>
@@ -1097,29 +1369,330 @@ export default function ExpensesPage() {
 
       {/* 
       =======================================================================
-      MODAL 5: DELETE CONFIRMATION
+      MODAL 5: DELETE CONFIRMATION (Luxury Audit Safe)
       =======================================================================
       */}
       <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
         <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-4">
+            <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mb-3">
+              <AlertTriangle className="w-6 h-6 text-rose-600" />
+            </div>
             <DialogTitle className="text-xl font-serif font-bold text-rose-700">
               Confirm Delete Expense
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#82747A]">
-              Are you sure you want to delete expense record <strong className="text-[#59283A]">{selectedExpense?.expenseReference}</strong> (₹{Number(selectedExpense?.amount || 0).toLocaleString()})?
-              This action will remove the record from financial accounts.
+            <DialogDescription className="text-xs text-[#82747A] mt-1">
+              Are you sure you want to delete expense record{" "}
+              <strong className="text-[#59283A] font-semibold">
+                {selectedExpense?.expenseReference}
+              </strong>
+              {selectedExpense?.category?.name && ` (${selectedExpense.category.name})`}
+              {selectedExpense?.amount && ` for ₹${Number(selectedExpense.amount).toLocaleString("en-IN")}`}?
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
-            <Button type="button" variant="outline" size="sm" onClick={() => setDeleteModalOpen(false)}>
+          <div className="p-3.5 bg-[#F5F0EA]/70 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2.5 my-3">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#2E5E44]">Permanent History Preserved:</strong> This expense reference, category, description, and payment record will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#963730]">Active Outflow Removal:</strong> The expense will be removed from active operational disbursement ledgers and monthly P&amp;L outflow totals.
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="pt-3 border-t border-[#E8DDD8] gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setDeleteModalOpen(false);
+                setSelectedExpense(null);
+              }}
+              className="text-xs h-9 px-4 font-medium border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+            >
               Cancel
             </Button>
-            <Button variant="destructive" size="sm" disabled={submitting} onClick={handleDeleteExpense}>
-              {submitting ? "Deleting..." : "Delete Record"}
+            <Button
+              type="button"
+              size="sm"
+              disabled={submitting}
+              onClick={handleDeleteExpense}
+              className="text-xs h-9 px-4 font-semibold bg-[#B54C44] hover:bg-[#923832] text-white flex items-center justify-center gap-1.5 min-w-[130px] rounded-lg transition-colors"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white shrink-0" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Yes, Delete Expense</span>
+                </>
+              )}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* FULL MONTH EXPENSE HISTORY & ARCHIVE MODAL                                */}
+      {/* ========================================================================= */}
+      <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace Archive
+                  </span>
+                  <span className="text-xs text-[#82747A]">• Full Month Hotel Expense &amp; Operational Audit Logs</span>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Hotel Expense History &amp; Monthly Records</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Review complete monthly operating expenses, utility bills, maintenance disbursements, and deleted expense archives.
+                </DialogDescription>
+              </div>
+
+              {/* Month Selector Controls */}
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
+                  {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Next Month"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Summary Strip */}
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#8E7079]">Total Expenses</div>
+                  <div className="text-lg font-serif font-bold text-[#59283A]">
+                    {historyData?.totalCount || 0}
+                  </div>
+                </div>
+                <Receipt className="w-5 h-5 text-[#C4A06A]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#32765B]">Active Ledgers</div>
+                  <div className="text-lg font-serif font-bold text-[#32765B]">
+                    {historyData?.activeCount || 0}
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-[#32765B]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#B54C44]">Deleted / Cancelled</div>
+                  <div className="text-lg font-serif font-bold text-[#B54C44]">
+                    {historyData?.deletedCount || 0}
+                  </div>
+                </div>
+                <Archive className="w-5 h-5 text-[#B54C44]" />
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Filter Toolbar inside History */}
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search history by reference #, category, description, payment method, bill ref..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="pl-8 h-8 text-xs border-[#E8DDD8]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant={historyFilter === "ALL" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ALL")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ALL" ? "bg-[#59283A] text-white" : "border-[#E8DDD8] text-[#59283A]"}`}
+              >
+                All ({historyData?.totalCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "ACTIVE" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ACTIVE")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ACTIVE" ? "bg-[#32765B] text-white" : "border-[#E8DDD8] text-[#32765B]"}`}
+              >
+                Active ({historyData?.activeCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "DELETED" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("DELETED")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "DELETED" ? "bg-[#B54C44] text-white" : "border-[#E8DDD8] text-[#B54C44]"}`}
+              >
+                Deleted ({historyData?.deletedCount || 0})
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleExportExcel("MONTH")}
+                disabled={isExporting}
+                className="h-7 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] ml-1 flex items-center gap-1"
+                title="Download this month's complete expense records"
+              >
+                <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Export Month</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* History Records Table */}
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+            {historyLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center">
+                <LoadingSpinner text="Loading expense history records..." />
+              </div>
+            ) : filteredHistoryItems.length === 0 ? (
+              <div className="text-center py-12 text-[#82747A] text-xs">
+                No expense records or deletion activity found for {historyData?.monthName || "this month"}.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredHistoryItems.map((item: any, idx: number) => {
+                  const CatIcon = getCategoryIcon(item.categoryName || "");
+                  return (
+                    <div
+                      key={item.id || idx}
+                      className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                        item.isDeleted
+                          ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
+                          : "border-[#E8DDD8] hover:border-[#C4A06A]"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                            item.isDeleted
+                              ? "bg-[#B54C44]/10 text-[#B54C44]"
+                              : "bg-[#59283A]/10 text-[#59283A]"
+                          }`}
+                        >
+                          <CatIcon className="w-4 h-4" />
+                        </div>
+
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-sm text-[#59283A]">
+                              {item.categoryName || "Uncategorized"}
+                            </span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#F5F0EA] text-[#C4A06A] border border-[#E8DDD8]">
+                              {item.expenseReference}
+                            </span>
+                            <span className="font-mono font-bold text-rose-700 text-sm">
+                              ₹{Number(item.amount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+
+                          <div className="text-xs text-[#82747A] mt-0.5 flex items-center gap-2 flex-wrap">
+                            <span className="text-[#59283A] font-medium">{item.description}</span>
+                            <span>•</span>
+                            <span>Payment: {item.paymentMethod}</span>
+                            <span>•</span>
+                            <span>
+                              Date: {item.paymentDate ? new Date(item.paymentDate).toLocaleDateString("en-IN") : "-"}
+                            </span>
+                            {item.transactionReference && (
+                              <>
+                                <span>•</span>
+                                <span className="font-mono text-[11px]">Bill/Ref: {item.transactionReference}</span>
+                              </>
+                            )}
+                          </div>
+
+                          {item.notes && (
+                            <div className="text-[11px] text-[#8E7079] mt-1 italic">
+                              "{item.notes}"
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex sm:flex-col items-end justify-between sm:justify-center gap-1.5 shrink-0">
+                        {item.isDeleted ? (
+                          <div className="text-right">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#B54C44]/10 text-[#B54C44] border border-[#B54C44]/20">
+                              <Archive className="w-3 h-3" />
+                              DELETED / ARCHIVED
+                            </span>
+                            {item.deletedAt && (
+                              <div className="text-[10px] text-[#8E7079] mt-0.5">
+                                {new Date(item.deletedAt).toLocaleString("en-IN")}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#32765B]/10 text-[#32765B] border border-[#32765B]/20">
+                              <CheckCircle2 className="w-3 h-3" />
+                              ACTIVE EXPENSE
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                handleOpenDelete({
+                                  id: item.id,
+                                  expenseReference: item.expenseReference,
+                                  amount: item.amount,
+                                  description: item.description,
+                                  category: { name: item.categoryName } as any,
+                                } as any);
+                              }}
+                              className="h-7 px-2 text-xs text-[#B54C44] hover:bg-rose-50 hover:text-rose-700"
+                              title="Delete this expense record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
