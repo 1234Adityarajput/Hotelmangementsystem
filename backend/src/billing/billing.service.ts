@@ -796,4 +796,280 @@ export class BillingService {
 
     return updated;
   }
+
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    let month = now.getMonth() + 1;
+    let year = now.getFullYear();
+
+    if (monthParam) {
+      const parsedMonth = parseInt(monthParam, 10);
+      if (parsedMonth >= 1 && parsedMonth <= 12) {
+        month = parsedMonth;
+      }
+    }
+    if (yearParam) {
+      year = parseInt(yearParam, 10) || year;
+    }
+
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch finalized / generated invoices in this month
+    const invoices = await this.prisma.invoice.findMany({
+      where: {
+        OR: [
+          { createdAt: { gte: startDate, lte: endDate } },
+          { invoiceDate: { gte: startDate, lte: endDate } },
+        ],
+      },
+      include: {
+        booking: {
+          include: {
+            primaryGuest: true,
+            room: { include: { roomType: true } },
+            bookingItems: { include: { item: true } },
+          },
+        },
+        payments: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const enrichedInvoices = invoices.map((inv) => ({
+      id: inv.id,
+      invoiceNumber: inv.invoiceNumber,
+      bookingId: inv.bookingId,
+      bookingNumber: inv.booking?.bookingNumber || 'N/A',
+      guestName: inv.booking?.primaryGuest?.fullName || 'Guest',
+      guestMobile: inv.booking?.primaryGuest?.mobileNumber || '',
+      roomNumber: inv.booking?.room?.roomNumber || 'N/A',
+      roomType: inv.booking?.room?.roomType?.name || 'Standard',
+      checkInDate: inv.booking?.checkInDate || inv.invoiceDate,
+      expectedCheckOutDate: inv.booking?.expectedCheckOutDate || inv.invoiceDate,
+      numberOfNights: inv.booking?.numberOfNights || 1,
+      roomRatePerNight: Number(inv.booking?.roomRatePerNight || 0),
+      roomCharges: Number(inv.roomCharges),
+      additionalCharges: Number(inv.additionalCharges),
+      subtotal: Number(inv.subtotal),
+      discountAmount: Number(inv.discountAmount),
+      taxAmount: Number(inv.taxAmount),
+      finalBill: Number(inv.totalAmount),
+      totalPaid: Number(inv.totalPaid),
+      balanceAmount: Number(inv.balanceAmount),
+      invoiceStatus: inv.invoiceStatus,
+      isActive: true,
+      isDeleted: false,
+      status: 'ACTIVE',
+      createdAt: inv.createdAt,
+      invoiceDate: inv.invoiceDate,
+    }));
+
+    // 2. Fetch active in-house guest folios that have activity in this month
+    const activeStays = await this.prisma.booking.findMany({
+      where: {
+        bookingStatus: 'CHECKED_IN',
+        OR: [
+          { createdAt: { gte: startDate, lte: endDate } },
+          { checkInDate: { gte: startDate, lte: endDate } },
+        ],
+        invoices: { none: {} },
+      },
+      include: {
+        primaryGuest: true,
+        room: { include: { roomType: true } },
+        bookingItems: { include: { item: true } },
+        payments: true,
+      },
+    });
+
+    const enrichedFolios = activeStays.map((b) => {
+      const roomCharges = Number(b.roomRatePerNight) * b.numberOfNights;
+      const addCharges = b.bookingItems.reduce((acc, bi) => acc + Number(bi.totalAmount), 0);
+      const paid = b.payments.reduce((acc, p) => acc + Number(p.amount), 0);
+      const finalBill = roomCharges + addCharges;
+      return {
+        id: b.id,
+        invoiceNumber: `FOLIO-${b.bookingNumber}`,
+        bookingId: b.id,
+        bookingNumber: b.bookingNumber,
+        guestName: b.primaryGuest?.fullName || 'Guest',
+        guestMobile: b.primaryGuest?.mobileNumber || '',
+        roomNumber: b.room?.roomNumber || 'N/A',
+        roomType: b.room?.roomType?.name || 'Standard',
+        checkInDate: b.checkInDate,
+        expectedCheckOutDate: b.expectedCheckOutDate,
+        numberOfNights: b.numberOfNights,
+        roomRatePerNight: Number(b.roomRatePerNight),
+        roomCharges,
+        additionalCharges: addCharges,
+        subtotal: finalBill,
+        discountAmount: 0,
+        taxAmount: 0,
+        finalBill,
+        totalPaid: paid,
+        balanceAmount: Math.max(0, finalBill - paid),
+        invoiceStatus: paid >= finalBill ? 'PAID' : paid > 0 ? 'PARTIALLY_PAID' : 'PENDING',
+        isActive: true,
+        isDeleted: false,
+        status: 'ACTIVE',
+        createdAt: b.createdAt,
+        invoiceDate: b.checkInDate,
+      };
+    });
+
+    // 3. Fetch deleted invoice or billing item charges from AuditLog
+    const deleteLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: { in: ['INVOICE', 'BOOKING_ITEM', 'FOLIO'] },
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedItems = deleteLogs.map((log) => {
+      const prev = (log.previousValues || {}) as any;
+      return {
+        id: log.entityId || prev.id || `archived-billing-${log.id}`,
+        invoiceNumber: prev.invoiceNumber || `ARCHIVED-INV-${log.id.slice(-6)}`,
+        bookingId: prev.bookingId || '',
+        bookingNumber: prev.bookingNumber || prev.booking?.bookingNumber || 'ARCHIVED-BKG',
+        guestName: prev.guestName || prev.booking?.primaryGuest?.fullName || 'Deleted / Archived Record',
+        guestMobile: prev.guestMobile || prev.booking?.primaryGuest?.mobileNumber || '',
+        roomNumber: prev.roomNumber || prev.booking?.room?.roomNumber || 'N/A',
+        roomType: prev.roomType || prev.booking?.room?.roomType?.name || 'Standard',
+        checkInDate: prev.checkInDate || log.changedAt,
+        expectedCheckOutDate: prev.expectedCheckOutDate || log.changedAt,
+        numberOfNights: prev.numberOfNights || 1,
+        roomRatePerNight: Number(prev.roomRatePerNight || 0),
+        roomCharges: Number(prev.roomCharges || 0),
+        additionalCharges: Number(prev.additionalCharges || 0),
+        subtotal: Number(prev.subtotal || prev.totalAmount || 0),
+        discountAmount: Number(prev.discountAmount || 0),
+        taxAmount: Number(prev.taxAmount || 0),
+        finalBill: Number(prev.totalAmount || prev.finalBill || 0),
+        totalPaid: Number(prev.totalPaid || 0),
+        balanceAmount: Number(prev.balanceAmount || 0),
+        invoiceStatus: prev.invoiceStatus || 'CANCELLED',
+        isActive: false,
+        isDeleted: true,
+        status: 'DELETED',
+        createdAt: prev.createdAt || log.changedAt,
+        invoiceDate: prev.invoiceDate || log.changedAt,
+        deletedAt: log.changedAt,
+      };
+    });
+
+    const allHistory = [...enrichedInvoices, ...enrichedFolios, ...deletedItems].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedInvoices.length + enrichedFolios.length,
+      deletedCount: deletedItems.length,
+      items: allHistory,
+    };
+  }
+
+  async remove(id: string) {
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id },
+      include: {
+        booking: {
+          include: {
+            primaryGuest: true,
+            room: true,
+          },
+        },
+        payments: true,
+      },
+    });
+
+    if (invoice) {
+      // 1. Audit log snapshot for permanent invoice history
+      await this.prisma.auditLog.create({
+        data: {
+          entityType: 'INVOICE',
+          entityId: invoice.id,
+          action: 'DELETE',
+          previousValues: {
+            ...invoice,
+            bookingNumber: invoice.booking?.bookingNumber,
+            guestName: invoice.booking?.primaryGuest?.fullName,
+            guestMobile: invoice.booking?.primaryGuest?.mobileNumber,
+            roomNumber: invoice.booking?.room?.roomNumber,
+            deletedAt: new Date().toISOString(),
+          } as any,
+          description: `Deleted invoice ${invoice.invoiceNumber} (₹${invoice.totalAmount}) for booking ${invoice.booking?.bookingNumber}. Preserved in history.`,
+        },
+      });
+
+      // 2. Unlink payments from invoice
+      await this.prisma.payment.updateMany({
+        where: { invoiceId: id },
+        data: { invoiceId: null },
+      });
+
+      // 3. Delete invoice
+      await this.prisma.invoice.delete({ where: { id } });
+
+      return {
+        success: true,
+        message: `Invoice ${invoice.invoiceNumber} deleted from active database and archived in history.`,
+        invoiceNumber: invoice.invoiceNumber,
+      };
+    }
+
+    // Check if it's a bookingItem (itemized service charge)
+    const item = await this.prisma.bookingItem.findUnique({
+      where: { id },
+      include: {
+        booking: {
+          include: {
+            primaryGuest: true,
+            room: true,
+          },
+        },
+        item: true,
+      },
+    });
+
+    if (item) {
+      const name = item.itemNameSnapshot || item.item?.name || 'Service Item';
+      await this.prisma.auditLog.create({
+        data: {
+          entityType: 'BOOKING_ITEM',
+          entityId: item.id,
+          action: 'DELETE',
+          previousValues: {
+            ...item,
+            itemName: name,
+            bookingNumber: item.booking?.bookingNumber,
+            guestName: item.booking?.primaryGuest?.fullName,
+            roomNumber: item.booking?.room?.roomNumber,
+            deletedAt: new Date().toISOString(),
+          } as any,
+          description: `Deleted billing item charge ${name} (₹${item.totalAmount}) from booking ${item.booking?.bookingNumber}. Preserved in history.`,
+        },
+      });
+
+      await this.prisma.bookingItem.delete({ where: { id } });
+
+      return {
+        success: true,
+        message: `Service charge for "${name}" (₹${item.totalAmount}) deleted and folio updated.`,
+        itemName: name,
+      };
+    }
+
+    throw new NotFoundException(`Invoice or Billing record with ID ${id} not found`);
+  }
 }

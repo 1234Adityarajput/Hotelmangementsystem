@@ -28,7 +28,16 @@ import {
   FileText,
   BadgePercent,
   RefreshCw,
+  Download,
+  History,
+  Trash2,
+  Archive,
+  ChevronLeft,
+  ChevronRight,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
+import ExcelJS from "exceljs";
 import { billingService } from "@/services/billing.service";
 import { paymentsService } from "@/services/payments.service";
 import { itemsService } from "@/services/items.service";
@@ -99,6 +108,395 @@ export default function AutomaticBillingPage() {
   });
 
   const [submitting, setSubmitting] = useState(false);
+
+  // Delete modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string;
+    invoiceNumber?: string;
+    guestName?: string;
+    roomNumber?: string;
+    amount?: number;
+    type: "INVOICE" | "FOLIO" | "CHARGE";
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // History modal state
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyMonth, setHistoryMonth] = useState<number>(new Date().getMonth() + 1);
+  const [historyYear, setHistoryYear] = useState<number>(new Date().getFullYear());
+  const [historyData, setHistoryData] = useState<any>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACTIVE" | "DELETED">("ALL");
+  const [historySearch, setHistorySearch] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const MONTH_NAMES = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const handleConfirmDelete = (target: {
+    id: string;
+    invoiceNumber?: string;
+    guestName?: string;
+    roomNumber?: string;
+    amount?: number;
+    type: "INVOICE" | "FOLIO" | "CHARGE";
+  }) => {
+    setItemToDelete(target);
+    setDeleteModalOpen(true);
+  };
+
+  const handleExecuteDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      setIsDeleting(true);
+      const res = await billingService.remove(itemToDelete.id);
+      toast.success(res.message || "Record deleted and archived in history");
+      setDeleteModalOpen(false);
+      setItemToDelete(null);
+      await fetchData();
+      if (selectedFolio) {
+        try {
+          const updated = await billingService.getLiveBillingFolio(selectedFolio.bookingId);
+          setSelectedFolio(updated);
+        } catch (_) {}
+      }
+      if (historyModalOpen) {
+        fetchHistory(historyMonth, historyYear);
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to delete billing record");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const fetchHistory = async (m?: number, y?: number) => {
+    try {
+      setHistoryLoading(true);
+      const res = await billingService.getHistory({
+        month: m || historyMonth,
+        year: y || historyYear,
+      });
+      setHistoryData(res);
+    } catch (err: any) {
+      toast.error("Failed to load billing history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleOpenHistoryModal = () => {
+    setHistoryModalOpen(true);
+    fetchHistory(historyMonth, historyYear);
+  };
+
+  const handlePrevMonth = () => {
+    let newM = historyMonth - 1;
+    let newY = historyYear;
+    if (newM < 1) {
+      newM = 12;
+      newY -= 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleNextMonth = () => {
+    let newM = historyMonth + 1;
+    let newY = historyYear;
+    if (newM > 12) {
+      newM = 1;
+      newY += 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleExportExcel = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating Excel report for Automatic Guest Billing & Folios...");
+
+      let exportItems: any[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await billingService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTH_NAMES[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const allInvoices = await billingService.findAll({ limit: 500 }).catch(() => ({ items: [] }));
+        const folioItems = folios.map((f) => ({
+          invoiceNumber: `FOLIO-${f.bookingNumber}`,
+          bookingNumber: f.bookingNumber,
+          guestName: f.guestName,
+          guestMobile: f.guestMobile,
+          roomNumber: f.roomNumber,
+          roomType: f.roomType,
+          checkInDate: f.checkInDate,
+          expectedCheckOutDate: f.expectedCheckOutDate,
+          numberOfNights: f.numberOfNights,
+          roomRatePerNight: f.roomRatePerNight,
+          roomCharges: f.roomCharges,
+          foodAndBeverageCharges: f.foodAndBeverageCharges,
+          laundryCharges: f.laundryCharges,
+          roomServiceCharges: f.roomServiceCharges,
+          extraBedCharges: f.extraBedCharges,
+          servicesAndSundries: f.otherServicesCharges + f.additionalItemCharges,
+          additionalCharges: f.totalAdditionalCharges,
+          subtotal: f.subtotal,
+          discountAmount: f.discountAmount,
+          taxAmount: f.taxAmount,
+          finalBill: f.finalBill,
+          totalPaid: f.payments.totalPaymentsReceived,
+          balanceAmount: Math.max(0, f.remainingBalance),
+          invoiceStatus: f.remainingBalance <= 0 ? "SETTLED" : "ACTIVE_FOLIO",
+          isDeleted: false,
+          createdAt: f.checkInDate,
+        }));
+
+        const invItems = (allInvoices.items || []).map((inv: any) => ({
+          invoiceNumber: inv.invoiceNumber,
+          bookingNumber: inv.booking?.bookingNumber || "—",
+          guestName: inv.booking?.primaryGuest?.fullName || "Guest",
+          guestMobile: inv.booking?.primaryGuest?.mobileNumber || "—",
+          roomNumber: inv.booking?.room?.roomNumber || "—",
+          roomType: inv.booking?.room?.roomType?.name || "Standard",
+          checkInDate: inv.booking?.checkInDate || inv.invoiceDate,
+          expectedCheckOutDate: inv.booking?.expectedCheckOutDate || inv.invoiceDate,
+          numberOfNights: inv.booking?.numberOfNights || 1,
+          roomRatePerNight: Number(inv.booking?.roomRatePerNight || 0),
+          roomCharges: Number(inv.roomCharges),
+          foodAndBeverageCharges: 0,
+          laundryCharges: 0,
+          roomServiceCharges: 0,
+          extraBedCharges: 0,
+          servicesAndSundries: Number(inv.additionalCharges),
+          additionalCharges: Number(inv.additionalCharges),
+          subtotal: Number(inv.subtotal),
+          discountAmount: Number(inv.discountAmount),
+          taxAmount: Number(inv.taxAmount),
+          finalBill: Number(inv.totalAmount),
+          totalPaid: Number(inv.totalPaid),
+          balanceAmount: Number(inv.balanceAmount),
+          invoiceStatus: inv.invoiceStatus,
+          isDeleted: false,
+          createdAt: inv.createdAt,
+        }));
+
+        exportItems = [...folioItems, ...invItems];
+        scopeTitle = "All_Billing_Records";
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No billing records found to export for selected scope");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "Hotel Radha Palace";
+      workbook.created = new Date();
+
+      const worksheet = workbook.addWorksheet("Billing Register");
+
+      // Title Banner
+      worksheet.mergeCells("A1:V1");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "HOTEL RADHA PALACE — AUTOMATIC GUEST BILLING & FOLIO REGISTER";
+      titleCell.font = { name: "Georgia", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF59283A" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(1).height = 32;
+
+      worksheet.mergeCells("A2:V2");
+      const subCell = worksheet.getCell("A2");
+      subCell.value = `Export Scope: ${scopeTitle} | Total Records: ${exportItems.length} | Generated: ${new Date().toLocaleString("en-IN")}`;
+      subCell.font = { name: "Arial", size: 10, italic: true, color: { argb: "FF59283A" } };
+      subCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF5F0EA" } };
+      subCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(2).height = 20;
+
+      // Headers
+      const headers = [
+        "S.No",
+        "Invoice / Folio #",
+        "Booking #",
+        "Guest Full Name",
+        "Mobile Number",
+        "Room #",
+        "Room Category",
+        "Check-In Date",
+        "Nights",
+        "Room Rate (₹)",
+        "Room Charges (₹)",
+        "Additional Charges (₹)",
+        "Subtotal (₹)",
+        "Discount (₹)",
+        "Taxes (₹)",
+        "Final Bill (₹)",
+        "Payments Received (₹)",
+        "Balance Due (₹)",
+        "Status",
+        "Lifecycle",
+        "Bill Date",
+        "Archived Date",
+      ];
+
+      const headerRow = worksheet.addRow(headers);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7A4652" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE8DDD8" } },
+          bottom: { style: "medium", color: { argb: "FF59283A" } },
+          left: { style: "thin", color: { argb: "FFE8DDD8" } },
+          right: { style: "thin", color: { argb: "FFE8DDD8" } },
+        };
+      });
+
+      exportItems.forEach((b, idx) => {
+        const row = worksheet.addRow([
+          idx + 1,
+          b.invoiceNumber || "—",
+          b.bookingNumber || "—",
+          b.guestName || "—",
+          b.guestMobile || "—",
+          b.roomNumber ? `Room ${b.roomNumber}` : "—",
+          b.roomType || "Standard Room",
+          b.checkInDate ? new Date(b.checkInDate).toLocaleDateString("en-IN") : "—",
+          b.numberOfNights || 1,
+          Number(b.roomRatePerNight || 0),
+          Number(b.roomCharges || 0),
+          Number(b.additionalCharges || 0),
+          Number(b.subtotal || 0),
+          Number(b.discountAmount || 0),
+          Number(b.taxAmount || 0),
+          Number(b.finalBill || 0),
+          Number(b.totalPaid || 0),
+          Number(b.balanceAmount || 0),
+          b.invoiceStatus || "PENDING",
+          b.isDeleted ? "DELETED / ARCHIVED" : "ACTIVE RECORD",
+          b.invoiceDate || b.createdAt ? new Date(b.invoiceDate || b.createdAt).toLocaleDateString("en-IN") : "—",
+          b.deletedAt ? new Date(b.deletedAt).toLocaleDateString("en-IN") : "—",
+        ]);
+        row.height = 22;
+
+        const isEven = idx % 2 === 0;
+        const isDeletedRow = b.isDeleted;
+
+        row.eachCell((cell, colNum) => {
+          cell.font = { name: "Arial", size: 9 };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE8DDD8" } },
+            bottom: { style: "thin", color: { argb: "FFE8DDD8" } },
+            left: { style: "thin", color: { argb: "FFE8DDD8" } },
+            right: { style: "thin", color: { argb: "FFE8DDD8" } },
+          };
+
+          if (isDeletedRow) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8E8E5" } };
+          } else if (!isEven) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDFBF9" } };
+          }
+
+          if (
+            colNum === 1 ||
+            colNum === 2 ||
+            colNum === 3 ||
+            colNum === 5 ||
+            colNum === 6 ||
+            colNum === 8 ||
+            colNum === 9 ||
+            colNum === 19 ||
+            colNum === 20 ||
+            colNum === 21 ||
+            colNum === 22
+          ) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else if (
+            colNum === 10 ||
+            colNum === 11 ||
+            colNum === 12 ||
+            colNum === 13 ||
+            colNum === 14 ||
+            colNum === 15 ||
+            colNum === 16 ||
+            colNum === 17 ||
+            colNum === 18
+          ) {
+            cell.alignment = { vertical: "middle", horizontal: "right" };
+            cell.numFmt = "₹#,##0.00";
+          } else {
+            cell.alignment = { vertical: "middle", horizontal: "left" };
+          }
+        });
+      });
+
+      worksheet.columns = [
+        { width: 7 },
+        { width: 18 },
+        { width: 16 },
+        { width: 22 },
+        { width: 16 },
+        { width: 14 },
+        { width: 18 },
+        { width: 14 },
+        { width: 9 },
+        { width: 14 },
+        { width: 16 },
+        { width: 18 },
+        { width: 16 },
+        { width: 14 },
+        { width: 14 },
+        { width: 16 },
+        { width: 18 },
+        { width: 16 },
+        { width: 16 },
+        { width: 20 },
+        { width: 14 },
+        { width: 16 },
+      ];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Hotel_Radha_Palace_Billing_${scopeTitle}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`Export completed successfully (${exportItems.length} billing records)`);
+    } catch (err: any) {
+      console.error("Export error:", err);
+      toast.error(err.message || "Failed to generate billing Excel report");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const filteredHistoryItems = (historyData?.items || []).filter((item: any) => {
+    if (historyFilter === "ACTIVE" && item.isDeleted) return false;
+    if (historyFilter === "DELETED" && !item.isDeleted) return false;
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase();
+    return (
+      item.invoiceNumber?.toLowerCase().includes(q) ||
+      item.bookingNumber?.toLowerCase().includes(q) ||
+      item.guestName?.toLowerCase().includes(q) ||
+      item.guestMobile?.includes(q) ||
+      item.roomNumber?.toLowerCase().includes(q)
+    );
+  });
 
   // Fetch all live data
   const fetchData = async () => {
@@ -326,6 +724,27 @@ export default function AutomaticBillingPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenHistoryModal}
+            className="h-9 px-3.5 text-xs font-semibold border-[#E8DDD8] text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1.5 shadow-xs transition-all"
+          >
+            <History className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>Billing History</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleExportExcel("ALL")}
+            disabled={isExporting}
+            className="h-9 px-3.5 text-xs font-semibold border-[#C4A06A]/60 text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1.5 shadow-xs transition-all"
+          >
+            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>{isExporting ? "Exporting..." : "Export"}</span>
+          </Button>
+
           <Button
             variant="outline"
             onClick={fetchData}
@@ -602,6 +1021,23 @@ export default function AutomaticBillingPage() {
                         >
                           <Eye className="w-3 h-3 mr-1" />
                           View Folio
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleConfirmDelete({
+                            id: folio.bookingId,
+                            invoiceNumber: `FOLIO-${folio.bookingNumber}`,
+                            guestName: folio.guestName,
+                            roomNumber: folio.roomNumber,
+                            amount: folio.finalBill,
+                            type: "FOLIO",
+                          })}
+                          className="h-8 px-2 text-[#B54C44] hover:bg-[#F8E8E5] hover:text-[#963730]"
+                          title="Delete / Cancel Stay Folio"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </div>
                     </div>
@@ -894,6 +1330,7 @@ export default function AutomaticBillingPage() {
                       <th className="px-4 py-3">Total Paid</th>
                       <th className="px-4 py-3">Balance Due</th>
                       <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E8DDD8]">
@@ -944,6 +1381,36 @@ export default function AutomaticBillingPage() {
                           >
                             {inv.invoiceStatus}
                           </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-right space-x-1 whitespace-nowrap">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenDossier(inv.bookingId)}
+                            className="h-7 text-xs border-[#E8DDD8] text-[#82747A] hover:text-[#59283A]"
+                            title="View Folio Dossier"
+                          >
+                            <Eye className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
+                            Folio
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              handleConfirmDelete({
+                                id: inv.id,
+                                invoiceNumber: inv.invoiceNumber,
+                                guestName: inv.booking?.primaryGuest?.fullName || "Guest",
+                                roomNumber: inv.booking?.room?.roomNumber || "N/A",
+                                amount: Number(inv.totalAmount),
+                                type: "INVOICE",
+                              })
+                            }
+                            className="h-7 px-2 text-[#B54C44] hover:bg-[#F8E8E5] hover:text-[#963730]"
+                            title="Delete Invoice"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -1676,6 +2143,346 @@ export default function AutomaticBillingPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* MODAL 4: DELETE CONFIRMATION MODAL (AUDIT ARCHIVED)                       */}
+      {/* ========================================================================= */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="text-center sm:text-center pb-2">
+            <div className="w-12 h-12 rounded-full bg-[#F8E8E5] border border-[#F2D1CB] text-[#B54C44] flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <DialogTitle className="text-lg font-serif font-bold text-[#59283A]">
+              Delete Billing Record from Register?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#82747A] mt-1">
+              Are you sure you want to delete{" "}
+              <strong className="text-[#59283A] font-semibold">
+                {itemToDelete?.invoiceNumber || "this billing record"}
+              </strong>
+              {itemToDelete?.guestName && ` for ${itemToDelete.guestName}`}
+              {itemToDelete?.amount ? ` (₹${itemToDelete.amount.toLocaleString("en-IN")})` : ""}?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-3.5 bg-[#F5F0EA]/70 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2.5 my-1">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#2E5E44]">Permanent History Preserved:</strong> This billing record&apos;s complete invoice number, room charges, additional itemized services, payments, and guest dossier will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#963730]">Active Database Removal:</strong> The record will be safely removed from your active invoices and folio registers.
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-row items-center justify-end gap-2 pt-4 border-t border-[#E8DDD8]/60 mt-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => {
+                setDeleteModalOpen(false);
+                setItemToDelete(null);
+              }}
+              className="text-xs h-9 px-4 font-medium border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleExecuteDelete}
+              className="text-xs h-9 px-4 font-semibold bg-[#B54C44] hover:bg-[#923832] text-white flex items-center justify-center gap-1.5 min-w-[130px] rounded-lg transition-colors"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white shrink-0" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Yes, Delete Record</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* MODAL 5: FULL MONTH BILLING HISTORY & ARCHIVE MODAL                       */}
+      {/* ========================================================================= */}
+      <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace Archive
+                  </span>
+                  <span className="text-xs text-[#82747A]">• Full Month Billing Activity &amp; Invoices</span>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Billing History &amp; Monthly Records</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Review complete month guest bills, itemized folios, settlements, and deleted invoices.
+                </DialogDescription>
+              </div>
+
+              {/* Month Selector Controls */}
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
+                  {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Next Month"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Summary Strip */}
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#8E7079]">Total Billing Records</div>
+                  <div className="text-lg font-serif font-bold text-[#59283A]">
+                    {historyData?.totalCount || 0}
+                  </div>
+                </div>
+                <Receipt className="w-5 h-5 text-[#C4A06A]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#32765B]">Active / Settled</div>
+                  <div className="text-lg font-serif font-bold text-[#32765B]">
+                    {historyData?.activeCount || 0}
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-[#32765B]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#B54C44]">Deleted / Cancelled</div>
+                  <div className="text-lg font-serif font-bold text-[#B54C44]">
+                    {historyData?.deletedCount || 0}
+                  </div>
+                </div>
+                <Archive className="w-5 h-5 text-[#B54C44]" />
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Filter Toolbar inside History */}
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search history by invoice #, booking #, guest, room..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="pl-8 h-8 text-xs border-[#E8DDD8]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant={historyFilter === "ALL" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ALL")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ALL" ? "bg-[#59283A] text-white" : "border-[#E8DDD8] text-[#59283A]"}`}
+              >
+                All ({historyData?.totalCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "ACTIVE" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ACTIVE")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ACTIVE" ? "bg-[#32765B] text-white" : "border-[#E8DDD8] text-[#32765B]"}`}
+              >
+                Active ({historyData?.activeCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "DELETED" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("DELETED")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "DELETED" ? "bg-[#B54C44] text-white" : "border-[#E8DDD8] text-[#B54C44]"}`}
+              >
+                Deleted ({historyData?.deletedCount || 0})
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleExportExcel("MONTH")}
+                disabled={isExporting}
+                className="h-7 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] ml-1 flex items-center gap-1"
+                title="Download this month's complete billing records"
+              >
+                <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Export Month</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* History Records Table */}
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+            {historyLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center">
+                <LoadingSpinner size="md" text="Loading billing history records..." />
+              </div>
+            ) : filteredHistoryItems.length === 0 ? (
+              <div className="text-center py-12 text-[#82747A] text-xs">
+                No billing or deletion activity found for {historyData?.monthName || "this month"}.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredHistoryItems.map((item: any, idx: number) => (
+                  <div
+                    key={item.id || idx}
+                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                      item.isDeleted
+                        ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
+                        : "border-[#E8DDD8] hover:border-[#C4A06A]"
+                    }`}
+                  >
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                          item.isDeleted
+                            ? "bg-[#F8E8E5] text-[#B54C44]"
+                            : "bg-[#E7F1E9] text-[#32765B]"
+                        }`}
+                      >
+                        {item.isDeleted ? <Trash2 className="w-4 h-4" /> : <Receipt className="w-4 h-4" />}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sm text-[#59283A] font-mono">{item.invoiceNumber || item.bookingNumber}</span>
+                          <span className="font-semibold text-xs text-[#59283A]">
+                            {item.guestName || "Guest"}
+                          </span>
+                          {item.guestMobile && (
+                            <span className="text-[11px] text-[#8E7079] font-mono">
+                              {item.guestMobile}
+                            </span>
+                          )}
+                          <span className="text-[11px] bg-[#F5F0EA] text-[#59283A] px-2 py-0.5 rounded font-medium">
+                            Room {item.roomNumber || "N/A"} ({item.roomType || "Standard"})
+                          </span>
+                          {item.isDeleted ? (
+                            <Badge className="text-[9px] bg-[#F8E8E5] text-[#B54C44] border-[#B54C44]/30">
+                              Deleted / Archived
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="outline"
+                              className={`text-[9px] font-semibold ${
+                                item.invoiceStatus === "PAID" || item.invoiceStatus === "SETTLED"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : item.invoiceStatus === "PARTIALLY_PAID"
+                                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                                  : "bg-rose-50 text-rose-700 border-rose-200"
+                              }`}
+                            >
+                              {item.invoiceStatus || "ACTIVE"}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-3 text-[11px] text-[#82747A] mt-1 flex-wrap">
+                          <span>
+                            Room Chg: <strong className="font-mono">₹{Number(item.roomCharges || 0).toLocaleString("en-IN")}</strong>
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Extra: <strong className="font-mono">₹{Number(item.additionalCharges || 0).toLocaleString("en-IN")}</strong>
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Total: <strong className="font-mono text-[#59283A]">₹{Number(item.finalBill || item.totalAmount || 0).toLocaleString("en-IN")}</strong>
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Paid: <strong className="font-mono text-[#32765B]">₹{Number(item.totalPaid || 0).toLocaleString("en-IN")}</strong>
+                          </span>
+                          <span>•</span>
+                          {item.isDeleted ? (
+                            <span className="text-[#B54C44] font-medium">
+                              Archived: {item.deletedAt ? new Date(item.deletedAt).toLocaleDateString("en-IN") : "Recorded"}
+                            </span>
+                          ) : (
+                            <span>
+                              Created: {new Date(item.createdAt || item.invoiceDate).toLocaleDateString("en-IN")}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-center">
+                      {item.bookingId && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleOpenDossier(item.bookingId)}
+                          className="h-7 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+                        >
+                          <Eye className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
+                          <span>Dossier</span>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="p-3 border-t border-[#E8DDD8] bg-white flex items-center justify-between flex-shrink-0">
+            <span className="text-[11px] text-[#82747A]">
+              Showing {filteredHistoryItems.length} of {historyData?.totalCount || 0} billing records for {historyData?.monthName || "selected month"}.
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setHistoryModalOpen(false)}
+              className="text-xs border-[#E8DDD8] text-[#59283A]"
+            >
+              Close Archive
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

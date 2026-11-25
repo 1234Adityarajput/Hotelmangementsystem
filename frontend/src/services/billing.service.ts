@@ -69,4 +69,22 @@ export const billingService = {
     const res = await apiClient.patch<ApiResponse<Invoice>>(`/invoices/${id}/cancel`, { reason });
     return res.data.data;
   },
+
+  async remove(id: string): Promise<{ success: boolean; message: string; invoiceNumber?: string; itemName?: string }> {
+    const res = await apiClient.delete<ApiResponse<any>>(`/invoices/${id}`);
+    return res.data.data;
+  },
+
+  async getHistory(params?: { month?: number; year?: number }): Promise<{
+    month: number;
+    year: number;
+    monthName: string;
+    totalCount: number;
+    activeCount: number;
+    deletedCount: number;
+    items: any[];
+  }> {
+    const res = await apiClient.get<ApiResponse<any>>("/invoices/history", { params });
+    return res.data.data;
+  },
 };

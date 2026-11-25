@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { BillingService } from './billing.service';
 import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
@@ -10,6 +10,12 @@ import { QuickPostChargeDto } from './dto/quick-post-charge.dto';
 @Controller('invoices')
 export class InvoicesController {
   constructor(private readonly billingService: BillingService) {}
+
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly billing and invoice history including active and deleted records' })
+  async getHistory(@Query('month') month?: string, @Query('year') year?: string) {
+    return this.billingService.getHistory(month, year);
+  }
 
   @Get('active-folios')
   @ApiOperation({ summary: 'List all active guest folios with live automatic billing calculations' })
@@ -60,5 +66,11 @@ export class InvoicesController {
   @ApiOperation({ summary: 'Cancel an unpaid or draft invoice' })
   async cancelInvoice(@Param('id') id: string, @Body('reason') reason?: string) {
     return this.billingService.cancelInvoice(id, reason);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete invoice or folio charge with permanent audit preservation' })
+  async remove(@Param('id') id: string) {
+    return this.billingService.remove(id);
   }
 }
