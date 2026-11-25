@@ -77,6 +77,35 @@ export interface BulkMarkAttendancePayload {
   notes?: string;
 }
 
+export interface AttendanceHistoryItem {
+  id: string;
+  staffId: string;
+  employeeCode: string;
+  staffName: string;
+  department: string;
+  designation: string;
+  attendanceDate: string;
+  attendanceStatus: 'PRESENT' | 'ABSENT' | 'HALF_DAY' | 'LEAVE' | 'WEEKLY_OFF';
+  checkInTime?: string;
+  checkOutTime?: string;
+  workingHours: number;
+  overtimeHours: number;
+  notes?: string;
+  createdAt: string;
+  deletedAt?: string;
+  isDeleted: boolean;
+}
+
+export interface MonthlyAttendanceHistoryResponse {
+  month: number;
+  year: number;
+  monthName: string;
+  totalCount: number;
+  activeCount: number;
+  deletedCount: number;
+  items: AttendanceHistoryItem[];
+}
+
 export const attendanceService = {
   async getDailyRegister(date?: string, department?: string): Promise<DailyRegisterResponse> {
     const res = await apiClient.get<ApiResponse<DailyRegisterResponse>>("/attendance/daily", {
@@ -136,6 +165,16 @@ export const attendanceService = {
 
   async update(id: string, data: Partial<Attendance>): Promise<Attendance> {
     const res = await apiClient.patch<ApiResponse<Attendance>>(`/attendance/${id}`, data);
+    return res.data.data;
+  },
+
+  async delete(id: string): Promise<{ success: boolean; message: string }> {
+    const res = await apiClient.delete<ApiResponse<{ success: boolean; message: string }>>(`/attendance/${id}`);
+    return res.data.data;
+  },
+
+  async getHistory(params?: { month?: number; year?: number }): Promise<MonthlyAttendanceHistoryResponse> {
+    const res = await apiClient.get<ApiResponse<MonthlyAttendanceHistoryResponse>>("/attendance/history", { params });
     return res.data.data;
   },
 };

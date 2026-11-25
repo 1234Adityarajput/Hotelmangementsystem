@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   Query,
@@ -57,6 +58,15 @@ export class AttendanceController {
     );
   }
 
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly attendance history including deleted audit logs' })
+  async getHistory(
+    @Query('month') month?: string,
+    @Query('year') year?: string,
+  ) {
+    return this.attendanceService.getHistory(month, year);
+  }
+
   @Get('staff/:staffId')
   @ApiOperation({ summary: 'Get attendance history for a single employee' })
   async getStaffHistory(
@@ -84,5 +94,11 @@ export class AttendanceController {
   @ApiOperation({ summary: 'Update/correct an attendance record' })
   async update(@Param('id') id: string, @Body() dto: UpdateAttendanceDto) {
     return this.attendanceService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete an attendance record and archive to audit log' })
+  async remove(@Param('id') id: string) {
+    return this.attendanceService.delete(id);
   }
 }

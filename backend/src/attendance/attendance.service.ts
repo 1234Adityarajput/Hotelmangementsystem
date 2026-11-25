@@ -481,4 +481,140 @@ export class AttendanceService {
       staffRows,
     };
   }
+
+  async delete(id: string) {
+    const existing = await this.prisma.attendance.findUnique({
+      where: { id },
+      include: {
+        staff: true,
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Attendance record with ID ${id} not found`);
+    }
+
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Snapshot full attendance record into AuditLog for permanent history preservation
+      await tx.auditLog.create({
+        data: {
+          entityType: 'ATTENDANCE',
+          entityId: id,
+          action: 'DELETE',
+          previousValues: {
+            ...existing,
+            staffName: existing.staff.fullName,
+            employeeCode: existing.staff.employeeCode,
+            department: existing.staff.department,
+            designation: existing.staff.designation,
+            deletedAt: new Date().toISOString(),
+          } as any,
+          description: `Deleted attendance record for ${existing.staff.fullName} (${existing.staff.employeeCode}) on ${existing.attendanceDate.toISOString().split('T')[0]}. Preserved in audit history.`,
+        },
+      });
+
+      // 2. Delete attendance record from active database
+      await tx.attendance.delete({ where: { id } });
+
+      return {
+        success: true,
+        message: `Attendance record for ${existing.staff.fullName} on ${existing.attendanceDate.toISOString().split('T')[0]} deleted successfully and archived in Monthly History.`,
+        attendanceId: id,
+        staffName: existing.staff.fullName,
+      };
+    });
+  }
+
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
+    const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
+
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch active attendance records for this month
+    const activeRecords = await this.prisma.attendance.findMany({
+      where: {
+        attendanceDate: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      include: {
+        staff: true,
+      },
+      orderBy: { attendanceDate: 'desc' },
+    });
+
+    const enrichedActive = activeRecords.map((a) => ({
+      id: a.id,
+      staffId: a.staffId,
+      employeeCode: a.staff.employeeCode,
+      staffName: a.staff.fullName,
+      department: a.staff.department,
+      designation: a.staff.designation,
+      attendanceDate: a.attendanceDate.toISOString().split('T')[0],
+      attendanceStatus: a.attendanceStatus,
+      checkInTime: a.checkInTime,
+      checkOutTime: a.checkOutTime,
+      workingHours: Number(a.workingHours || 0),
+      overtimeHours: Number(a.overtimeHours || 0),
+      notes: a.notes,
+      createdAt: a.createdAt,
+      isDeleted: false,
+    }));
+
+    // 2. Fetch deleted attendance records from AuditLog for this month
+    const deletedLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'ATTENDANCE',
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedItems = deletedLogs.map((log) => {
+      const prev: any = log.previousValues || {};
+      const attDate = prev.attendanceDate ? new Date(prev.attendanceDate).toISOString().split('T')[0] : log.changedAt.toISOString().split('T')[0];
+      return {
+        id: log.entityId,
+        staffId: prev.staffId,
+        employeeCode: prev.employeeCode || 'EMP-ARCHIVED',
+        staffName: prev.staffName || 'Archived Employee',
+        department: prev.department || 'General',
+        designation: prev.designation || 'Staff',
+        attendanceDate: attDate,
+        attendanceStatus: prev.attendanceStatus || 'PRESENT',
+        checkInTime: prev.checkInTime,
+        checkOutTime: prev.checkOutTime,
+        workingHours: Number(prev.workingHours || 0),
+        overtimeHours: Number(prev.overtimeHours || 0),
+        notes: prev.notes,
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+        isDeleted: true,
+      };
+    });
+
+    const allHistory = [...enrichedActive, ...deletedItems].sort(
+      (a, b) =>
+        new Date(b.attendanceDate || b.createdAt).getTime() -
+        new Date(a.attendanceDate || a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedItems.length,
+      items: allHistory,
+    };
+  }
 }

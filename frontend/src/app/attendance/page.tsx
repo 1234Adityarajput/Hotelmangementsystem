@@ -31,12 +31,21 @@ import {
   Coffee,
   HelpCircle,
   ShieldAlert,
+  Download,
+  History,
+  Trash2,
+  Archive,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
+import ExcelJS from "exceljs";
 import {
   attendanceService,
   DailyRegisterResponse,
   MonthlyMatrixResponse,
   MonthlyStaffRow,
+  AttendanceHistoryItem,
+  MonthlyAttendanceHistoryResponse,
 } from "@/services/attendance.service";
 import { staffService } from "@/services/staff.service";
 import { Attendance, Staff } from "@/types";
@@ -173,6 +182,25 @@ export default function AttendancePage() {
     checkOutTime: "06:00 PM",
     notes: "Bulk marked by Administrator",
   });
+
+  // Delete Attendance State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState<{
+    staff: Staff;
+    attendance: Attendance;
+    date: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Monthly Attendance History & Archive Modal State
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyMonth, setHistoryMonth] = useState(new Date().getMonth() + 1);
+  const [historyYear, setHistoryYear] = useState(new Date().getFullYear());
+  const [historyData, setHistoryData] = useState<MonthlyAttendanceHistoryResponse | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACTIVE" | "DELETED">("ALL");
+  const [historySearch, setHistorySearch] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   // Load Active Staff list once for selectors
   useEffect(() => {
@@ -358,6 +386,267 @@ export default function AttendancePage() {
     }
   };
 
+  // Delete Handlers
+  const handleOpenDelete = (staff: Staff, att: Attendance, date: string) => {
+    setRecordToDelete({ staff, attendance: att, date });
+    setDeleteModalOpen(true);
+  };
+
+  const handleExecuteDelete = async () => {
+    if (!recordToDelete) return;
+    try {
+      setIsDeleting(true);
+      const res = await attendanceService.delete(recordToDelete.attendance.id);
+      toast.success(res.message || `Attendance for ${recordToDelete.staff.fullName} deleted and archived`);
+      setDeleteModalOpen(false);
+      setRecordToDelete(null);
+      if (activeTab === "daily") fetchDailyRegister();
+      if (activeTab === "monthly") fetchMonthlyMatrix();
+      if (activeTab === "history") fetchStaffHistory();
+      if (historyModalOpen) fetchHistory(historyMonth, historyYear);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to delete attendance record");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // History & Archive Handlers
+  const fetchHistory = async (m?: number, y?: number) => {
+    try {
+      setHistoryLoading(true);
+      const res = await attendanceService.getHistory({
+        month: m || historyMonth,
+        year: y || historyYear,
+      });
+      setHistoryData(res);
+    } catch (err: any) {
+      toast.error("Failed to load staff attendance history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleOpenHistoryModal = () => {
+    setHistoryModalOpen(true);
+    fetchHistory(historyMonth, historyYear);
+  };
+
+  const handlePrevMonth = () => {
+    let newM = historyMonth - 1;
+    let newY = historyYear;
+    if (newM < 1) {
+      newM = 12;
+      newY -= 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleNextMonth = () => {
+    let newM = historyMonth + 1;
+    let newY = historyYear;
+    if (newM > 12) {
+      newM = 1;
+      newY += 1;
+    }
+    setHistoryMonth(newM);
+    setHistoryYear(newY);
+    fetchHistory(newM, newY);
+  };
+
+  const handleExportExcel = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating Excel report for Staff Attendance...");
+
+      let exportItems: AttendanceHistoryItem[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await attendanceService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTH_NAMES[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const histRes = await attendanceService.getHistory({
+          month: new Date(selectedDate).getMonth() + 1,
+          year: new Date(selectedDate).getFullYear(),
+        });
+        exportItems = histRes.items || [];
+        scopeTitle = `${MONTH_NAMES[new Date(selectedDate).getMonth()]}_${new Date(selectedDate).getFullYear()}`;
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No attendance records found to export for selected scope");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "Hotel Radha Palace";
+      workbook.created = new Date();
+
+      const worksheet = workbook.addWorksheet("Attendance Records");
+
+      // Title Banner
+      worksheet.mergeCells("A1:N1");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "HOTEL RADHA PALACE — STAFF ATTENDANCE REGISTER";
+      titleCell.font = { name: "Georgia", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF59283A" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(1).height = 32;
+
+      worksheet.mergeCells("A2:N2");
+      const subCell = worksheet.getCell("A2");
+      subCell.value = `Export Scope: ${scopeTitle} | Total Records: ${exportItems.length} | Generated: ${new Date().toLocaleString("en-IN")}`;
+      subCell.font = { name: "Arial", size: 10, italic: true, color: { argb: "FF59283A" } };
+      subCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF5F0EA" } };
+      subCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(2).height = 20;
+
+      // Headers
+      const headers = [
+        "S.No",
+        "Employee Code",
+        "Staff Name",
+        "Department",
+        "Designation",
+        "Attendance Date",
+        "Status",
+        "Check-In",
+        "Check-Out",
+        "Working Hours (h)",
+        "Overtime (h)",
+        "Notes",
+        "Lifecycle",
+        "Archived Date",
+      ];
+
+      const headerRow = worksheet.addRow(headers);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7A4652" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE8DDD8" } },
+          bottom: { style: "medium", color: { argb: "FF59283A" } },
+          left: { style: "thin", color: { argb: "FFE8DDD8" } },
+          right: { style: "thin", color: { argb: "FFE8DDD8" } },
+        };
+      });
+
+      exportItems.forEach((att: AttendanceHistoryItem, idx: number) => {
+        const dateStr = att.attendanceDate ? new Date(att.attendanceDate).toLocaleDateString("en-IN") : "—";
+        const row = worksheet.addRow([
+          idx + 1,
+          att.employeeCode || "—",
+          att.staffName || "—",
+          att.department || "—",
+          att.designation || "—",
+          dateStr,
+          att.attendanceStatus || "PRESENT",
+          att.checkInTime || "—",
+          att.checkOutTime || "—",
+          Number(att.workingHours || 0),
+          Number(att.overtimeHours || 0),
+          att.notes || "—",
+          att.isDeleted ? "DELETED / ARCHIVED" : "ACTIVE RECORD",
+          att.deletedAt ? new Date(att.deletedAt).toLocaleDateString("en-IN") : "—",
+        ]);
+        row.height = 22;
+
+        const isEven = idx % 2 === 0;
+        const isDeletedRow = att.isDeleted;
+
+        row.eachCell((cell, colNum) => {
+          cell.font = { name: "Arial", size: 9 };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE8DDD8" } },
+            bottom: { style: "thin", color: { argb: "FFE8DDD8" } },
+            left: { style: "thin", color: { argb: "FFE8DDD8" } },
+            right: { style: "thin", color: { argb: "FFE8DDD8" } },
+          };
+
+          if (isDeletedRow) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8E8E5" } };
+          } else if (!isEven) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDFBF9" } };
+          }
+
+          if (
+            colNum === 1 ||
+            colNum === 2 ||
+            colNum === 6 ||
+            colNum === 7 ||
+            colNum === 8 ||
+            colNum === 9 ||
+            colNum === 13 ||
+            colNum === 14
+          ) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else if (colNum === 10 || colNum === 11) {
+            cell.alignment = { vertical: "middle", horizontal: "right" };
+          } else {
+            cell.alignment = { vertical: "middle", horizontal: "left" };
+          }
+        });
+      });
+
+      worksheet.columns = [
+        { width: 8 },  // S.No
+        { width: 16 }, // Employee Code
+        { width: 24 }, // Staff Name
+        { width: 20 }, // Department
+        { width: 24 }, // Designation
+        { width: 16 }, // Date
+        { width: 14 }, // Status
+        { width: 14 }, // Check-In
+        { width: 14 }, // Check-Out
+        { width: 18 }, // Working Hours
+        { width: 14 }, // Overtime
+        { width: 26 }, // Notes
+        { width: 20 }, // Lifecycle
+        { width: 18 }, // Archived Date
+      ];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `Hotel_Radha_Palace_Attendance_${scopeTitle.replace(/\s+/g, "_")}.xlsx`;
+      anchor.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`Attendance report exported successfully (${exportItems.length} records)`);
+    } catch (err: any) {
+      console.error("Export error:", err);
+      toast.error("Failed to generate Excel export");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const filteredHistoryItems = (historyData?.items || []).filter((item) => {
+    if (historyFilter === "ACTIVE" && item.isDeleted) return false;
+    if (historyFilter === "DELETED" && !item.isDeleted) return false;
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase();
+    return (
+      (item.staffName && item.staffName.toLowerCase().includes(q)) ||
+      (item.employeeCode && item.employeeCode.toLowerCase().includes(q)) ||
+      (item.department && item.department.toLowerCase().includes(q)) ||
+      (item.designation && item.designation.toLowerCase().includes(q)) ||
+      (item.attendanceStatus && item.attendanceStatus.toLowerCase().includes(q)) ||
+      (item.notes && item.notes.toLowerCase().includes(q)) ||
+      (item.attendanceDate && item.attendanceDate.includes(q))
+    );
+  });
+
   // Date Navigation Helpers
   const handleDateShift = (days: number) => {
     const cur = new Date(selectedDate);
@@ -424,6 +713,28 @@ export default function AttendancePage() {
           >
             <CheckCheck className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Bulk Mark Attendance</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenHistoryModal}
+            className="h-9 px-3 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5"
+          >
+            <History className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>Attendance History</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleExportExcel("ALL")}
+            disabled={isExporting}
+            className="h-9 px-3 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5"
+            title="Download complete attendance records as Excel spreadsheet"
+          >
+            <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+            <span>{isExporting ? "Exporting..." : "Export"}</span>
           </Button>
 
           <Button
@@ -678,7 +989,7 @@ export default function AttendancePage() {
                         <th className="px-4 py-3">Working Hours</th>
                         <th className="px-4 py-3">Shift Timings</th>
                         <th className="px-4 py-3">Notes</th>
-                        <th className="px-4 py-3 text-right">Edit</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#E8DDD8]">
@@ -764,16 +1075,30 @@ export default function AttendancePage() {
                               {att?.notes || "-"}
                             </td>
                             <td className="px-4 py-3 text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleOpenDetailedModal(item.staff, att, selectedDate)}
-                                className="h-7 px-2 text-[#82747A] hover:text-[#C4A06A] hover:bg-[#EFE8E0]"
-                                title="Edit Check-In, Check-Out, and Hours"
-                              >
-                                <Edit2 className="w-3.5 h-3.5 mr-1" />
-                                <span>Edit</span>
-                              </Button>
+                              <div className="flex items-center justify-end gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleOpenDetailedModal(item.staff, att, selectedDate)}
+                                  className="h-7 px-2 text-[#82747A] hover:text-[#59283A] hover:bg-[#EFE8E0]"
+                                  title="Edit Check-In, Check-Out, and Hours"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
+                                  <span>Edit</span>
+                                </Button>
+                                {att && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleOpenDelete(item.staff, att, selectedDate)}
+                                    className="h-7 px-2 text-xs text-[#B54C44] hover:bg-rose-50 hover:text-rose-700"
+                                    title="Delete attendance record and preserve snapshot in audit history"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 mr-1 text-rose-500" />
+                                    <span>Delete</span>
+                                  </Button>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
@@ -1600,6 +1925,354 @@ export default function AttendancePage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* DELETE CONFIRMATION MODAL (AUDIT ARCHIVED)                                */}
+      {/* ========================================================================= */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
+          <DialogHeader className="text-center sm:text-center pb-2">
+            <div className="w-12 h-12 rounded-full bg-[#F8E8E5] border border-[#F2D1CB] text-[#B54C44] flex items-center justify-center mx-auto mb-3">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <DialogTitle className="text-lg font-serif font-bold text-[#59283A]">
+              Delete Attendance Record?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#82747A] mt-1">
+              Are you sure you want to delete the attendance record for{" "}
+              <strong className="text-[#59283A] font-semibold">
+                {recordToDelete?.staff.fullName}
+              </strong>
+              {recordToDelete?.staff.employeeCode && ` (${recordToDelete.staff.employeeCode})`}
+              {recordToDelete?.date && ` on ${recordToDelete.date}`}?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-3.5 bg-[#F5F0EA]/70 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2.5 my-1">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#2E5E44]">Permanent History Preserved:</strong> This employee&apos;s shift timings, working hours, and attendance status snapshot will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#963730]">Active Roster Reset:</strong> The record will be removed from your daily attendance register and monthly roster, resetting the employee to UNMARKED for this date.
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-row items-center justify-end gap-2 pt-4 border-t border-[#E8DDD8]/60 mt-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => {
+                setDeleteModalOpen(false);
+                setRecordToDelete(null);
+              }}
+              className="text-xs h-9 px-4 font-medium border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleExecuteDelete}
+              className="text-xs h-9 px-4 font-semibold bg-[#B54C44] hover:bg-[#923832] text-white flex items-center justify-center gap-1.5 min-w-[130px] rounded-lg transition-colors"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white shrink-0" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Yes, Delete Attendance</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* FULL MONTH ATTENDANCE HISTORY & ARCHIVE MODAL                             */}
+      {/* ========================================================================= */}
+      <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace Archive
+                  </span>
+                  <span className="text-xs text-[#82747A]">• Full Month Workforce Attendance &amp; Audit Logs</span>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Attendance History &amp; Monthly Records</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Review complete month staff attendance shifts, overtime hours, and deleted attendance archives.
+                </DialogDescription>
+              </div>
+
+              {/* Month Selector Controls */}
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
+                  {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Next Month"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Summary Strip */}
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#8E7079]">Total Records</div>
+                  <div className="text-lg font-serif font-bold text-[#59283A]">
+                    {historyData?.totalCount || 0}
+                  </div>
+                </div>
+                <CalendarCheck className="w-5 h-5 text-[#C4A06A]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#32765B]">Active / Marked</div>
+                  <div className="text-lg font-serif font-bold text-[#32765B]">
+                    {historyData?.activeCount || 0}
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-[#32765B]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#B54C44]">Deleted / Reset</div>
+                  <div className="text-lg font-serif font-bold text-[#B54C44]">
+                    {historyData?.deletedCount || 0}
+                  </div>
+                </div>
+                <Archive className="w-5 h-5 text-[#B54C44]" />
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Filter Toolbar inside History */}
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search history by staff name, code, department, status, notes..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="pl-8 h-8 text-xs border-[#E8DDD8]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant={historyFilter === "ALL" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ALL")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ALL" ? "bg-[#59283A] text-white" : "border-[#E8DDD8] text-[#59283A]"}`}
+              >
+                All ({historyData?.totalCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "ACTIVE" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ACTIVE")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ACTIVE" ? "bg-[#32765B] text-white" : "border-[#E8DDD8] text-[#32765B]"}`}
+              >
+                Active ({historyData?.activeCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "DELETED" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("DELETED")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "DELETED" ? "bg-[#B54C44] text-white" : "border-[#E8DDD8] text-[#B54C44]"}`}
+              >
+                Deleted ({historyData?.deletedCount || 0})
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleExportExcel("MONTH")}
+                disabled={isExporting}
+                className="h-7 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] ml-1 flex items-center gap-1"
+                title="Download this month's complete attendance records"
+              >
+                <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Export Month</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* History Records Table */}
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+            {historyLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center">
+                <LoadingSpinner size="md" text="Loading attendance history records..." />
+              </div>
+            ) : filteredHistoryItems.length === 0 ? (
+              <div className="text-center py-12 text-[#82747A] text-xs">
+                No attendance records or deletion activity found for {historyData?.monthName || "this month"}.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredHistoryItems.map((item: any, idx: number) => {
+                  const cfg = STATUS_CONFIG[item.attendanceStatus] || STATUS_CONFIG.PRESENT;
+                  return (
+                    <div
+                      key={item.id || idx}
+                      className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                        item.isDeleted
+                          ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
+                          : "border-[#E8DDD8] hover:border-[#C4A06A]"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-9 h-9 rounded-lg flex items-center justify-center font-serif font-bold text-xs shrink-0 ${
+                            item.isDeleted
+                              ? "bg-[#B54C44]/10 text-[#B54C44]"
+                              : "bg-[#59283A]/10 text-[#59283A]"
+                          }`}
+                        >
+                          {item.staffName ? item.staffName.substring(0, 2).toUpperCase() : "AT"}
+                        </div>
+
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-sm text-[#59283A]">
+                              {item.staffName}
+                            </span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#F5F0EA] text-[#C4A06A] border border-[#E8DDD8]">
+                              {item.employeeCode}
+                            </span>
+                            <Badge
+                              variant="outline"
+                              className={`text-[9px] font-semibold px-2 py-0.5 ${cfg.bg} ${cfg.text} ${cfg.border}`}
+                            >
+                              {cfg.label}
+                            </Badge>
+                          </div>
+
+                          <div className="text-xs text-[#82747A] mt-0.5 flex items-center gap-2 flex-wrap">
+                            <span>{item.department}</span>
+                            <span>•</span>
+                            <span>{item.designation}</span>
+                            <span>•</span>
+                            <span className="font-medium text-[#59283A]">
+                              Date: {new Date(item.attendanceDate).toLocaleDateString("en-IN")}
+                            </span>
+                          </div>
+
+                          <div className="text-[11px] text-[#8E7079] mt-1 flex items-center gap-2 flex-wrap">
+                            {item.checkInTime ? (
+                              <span className="font-mono">
+                                Shift: {item.checkInTime} → {item.checkOutTime || "Pending"}
+                              </span>
+                            ) : (
+                              <span>Shift: Not recorded</span>
+                            )}
+                            <span>•</span>
+                            <span className="font-mono">
+                              Hours: <strong>{Number(item.workingHours || 0)}h</strong>
+                              {Number(item.overtimeHours) > 0 && ` (+${item.overtimeHours}h OT)`}
+                            </span>
+                            {item.notes && (
+                              <>
+                                <span>•</span>
+                                <span className="italic truncate max-w-[200px]">"{item.notes}"</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex sm:flex-col items-end justify-between sm:justify-center gap-1.5 shrink-0">
+                        {item.isDeleted ? (
+                          <div className="text-right">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#B54C44]/10 text-[#B54C44] border border-[#B54C44]/20">
+                              <Archive className="w-3 h-3" />
+                              DELETED / ARCHIVED
+                            </span>
+                            {item.deletedAt && (
+                              <div className="text-[10px] text-[#8E7079] mt-0.5">
+                                {new Date(item.deletedAt).toLocaleString("en-IN")}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#32765B]/10 text-[#32765B] border border-[#32765B]/20">
+                              <CheckCircle2 className="w-3 h-3" />
+                              ACTIVE RECORD
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                handleOpenDelete(
+                                  {
+                                    id: item.staffId,
+                                    fullName: item.staffName,
+                                    employeeCode: item.employeeCode,
+                                    department: item.department,
+                                    designation: item.designation,
+                                  } as any,
+                                  {
+                                    id: item.id,
+                                    attendanceDate: item.attendanceDate,
+                                    attendanceStatus: item.attendanceStatus,
+                                  } as any,
+                                  item.attendanceDate
+                                );
+                              }}
+                              className="h-7 px-2 text-xs text-[#B54C44] hover:bg-rose-50 hover:text-rose-700"
+                              title="Delete this attendance record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
