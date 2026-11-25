@@ -102,4 +102,24 @@ export const paymentsService = {
     const res = await apiClient.post<ApiResponse<Payment>>("/payments", data);
     return res.data.data;
   },
+
+  async remove(id: string): Promise<{ success: boolean; message: string; paymentReference?: string }> {
+    const res = await apiClient.delete<ApiResponse<{ success: boolean; message: string; paymentReference?: string }>>(
+      `/payments/${id}`
+    );
+    return res.data.data;
+  },
+
+  async getHistory(params?: { month?: number; year?: number }): Promise<{
+    month: number;
+    year: number;
+    monthName: string;
+    totalCount: number;
+    activeCount: number;
+    deletedCount: number;
+    items: any[];
+  }> {
+    const res = await apiClient.get<ApiResponse<any>>("/payments/history", { params });
+    return res.data.data;
+  },
 };

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { RecordPaymentDto } from './dto/record-payment.dto';
@@ -24,6 +24,12 @@ export class PaymentsController {
     return this.paymentsService.getPendingPayments();
   }
 
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly payments history and archived records' })
+  async getHistory(@Query('month') month?: string, @Query('year') year?: string) {
+    return this.paymentsService.getHistory(month, year);
+  }
+
   @Get()
   @ApiOperation({ summary: 'List all payments with filters for method, status, booking or invoice' })
   async findAll(@Query() query: QueryPaymentDto) {
@@ -39,6 +45,9 @@ export class PaymentsController {
     if (id === 'pending') {
       return this.paymentsService.getPendingPayments();
     }
+    if (id === 'history') {
+      return this.paymentsService.getHistory();
+    }
     return this.paymentsService.findOne(id);
   }
 
@@ -52,5 +61,11 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Record a new payment (Advance, Partial, Final) and update invoice balance' })
   async recordPayment(@Body() dto: RecordPaymentDto) {
     return this.paymentsService.recordPayment(dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Safely delete payment, adjust balances, and archive in audit log' })
+  async remove(@Param('id') id: string) {
+    return this.paymentsService.remove(id);
   }
 }

@@ -437,4 +437,192 @@ export class PaymentsService {
 
     return payment;
   }
+
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
+    const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
+
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch active payments created/recorded in this month
+    const activePayments = await this.prisma.payment.findMany({
+      where: {
+        paymentDate: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      include: {
+        booking: {
+          include: {
+            primaryGuest: true,
+            room: {
+              include: {
+                roomType: true,
+              },
+            },
+          },
+        },
+        invoice: true,
+      },
+      orderBy: { paymentDate: 'desc' },
+    });
+
+    const enrichedActive = activePayments.map((p) => ({
+      id: p.id,
+      paymentReference: p.paymentReference,
+      transactionReference: p.transactionReference,
+      bookingId: p.bookingId,
+      bookingNumber: p.booking?.bookingNumber,
+      invoiceId: p.invoiceId,
+      invoiceNumber: p.invoice?.invoiceNumber,
+      guestName: p.booking?.primaryGuest?.fullName || 'Guest',
+      guestMobile: p.booking?.primaryGuest?.mobileNumber || '',
+      roomNumber: p.booking?.room?.roomNumber || 'N/A',
+      roomType: p.booking?.room?.roomType?.name || 'Standard',
+      paymentType: p.paymentType,
+      paymentMethod: p.paymentMethod,
+      amount: Number(p.amount),
+      paymentStatus: p.paymentStatus,
+      paymentDate: p.paymentDate,
+      createdAt: p.createdAt,
+      isDeleted: false,
+    }));
+
+    // 2. Fetch deleted payments from AuditLog
+    const deletedLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'PAYMENT',
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedItems = deletedLogs.map((log) => {
+      const prev: any = log.previousValues || {};
+      return {
+        id: log.entityId,
+        paymentReference: prev.paymentReference || 'PAY-ARCHIVED',
+        transactionReference: prev.transactionReference,
+        bookingId: prev.bookingId,
+        bookingNumber: prev.bookingNumber || prev.booking?.bookingNumber,
+        invoiceId: prev.invoiceId,
+        invoiceNumber: prev.invoiceNumber || prev.invoice?.invoiceNumber,
+        guestName: prev.guestName || prev.booking?.primaryGuest?.fullName || 'Archived Guest',
+        guestMobile: prev.guestMobile || prev.booking?.primaryGuest?.mobileNumber || '',
+        roomNumber: prev.roomNumber || prev.booking?.room?.roomNumber || 'N/A',
+        roomType: prev.roomType || 'Standard',
+        paymentType: prev.paymentType || 'SETTLEMENT',
+        paymentMethod: prev.paymentMethod || 'OTHER',
+        amount: Number(prev.amount || 0),
+        paymentStatus: 'DELETED',
+        paymentDate: prev.paymentDate || log.changedAt,
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+        isDeleted: true,
+      };
+    });
+
+    const allHistory = [...enrichedActive, ...deletedItems].sort(
+      (a, b) => new Date(b.paymentDate || b.createdAt).getTime() - new Date(a.paymentDate || a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedItems.length,
+      items: allHistory,
+    };
+  }
+
+  async remove(id: string) {
+    const payment = await this.prisma.payment.findUnique({
+      where: { id },
+      include: {
+        booking: {
+          include: {
+            primaryGuest: true,
+            room: true,
+          },
+        },
+        invoice: true,
+      },
+    });
+
+    if (!payment) {
+      throw new NotFoundException(`Payment record with ID ${id} not found`);
+    }
+
+    const paymentAmount = Number(payment.amount);
+
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Audit log snapshot for permanent history
+      await tx.auditLog.create({
+        data: {
+          entityType: 'PAYMENT',
+          entityId: payment.id,
+          action: 'DELETE',
+          previousValues: {
+            ...payment,
+            bookingNumber: payment.booking?.bookingNumber,
+            guestName: payment.booking?.primaryGuest?.fullName,
+            guestMobile: payment.booking?.primaryGuest?.mobileNumber,
+            roomNumber: payment.booking?.room?.roomNumber,
+            invoiceNumber: payment.invoice?.invoiceNumber,
+            deletedAt: new Date().toISOString(),
+          } as any,
+          description: `Deleted ${payment.paymentType} payment of ₹${paymentAmount} (${payment.paymentReference}) for booking ${payment.booking?.bookingNumber}. Balances updated.`,
+        },
+      });
+
+      // 2. Adjust invoice balances if linked
+      if (payment.invoiceId) {
+        const inv = await tx.invoice.findUnique({ where: { id: payment.invoiceId } });
+        if (inv) {
+          const newTotalPaid = Math.max(0, Math.round((Number(inv.totalPaid) - paymentAmount) * 100) / 100);
+          const newBalance = Math.round((Number(inv.totalAmount) - newTotalPaid) * 100) / 100;
+          const newStatus = newBalance <= 0 ? 'PAID' : (newTotalPaid > 0 ? 'PARTIALLY_PAID' : 'FINALIZED');
+
+          await tx.invoice.update({
+            where: { id: inv.id },
+            data: {
+              totalPaid: newTotalPaid,
+              balanceAmount: newBalance,
+              invoiceStatus: newStatus,
+            },
+          });
+        }
+      }
+
+      // 3. Adjust booking advance if advance payment
+      if (payment.paymentType === 'ADVANCE' && payment.bookingId) {
+        const bkg = await tx.booking.findUnique({ where: { id: payment.bookingId } });
+        if (bkg) {
+          const newAdvance = Math.max(0, Math.round((Number(bkg.advanceAmount) - paymentAmount) * 100) / 100);
+          await tx.booking.update({
+            where: { id: bkg.id },
+            data: { advanceAmount: newAdvance },
+          });
+        }
+      }
+
+      // 4. Delete payment record
+      await tx.payment.delete({ where: { id } });
+
+      return {
+        success: true,
+        message: `Payment ${payment.paymentReference} (₹${paymentAmount}) deleted and archived in history. Balances restored.`,
+        paymentReference: payment.paymentReference,
+      };
+    });
+  }
 }
