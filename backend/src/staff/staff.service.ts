@@ -11,7 +11,7 @@ import { QueryStaffDto } from './dto/query-staff.dto';
 
 @Injectable()
 export class StaffService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private async generateEmployeeCode(): Promise<string> {
     const yearMonth = new Date().toISOString().slice(0, 7).replace('-', '');
