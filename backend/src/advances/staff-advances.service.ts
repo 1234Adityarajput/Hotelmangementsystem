@@ -228,4 +228,150 @@ export class StaffAdvancesService {
       statusCounts,
     };
   }
+
+  async delete(id: string) {
+    const existing = await this.prisma.staffAdvance.findUnique({
+      where: { id },
+      include: {
+        staff: true,
+        salaryRecord: true,
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException(`Advance record with ID ${id} not found`);
+    }
+
+    if (existing.salaryRecordId) {
+      const pPeriod = existing.salaryRecord
+        ? `${existing.salaryRecord.payrollMonth}/${existing.salaryRecord.payrollYear}`
+        : existing.salaryRecordId;
+      throw new BadRequestException(
+        `Cannot delete advance voucher ${existing.advanceReference}: It is linked to processed payroll record for period ${pPeriod}`,
+      );
+    }
+
+    return await this.prisma.$transaction(async (tx) => {
+      // 1. Snapshot full advance details into AuditLog for permanent history preservation
+      await tx.auditLog.create({
+        data: {
+          entityType: 'STAFF_ADVANCE',
+          entityId: id,
+          action: 'DELETE',
+          previousValues: {
+            ...existing,
+            staffName: existing.staff.fullName,
+            employeeCode: existing.staff.employeeCode,
+            department: existing.staff.department,
+            deletedAt: new Date().toISOString(),
+          } as any,
+          description: `Deleted advance voucher ${existing.advanceReference} (₹${existing.amount}) for ${existing.staff.fullName} (${existing.staff.employeeCode}). Permanent record preserved in audit history.`,
+        },
+      });
+
+      // 2. Delete advance record from active database
+      await tx.staffAdvance.delete({ where: { id } });
+
+      return {
+        success: true,
+        message: `Advance voucher ${existing.advanceReference} for ${existing.staff.fullName} permanently deleted and archived in Monthly History.`,
+        advanceReference: existing.advanceReference,
+        staffName: existing.staff.fullName,
+      };
+    });
+  }
+
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
+    const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
+
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch active advances for this month
+    const activeAdvances = await this.prisma.staffAdvance.findMany({
+      where: {
+        advanceDate: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      include: {
+        staff: true,
+      },
+      orderBy: { advanceDate: 'desc' },
+    });
+
+    const enrichedActive = activeAdvances.map((a) => ({
+      id: a.id,
+      advanceReference: a.advanceReference,
+      staffId: a.staffId,
+      staffName: a.staff.fullName,
+      employeeCode: a.staff.employeeCode,
+      department: a.staff.department,
+      amount: Number(a.amount),
+      advanceDate: a.advanceDate.toISOString().split('T')[0],
+      paymentMethod: a.paymentMethod,
+      repaymentStatus: a.repaymentStatus,
+      recoveredAmount: Number(a.recoveredAmount),
+      balanceAmount: Number(a.balanceAmount),
+      notes: a.notes,
+      createdAt: a.createdAt,
+      isDeleted: false,
+    }));
+
+    // 2. Fetch deleted advances from AuditLog for this month
+    const deletedLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'STAFF_ADVANCE',
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedItems = deletedLogs.map((log) => {
+      const prev: any = log.previousValues || {};
+      const advDate = prev.advanceDate ? new Date(prev.advanceDate).toISOString().split('T')[0] : log.changedAt.toISOString().split('T')[0];
+      return {
+        id: log.entityId,
+        advanceReference: prev.advanceReference || 'ADV-ARCHIVED',
+        staffId: prev.staffId,
+        staffName: prev.staffName || 'Archived Employee',
+        employeeCode: prev.employeeCode || 'EMP-ARCHIVED',
+        department: prev.department || 'General',
+        amount: Number(prev.amount || 0),
+        advanceDate: advDate,
+        paymentMethod: prev.paymentMethod || 'CASH',
+        repaymentStatus: prev.repaymentStatus || 'PENDING',
+        recoveredAmount: Number(prev.recoveredAmount || 0),
+        balanceAmount: Number(prev.balanceAmount || 0),
+        notes: prev.notes,
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+        isDeleted: true,
+      };
+    });
+
+    const allHistory = [...enrichedActive, ...deletedItems].sort(
+      (a, b) =>
+        new Date(b.advanceDate || b.createdAt).getTime() -
+        new Date(a.advanceDate || a.createdAt).getTime()
+    );
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedItems.length,
+      totalAmount: allHistory.reduce((sum, r) => sum + (r.amount || 0), 0),
+      items: allHistory,
+    };
+  }
 }

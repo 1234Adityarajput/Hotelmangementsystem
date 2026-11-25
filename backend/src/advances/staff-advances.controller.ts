@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   Query,
@@ -25,6 +26,15 @@ export class StaffAdvancesController {
   @ApiOperation({ summary: 'Get advances financial overview and status breakdown' })
   async getStats() {
     return this.advancesService.getStats();
+  }
+
+  @Get('history')
+  @ApiOperation({ summary: 'Get monthly staff advance history including deleted audit logs' })
+  async getHistory(
+    @Query('month') month?: string,
+    @Query('year') year?: string,
+  ) {
+    return this.advancesService.getHistory(month, year);
   }
 
   @Get()
@@ -50,5 +60,11 @@ export class StaffAdvancesController {
   @ApiOperation({ summary: 'Record a recovery or repayment against an outstanding advance' })
   async recordRepayment(@Param('id') id: string, @Body() dto: RepayAdvanceDto) {
     return this.advancesService.recordRepayment(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete staff advance voucher and archive to audit log' })
+  async remove(@Param('id') id: string) {
+    return this.advancesService.delete(id);
   }
 }

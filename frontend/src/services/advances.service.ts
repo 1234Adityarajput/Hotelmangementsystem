@@ -13,6 +13,36 @@ export interface AdvanceStats {
   };
 }
 
+export interface AdvanceHistoryItem {
+  id: string;
+  advanceReference: string;
+  staffId: string;
+  staffName: string;
+  employeeCode: string;
+  department: string;
+  amount: number;
+  advanceDate: string;
+  paymentMethod: string;
+  repaymentStatus: string;
+  recoveredAmount: number;
+  balanceAmount: number;
+  notes?: string;
+  createdAt: string;
+  deletedAt?: string;
+  isDeleted: boolean;
+}
+
+export interface MonthlyAdvanceHistoryResponse {
+  month: number;
+  year: number;
+  monthName: string;
+  totalCount: number;
+  activeCount: number;
+  deletedCount: number;
+  totalAmount: number;
+  items: AdvanceHistoryItem[];
+}
+
 export const advancesService = {
   async getStats(): Promise<AdvanceStats> {
     const res = await apiClient.get<ApiResponse<AdvanceStats>>("/advances/stats");
@@ -58,6 +88,16 @@ export const advancesService = {
     data: { amount: number; notes?: string },
   ): Promise<StaffAdvance> {
     const res = await apiClient.post<ApiResponse<StaffAdvance>>(`/advances/${id}/repay`, data);
+    return res.data.data;
+  },
+
+  async delete(id: string): Promise<{ success: boolean; message: string }> {
+    const res = await apiClient.delete<ApiResponse<{ success: boolean; message: string }>>(`/advances/${id}`);
+    return res.data.data;
+  },
+
+  async getHistory(params?: { month?: number; year?: number }): Promise<MonthlyAdvanceHistoryResponse> {
+    const res = await apiClient.get<ApiResponse<MonthlyAdvanceHistoryResponse>>("/advances/history", { params });
     return res.data.data;
   },
 };
