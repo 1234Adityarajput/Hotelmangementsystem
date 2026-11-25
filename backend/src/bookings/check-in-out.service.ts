@@ -56,7 +56,20 @@ export class CheckInCheckOutService {
     return this.prisma.booking.findMany({
       where: { bookingStatus: 'CHECKED_IN' },
       include: {
-        primaryGuest: true,
+        primaryGuest: {
+          include: {
+            documents: true,
+          },
+        },
+        bookingGuests: {
+          include: {
+            guest: {
+              include: {
+                documents: true,
+              },
+            },
+          },
+        },
         room: { include: { roomType: true } },
         bookingItems: { include: { item: true } },
         invoices: { include: { payments: true } },

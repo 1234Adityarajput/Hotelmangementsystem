@@ -28,8 +28,16 @@ import {
   FileText,
   ShieldCheck,
   Sparkles,
+  Phone,
+  Mail,
+  MapPin,
+  Search,
+  ExternalLink,
+  ChevronRight,
+  BadgeCheck,
 } from "lucide-react";
 import { dashboardService } from "@/services/dashboard.service";
+import { bookingsService } from "@/services/bookings.service";
 import {
   DashboardStats,
   DashboardAnalytics,
@@ -39,8 +47,16 @@ import {
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { useAuth } from "@/providers/auth-provider";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const DEFAULT_STATS: DashboardStats = {
   rooms: {
@@ -149,6 +165,48 @@ export default function AdminDashboardPage() {
       setRefreshing(false);
     }
   };
+
+  // In-House Guests Modal State
+  const [inHouseModalOpen, setInHouseModalOpen] = useState(false);
+  const [inHouseStays, setInHouseStays] = useState<any[]>([]);
+  const [inHouseLoading, setInHouseLoading] = useState(false);
+  const [inHouseSearch, setInHouseSearch] = useState("");
+
+  const handleOpenInHouseModal = async () => {
+    setInHouseModalOpen(true);
+    try {
+      setInHouseLoading(true);
+      const res = await bookingsService.getActiveStays();
+      setInHouseStays(res || []);
+    } catch (err: any) {
+      toast.error("Failed to load in-house guest records");
+    } finally {
+      setInHouseLoading(false);
+    }
+  };
+
+  const filteredInHouseStays = inHouseStays.filter((b: any) => {
+    if (!inHouseSearch.trim()) return true;
+    const q = inHouseSearch.toLowerCase();
+    const guest = b.primaryGuest;
+    const room = b.room;
+    const docs = (guest?.documents || []).map((d: any) => `${d.idType} ${d.documentNumber}`).join(" ").toLowerCase();
+    return (
+      (b.bookingNumber && b.bookingNumber.toLowerCase().includes(q)) ||
+      (guest?.fullName && guest.fullName.toLowerCase().includes(q)) ||
+      (guest?.guestCode && guest.guestCode.toLowerCase().includes(q)) ||
+      (guest?.mobileNumber && guest.mobileNumber.toLowerCase().includes(q)) ||
+      (guest?.alternateMobileNumber && guest.alternateMobileNumber.toLowerCase().includes(q)) ||
+      (guest?.email && guest.email.toLowerCase().includes(q)) ||
+      (guest?.address && guest.address.toLowerCase().includes(q)) ||
+      (guest?.city && guest.city.toLowerCase().includes(q)) ||
+      (guest?.state && guest.state.toLowerCase().includes(q)) ||
+      (guest?.postalCode && guest.postalCode.toLowerCase().includes(q)) ||
+      (room?.roomNumber && room.roomNumber.toLowerCase().includes(q)) ||
+      (room?.roomType?.name && room.roomType.name.toLowerCase().includes(q)) ||
+      docs.includes(q)
+    );
+  });
 
   useEffect(() => {
     fetchDashboardData();
@@ -274,22 +332,30 @@ export default function AdminDashboardPage() {
           </Card>
 
           {/* 4. Currently Staying Guests */}
-          <Card className="hover:border-[#C4A06A]/60 transition-all">
+          <Card
+            onClick={handleOpenInHouseModal}
+            className="hover:border-[#C4A06A] hover:shadow-md transition-all cursor-pointer group bg-white border-[#E8DDD8]"
+          >
             <CardHeader className="flex flex-row items-center justify-between pb-1.5 space-y-0">
-              <CardTitle className="text-xs font-bold text-[#82747A] uppercase tracking-wider font-sans">
+              <CardTitle className="text-xs font-bold text-[#82747A] group-hover:text-[#59283A] uppercase tracking-wider font-sans transition-colors">
                 4. In-House Guests
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-[#E9EFF3] text-[#627D91] border border-[#627D91]/20 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#E9EFF3] text-[#627D91] group-hover:bg-[#59283A] group-hover:text-[#C4A06A] border border-[#627D91]/20 flex items-center justify-center transition-colors">
                 <Users className="w-4 h-4" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="font-serif text-3xl font-bold text-[#59283A]">
+              <div className="font-serif text-3xl font-bold text-[#59283A] group-hover:text-[#C4A06A] transition-colors">
                 {stats?.stays?.currentlyStayingGuests || 0}
               </div>
-              <p className="text-[11px] text-[#82747A] mt-1 font-medium">
-                Currently staying guests
-              </p>
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-[11px] text-[#82747A] font-medium">
+                  Currently staying guests
+                </p>
+                <span className="text-[10px] text-[#C4A06A] font-bold group-hover:underline flex items-center gap-0.5">
+                  View Dossiers →
+                </span>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -1040,6 +1106,345 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ========================================================================= */}
+      {/* IN-HOUSE GUESTS REGISTRATION DOSSIER MODAL                                */}
+      {/* ========================================================================= */}
+      <Dialog open={inHouseModalOpen} onOpenChange={setInHouseModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/50 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace • Live Stay Register
+                  </span>
+                  <Badge variant="outline" className="text-[10px] border-emerald-300 text-emerald-800 bg-emerald-50">
+                    Active In-House Folios
+                  </Badge>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1.5 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Currently Staying Guests (Checked-In Roster)</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Complete registration records, room allocation, stay duration, identity proof &amp; contact dossier of all guests currently staying in the hotel.
+                </DialogDescription>
+              </div>
+
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <Badge className="bg-[#59283A] text-white px-3 py-1 text-xs font-semibold shadow-xs">
+                  {inHouseStays.length} Stays • {inHouseStays.reduce((sum, b) => sum + (b.numberOfGuests || 1), 0)} Total Pax
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleOpenInHouseModal}
+                  disabled={inHouseLoading}
+                  className="h-8 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5"
+                  title="Refresh live in-house guest data"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-[#C4A06A] ${inHouseLoading ? "animate-spin" : ""}`} />
+                  <span>Refresh</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Search inside Modal */}
+            <div className="relative mt-3.5">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search in-house guests by name, mobile, email, room #, booking #, ID number, city..."
+                value={inHouseSearch}
+                onChange={(e) => setInHouseSearch(e.target.value)}
+                className="pl-9 h-9 text-xs border-[#E8DDD8] bg-white rounded-lg shadow-2xs"
+              />
+            </div>
+          </DialogHeader>
+
+          {/* Modal Body: Guest Cards */}
+          <div className="flex-1 overflow-y-auto p-5 bg-[#F5F0EA]/20 space-y-4">
+            {inHouseLoading ? (
+              <div className="py-20 flex flex-col items-center justify-center">
+                <LoadingSpinner size="md" text="Loading active in-house guest records..." />
+              </div>
+            ) : filteredInHouseStays.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-2xl border border-[#E8DDD8] p-8 space-y-3">
+                <div className="w-14 h-14 rounded-full bg-[#F5F0EA] flex items-center justify-center mx-auto text-[#C4A06A]">
+                  <Users className="w-7 h-7" />
+                </div>
+                <h4 className="text-base font-serif font-bold text-[#59283A]">
+                  {inHouseSearch ? "No Guests Match Your Search" : "No Guests Currently Checked In"}
+                </h4>
+                <p className="text-xs text-[#82747A] max-w-md mx-auto">
+                  {inHouseSearch
+                    ? `No currently staying guests found matching "${inHouseSearch}". Try searching by a different name, room number or mobile.`
+                    : "There are currently 0 active in-house stays recorded in the hotel. Check in guests from the Front Desk Check-In & Check-Out section."}
+                </p>
+                <div className="pt-2">
+                  <Link href="/stays">
+                    <Button size="sm" className="bg-[#59283A] hover:bg-[#472130] text-white text-xs">
+                      Go to Front Desk Stays →
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredInHouseStays.map((stay: any) => {
+                  const guest = stay.primaryGuest;
+                  const room = stay.room;
+                  const docs = guest?.documents || [];
+
+                  return (
+                    <div
+                      key={stay.id}
+                      className="bg-white rounded-2xl border border-[#E8DDD8] hover:border-[#C4A06A] shadow-xs hover:shadow-md transition-all overflow-hidden"
+                    >
+                      {/* Top Bar: Room + Status + Booking Reference */}
+                      <div className="bg-[#F5F0EA]/70 px-5 py-3 border-b border-[#E8DDD8] flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className="font-serif font-bold text-base text-[#59283A] bg-white px-3 py-1 rounded-lg border border-[#C4A06A]/30 shadow-2xs">
+                            Room {room?.roomNumber || "N/A"}
+                          </span>
+                          <div>
+                            <span className="text-xs font-semibold text-[#59283A] block">
+                              {room?.roomType?.name || "Standard Room"} • Floor {room?.floor || "1"}
+                            </span>
+                            <span className="text-[10px] font-mono text-[#C4A06A]">
+                              Ref: {stay.bookingNumber}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                            CHECKED IN • IN-HOUSE
+                          </span>
+                          <span className="text-[11px] text-[#82747A] font-medium hidden sm:inline">
+                            Check-In: {stay.actualCheckInAt ? new Date(stay.actualCheckInAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : stay.checkInDate}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Main Dossier Grid */}
+                      <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
+                        {/* Column 1: Primary Guest Identity */}
+                        <div className="space-y-2.5 border-b md:border-b-0 md:border-r border-[#E8DDD8] pb-4 md:pb-0 md:pr-4">
+                          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#C4A06A]">
+                            <UserCheck className="w-3.5 h-3.5" />
+                            <span>Primary Guest Dossier</span>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <div className="w-11 h-11 rounded-xl bg-[#59283A] text-[#C4A06A] flex items-center justify-center font-serif font-bold text-base shrink-0 shadow-xs">
+                              {guest?.fullName ? guest.fullName.substring(0, 2).toUpperCase() : "GT"}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="font-bold text-sm text-[#59283A] leading-tight truncate">
+                                {guest?.fullName || "Unnamed Guest"}
+                              </h4>
+                              <div className="text-[10px] font-mono text-[#82747A] mt-0.5">
+                                Code: {guest?.guestCode || "N/A"}
+                              </div>
+                              <div className="text-[11px] text-[#82747A] mt-1 flex items-center gap-2 flex-wrap">
+                                <span className="bg-[#F5F0EA] px-1.5 py-0.5 rounded text-[10px] font-semibold text-[#59283A]">
+                                  {guest?.gender || "Gender Unspecified"}
+                                </span>
+                                <span>•</span>
+                                <span>{guest?.country || "India"}</span>
+                                {guest?.dateOfBirth && (
+                                  <>
+                                    <span>•</span>
+                                    <span>DOB: {new Date(guest.dateOfBirth).toLocaleDateString("en-IN")}</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Identity Document / KYC Info */}
+                          <div className="pt-2 border-t border-[#E8DDD8]/60 space-y-1.5">
+                            <div className="text-[10px] font-bold uppercase text-[#8E7079]">
+                              ID Proof (Registration Time)
+                            </div>
+                            {docs.length > 0 ? (
+                              docs.map((doc: any, i: number) => (
+                                <div key={i} className="p-2 rounded-lg bg-[#F5F0EA]/60 border border-[#E8DDD8] flex items-center justify-between">
+                                  <div>
+                                    <span className="font-semibold text-[11px] text-[#59283A] block">
+                                      {doc.idType?.replace(/_/g, " ") || "Government ID"}
+                                    </span>
+                                    <span className="font-mono text-[10px] text-[#82747A]">
+                                      {doc.documentNumber || "No number recorded"}
+                                    </span>
+                                  </div>
+                                  <BadgeCheck className="w-4 h-4 text-[#32765B]" />
+                                </div>
+                              ))
+                            ) : (
+                              <div className="text-[11px] text-[#82747A] italic bg-[#F5F0EA]/40 p-2 rounded-lg border border-dashed border-[#E8DDD8]">
+                                No physical ID document attached at registration.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Column 2: Contact & Residential Details */}
+                        <div className="space-y-2.5 border-b md:border-b-0 md:border-r border-[#E8DDD8] pb-4 md:pb-0 md:pr-4">
+                          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#C4A06A]">
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>Contact &amp; Address Details</span>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-md bg-[#F5F0EA] text-[#59283A] flex items-center justify-center shrink-0">
+                                <Phone className="w-3 h-3 text-[#C4A06A]" />
+                              </div>
+                              <div>
+                                <div className="text-[10px] text-[#82747A]">Primary Mobile</div>
+                                <a
+                                  href={`tel:${guest?.mobileNumber}`}
+                                  className="font-bold text-xs text-[#59283A] hover:text-[#C4A06A] transition-colors"
+                                >
+                                  {guest?.mobileNumber || "N/A"}
+                                </a>
+                              </div>
+                            </div>
+
+                            {guest?.alternateMobileNumber && (
+                              <div className="flex items-center gap-2 pl-8">
+                                <span className="text-[10px] text-[#82747A]">Alt:</span>
+                                <span className="text-xs font-medium text-[#59283A]">{guest.alternateMobileNumber}</span>
+                              </div>
+                            )}
+
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-md bg-[#F5F0EA] text-[#59283A] flex items-center justify-center shrink-0">
+                                <Mail className="w-3 h-3 text-[#C4A06A]" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-[10px] text-[#82747A]">Email Address</div>
+                                <div className="font-medium text-xs text-[#59283A] truncate">
+                                  {guest?.email || "No email registered"}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-start gap-2 pt-1 border-t border-[#E8DDD8]/60">
+                              <div className="w-6 h-6 rounded-md bg-[#F5F0EA] text-[#59283A] flex items-center justify-center shrink-0 mt-0.5">
+                                <MapPin className="w-3 h-3 text-[#C4A06A]" />
+                              </div>
+                              <div>
+                                <div className="text-[10px] text-[#82747A]">Residential Address</div>
+                                <p className="text-[11px] text-[#59283A] leading-relaxed">
+                                  {guest?.address || "Address not provided"}
+                                </p>
+                                {(guest?.city || guest?.state || guest?.postalCode) && (
+                                  <div className="text-[10px] text-[#82747A] font-semibold mt-0.5">
+                                    {[guest.city, guest.state, guest.postalCode].filter(Boolean).join(", ")}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Column 3: Stay Duration, Tariff & Navigation */}
+                        <div className="space-y-2.5 flex flex-col justify-between">
+                          <div className="space-y-2.5">
+                            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#C4A06A]">
+                              <Calendar className="w-3.5 h-3.5" />
+                              <span>Stay Timeline &amp; Tariff</span>
+                            </div>
+
+                            <div className="space-y-1.5 p-3 rounded-xl bg-[#F5F0EA]/50 border border-[#E8DDD8]">
+                              <div className="flex justify-between items-center text-[11px]">
+                                <span className="text-[#82747A]">Stay Duration:</span>
+                                <span className="font-bold text-[#59283A]">
+                                  {stay.numberOfNights} Night(s) • {stay.numberOfGuests || 1} Pax
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center text-[11px]">
+                                <span className="text-[#82747A]">Room Rate:</span>
+                                <span className="font-bold text-[#59283A] font-mono">
+                                  ₹{Number(stay.roomRatePerNight).toLocaleString("en-IN")}/night
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center text-[11px]">
+                                <span className="text-[#82747A]">Advance Paid:</span>
+                                <span className="font-bold text-emerald-700 font-mono">
+                                  ₹{Number(stay.advanceAmount || 0).toLocaleString("en-IN")}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center text-[11px] pt-1.5 border-t border-[#E8DDD8]">
+                                <span className="text-[#82747A]">Expected Departure:</span>
+                                <span className="font-bold text-[#59283A]">
+                                  {new Date(stay.expectedCheckOutDate).toLocaleDateString("en-IN")} ({stay.expectedCheckOutTime || "11:00 AM"})
+                                </span>
+                              </div>
+                            </div>
+
+                            {stay.notes && (
+                              <div className="text-[11px] text-[#82747A] italic bg-[#F5F0EA]/30 p-2 rounded-lg border border-[#E8DDD8]">
+                                <span className="font-semibold text-[#59283A] not-italic">Notes: </span>
+                                "{stay.notes}"
+                              </div>
+                            )}
+
+                            {/* Additional Guests if any */}
+                            {stay.bookingGuests && stay.bookingGuests.length > 0 && (
+                              <div className="pt-1">
+                                <div className="text-[10px] font-bold text-[#8E7079] uppercase mb-1">
+                                  Accompanying Guests ({stay.bookingGuests.length})
+                                </div>
+                                <div className="space-y-1">
+                                  {stay.bookingGuests.map((bg: any, bIdx: number) => (
+                                    <div key={bIdx} className="text-[11px] text-[#59283A] flex items-center justify-between p-1.5 rounded bg-white border border-[#E8DDD8]">
+                                      <span className="font-semibold">{bg.guest?.fullName}</span>
+                                      <span className="text-[10px] text-[#82747A]">{bg.guest?.mobileNumber}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Quick Actions */}
+                          <div className="pt-2 flex items-center gap-2">
+                            <Link href="/stays" className="flex-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full h-8 text-[11px] border-[#59283A]/30 text-[#59283A] hover:bg-[#59283A]/10 font-medium flex items-center justify-center gap-1 shadow-2xs"
+                              >
+                                <ExternalLink className="w-3 h-3 text-[#C4A06A]" />
+                                <span>Stay Folio</span>
+                              </Button>
+                            </Link>
+                            <Link href="/guests" className="flex-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full h-8 text-[11px] border-[#C4A06A]/40 text-[#59283A] hover:bg-[#C4A06A]/10 font-medium flex items-center justify-center gap-1 shadow-2xs"
+                              >
+                                <UserCheck className="w-3 h-3 text-[#C4A06A]" />
+                                <span>Guest Profile</span>
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
