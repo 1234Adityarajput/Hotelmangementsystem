@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
+import { DocumentUploader } from "@/components/shared/document-uploader";
 import {
   Dialog,
   DialogContent,
@@ -956,34 +957,23 @@ export default function GuestsPage() {
                   />
                 </div>
 
-                {/* 7. ID Proof Document Reference / File Picker */}
+                {/* 7. Real Government ID Document Uploader (From PC / File Manager) */}
                 <div className="space-y-1 sm:col-span-3">
-                  <label className="font-semibold text-[#59283A] flex items-center justify-between">
-                    <span>ID Proof Document Reference (Scan / PDF / Photo)</span>
-                    <span className="text-[10px] text-[#8E7079]">Safe internal archive reference</span>
-                  </label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={formData.idProofDocument}
-                      onChange={(e) => setFormData({ ...formData, idProofDocument: e.target.value })}
-                      placeholder="e.g. docs/guests/aadhaar_ramesh_scan.pdf"
-                      className="h-8 text-xs border-[#E8DDD8] bg-white font-mono flex-1"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const fakeRef = `docs/guests/id_${formData.idProofType.toLowerCase()}_${Date.now()}.pdf`;
-                        setFormData({ ...formData, idProofDocument: fakeRef });
-                        toast.success("Document attached to guest registration");
-                      }}
-                      className="h-8 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] shrink-0"
-                    >
-                      <Upload className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
-                      Attach Doc
-                    </Button>
-                  </div>
+                  <DocumentUploader
+                    value={formData.idProofDocument}
+                    onChange={(res) => {
+                      setFormData({
+                        ...formData,
+                        idProofDocument: res.url,
+                      });
+                    }}
+                    onRemove={() => {
+                      setFormData({
+                        ...formData,
+                        idProofDocument: "",
+                      });
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -1159,6 +1149,24 @@ export default function GuestsPage() {
                             onChange={(e) => handleCompanionFieldChange(idx, "idProofNumber", e.target.value)}
                             placeholder="Companion ID number"
                             className="h-7 text-xs font-mono border-[#E8DDD8]"
+                          />
+                        </div>
+
+                        {/* Companion Document Uploader from PC */}
+                        <div className="sm:col-span-4 space-y-1 mt-1 pt-1.5 border-t border-[#E8DDD8]/70">
+                          <label className="text-[11px] font-semibold text-[#82747A] flex items-center justify-between">
+                            <span>Companion ID Proof Document (Upload from PC / File Manager)</span>
+                            <span className="text-[10px] text-[#8E7079]">Optional photo or PDF scan</span>
+                          </label>
+                          <DocumentUploader
+                            compact
+                            value={comp.documentFileReference}
+                            onChange={(res) => {
+                              handleCompanionFieldChange(idx, "documentFileReference", res.url);
+                            }}
+                            onRemove={() => {
+                              handleCompanionFieldChange(idx, "documentFileReference", "");
+                            }}
                           />
                         </div>
                       </div>
@@ -1407,42 +1415,56 @@ export default function GuestsPage() {
                       <span>Upload / Record Additional Identity Document</span>
                     </h5>
 
-                    <form onSubmit={handleAddDocument} className="flex flex-wrap items-center gap-2 pt-1">
-                      <select
-                        value={docType}
-                        onChange={(e) => setDocType(e.target.value)}
-                        className="h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white"
-                      >
-                        {ID_PROOF_TYPES.map((t) => (
-                          <option key={t.value} value={t.value}>
-                            {t.label}
-                          </option>
-                        ))}
-                      </select>
+                    <form onSubmit={handleAddDocument} className="space-y-3 pt-1">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-semibold text-[#82747A]">Document Type</label>
+                          <select
+                            value={docType}
+                            onChange={(e) => setDocType(e.target.value)}
+                            className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white"
+                          >
+                            {ID_PROOF_TYPES.map((t) => (
+                              <option key={t.value} value={t.value}>
+                                {t.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-                      <Input
-                        required
-                        placeholder="Document Number (e.g. 1234-5678-9012)"
-                        value={docNumber}
-                        onChange={(e) => setDocNumber(e.target.value)}
-                        className="h-8 text-xs flex-1 min-w-[180px] bg-white font-mono border-[#E8DDD8]"
-                      />
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-semibold text-[#82747A]">Document Number *</label>
+                          <Input
+                            required
+                            placeholder="e.g. 1234-5678-9012"
+                            value={docNumber}
+                            onChange={(e) => setDocNumber(e.target.value)}
+                            className="h-8 text-xs bg-white font-mono border-[#E8DDD8]"
+                          />
+                        </div>
+                      </div>
 
-                      <Input
-                        placeholder="Document File Reference (optional)"
-                        value={docRef}
-                        onChange={(e) => setDocRef(e.target.value)}
-                        className="h-8 text-xs flex-1 min-w-[180px] bg-white font-mono border-[#E8DDD8]"
-                      />
+                      <div className="space-y-1">
+                        <DocumentUploader
+                          compact
+                          value={docRef}
+                          onChange={(res) => setDocRef(res.url)}
+                          onRemove={() => setDocRef("")}
+                          label="Attach Document File from PC (Photo / PDF)"
+                          description="Click to browse from your computer or drag & drop"
+                        />
+                      </div>
 
-                      <Button
-                        type="submit"
-                        size="sm"
-                        className="h-8 text-xs bg-[#59283A] hover:bg-[#472130] text-white"
-                      >
-                        <ShieldCheck className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
-                        Save Document
-                      </Button>
+                      <div className="flex justify-end pt-1">
+                        <Button
+                          type="submit"
+                          size="sm"
+                          className="h-8 text-xs bg-[#59283A] hover:bg-[#472130] text-white"
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
+                          Save Document to Profile
+                        </Button>
+                      </div>
                     </form>
                   </div>
 
@@ -1765,37 +1787,88 @@ export default function GuestsPage() {
 
           {previewDocData && (
             <div className="space-y-4 pt-3">
-              {/* Visual Simulated ID Card Container */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-[#59283A] to-[#7A4652] text-white shadow-lg relative overflow-hidden">
-                {/* Holographic Watermark Simulation */}
-                <div className="absolute -right-8 -bottom-8 w-36 h-36 rounded-full bg-white/5 pointer-events-none" />
-                <div className="absolute right-4 top-4 text-[#C4A06A] font-serif font-bold tracking-widest text-[11px] uppercase">
-                  Govt Document
+              {/* Branch 1: Real Image Document Preview */}
+              {previewDocData.reference?.startsWith("data:image/") ||
+              previewDocData.reference?.match(/\.(jpeg|jpg|png|webp|gif)(\?.*)?$/i) ? (
+                <div className="space-y-3">
+                  <div className="relative w-full h-[320px] rounded-2xl overflow-hidden border border-[#E8DDD8] bg-black/5 flex items-center justify-center p-2 shadow-inner">
+                    <img
+                      src={previewDocData.reference}
+                      alt={previewDocData.type}
+                      className="max-h-full max-w-full object-contain rounded-lg"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-xs p-3.5 rounded-xl bg-[#F5F0EA] border border-[#E8DDD8]">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[#59283A] text-sm">{previewDocData.type}</span>
+                        <Badge variant="outline" className="text-[10px] bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30 font-bold">
+                          Attached Image
+                        </Badge>
+                      </div>
+                      <p className="font-mono text-xs text-[#82747A] mt-0.5 font-bold">
+                        ID: {previewDocData.number}
+                      </p>
+                    </div>
+                    <span className="text-[10px] text-[#C4A06A] font-bold uppercase tracking-wider bg-white px-2.5 py-1 rounded-md border border-[#E8DDD8]">
+                      Verified ID
+                    </span>
+                  </div>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-14 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center text-white/60">
-                    <Users className="w-6 h-6" />
-                    <span className="text-[8px] uppercase mt-1">Photo</span>
+              ) : previewDocData.reference?.startsWith("data:application/pdf") ||
+                previewDocData.reference?.match(/\.pdf(\?.*)?$/i) ? (
+                /* Branch 2: PDF Document Preview */
+                <div className="p-6 rounded-2xl border border-[#E8DDD8] bg-[#F5F0EA] text-center space-y-3 shadow-inner">
+                  <div className="w-14 h-14 rounded-2xl bg-white mx-auto flex items-center justify-center text-[#B54C44] shadow-sm border border-[#E8DDD8]">
+                    <FileText className="w-7 h-7" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider text-[#C4A06A] font-bold block">
-                      {previewDocData.type}
-                    </span>
-                    <h4 className="text-base font-bold text-white tracking-wide">
-                      {previewDocData.guestName}
-                    </h4>
-                    <p className="font-mono text-sm tracking-wider text-amber-200 mt-1 font-bold">
-                      {previewDocData.number}
-                    </p>
+                    <h5 className="font-bold text-base text-[#59283A]">{previewDocData.type} (PDF Document)</h5>
+                    <p className="text-xs font-mono text-[#82747A] mt-1 font-bold">Document ID: {previewDocData.number}</p>
+                    <p className="text-[11px] text-[#8E7079] mt-0.5">Guest: {previewDocData.guestName}</p>
+                  </div>
+                  <a
+                    href={previewDocData.reference}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#59283A] text-white text-xs font-bold hover:bg-[#472130] transition-colors shadow-sm"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-[#C4A06A]" />
+                    <span>Open PDF in Full Screen</span>
+                  </a>
+                </div>
+              ) : (
+                /* Branch 3: Legacy Simulated Card */
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-[#59283A] to-[#7A4652] text-white shadow-lg relative overflow-hidden">
+                  <div className="absolute -right-8 -bottom-8 w-36 h-36 rounded-full bg-white/5 pointer-events-none" />
+                  <div className="absolute right-4 top-4 text-[#C4A06A] font-serif font-bold tracking-widest text-[11px] uppercase">
+                    Govt Document
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-14 rounded-lg bg-white/10 border border-white/20 flex flex-col items-center justify-center text-white/60">
+                      <Users className="w-6 h-6" />
+                      <span className="text-[8px] uppercase mt-1">Photo</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase tracking-wider text-[#C4A06A] font-bold block">
+                        {previewDocData.type}
+                      </span>
+                      <h4 className="text-base font-bold text-white tracking-wide">
+                        {previewDocData.guestName}
+                      </h4>
+                      <p className="font-mono text-sm tracking-wider text-amber-200 mt-1 font-bold">
+                        {previewDocData.number}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-[10px] text-white/70 font-mono">
+                    <span>REF: {previewDocData.reference}</span>
+                    <span className="text-[#C4A06A] font-semibold">STATUS: VERIFIED</span>
                   </div>
                 </div>
-
-                <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-[10px] text-white/70 font-mono">
-                  <span>REF: {previewDocData.reference}</span>
-                  <span className="text-[#C4A06A] font-semibold">STATUS: VERIFIED</span>
-                </div>
-              </div>
+              )}
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <Button
@@ -1806,16 +1879,27 @@ export default function GuestsPage() {
                 >
                   Close
                 </Button>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    toast.success(`Exporting ${previewDocData.type} reference for ${previewDocData.guestName}`);
-                  }}
-                  className="text-xs bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
-                  <span>Download Document</span>
-                </Button>
+                {previewDocData.reference ? (
+                  <a
+                    href={previewDocData.reference}
+                    download={`${previewDocData.guestName}_${previewDocData.type}.jpg`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#59283A] hover:bg-[#472130] text-white text-xs font-semibold shadow-xs transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                    <span>Download Document</span>
+                  </a>
+                ) : (
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      toast.success(`Exporting ${previewDocData.type} reference for ${previewDocData.guestName}`);
+                    }}
+                    className="text-xs bg-[#59283A] hover:bg-[#472130] text-white flex items-center gap-1.5"
+                  >
+                    <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                    <span>Download Reference</span>
+                  </Button>
+                )}
               </div>
             </div>
           )}
