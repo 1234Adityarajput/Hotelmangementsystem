@@ -6,7 +6,7 @@ import { UpdateHotelSettingDto } from './dto/update-settings.dto';
 export class SettingsService {
   private readonly logger = new Logger(SettingsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getSettings() {
     return this.prisma.hotelSetting.upsert({
