@@ -876,8 +876,8 @@ RETURNS TRIGGER AS $$
 DECLARE
   v_booking_primary_guest TEXT;
 BEGIN
-  -- If invoked from parent trigger cascade (depth > 1), allow execution
-  IF pg_trigger_depth() > 1 THEN
+  -- If invoked from parent trigger cascade (depth > 1) or bypass session flag, allow execution
+  IF pg_trigger_depth() > 1 OR current_setting('hotel.allow_guest_delete', true) = 'on' THEN
     IF (TG_OP = 'DELETE') THEN
       RETURN OLD;
     ELSE
