@@ -1642,7 +1642,7 @@ export default function ExpensesPage() {
 
                           {item.notes && (
                             <div className="text-[11px] text-[#8E7079] mt-1 italic">
-                              "{item.notes}"
+                              &quot;{item.notes}&quot;
                             </div>
                           )}
                         </div>

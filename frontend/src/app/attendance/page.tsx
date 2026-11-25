@@ -2213,7 +2213,7 @@ export default function AttendancePage() {
                             {item.notes && (
                               <>
                                 <span>•</span>
-                                <span className="italic truncate max-w-[200px]">"{item.notes}"</span>
+                                <span className="italic truncate max-w-[200px]">&quot;{item.notes}&quot;</span>
                               </>
                             )}
                           </div>

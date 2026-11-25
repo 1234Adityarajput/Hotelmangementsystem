@@ -1390,7 +1390,7 @@ export default function AdminDashboardPage() {
                             {stay.notes && (
                               <div className="text-[11px] text-[#82747A] italic bg-[#F5F0EA]/30 p-2 rounded-lg border border-[#E8DDD8]">
                                 <span className="font-semibold text-[#59283A] not-italic">Notes: </span>
-                                "{stay.notes}"
+                                &quot;{stay.notes}&quot;
                               </div>
                             )}
 
