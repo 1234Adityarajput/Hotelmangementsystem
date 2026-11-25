@@ -225,21 +225,186 @@ export class RoomsService {
     return this.update(id, { pricePerNight: Number(pricePerNight) });
   }
 
+  async getHistory(monthParam?: string, yearParam?: string) {
+    const now = new Date();
+    let month = now.getMonth() + 1;
+    let year = now.getFullYear();
+
+    if (monthParam) {
+      if (typeof monthParam === 'string' && monthParam.includes('-')) {
+        const parts = monthParam.split('-');
+        year = parseInt(parts[0], 10) || year;
+        month = parseInt(parts[1], 10) || month;
+      } else {
+        month = parseInt(monthParam, 10) || month;
+      }
+    }
+    if (yearParam) {
+      year = parseInt(yearParam, 10) || year;
+    }
+
+    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // 1. Fetch active rooms in inventory
+    const activeRooms = await this.prisma.room.findMany({
+      where: {
+        isActive: true,
+      },
+      include: {
+        roomType: true,
+        bookings: {
+          where: { bookingStatus: { in: ['RESERVED', 'CHECKED_IN'] } },
+          take: 1,
+          include: {
+            primaryGuest: {
+              select: { id: true, fullName: true, mobileNumber: true },
+            },
+          },
+          orderBy: { checkInDate: 'asc' },
+        },
+      },
+      orderBy: [{ floor: 'asc' }, { roomNumber: 'asc' }],
+    });
+
+    const enrichedActive = activeRooms.map((r) => ({
+      id: r.id,
+      roomNumber: r.roomNumber,
+      roomTypeId: r.roomTypeId,
+      roomType: r.roomType,
+      floor: r.floor,
+      pricePerNight: Number(r.pricePerNight),
+      description: r.description,
+      roomStatus: r.roomStatus,
+      isActive: true,
+      isDeleted: false,
+      status: 'ACTIVE',
+      currentBooking: r.bookings[0] || null,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
+    }));
+
+    // 2. Fetch deleted room logs from AuditLog for this month
+    const deleteLogs = await this.prisma.auditLog.findMany({
+      where: {
+        entityType: 'ROOM',
+        action: 'DELETE',
+        changedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: { changedAt: 'desc' },
+    });
+
+    const deletedRooms = deleteLogs.map((log) => {
+      const prev = (log.previousValues || {}) as any;
+      return {
+        id: log.entityId || prev.id || `archived-room-${log.id}`,
+        roomNumber: prev.roomNumber || 'ARCHIVED-ROOM',
+        roomTypeId: prev.roomTypeId || '',
+        roomType: prev.roomType || {
+          name: prev.roomTypeName || 'Archived Category',
+          capacity: prev.capacity || 2,
+          defaultPricePerNight: prev.pricePerNight || 0,
+        },
+        floor: prev.floor || 1,
+        pricePerNight: Number(prev.pricePerNight || 0),
+        description: prev.description || 'Decommissioned room dossier preserved in audit archive.',
+        roomStatus: prev.roomStatus || 'MAINTENANCE',
+        isActive: false,
+        isDeleted: true,
+        status: 'DELETED',
+        currentBooking: null,
+        createdAt: prev.createdAt || log.changedAt,
+        deletedAt: log.changedAt,
+      };
+    });
+
+    // 3. Combine both lists
+    const allHistory = [...enrichedActive, ...deletedRooms].sort((a, b) => {
+      if (a.isDeleted !== b.isDeleted) {
+        return a.isDeleted ? 1 : -1;
+      }
+      return a.roomNumber.localeCompare(b.roomNumber, undefined, { numeric: true });
+    });
+
+    return {
+      month,
+      year,
+      monthName: startDate.toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+      totalCount: allHistory.length,
+      activeCount: enrichedActive.length,
+      deletedCount: deletedRooms.length,
+      items: allHistory,
+    };
+  }
+
   async remove(id: string) {
+    const room = await this.prisma.room.findUnique({
+      where: { id },
+      include: {
+        roomType: true,
+      },
+    });
+
+    if (!room) {
+      throw new NotFoundException(`Room with ID ${id} not found`);
+    }
+
+    // Check if room has active reservations or currently staying in-house guests
     const activeBooking = await this.prisma.booking.findFirst({
       where: {
         roomId: id,
         bookingStatus: { in: ['RESERVED', 'CHECKED_IN'] },
       },
+      include: {
+        primaryGuest: {
+          select: { fullName: true, mobileNumber: true },
+        },
+      },
     });
+
     if (activeBooking) {
-      throw new ConflictException('Cannot delete or deactivate room with active or reserved bookings');
+      throw new ConflictException(
+        `Cannot delete Room ${room.roomNumber}: Currently has an active ${activeBooking.bookingStatus === 'CHECKED_IN' ? 'in-house stay' : 'reservation'} with guest ${activeBooking.primaryGuest?.fullName || 'Guest'}. Please complete checkout or reassign the stay before deleting.`
+      );
     }
 
-    await this.prisma.room.update({
-      where: { id },
-      data: { isActive: false },
+    // 1. Create audit log snapshot for permanent room history preservation
+    await this.prisma.auditLog.create({
+      data: {
+        entityType: 'ROOM',
+        entityId: room.id,
+        action: 'DELETE',
+        previousValues: {
+          ...room,
+          roomTypeName: room.roomType?.name,
+          capacity: room.roomType?.capacity,
+          deletedAt: new Date().toISOString(),
+        } as any,
+        description: `Deleted room ${room.roomNumber} (${room.roomType?.name}, Floor ${room.floor}) from active inventory. Complete dossier preserved in history.`,
+      },
     });
-    return { success: true, message: 'Room deactivated successfully' };
+
+    // 2. Safely remove from active inventory
+    const historicalBookingsCount = await this.prisma.booking.count({
+      where: { roomId: id },
+    });
+
+    if (historicalBookingsCount === 0) {
+      await this.prisma.room.delete({ where: { id } });
+    } else {
+      await this.prisma.room.update({
+        where: { id },
+        data: { isActive: false },
+      });
+    }
+
+    return {
+      success: true,
+      message: `Room ${room.roomNumber} (${room.roomType?.name}) deleted from active inventory and archived in history.`,
+      roomNumber: room.roomNumber,
+    };
   }
 }

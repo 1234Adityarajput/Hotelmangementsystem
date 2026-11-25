@@ -27,7 +27,16 @@ import {
   Check,
   X,
   FileText,
+  Download,
+  History,
+  FileSpreadsheet,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  Archive,
+  Loader2,
 } from "lucide-react";
+import ExcelJS from "exceljs";
 import { roomsService } from "@/services/rooms.service";
 import { Room, RoomType } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -43,6 +52,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
 
 export default function RoomsPage() {
   const [activeTab, setActiveTab] = useState<"rooms" | "types">("rooms");
@@ -97,6 +111,31 @@ export default function RoomsPage() {
 
   const [submitting, setSubmitting] = useState(false);
 
+  // Delete Room modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Full Month Room History & Archive state
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [historyMonth, setHistoryMonth] = useState<number>(new Date().getMonth() + 1);
+  const [historyYear, setHistoryYear] = useState<number>(new Date().getFullYear());
+  const [historyData, setHistoryData] = useState<{
+    month: number;
+    year: number;
+    monthName: string;
+    totalCount: number;
+    activeCount: number;
+    deletedCount: number;
+    items: any[];
+  } | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACTIVE" | "DELETED">("ALL");
+  const [historySearch, setHistorySearch] = useState("");
+
+  // Excel Export state
+  const [isExporting, setIsExporting] = useState(false);
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -122,6 +161,250 @@ export default function RoomsPage() {
   useEffect(() => {
     fetchData();
   }, [statusFilter, typeFilter, floorFilter, search]);
+
+  const handleConfirmDelete = (r: Room) => {
+    if (r.roomStatus === "OCCUPIED") {
+      toast.error(`Cannot delete Room ${r.roomNumber}: Currently occupied by an in-house guest. Complete checkout or reassign stay first.`);
+      return;
+    }
+    setRoomToDelete(r);
+    setDeleteModalOpen(true);
+  };
+
+  const handleExecuteDelete = async () => {
+    if (!roomToDelete) return;
+    try {
+      setIsDeleting(true);
+      await roomsService.remove(roomToDelete.id);
+      toast.success(
+        `Room ${roomToDelete.roomNumber} (${roomToDelete.roomType?.name || "Room"}) removed from active inventory. Complete dossier archived in history.`
+      );
+      setDeleteModalOpen(false);
+      setRoomToDelete(null);
+      fetchData();
+      if (historyModalOpen) {
+        fetchHistory(historyMonth, historyYear);
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || err.message || "Failed to delete room");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const fetchHistory = async (month: number, year: number) => {
+    try {
+      setHistoryLoading(true);
+      const data = await roomsService.getHistory({ month, year });
+      setHistoryData(data);
+    } catch (err: any) {
+      console.error("Failed to load room history:", err);
+      toast.error(err.response?.data?.message || err.message || "Failed to load room history");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleOpenHistoryModal = () => {
+    setHistoryModalOpen(true);
+    fetchHistory(historyMonth, historyYear);
+  };
+
+  const handlePrevMonth = () => {
+    let newMonth = historyMonth - 1;
+    let newYear = historyYear;
+    if (newMonth < 1) {
+      newMonth = 12;
+      newYear -= 1;
+    }
+    setHistoryMonth(newMonth);
+    setHistoryYear(newYear);
+    fetchHistory(newMonth, newYear);
+  };
+
+  const handleNextMonth = () => {
+    let newMonth = historyMonth + 1;
+    let newYear = historyYear;
+    if (newMonth > 12) {
+      newMonth = 1;
+      newYear += 1;
+    }
+    setHistoryMonth(newMonth);
+    setHistoryYear(newYear);
+    fetchHistory(newMonth, newYear);
+  };
+
+  const handleExportExcel = async (scope: "MONTH" | "ALL") => {
+    try {
+      setIsExporting(true);
+      toast.info("Generating Excel report for Room Inventory...");
+
+      let exportItems: any[] = [];
+      let scopeTitle = "";
+
+      if (scope === "MONTH") {
+        const histRes = await roomsService.getHistory({ month: historyMonth, year: historyYear });
+        exportItems = histRes.items || [];
+        scopeTitle = histRes.monthName || `${MONTH_NAMES[historyMonth - 1]}_${historyYear}`;
+      } else {
+        const allRes = await roomsService.findAll({ limit: 500 });
+        exportItems = allRes.items || [];
+        scopeTitle = "All_Active_Rooms";
+      }
+
+      if (exportItems.length === 0) {
+        toast.warning("No room records found to export for selected scope");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "Hotel Radha Palace";
+      workbook.created = new Date();
+
+      const worksheet = workbook.addWorksheet("Room Inventory");
+
+      // Title Banner
+      worksheet.mergeCells("A1:M1");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "HOTEL RADHA PALACE — ROOM INVENTORY & STATUS REGISTER";
+      titleCell.font = { name: "Georgia", size: 14, bold: true, color: { argb: "FFFFFFFF" } };
+      titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF59283A" } };
+      titleCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(1).height = 32;
+
+      worksheet.mergeCells("A2:M2");
+      const subCell = worksheet.getCell("A2");
+      subCell.value = `Export Scope: ${scopeTitle} | Total Rooms: ${exportItems.length} | Generated: ${new Date().toLocaleString("en-IN")}`;
+      subCell.font = { name: "Arial", size: 10, italic: true, color: { argb: "FF59283A" } };
+      subCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF5F0EA" } };
+      subCell.alignment = { vertical: "middle", horizontal: "center" };
+      worksheet.getRow(2).height = 20;
+
+      // Headers
+      const headers = [
+        "S.No",
+        "Room Number",
+        "Category / Type",
+        "Floor",
+        "Max Capacity",
+        "Price Per Night (₹)",
+        "Room Status",
+        "Active In-House Guest",
+        "Guest Mobile",
+        "Booking Status",
+        "Description",
+        "Inventory Status",
+        "Archived / Deletion Date",
+      ];
+
+      const headerRow = worksheet.addRow(headers);
+      headerRow.height = 26;
+      headerRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF7A4652" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE8DDD8" } },
+          bottom: { style: "medium", color: { argb: "FF59283A" } },
+          left: { style: "thin", color: { argb: "FFE8DDD8" } },
+          right: { style: "thin", color: { argb: "FFE8DDD8" } },
+        };
+      });
+
+      exportItems.forEach((r, idx) => {
+        const row = worksheet.addRow([
+          idx + 1,
+          `Room ${r.roomNumber}`,
+          r.roomType?.name || "Standard Room",
+          `Floor ${r.floor}`,
+          `${r.roomType?.capacity || 2} Pax`,
+          Number(r.pricePerNight || 0),
+          r.roomStatus || "AVAILABLE",
+          r.currentBooking?.primaryGuest?.fullName || "—",
+          r.currentBooking?.primaryGuest?.mobileNumber || "—",
+          r.currentBooking?.bookingStatus || "—",
+          r.description || r.roomType?.description || "—",
+          r.isDeleted ? "DELETED / ARCHIVED" : "ACTIVE INVENTORY",
+          r.deletedAt ? new Date(r.deletedAt).toLocaleDateString("en-IN") : "—",
+        ]);
+        row.height = 22;
+
+        const isEven = idx % 2 === 0;
+        const isDeletedRow = r.isDeleted;
+
+        row.eachCell((cell, colNum) => {
+          cell.font = { name: "Arial", size: 9 };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE8DDD8" } },
+            bottom: { style: "thin", color: { argb: "FFE8DDD8" } },
+            left: { style: "thin", color: { argb: "FFE8DDD8" } },
+            right: { style: "thin", color: { argb: "FFE8DDD8" } },
+          };
+
+          if (isDeletedRow) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8E8E5" } };
+          } else if (!isEven) {
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDFBF9" } };
+          }
+
+          if (colNum === 1 || colNum === 2 || colNum === 4 || colNum === 5 || colNum === 7 || colNum === 12 || colNum === 13) {
+            cell.alignment = { vertical: "middle", horizontal: "center" };
+          } else if (colNum === 6) {
+            cell.alignment = { vertical: "middle", horizontal: "right" };
+            cell.numFmt = "₹#,##0.00";
+          } else {
+            cell.alignment = { vertical: "middle", horizontal: "left" };
+          }
+        });
+      });
+
+      worksheet.columns = [
+        { width: 7 },
+        { width: 16 },
+        { width: 24 },
+        { width: 12 },
+        { width: 14 },
+        { width: 18 },
+        { width: 18 },
+        { width: 24 },
+        { width: 18 },
+        { width: 18 },
+        { width: 32 },
+        { width: 22 },
+        { width: 22 },
+      ];
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Hotel_Radha_Palace_Rooms_${scopeTitle}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`Export completed successfully (${exportItems.length} rooms)`);
+    } catch (err: any) {
+      console.error("Export error:", err);
+      toast.error(err.message || "Failed to generate room Excel report");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const filteredHistoryItems = (historyData?.items || []).filter((item: any) => {
+    if (historyFilter === "ACTIVE" && item.isDeleted) return false;
+    if (historyFilter === "DELETED" && !item.isDeleted) return false;
+    if (!historySearch.trim()) return true;
+    const q = historySearch.toLowerCase();
+    return (
+      item.roomNumber?.toLowerCase().includes(q) ||
+      item.roomType?.name?.toLowerCase().includes(q) ||
+      String(item.floor).includes(q)
+    );
+  });
 
   // Availability statistics
   const totalRoomsCount = rooms.length;
@@ -392,7 +675,7 @@ export default function RoomsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <Button
             variant="outline"
             onClick={() => setAvailabilityExplorerOpen(!availabilityExplorerOpen)}
@@ -400,6 +683,25 @@ export default function RoomsPage() {
           >
             <Calendar className="w-4 h-4 text-[#C4A06A]" />
             <span>Check Room Availability</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleOpenHistoryModal}
+            className="border-[#59283A]/30 text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5 text-xs h-9 shadow-sm"
+          >
+            <History className="w-4 h-4 text-[#C4A06A]" />
+            <span>Room History</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => handleExportExcel("ALL")}
+            disabled={isExporting}
+            className="border-[#32765B]/40 text-[#32765B] hover:bg-[#E7F1E9] flex items-center gap-1.5 text-xs h-9 shadow-sm font-medium"
+          >
+            <Download className="w-4 h-4 text-[#32765B]" />
+            <span>{isExporting ? "Exporting..." : "Export"}</span>
           </Button>
 
           {activeTab === "rooms" ? (
@@ -941,6 +1243,17 @@ export default function RoomsPage() {
                                 )}
                               </Button>
                             )}
+
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleConfirmDelete(r)}
+                              disabled={isOccupied}
+                              title={isOccupied ? "Cannot delete occupied room" : "Delete Room from Inventory"}
+                              className="h-7 px-2 text-[#8E7079] hover:text-[#B54C44] hover:bg-[#F8E8E5] disabled:opacity-40"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 text-[#B54C44]" />
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>
@@ -1114,6 +1427,18 @@ export default function RoomsPage() {
                                     {isAvailable ? "Maintain" : "Ready"}
                                   </Button>
                                 )}
+
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleConfirmDelete(r)}
+                                  disabled={isOccupied}
+                                  className="h-7 px-2 text-[#8E7079] hover:text-[#B54C44] hover:bg-[#F8E8E5] disabled:opacity-40"
+                                  title={isOccupied ? "Cannot delete occupied room" : "Delete Room"}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5 mr-1 text-[#B54C44]" />
+                                  <span>Delete</span>
+                                </Button>
                               </td>
                             </tr>
                           );
@@ -1653,6 +1978,317 @@ export default function RoomsPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* DELETE ROOM CONFIRMATION MODAL                                            */}
+      {/* ========================================================================= */}
+      <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+        <DialogContent className="sm:max-w-md w-[95vw] max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6 rounded-2xl overflow-hidden">
+          <DialogHeader className="pb-2">
+            <div className="w-12 h-12 rounded-2xl bg-[#F8E8E5] text-[#B54C44] flex items-center justify-center mb-2 mx-auto">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <DialogTitle className="text-lg font-serif font-bold text-[#59283A] text-center">
+              Delete Room from Inventory?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#82747A] text-center">
+              Are you sure you want to delete{" "}
+              <strong className="text-[#59283A]">Room {roomToDelete?.roomNumber}</strong> ({roomToDelete?.roomType?.name}, Floor {roomToDelete?.floor})?
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-3.5 bg-[#F5F0EA]/70 rounded-xl border border-[#E8DDD8] text-xs text-[#59283A] space-y-2.5 my-1">
+            <div className="flex items-start gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-[#32765B] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#2E5E44]">Permanent History Preserved:</strong> This room&apos;s full specifications, category, floor tier, nightly rates, and historical stay logs will be permanently archived in <strong>Monthly History &amp; Audit Logs</strong>.
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5">
+              <Trash2 className="w-4 h-4 text-[#B54C44] mt-0.5 shrink-0" />
+              <div className="leading-relaxed">
+                <strong className="text-[#963730]">Active Inventory Removal:</strong> The room will be removed from your active room inventory, live occupancy boards, and future booking calendars.
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-row items-center justify-end gap-2 pt-4 border-t border-[#E8DDD8]/60 mt-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => {
+                setDeleteModalOpen(false);
+                setRoomToDelete(null);
+              }}
+              className="text-xs h-9 px-4 font-medium border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              disabled={isDeleting}
+              onClick={handleExecuteDelete}
+              className="text-xs h-9 px-4 font-semibold bg-[#B54C44] hover:bg-[#923832] text-white flex items-center justify-center gap-1.5 min-w-[130px] rounded-lg transition-colors"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white shrink-0" />
+                  <span>Deleting...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>Yes, Delete Room</span>
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ========================================================================= */}
+      {/* FULL MONTH ROOM INVENTORY HISTORY & ARCHIVE MODAL                         */}
+      {/* ========================================================================= */}
+      <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
+        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                    Hotel Radha Palace Archive
+                  </span>
+                  <span className="text-xs text-[#82747A]">• Full Month Room Activity &amp; Records</span>
+                </div>
+                <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
+                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <span>Room Inventory &amp; Deletion History</span>
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Review room inventory lifecycle, specifications, nightly rates, and rooms decommissioned or deleted from active operations.
+                </DialogDescription>
+              </div>
+
+              {/* Month Selector Controls */}
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Previous Month"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
+                  {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 p-0 text-[#59283A]"
+                  title="Next Month"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Summary Strip */}
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#8E7079]">Total Room Dossiers</div>
+                  <div className="text-lg font-serif font-bold text-[#59283A]">
+                    {historyData?.totalCount || 0}
+                  </div>
+                </div>
+                <BedDouble className="w-5 h-5 text-[#C4A06A]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#32765B]">Active in Inventory</div>
+                  <div className="text-lg font-serif font-bold text-[#32765B]">
+                    {historyData?.activeCount || 0}
+                  </div>
+                </div>
+                <CheckCircle2 className="w-5 h-5 text-[#32765B]" />
+              </div>
+
+              <div className="bg-white p-2.5 rounded-xl border border-[#E8DDD8] flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-[#B54C44]">Deleted / Decommissioned</div>
+                  <div className="text-lg font-serif font-bold text-[#B54C44]">
+                    {historyData?.deletedCount || 0}
+                  </div>
+                </div>
+                <Archive className="w-5 h-5 text-[#B54C44]" />
+              </div>
+            </div>
+          </DialogHeader>
+
+          {/* Search & Filter Toolbar inside History */}
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
+              <Input
+                placeholder="Search history by room number, category, floor..."
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                className="pl-8 h-8 text-xs border-[#E8DDD8]"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant={historyFilter === "ALL" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ALL")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ALL" ? "bg-[#59283A] text-white" : "border-[#E8DDD8] text-[#59283A]"}`}
+              >
+                All ({historyData?.totalCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "ACTIVE" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("ACTIVE")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "ACTIVE" ? "bg-[#32765B] text-white" : "border-[#E8DDD8] text-[#32765B]"}`}
+              >
+                Active ({historyData?.activeCount || 0})
+              </Button>
+              <Button
+                variant={historyFilter === "DELETED" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setHistoryFilter("DELETED")}
+                className={`h-7 text-xs px-2.5 ${historyFilter === "DELETED" ? "bg-[#B54C44] text-white" : "border-[#E8DDD8] text-[#B54C44]"}`}
+              >
+                Deleted ({historyData?.deletedCount || 0})
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleExportExcel("MONTH")}
+                disabled={isExporting}
+                className="h-7 text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] ml-1 flex items-center gap-1"
+                title="Download this month's complete record"
+              >
+                <Download className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Export Month</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* History Records Table */}
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+            {historyLoading ? (
+              <div className="py-12 flex flex-col items-center justify-center">
+                <LoadingSpinner size="md" text="Loading room history records..." />
+              </div>
+            ) : filteredHistoryItems.length === 0 ? (
+              <div className="text-center py-12 text-[#82747A] text-xs">
+                No room inventory or deletion activity found for {historyData?.monthName || "this month"}.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredHistoryItems.map((item: any, idx: number) => (
+                  <div
+                    key={item.id || idx}
+                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                      item.isDeleted
+                        ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
+                        : "border-[#E8DDD8] hover:border-[#C4A06A]"
+                    }`}
+                  >
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                          item.isDeleted
+                            ? "bg-[#F8E8E5] text-[#B54C44]"
+                            : "bg-[#E7F1E9] text-[#32765B]"
+                        }`}
+                      >
+                        {item.isDeleted ? <Trash2 className="w-4 h-4" /> : <BedDouble className="w-4 h-4" />}
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-sm text-[#59283A]">Room {item.roomNumber}</span>
+                          <span className="font-mono text-[10px] bg-[#F5F0EA] text-[#82747A] px-1.5 py-0.5 rounded">
+                            Floor {item.floor}
+                          </span>
+                          <span className="text-xs font-semibold text-[#8E7079]">
+                            {item.roomType?.name || "Standard Room"}
+                          </span>
+                          {item.isDeleted ? (
+                            <Badge className="text-[9px] bg-[#F8E8E5] text-[#B54C44] border-[#B54C44]/30">
+                              Decommissioned / Deleted
+                            </Badge>
+                          ) : (
+                            <Badge className="text-[9px] bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30">
+                              Active Inventory
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-3 text-[11px] text-[#82747A] mt-1 flex-wrap">
+                          <span>Nightly Tariff: <strong>₹{Number(item.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong></span>
+                          <span>•</span>
+                          <span>Capacity: <strong>{item.roomType?.capacity || 2} Pax</strong></span>
+                          <span>•</span>
+                          {item.isDeleted ? (
+                            <span className="text-[#B54C44] font-medium">
+                              Archived: {item.deletedAt ? new Date(item.deletedAt).toLocaleDateString("en-IN") : "Recorded"}
+                            </span>
+                          ) : (
+                            <span>
+                              Status: <strong className="text-[#32765B] uppercase">{item.roomStatus || "AVAILABLE"}</strong>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-center">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedRoomDetails(item);
+                          setDetailsModalOpen(true);
+                        }}
+                        className="h-7 text-xs border-[#E8DDD8] text-[#59283A] hover:bg-[#F5F0EA]"
+                      >
+                        <Eye className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
+                        <span>Dossier</span>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="p-3 border-t border-[#E8DDD8] bg-white flex items-center justify-between flex-shrink-0">
+            <span className="text-[11px] text-[#82747A]">
+              Showing {filteredHistoryItems.length} of {historyData?.totalCount || 0} room records for {historyData?.monthName || "selected month"}.
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setHistoryModalOpen(false)}
+              className="text-xs border-[#E8DDD8] text-[#59283A]"
+            >
+              Close Archive
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

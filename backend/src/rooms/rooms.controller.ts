@@ -27,6 +27,15 @@ export class RoomsController {
     return this.roomsService.findAvailable(checkIn, checkOut, roomTypeId);
   }
 
+  @Get('history')
+  @ApiOperation({ summary: 'Monthly room inventory history and archive' })
+  async getHistory(
+    @Query('month') month?: string,
+    @Query('year') year?: string,
+  ) {
+    return this.roomsService.getHistory(month, year);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get single room details' })
   async findOne(@Param('id') id: string) {

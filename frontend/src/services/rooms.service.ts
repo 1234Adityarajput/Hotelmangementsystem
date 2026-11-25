@@ -48,6 +48,11 @@ export const roomsService = {
     return res.data.data;
   },
 
+  async getHistory(params?: { month?: number; year?: number }): Promise<any> {
+    const res = await apiClient.get<ApiResponse<any>>("/rooms/history", { params });
+    return res.data.data;
+  },
+
   // Room Types
   async findAllTypes(): Promise<RoomType[]> {
     const res = await apiClient.get<ApiResponse<RoomType[]>>("/room-types");
