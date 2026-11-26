@@ -131,6 +131,10 @@ export default function StaysPage() {
 
   const [submitting, setSubmitting] = useState(false);
 
+  // Walk-in Guest Quick Search State
+  const [walkInGuestSearch, setWalkInGuestSearch] = useState("");
+  const [isSearchingWalkInGuest, setIsSearchingWalkInGuest] = useState(false);
+
   // Delete modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [stayToDelete, setStayToDelete] = useState<Booking | null>(null);
@@ -488,11 +492,72 @@ export default function StaysPage() {
         roomId: roomList[0]?.id || "",
         roomRatePerNight: roomList[0] ? Number(roomList[0].pricePerNight) : 2000,
       }));
+      setWalkInGuestSearch("");
       setWalkInModalOpen(true);
     } catch (err: any) {
       console.error("Failed to prepare walk-in check-in:", err);
+      setWalkInGuestSearch("");
       setWalkInForm((prev) => ({ ...prev, guestType: "NEW" }));
       setWalkInModalOpen(true);
+    }
+  };
+
+  // Quick Search registered guest by Mobile #, Name, ID Proof, or Guest Code
+  const handleSearchWalkInGuest = async (query: string) => {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      toast.info("Please enter a mobile number, guest name, or ID proof to search");
+      return;
+    }
+
+    setIsSearchingWalkInGuest(true);
+
+    // 1. Search in local allGuests array first (mobile, name, code, or id proof)
+    const cleanDigits = q.replace(/\D/g, "");
+    const matched = allGuests.find((g) => {
+      const matchName = g.fullName?.toLowerCase().includes(q);
+      const matchMobile = cleanDigits.length >= 3 && g.mobileNumber?.replace(/\D/g, "").includes(cleanDigits);
+      const matchCode = g.guestCode?.toLowerCase().includes(q);
+      const matchId = g.idProofNumber?.toLowerCase().includes(q);
+      const matchDoc = (g.documents || []).some((d: any) =>
+        d.documentNumber?.toLowerCase().includes(q)
+      );
+      return matchName || matchMobile || matchCode || matchId || matchDoc;
+    });
+
+    if (matched) {
+      setWalkInForm((prev) => ({ ...prev, primaryGuestId: matched.id, guestType: "EXISTING" }));
+      toast.success(`Guest found: ${matched.fullName} (${matched.mobileNumber})`);
+      setIsSearchingWalkInGuest(false);
+      return;
+    }
+
+    // 2. Query backend API if not in the cached 100 items
+    try {
+      const res = await guestsService.findAll({ search: query.trim(), limit: 10 });
+      const items: Guest[] = Array.isArray(res?.items)
+        ? res.items
+        : Array.isArray(res)
+        ? (res as any)
+        : [];
+
+      if (items.length > 0) {
+        const found = items[0];
+        setAllGuests((prev) => {
+          if (!prev.some((g) => g.id === found.id)) {
+            return [found, ...prev];
+          }
+          return prev;
+        });
+        setWalkInForm((prev) => ({ ...prev, primaryGuestId: found.id, guestType: "EXISTING" }));
+        toast.success(`Guest found: ${found.fullName} (${found.mobileNumber})`);
+      } else {
+        toast.error(`No registered guest found matching "${query}"`);
+      }
+    } catch (err) {
+      toast.error("Failed to query guest records");
+    } finally {
+      setIsSearchingWalkInGuest(false);
     }
   };
 
@@ -2245,30 +2310,117 @@ export default function StaysPage() {
               </div>
 
               {walkInForm.guestType === "EXISTING" ? (
-                allGuests.length > 0 ? (
-                  <select
-                    value={walkInForm.primaryGuestId}
-                    onChange={(e) => setWalkInForm({ ...walkInForm, primaryGuestId: e.target.value })}
-                    className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
-                  >
-                    {allGuests.map((g) => (
-                      <option key={g.id} value={g.id}>
-                        {g.fullName} ({g.mobileNumber}) • {g.guestCode}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <div className="p-2.5 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8] text-[11px] text-[#82747A] flex items-center justify-between">
-                    <span>No registered guests found in system.</span>
-                    <button
+                <div className="space-y-2">
+                  {/* Quick Search Row alongside dropdown */}
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-[#C4A06A]" />
+                      <Input
+                        type="text"
+                        placeholder="Search by Mobile #, Name, or ID Proof..."
+                        value={walkInGuestSearch}
+                        onChange={(e) => setWalkInGuestSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleSearchWalkInGuest(walkInGuestSearch);
+                          }
+                        }}
+                        className="pl-8 pr-7 h-8 text-xs border-[#E8DDD8] bg-white text-[#59283A] placeholder:text-[#8E7079]"
+                      />
+                      {walkInGuestSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setWalkInGuestSearch("")}
+                          className="absolute right-2 top-2 text-[#8E7079] hover:text-[#59283A]"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <Button
                       type="button"
-                      onClick={() => setWalkInForm({ ...walkInForm, guestType: "NEW" })}
-                      className="text-[#59283A] font-semibold underline"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSearchWalkInGuest(walkInGuestSearch)}
+                      disabled={isSearchingWalkInGuest}
+                      className="h-8 px-3 border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] text-xs font-semibold shrink-0"
                     >
-                      Enter Guest Details
-                    </button>
+                      {isSearchingWalkInGuest ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <>
+                          <Search className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
+                          Search
+                        </>
+                      )}
+                    </Button>
                   </div>
-                )
+
+                  {/* Dropdown Selector */}
+                  {allGuests.length > 0 ? (
+                    <select
+                      value={walkInForm.primaryGuestId}
+                      onChange={(e) => setWalkInForm({ ...walkInForm, primaryGuestId: e.target.value })}
+                      className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
+                    >
+                      {allGuests.map((g) => (
+                        <option key={g.id} value={g.id}>
+                          {g.fullName} ({g.mobileNumber}) • {g.guestCode}
+                          {g.idProofNumber ? ` • ${g.idProofType || "ID"}: ${g.idProofNumber}` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="p-2.5 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8] text-[11px] text-[#82747A] flex items-center justify-between">
+                      <span>No registered guests found in system.</span>
+                      <button
+                        type="button"
+                        onClick={() => setWalkInForm({ ...walkInForm, guestType: "NEW" })}
+                        className="text-[#59283A] font-semibold underline"
+                      >
+                        Enter Guest Details
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Instant Guest Information Preview Card */}
+                  {(() => {
+                    const selectedGuest = allGuests.find((g) => g.id === walkInForm.primaryGuestId);
+                    if (!selectedGuest) return null;
+                    return (
+                      <div className="p-2.5 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8] text-xs space-y-1">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 font-bold text-[#59283A]">
+                            <span>{selectedGuest.fullName}</span>
+                            <span className="font-mono text-[10px] text-[#C4A06A] bg-white px-1.5 py-0.2 rounded border border-[#E8DDD8]">
+                              {selectedGuest.guestCode}
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-semibold text-[#32765B] bg-[#E7F1E9] px-2 py-0.5 rounded flex items-center gap-1">
+                            <ShieldCheck className="w-3 h-3 text-[#32765B]" />
+                            Guest Verified
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-[#82747A] flex flex-wrap items-center gap-x-3 gap-y-1">
+                          <span className="flex items-center gap-1 font-mono text-[#59283A]">
+                            <Phone className="w-3 h-3 text-[#C4A06A]" />
+                            {selectedGuest.mobileNumber}
+                          </span>
+                          {selectedGuest.idProofNumber && (
+                            <span className="flex items-center gap-1">
+                              <span className="font-semibold text-[#59283A]">{selectedGuest.idProofType || "ID"}:</span>
+                              <span className="font-mono">{selectedGuest.idProofNumber}</span>
+                            </span>
+                          )}
+                          {selectedGuest.city && (
+                            <span>• {selectedGuest.city}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
               ) : (
                 <div className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] space-y-2">
                   <div className="grid grid-cols-2 gap-2">
