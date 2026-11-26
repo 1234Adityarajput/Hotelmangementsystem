@@ -36,7 +36,6 @@ import {
   ChevronRight,
   AlertTriangle,
   Loader2,
-  ShieldCheck,
 } from "lucide-react";
 import ExcelJS from "exceljs";
 import { useAuth } from "@/providers/auth-provider";
@@ -810,25 +809,8 @@ export default function AutomaticBillingPage() {
         </div>
       </div>
 
-      {/* KPI Metrics Strip */}
-      {isManager ? (
-        <div className="py-4 px-6 text-center flex items-center justify-center gap-3 bg-[#F5F0EA]/50 rounded-xl border border-dashed border-[#C4A06A]/50">
-          <div className="w-9 h-9 rounded-full bg-[#59283A]/10 flex items-center justify-center text-[#59283A] shrink-0">
-            <ShieldCheck className="w-5 h-5 text-[#C4A06A]" />
-          </div>
-          <div className="text-left">
-            <div className="text-xs font-bold uppercase tracking-wider text-[#A97832] flex items-center gap-2">
-              <span>Owner Confidential</span>
-              <span className="text-[10px] font-normal normal-case text-[#8E7079] bg-white px-2 py-0.5 rounded border border-[#E8DDD8]">
-                Executive Access Only
-              </span>
-            </div>
-            <p className="text-[11px] text-[#82747A] mt-0.5">
-              Live room charges, additional billing items, payments received, and balance due are confidential to Executive Hotel Owner.
-            </p>
-          </div>
-        </div>
-      ) : (
+      {/* KPI Metrics Strip (Executive Owner Only) */}
+      {!isManager && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           <Card className="border-[#E8DDD8] bg-white shadow-sm p-4">
             <div className="flex items-center justify-between text-xs text-[#82747A] mb-1">
