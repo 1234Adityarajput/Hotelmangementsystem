@@ -107,3 +107,10 @@
   background: #59283A;
   color: #FFFFFF;
 }
+
+/* Hide Next.js dev issue / indicator badge portal */
+nextjs-portal,
+[data-nextjs-toast],
+[data-nextjs-dev-indicator] {
+  display: none !important;
+}

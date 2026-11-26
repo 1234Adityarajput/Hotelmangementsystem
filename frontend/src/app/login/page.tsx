@@ -93,25 +93,10 @@ export default function LoginPage() {
             folios, staff payroll engine, and unified property management console designed for
             high-standard hotel operations.
           </p>
-
-          <div className="mt-8 flex flex-wrap items-center gap-3 text-xs">
-            <div className="flex items-center gap-2 bg-white/95 px-4 py-2 rounded-xl border border-black/15 font-black text-[#1E0B14] shadow-sm backdrop-blur-md">
-              <CheckCircle2 className="w-4 h-4 text-[#166534] stroke-[2.5]" />
-              <span>Modular Monolith</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/95 px-4 py-2 rounded-xl border border-black/15 font-black text-[#1E0B14] shadow-sm backdrop-blur-md">
-              <CheckCircle2 className="w-4 h-4 text-[#166534] stroke-[2.5]" />
-              <span>Cloud Database Live</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/95 px-4 py-2 rounded-xl border border-black/15 font-black text-[#1E0B14] shadow-sm backdrop-blur-md">
-              <CheckCircle2 className="w-4 h-4 text-[#C4A06A] stroke-[2.5]" />
-              <span>Royal Burgundy &amp; Pearl</span>
-            </div>
-          </div>
         </div>
 
-        {/* 5. Bottom 3-Column Highlights (Ultra Dark & Bold) */}
-        <div className="relative z-10 pt-8 border-t-2 border-[#1E0B14]/25 grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* 5. Bottom Highlights */}
+        <div className="relative z-10 pt-8 border-t-2 border-[#1E0B14]/25 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-md">
           <div>
             <div className="font-serif text-3xl lg:text-4xl font-black text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">33+ Rooms</div>
             <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">Active Across All Floors</div>
@@ -119,10 +104,6 @@ export default function LoginPage() {
           <div>
             <div className="font-serif text-3xl lg:text-4xl font-black text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">Instant Check-In</div>
             <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">Front Desk Key Dispatch</div>
-          </div>
-          <div>
-            <div className="font-serif text-3xl lg:text-4xl font-black text-[#166534] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">Cloud DB Live</div>
-            <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">100% Encrypted &amp; Audited</div>
           </div>
         </div>
       </div>
