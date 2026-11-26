@@ -98,7 +98,7 @@ export default function LoginPage() {
         {/* 5. Bottom Highlights */}
         <div className="relative z-10 pt-8 border-t-2 border-[#1E0B14]/25 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-md">
           <div>
-            <div className="font-serif text-3xl lg:text-4xl font-black text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">33+ Rooms</div>
+            <div className="font-serif text-3xl lg:text-4xl font-black text-[#1E0B14] drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]">30+ Rooms</div>
             <div className="text-xs sm:text-sm text-[#1E0B14] mt-1 font-black tracking-wide drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)]">Active Across All Floors</div>
           </div>
           <div>
