@@ -488,7 +488,7 @@ export default function StaysPage() {
       setWalkInForm((prev) => ({
         ...prev,
         guestType: guestList.length > 0 ? "EXISTING" : "NEW",
-        primaryGuestId: guestList[0]?.id || "",
+        primaryGuestId: "",
         roomId: roomList[0]?.id || "",
         roomRatePerNight: roomList[0] ? Number(roomList[0].pricePerNight) : 2000,
       }));
@@ -2364,6 +2364,7 @@ export default function StaysPage() {
                       onChange={(e) => setWalkInForm({ ...walkInForm, primaryGuestId: e.target.value })}
                       className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
                     >
+                      <option value="">-- Select Registered Guest (or Search Above) --</option>
                       {allGuests.map((g) => (
                         <option key={g.id} value={g.id}>
                           {g.fullName} ({g.mobileNumber}) • {g.guestCode}
@@ -2386,6 +2387,7 @@ export default function StaysPage() {
 
                   {/* Instant Guest Information Preview Card */}
                   {(() => {
+                    if (!walkInForm.primaryGuestId) return null;
                     const selectedGuest = allGuests.find((g) => g.id === walkInForm.primaryGuestId);
                     if (!selectedGuest) return null;
                     return (
