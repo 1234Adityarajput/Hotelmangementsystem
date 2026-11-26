@@ -1788,10 +1788,7 @@ export default function StaysPage() {
                     className="flex justify-between items-center text-sm font-bold p-2.5 bg-[#F6EDDC] rounded-lg border border-[#A97832]/30 mt-2 cursor-pointer hover:bg-[#F3E6D0] transition-colors"
                     title="Click to copy balance due to settlement amount"
                   >
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[#A97832]">Remaining Payment (Balance Due):</span>
-                      <span className="text-[10px] text-[#A97832]/80 font-normal underline">(Click to sync)</span>
-                    </div>
+                    <span className="text-[#A97832]">Remaining Payment (Balance Due):</span>
                     <span className="font-mono text-base text-[#A97832]">
                       ₹{computedBalanceDue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
@@ -1821,20 +1818,9 @@ export default function StaysPage() {
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between mb-0.5">
-                      <label className="text-[11px] font-semibold text-[#59283A]">Settlement Amount (₹)</label>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsManualSettlement(false);
-                          setSettlementAmount(computedBalanceDue);
-                        }}
-                        className="text-[10px] text-[#A97832] hover:text-[#59283A] font-bold underline transition-colors"
-                        title="Auto-fill exact remaining balance"
-                      >
-                        Auto-fill ₹{computedBalanceDue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                      </button>
-                    </div>
+                    <label className="text-[11px] font-semibold text-[#59283A] block mb-0.5 whitespace-nowrap">
+                      Settlement Amount (₹)
+                    </label>
                     <Input
                       type="number"
                       min="0"
