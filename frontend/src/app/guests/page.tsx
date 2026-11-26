@@ -42,6 +42,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { DocumentUploader } from "@/components/shared/document-uploader";
+import { WhatsAppIcon, getWhatsAppRegistrationLink } from "@/lib/whatsapp";
 import {
   Dialog,
   DialogContent,
@@ -607,12 +608,28 @@ export default function GuestsPage() {
 
     try {
       setSubmitting(true);
-      await guestsService.create({
+      const createdGuest = await guestsService.create({
         ...formData,
         dateOfBirth: formData.dateOfBirth ? formData.dateOfBirth : undefined,
         numberOfGuests: Number(formData.numberOfGuests) || 1,
       });
-      toast.success("Guest registered with complete profile and identity records");
+      toast.success("Guest registered with complete profile and identity records", {
+        action: createdGuest?.mobileNumber
+          ? {
+              label: "WhatsApp",
+              onClick: () => {
+                window.open(
+                  getWhatsAppRegistrationLink({
+                    fullName: createdGuest.fullName,
+                    guestCode: createdGuest.guestCode,
+                    mobileNumber: createdGuest.mobileNumber,
+                  }),
+                  "_blank"
+                );
+              },
+            }
+          : undefined,
+      });
       setAddModalOpen(false);
       fetchGuests();
     } catch (err: any) {
@@ -998,6 +1015,22 @@ export default function GuestsPage() {
                           <div className="flex items-center gap-1.5 font-mono text-[#59283A] font-medium">
                             <Phone className="w-3.5 h-3.5 text-[#C4A06A]" />
                             <span>{g.mobileNumber}</span>
+                            {g.mobileNumber && (
+                              <a
+                                href={getWhatsAppRegistrationLink({
+                                  fullName: g.fullName,
+                                  guestCode: g.guestCode,
+                                  mobileNumber: g.mobileNumber,
+                                })}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 ml-1 px-1.5 py-0.5 rounded text-[11px] font-semibold text-[#128C7E] bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 transition-all hover:scale-105"
+                                title="Chat with Guest on WhatsApp"
+                              >
+                                <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366]" />
+                                <span className="hidden sm:inline text-[10px]">WhatsApp</span>
+                              </a>
+                            )}
                           </div>
                           {g.alternateMobileNumber && (
                             <div className="text-[11px] text-[#8E7079] font-mono pl-5">
@@ -1098,6 +1131,22 @@ export default function GuestsPage() {
 
                         {/* Actions */}
                         <td className="px-4 py-3.5 text-right space-x-1.5 whitespace-nowrap">
+                          {g.mobileNumber && (
+                            <a
+                              href={getWhatsAppRegistrationLink({
+                                fullName: g.fullName,
+                                guestCode: g.guestCode,
+                                mobileNumber: g.mobileNumber,
+                              })}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center h-7 px-2 text-xs font-semibold text-[#128C7E] hover:text-[#0b665b] hover:bg-[#25D366]/15 border border-[#25D366]/30 rounded-md transition-colors"
+                              title="Send Welcome WhatsApp Message to Guest"
+                            >
+                              <WhatsAppIcon className="w-3.5 h-3.5 mr-1 text-[#25D366]" />
+                              <span>WhatsApp</span>
+                            </a>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -1657,6 +1706,22 @@ export default function GuestsPage() {
               </div>
 
               <div className="flex items-center gap-2">
+                {selectedGuest?.mobileNumber && (
+                  <a
+                    href={getWhatsAppRegistrationLink({
+                      fullName: selectedGuest.fullName,
+                      guestCode: selectedGuest.guestCode,
+                      mobileNumber: selectedGuest.mobileNumber,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-[#128C7E] bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 transition-colors shadow-sm"
+                    title="Open WhatsApp Chat with Guest"
+                  >
+                    <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366]" />
+                    <span>WhatsApp Guest</span>
+                  </a>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -1740,9 +1805,26 @@ export default function GuestsPage() {
                       <span className="text-[#8E7079] block text-[10px] uppercase font-bold tracking-wider">
                         Primary Mobile Number
                       </span>
-                      <span className="font-mono font-semibold text-sm text-[#59283A]">
-                        {selectedGuest.mobileNumber}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-semibold text-sm text-[#59283A]">
+                          {selectedGuest.mobileNumber}
+                        </span>
+                        {selectedGuest.mobileNumber && (
+                          <a
+                            href={getWhatsAppRegistrationLink({
+                              fullName: selectedGuest.fullName,
+                              guestCode: selectedGuest.guestCode,
+                              mobileNumber: selectedGuest.mobileNumber,
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[#25D366] hover:text-[#1ebd59] p-1 rounded-full hover:bg-[#25D366]/10"
+                            title="Chat on WhatsApp"
+                          >
+                            <WhatsAppIcon className="w-4 h-4 text-[#25D366]" />
+                          </a>
+                        )}
+                      </div>
                     </div>
 
                     <div>

@@ -50,6 +50,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
+import { WhatsAppIcon, getWhatsAppCheckInLink } from "@/lib/whatsapp";
 import {
   Dialog,
   DialogContent,
@@ -548,7 +549,39 @@ export default function StaysPage() {
         advancePaymentMethod: walkInForm.advancePaymentMethod,
       });
 
-      toast.success("Walk-in check-in completed. Guest is now in-house.");
+      const guestPhone =
+        walkInForm.guestType === "NEW"
+          ? walkInForm.newGuestMobile
+          : allGuests.find((g) => g.id === targetGuestId)?.mobileNumber;
+      const guestName =
+        walkInForm.guestType === "NEW"
+          ? walkInForm.newGuestName
+          : allGuests.find((g) => g.id === targetGuestId)?.fullName || "Guest";
+      const selRoom = allAvailableRooms.find((r) => r.id === walkInForm.roomId);
+
+      toast.success("Walk-in check-in completed. Guest is now in-house.", {
+        action: guestPhone
+          ? {
+              label: "WhatsApp",
+              onClick: () => {
+                window.open(
+                  getWhatsAppCheckInLink({
+                    guestName,
+                    mobileNumber: guestPhone,
+                    roomNumber: selRoom?.roomNumber || "",
+                    roomType: selRoom?.roomType?.name || "",
+                    checkInDate: walkInForm.checkInDate,
+                    checkInTime: walkInForm.checkInTime,
+                    expectedCheckOutDate: walkInForm.expectedCheckOutDate,
+                    expectedCheckOutTime: walkInForm.expectedCheckOutTime,
+                    advanceAmount: Number(walkInForm.advanceAmount || 0),
+                  }),
+                  "_blank"
+                );
+              },
+            }
+          : undefined,
+      });
       setWalkInModalOpen(false);
       fetchData();
     } catch (err: any) {
@@ -582,7 +615,30 @@ export default function StaysPage() {
         advancePaymentMethod: checkInAdvanceMethod,
       });
       toast.success(
-        `Guest ${checkInBooking.primaryGuest?.fullName} checked into Room ${checkInBooking.room?.roomNumber}`
+        `Guest ${checkInBooking.primaryGuest?.fullName} checked into Room ${checkInBooking.room?.roomNumber}`,
+        {
+          action: checkInBooking.primaryGuest?.mobileNumber
+            ? {
+                label: "WhatsApp",
+                onClick: () => {
+                  window.open(
+                    getWhatsAppCheckInLink({
+                      guestName: checkInBooking.primaryGuest?.fullName || "Guest",
+                      mobileNumber: checkInBooking.primaryGuest!.mobileNumber,
+                      roomNumber: checkInBooking.room?.roomNumber || "",
+                      roomType: checkInBooking.room?.roomType?.name || "",
+                      checkInDate: checkInBooking.checkInDate,
+                      checkInTime,
+                      expectedCheckOutDate: checkInBooking.expectedCheckOutDate,
+                      expectedCheckOutTime: checkInBooking.expectedCheckOutTime,
+                      advanceAmount: Number(checkInAdvanceAmount || 0),
+                    }),
+                    "_blank"
+                  );
+                },
+              }
+            : undefined,
+        }
       );
       setCheckInModalOpen(false);
       fetchData();
@@ -940,6 +996,34 @@ export default function StaysPage() {
                           <div className="text-[11px] text-[#82747A] font-mono flex items-center gap-1 mt-0.5">
                             <Phone className="w-3 h-3 text-[#C4A06A]" />
                             <span>{b.primaryGuest?.mobileNumber}</span>
+                            {b.primaryGuest?.mobileNumber && (
+                              <a
+                                href={getWhatsAppCheckInLink({
+                                  guestName: b.primaryGuest?.fullName || "Guest",
+                                  mobileNumber: b.primaryGuest.mobileNumber,
+                                  roomNumber: b.room?.roomNumber || "",
+                                  roomType: b.room?.roomType?.name || "",
+                                  checkInDate: b.checkInDate,
+                                  checkInTime: b.actualCheckInAt
+                                    ? new Date(b.actualCheckInAt).toLocaleTimeString("en-US", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                      })
+                                    : b.checkInTime || "12:00 PM",
+                                  expectedCheckOutDate: b.expectedCheckOutDate,
+                                  expectedCheckOutTime: b.expectedCheckOutTime || "11:00 AM",
+                                  advanceAmount: Number(b.advanceAmount || 0),
+                                })}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 ml-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-[#128C7E] bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 transition-all hover:scale-105"
+                                title="Send Check-In Confirmation via WhatsApp"
+                              >
+                                <WhatsAppIcon className="w-3 h-3 text-[#25D366]" />
+                                <span>WhatsApp</span>
+                              </a>
+                            )}
                           </div>
                         </td>
 
@@ -993,6 +1077,34 @@ export default function StaysPage() {
 
                         {/* Operations */}
                         <td className="px-4 py-3.5 text-right space-x-1.5 whitespace-nowrap">
+                          {b.primaryGuest?.mobileNumber && (
+                            <a
+                              href={getWhatsAppCheckInLink({
+                                guestName: b.primaryGuest?.fullName || "Guest",
+                                mobileNumber: b.primaryGuest.mobileNumber,
+                                roomNumber: b.room?.roomNumber || "",
+                                roomType: b.room?.roomType?.name || "",
+                                checkInDate: b.checkInDate,
+                                checkInTime: b.actualCheckInAt
+                                  ? new Date(b.actualCheckInAt).toLocaleTimeString("en-US", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      hour12: true,
+                                    })
+                                  : b.checkInTime || "12:00 PM",
+                                expectedCheckOutDate: b.expectedCheckOutDate,
+                                expectedCheckOutTime: b.expectedCheckOutTime || "11:00 AM",
+                                advanceAmount: Number(b.advanceAmount || 0),
+                              })}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center h-7 px-2 text-xs font-semibold text-[#128C7E] hover:text-[#0b665b] hover:bg-[#25D366]/15 border border-[#25D366]/30 rounded-md transition-colors"
+                              title="Send Check-In Confirmation via WhatsApp"
+                            >
+                              <WhatsAppIcon className="w-3.5 h-3.5 mr-1 text-[#25D366]" />
+                              <span>WhatsApp</span>
+                            </a>
+                          )}
                           <Button
                             variant="outline"
                             size="sm"
@@ -1077,8 +1189,31 @@ export default function StaysPage() {
 
                         <td className="px-4 py-3.5">
                           <div className="font-semibold text-[#59283A]">{b.primaryGuest?.fullName}</div>
-                          <div className="text-[11px] text-[#82747A] font-mono">
-                            {b.primaryGuest?.mobileNumber}
+                          <div className="text-[11px] text-[#82747A] font-mono flex items-center gap-1 mt-0.5">
+                            <Phone className="w-3 h-3 text-[#C4A06A]" />
+                            <span>{b.primaryGuest?.mobileNumber}</span>
+                            {b.primaryGuest?.mobileNumber && (
+                              <a
+                                href={getWhatsAppCheckInLink({
+                                  guestName: b.primaryGuest?.fullName || "Guest",
+                                  mobileNumber: b.primaryGuest.mobileNumber,
+                                  roomNumber: b.room?.roomNumber || "",
+                                  roomType: b.room?.roomType?.name || "",
+                                  checkInDate: b.checkInDate,
+                                  checkInTime: b.checkInTime || "12:00 PM",
+                                  expectedCheckOutDate: b.expectedCheckOutDate,
+                                  expectedCheckOutTime: b.expectedCheckOutTime || "11:00 AM",
+                                  advanceAmount: Number(b.advanceAmount || 0),
+                                })}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 ml-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-[#128C7E] bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 transition-all hover:scale-105"
+                                title="Send Check-In Confirmation via WhatsApp"
+                              >
+                                <WhatsAppIcon className="w-3 h-3 text-[#25D366]" />
+                                <span>WhatsApp</span>
+                              </a>
+                            )}
                           </div>
                         </td>
 
@@ -1398,9 +1533,32 @@ export default function StaysPage() {
                   <span className="font-bold text-[#59283A] text-sm">
                     {checkInBooking.primaryGuest?.fullName}
                   </span>
-                  <span className="font-mono text-[#82747A]">
-                    {checkInBooking.primaryGuest?.mobileNumber}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[#82747A]">
+                      {checkInBooking.primaryGuest?.mobileNumber}
+                    </span>
+                    {checkInBooking.primaryGuest?.mobileNumber && (
+                      <a
+                        href={getWhatsAppCheckInLink({
+                          guestName: checkInBooking.primaryGuest?.fullName || "Guest",
+                          mobileNumber: checkInBooking.primaryGuest.mobileNumber,
+                          roomNumber: checkInBooking.room?.roomNumber || "",
+                          roomType: checkInBooking.room?.roomType?.name || "",
+                          checkInDate: checkInBooking.checkInDate,
+                          checkInTime,
+                          expectedCheckOutDate: checkInBooking.expectedCheckOutDate,
+                          expectedCheckOutTime: checkInBooking.expectedCheckOutTime,
+                          advanceAmount: Number(checkInAdvanceAmount || 0),
+                        })}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[#25D366] hover:text-[#1ebd59] p-1 rounded-full hover:bg-[#25D366]/10"
+                        title="Chat on WhatsApp"
+                      >
+                        <WhatsAppIcon className="w-4 h-4 text-[#25D366]" />
+                      </a>
+                    )}
+                  </div>
                 </div>
                 <div className="text-[11px] text-[#82747A]">
                   {checkInBooking.primaryGuest?.city || "India"} • ID Verified
