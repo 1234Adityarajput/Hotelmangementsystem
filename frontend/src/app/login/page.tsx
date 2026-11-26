@@ -335,42 +335,27 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={submitting || isLoading}
-                className="w-full bg-[#59283A] hover:bg-[#472130] text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-[#59283A]/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full bg-[#59283A] hover:bg-[#472130] text-white font-semibold py-3 px-4 rounded-xl shadow-md shadow-[#59283A]/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
               >
                 {submitting || isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-[#C4A06A]" />
-                    <span>Verifying Credentials...</span>
+                    <span>Continuing...</span>
                   </>
                 ) : (
                   <>
-                    <span>Enter Dashboard Console</span>
+                    <span>Continue</span>
                     <ArrowRight className="w-4 h-4 text-[#C4A06A]" />
                   </>
                 )}
               </button>
-            </div>
-
-            {/* Role Credential Summary Box */}
-            <div className="p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8] text-xs space-y-1.5">
-              <div className="flex items-center justify-between font-semibold text-[#59283A]">
-                <span>Active Role: {selectedRole === "OWNER" ? "👑 Hotel Owner" : "👔 Hotel Manager"}</span>
-                <span className="text-[10px] bg-[#E7F1E9] text-[#32765B] px-2 py-0.5 rounded-full font-bold">
-                  {selectedRole === "OWNER" ? "Unrestricted" : "Operations"}
-                </span>
-              </div>
-              <p className="text-[11px] text-[#82747A] leading-relaxed">
-                {selectedRole === "OWNER"
-                  ? "Login ID: admin — Full access to all 18 modules (Financials, Payments, Payroll, Reports, Settings)."
-                  : "Login ID: manager — Front desk access (Guests, Rooms, Bookings, Stays, Billing, Items, Invoices, Staff & Attendance). Financials, Payments, Payroll, and Reports are protected."}
-              </p>
             </div>
           </form>
 
           {/* Footer Copyright */}
           <div className="mt-8 pt-5 border-t border-[#E8DDD8] text-center">
             <p className="text-[11px] text-[#82747A]">
-              Hotel Radha Palace © 2026 • Live Database Secure Console
+              Hotel Radha Palace © 2026
             </p>
           </div>
         </div>
