@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Shield, LogOut, CheckCircle2, ChevronRight, Menu } from "lucide-react";
+import { Shield, LogOut, ChevronRight, Menu } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 
@@ -201,12 +201,6 @@ export function Header({ onOpenMobile }: HeaderProps) {
 
       {/* Right Controls */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Live Status Indicator */}
-        <div className="hidden md:flex items-center gap-2 bg-[#E7F1E9] text-[#32765B] px-3.5 py-1.5 rounded-full text-xs font-semibold border border-[#32765B]/25 shadow-xs">
-          <CheckCircle2 className="w-3.5 h-3.5 text-[#32765B]" />
-          <span className="tracking-wide">Database Live</span>
-        </div>
-
         {/* Administrator Profile Pill */}
         <div className="flex items-center gap-2.5 bg-[#F5F0EA] px-3 sm:px-3.5 py-1.5 rounded-full border border-[#E8DDD8] shadow-xs">
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#59283A] to-[#472130] flex items-center justify-center text-[#C4A06A] shadow-xs">

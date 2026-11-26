@@ -412,27 +412,6 @@ export function Sidebar({
         ))}
       </nav>
 
-      {/* Footer System Status */}
-      <div className={cn(
-        "p-4 border-t border-[#472130] text-xs bg-[#472130]/70 text-[#8E7079] flex-shrink-0",
-        collapsed && "p-2 text-center"
-      )}>
-        {collapsed ? (
-          <div className="w-2.5 h-2.5 rounded-full bg-[#32765B] mx-auto animate-pulse" title="PostgreSQL Live" />
-        ) : (
-          <>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#32765B] animate-pulse" />
-                <span className="text-white font-medium text-[11px]">Database Connected</span>
-              </div>
-              <span className="text-[10px] text-[#C4A06A] font-mono">v2.0</span>
-            </div>
-            <p className="mt-1 text-[10px] text-[#8E7079]">Royal Burgundy & Pearl • Monolith</p>
-          </>
-        )}
-      </div>
-
       {/* Expand Button for Collapsed State */}
       {collapsed && onToggleCollapse && (
         <button
