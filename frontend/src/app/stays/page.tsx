@@ -58,6 +58,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 export default function StaysPage() {
   const [activeTab, setActiveTab] = useState<"arrivals" | "inhouse" | "departures" | "archive">("inhouse");
@@ -95,6 +96,7 @@ export default function StaysPage() {
   const [taxPercentage, setTaxPercentage] = useState<number>(12);
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "UPI" | "BANK_TRANSFER" | "OTHER">("CASH");
   const [settlementAmount, setSettlementAmount] = useState<number>(0);
+  const [isManualSettlement, setIsManualSettlement] = useState(false);
   const [checkOutNotes, setCheckOutNotes] = useState("");
   const [loadingSummary, setLoadingSummary] = useState(false);
 
@@ -608,10 +610,11 @@ export default function StaysPage() {
 
     try {
       setLoadingSummary(true);
+      setIsManualSettlement(false);
       setCheckOutModalOpen(true);
       const summary = await bookingsService.getCheckoutSummary(booking.id);
       setCheckoutSummary(summary);
-      setTaxPercentage(summary.taxPercentage || 12);
+      setTaxPercentage(summary.taxPercentage !== undefined ? Number(summary.taxPercentage) : 12);
       setSettlementAmount(summary.remainingPayment || 0);
     } catch (err) {
       toast.error("Failed to load live check-out folio");
@@ -620,21 +623,28 @@ export default function StaysPage() {
     }
   };
 
-  // Recalculate folio when discount or service charges change in modal
+  // Recalculate folio when discount, service charges, or tax change in modal
   const computedRoomCharges = checkoutSummary?.roomCharges || 0;
   const computedAdditionalCharges = checkoutSummary?.additionalItemCharges || 0;
-  const computedSubtotal = Math.round((computedRoomCharges + computedAdditionalCharges + Number(serviceCharges)) * 100) / 100;
+  const computedSubtotal = Math.round((computedRoomCharges + computedAdditionalCharges + Number(serviceCharges || 0)) * 100) / 100;
   let computedDiscount = 0;
   if (discountType === "PERCENTAGE") {
-    computedDiscount = Math.round(computedSubtotal * (Math.min(100, Number(discountValue)) / 100) * 100) / 100;
+    computedDiscount = Math.round(computedSubtotal * (Math.min(100, Math.max(0, Number(discountValue || 0))) / 100) * 100) / 100;
   } else {
-    computedDiscount = Math.min(Number(discountValue), computedSubtotal);
+    computedDiscount = Math.min(Math.max(0, Number(discountValue || 0)), computedSubtotal);
   }
-  const computedTaxable = Math.max(0, computedSubtotal - computedDiscount);
-  const computedTax = Math.round(computedTaxable * (Number(taxPercentage) / 100) * 100) / 100;
+  const computedTaxable = Math.max(0, Math.round((computedSubtotal - computedDiscount) * 100) / 100);
+  const computedTax = Math.round(computedTaxable * (Math.max(0, Number(taxPercentage || 0)) / 100) * 100) / 100;
   const computedTotalBill = Math.round((computedTaxable + computedTax) * 100) / 100;
   const computedPaidAlready = (checkoutSummary?.advancePayment || 0) + (checkoutSummary?.additionalPayments || 0);
   const computedBalanceDue = Math.max(0, Math.round((computedTotalBill - computedPaidAlready) * 100) / 100);
+
+  // Automatically keep settlement amount synchronized with live balance due unless user manually edits it
+  useEffect(() => {
+    if (checkOutModalOpen && !isManualSettlement) {
+      setSettlementAmount(computedBalanceDue);
+    }
+  }, [computedBalanceDue, checkOutModalOpen, isManualSettlement]);
 
   const handleConfirmCheckOut = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1484,7 +1494,7 @@ export default function StaysPage() {
                     <Input
                       type="number"
                       min="0"
-                      step="100"
+                      step="any"
                       value={checkInAdvanceAmount}
                       onChange={(e) => setCheckInAdvanceAmount(Number(e.target.value))}
                       className="h-8 text-xs font-mono border-[#E8DDD8]"
@@ -1564,7 +1574,7 @@ export default function StaysPage() {
               />
             </div>
           ) : (
-            <form onSubmit={handleConfirmCheckOut} className="space-y-4 pt-2 text-xs">
+            <form onSubmit={handleConfirmCheckOut} noValidate className="space-y-4 pt-2 text-xs">
               {/* Stay Header Summary */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
                 <div>
@@ -1654,9 +1664,12 @@ export default function StaysPage() {
                       <Input
                         type="number"
                         min="0"
-                        step="50"
+                        step="any"
                         value={serviceCharges}
-                        onChange={(e) => setServiceCharges(Number(e.target.value))}
+                        onChange={(e) => {
+                          setServiceCharges(e.target.value === "" ? 0 : Number(e.target.value));
+                          setIsManualSettlement(false);
+                        }}
                         className="h-7 text-xs font-mono text-right border-[#E8DDD8]"
                       />
                     </div>
@@ -1679,8 +1692,12 @@ export default function StaysPage() {
                       <Input
                         type="number"
                         min="0"
+                        step="any"
                         value={discountValue}
-                        onChange={(e) => setDiscountValue(Number(e.target.value))}
+                        onChange={(e) => {
+                          setDiscountValue(e.target.value === "" ? 0 : Number(e.target.value));
+                          setIsManualSettlement(false);
+                        }}
                         className="h-7 w-20 text-xs font-mono text-right border-[#E8DDD8]"
                       />
                       <span className="font-mono text-xs text-rose-600 font-medium w-24 text-right">
@@ -1689,11 +1706,50 @@ export default function StaysPage() {
                     </div>
                   </div>
 
-                  {/* Tax */}
+                  {/* Tax / GST - User configurable & dynamic */}
                   <div className="flex justify-between items-center text-xs pt-1">
-                    <span className="text-[#82747A]">Tax / GST ({taxPercentage}%):</span>
-                    <span className="font-mono font-semibold text-[#59283A]">
-                      ₹{computedTax.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[#82747A] font-semibold">Tax / GST:</span>
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="any"
+                          value={taxPercentage}
+                          onChange={(e) => {
+                            const val = e.target.value === "" ? 0 : Number(e.target.value);
+                            setTaxPercentage(val);
+                            setIsManualSettlement(false);
+                          }}
+                          className="h-7 w-16 text-xs font-mono text-right border-[#E8DDD8] bg-white px-1.5 focus:border-[#59283A]"
+                          placeholder="12"
+                        />
+                        <span className="text-xs font-bold text-[#82747A]">%</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {[0, 5, 12, 18, 28].map((rate) => (
+                          <button
+                            key={rate}
+                            type="button"
+                            onClick={() => {
+                              setTaxPercentage(rate);
+                              setIsManualSettlement(false);
+                            }}
+                            className={cn(
+                              "px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all border",
+                              Number(taxPercentage) === rate
+                                ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
+                                : "bg-white text-[#82747A] border-[#E8DDD8] hover:border-[#59283A] hover:text-[#59283A]"
+                            )}
+                          >
+                            {rate}%
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <span className="font-mono font-semibold text-[#59283A] w-24 text-right">
+                      +₹{computedTax.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
 
@@ -1724,8 +1780,18 @@ export default function StaysPage() {
                   ) : null}
 
                   {/* Remaining Payment / Balance Due */}
-                  <div className="flex justify-between items-center text-sm font-bold p-2.5 bg-[#F6EDDC] rounded-lg border border-[#A97832]/30 mt-2">
-                    <span className="text-[#A97832]">Remaining Payment (Balance Due):</span>
+                  <div
+                    onClick={() => {
+                      setIsManualSettlement(false);
+                      setSettlementAmount(computedBalanceDue);
+                    }}
+                    className="flex justify-between items-center text-sm font-bold p-2.5 bg-[#F6EDDC] rounded-lg border border-[#A97832]/30 mt-2 cursor-pointer hover:bg-[#F3E6D0] transition-colors"
+                    title="Click to copy balance due to settlement amount"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[#A97832]">Remaining Payment (Balance Due):</span>
+                      <span className="text-[10px] text-[#A97832]/80 font-normal underline">(Click to sync)</span>
+                    </div>
                     <span className="font-mono text-base text-[#A97832]">
                       ₹{computedBalanceDue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
@@ -1755,13 +1821,29 @@ export default function StaysPage() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-semibold text-[#59283A]">Settlement Amount (₹)</label>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <label className="text-[11px] font-semibold text-[#59283A]">Settlement Amount (₹)</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsManualSettlement(false);
+                          setSettlementAmount(computedBalanceDue);
+                        }}
+                        className="text-[10px] text-[#A97832] hover:text-[#59283A] font-bold underline transition-colors"
+                        title="Auto-fill exact remaining balance"
+                      >
+                        Auto-fill ₹{computedBalanceDue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      </button>
+                    </div>
                     <Input
                       type="number"
                       min="0"
-                      step="50"
+                      step="any"
                       value={settlementAmount}
-                      onChange={(e) => setSettlementAmount(Number(e.target.value))}
+                      onChange={(e) => {
+                        setIsManualSettlement(true);
+                        setSettlementAmount(e.target.value === "" ? 0 : Number(e.target.value));
+                      }}
                       className="h-8 text-xs font-mono bg-white border-[#E8DDD8]"
                     />
                   </div>
@@ -2191,7 +2273,7 @@ export default function StaysPage() {
                 <Input
                   type="number"
                   min="0"
-                  step="50"
+                  step="any"
                   value={walkInForm.roomRatePerNight}
                   onChange={(e) =>
                     setWalkInForm({ ...walkInForm, roomRatePerNight: Number(e.target.value) })
@@ -2208,7 +2290,7 @@ export default function StaysPage() {
                 <Input
                   type="number"
                   min="0"
-                  step="100"
+                  step="any"
                   value={walkInForm.advanceAmount}
                   onChange={(e) =>
                     setWalkInForm({ ...walkInForm, advanceAmount: Number(e.target.value) })
