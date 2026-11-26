@@ -29,7 +29,7 @@ import {
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
   const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("Admin@Hotel2026!");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedRole, setSelectedRole] = useState<"OWNER" | "MANAGER">("OWNER");
@@ -120,10 +120,10 @@ export default function LoginPage() {
     setSelectedRole(role);
     if (role === "OWNER") {
       setUsername("admin");
-      setPassword("Admin@Hotel2026!");
+      setPassword("");
     } else {
       setUsername("manager");
-      setPassword("Manager@Hotel2026!");
+      setPassword("");
     }
   };
 
@@ -328,18 +328,6 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
-              <div className="flex items-center justify-between mt-1 text-[11px]">
-                <p className="text-[#82747A]">
-                  Default: <span className="font-mono text-[#59283A] font-semibold">Admin@Hotel2026!</span>
-                </p>
-                <button
-                  type="button"
-                  onClick={openChangePasswordModal}
-                  className="font-bold text-[#59283A] hover:text-[#C4A06A] transition-colors underline cursor-pointer"
-                >
-                  Change Password
-                </button>
-              </div>
             </div>
 
             {/* Submit Button */}
@@ -373,8 +361,8 @@ export default function LoginPage() {
               </div>
               <p className="text-[11px] text-[#82747A] leading-relaxed">
                 {selectedRole === "OWNER"
-                  ? "Login: admin / Admin@Hotel2026! — Full access to all 18 modules (Financials, Payments, Payroll, Reports, Settings)."
-                  : "Login: manager / Manager@Hotel2026! — Front desk access (Guests, Rooms, Bookings, Stays, Billing, Items, Invoices, Staff & Attendance). Financials, Payments, Payroll, and Reports are protected."}
+                  ? "Login ID: admin — Full access to all 18 modules (Financials, Payments, Payroll, Reports, Settings)."
+                  : "Login ID: manager — Front desk access (Guests, Rooms, Bookings, Stays, Billing, Items, Invoices, Staff & Attendance). Financials, Payments, Payroll, and Reports are protected."}
               </p>
             </div>
           </form>
