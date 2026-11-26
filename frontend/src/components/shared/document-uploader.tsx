@@ -78,11 +78,7 @@ export function DocumentUploader({
         fileSize: res.fileSize,
       });
 
-      if (res.isCloudinary) {
-        toast.success(`Document uploaded to Cloudinary: ${res.fileName}`);
-      } else {
-        toast.success(`Document attached successfully: ${res.fileName} (${sizeStr})`);
-      }
+      toast.success(`Document attached successfully: ${res.fileName} (${sizeStr})`);
     } catch (err: any) {
       console.error("Document upload error:", err);
       toast.error(err.message || "Failed to process document file");
