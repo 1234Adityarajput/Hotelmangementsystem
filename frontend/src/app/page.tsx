@@ -867,7 +867,7 @@ export default function AdminDashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
-              <div className="grid grid-cols-4 gap-2 text-center text-xs">
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
                 <div className="p-2.5 bg-[#E7F1E9] rounded-lg border border-[#32765B]/20">
                   <span className="font-bold text-lg text-[#32765B] block">
                     {analytics?.staffAttendanceSummary?.present || 0}
@@ -879,12 +879,6 @@ export default function AdminDashboardPage() {
                     {analytics?.staffAttendanceSummary?.absent || 0}
                   </span>
                   <span className="text-[10px] text-[#B54C44] uppercase font-bold">Absent</span>
-                </div>
-                <div className="p-2.5 bg-[#F6EDDC] rounded-lg border border-[#A97832]/20">
-                  <span className="font-bold text-lg text-[#A97832] block">
-                    {analytics?.staffAttendanceSummary?.halfDay || 0}
-                  </span>
-                  <span className="text-[10px] text-[#A97832] uppercase font-bold">Half Day</span>
                 </div>
                 <div className="p-2.5 bg-[#E9EFF3] rounded-lg border border-[#627D91]/20">
                   <span className="font-bold text-lg text-[#627D91] block">

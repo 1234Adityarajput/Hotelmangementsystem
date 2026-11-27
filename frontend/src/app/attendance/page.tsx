@@ -883,8 +883,8 @@ export default function AttendancePage() {
             </div>
           </div>
 
-          {/* 6 KPI Stat Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* 5 KPI Stat Badges */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <Card className="border-[#E8DDD8] shadow-sm bg-white">
               <CardContent className="p-3 text-center">
                 <span className="text-[10px] uppercase font-bold text-[#82747A] block">Total Staff</span>
@@ -912,16 +912,6 @@ export default function AttendancePage() {
                   {dailyData?.stats.absent || 0}
                 </span>
                 <span className="text-[10px] text-rose-600 block mt-0.5">Unexcused</span>
-              </CardContent>
-            </Card>
-
-            <Card className="border-amber-200 shadow-sm bg-amber-50/40">
-              <CardContent className="p-3 text-center">
-                <span className="text-[10px] uppercase font-bold text-amber-700 block">Half Day</span>
-                <span className="text-2xl font-bold font-serif text-amber-700">
-                  {dailyData?.stats.halfDay || 0}
-                </span>
-                <span className="text-[10px] text-amber-600 block mt-0.5">4h Shift</span>
               </CardContent>
             </Card>
 
@@ -1028,7 +1018,7 @@ export default function AttendancePage() {
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-1">
-                                {(["PRESENT", "ABSENT", "HALF_DAY", "LEAVE", "WEEKLY_OFF"] as const).map((st) => {
+                                {(["PRESENT", "ABSENT", "LEAVE", "WEEKLY_OFF"] as const).map((st) => {
                                   const isCurrent = att?.attendanceStatus === st;
                                   const statusCfg = STATUS_CONFIG[st];
                                   return (
@@ -1195,7 +1185,7 @@ export default function AttendancePage() {
 
           {/* Monthly KPI Stats Strip */}
           {monthlyData && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               <Card className="border-[#E8DDD8] shadow-sm bg-white">
                 <CardContent className="p-3 text-center">
                   <span className="text-[10px] uppercase font-bold text-[#82747A] block">Staff Enrolled</span>
@@ -1225,16 +1215,6 @@ export default function AttendancePage() {
                     {monthlyData.overallStats.totalAbsent}
                   </span>
                   <span className="text-[10px] text-rose-600 block mt-0.5">Unexcused</span>
-                </CardContent>
-              </Card>
-
-              <Card className="border-amber-200 shadow-sm bg-amber-50/40">
-                <CardContent className="p-3 text-center">
-                  <span className="text-[10px] uppercase font-bold text-amber-700 block">Half Days</span>
-                  <span className="text-2xl font-bold font-serif text-amber-700">
-                    {monthlyData.overallStats.totalHalfDay}
-                  </span>
-                  <span className="text-[10px] text-amber-600 block mt-0.5">Half Shifts</span>
                 </CardContent>
               </Card>
 
@@ -1277,7 +1257,6 @@ export default function AttendancePage() {
               <div className="flex items-center gap-1.5 text-xs text-[#82747A]">
                 <span className="w-2 h-2 rounded-full bg-emerald-600" /> P: Present
                 <span className="w-2 h-2 rounded-full bg-rose-600 ml-2" /> A: Absent
-                <span className="w-2 h-2 rounded-full bg-amber-600 ml-2" /> HD: Half Day
                 <span className="w-2 h-2 rounded-full bg-blue-600 ml-2" /> L: Leave
                 <span className="w-2 h-2 rounded-full bg-purple-600 ml-2" /> WO: Off
               </div>
@@ -1309,7 +1288,6 @@ export default function AttendancePage() {
                         ))}
                         <th className="px-2 py-2 text-center text-emerald-800 bg-emerald-50/50">P</th>
                         <th className="px-2 py-2 text-center text-rose-800 bg-rose-50/50">A</th>
-                        <th className="px-2 py-2 text-center text-amber-800 bg-amber-50/50">HD</th>
                         <th className="px-2 py-2 text-center text-blue-800 bg-blue-50/50">L</th>
                         <th className="px-2 py-2 text-center text-purple-800 bg-purple-50/50">WO</th>
                         <th className="px-2.5 py-2 text-center font-bold text-[#59283A]">Hours</th>
@@ -1365,9 +1343,6 @@ export default function AttendancePage() {
                           </td>
                           <td className="px-2 py-2 text-center font-bold font-mono text-rose-700 bg-rose-50/30">
                             {row.summary.absentCount}
-                          </td>
-                          <td className="px-2 py-2 text-center font-bold font-mono text-amber-700 bg-amber-50/30">
-                            {row.summary.halfDayCount}
                           </td>
                           <td className="px-2 py-2 text-center font-bold font-mono text-blue-700 bg-blue-50/30">
                             {row.summary.leaveCount}
@@ -1450,7 +1425,7 @@ export default function AttendancePage() {
 
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-semibold text-[#82747A]">Status:</span>
-              {["ALL", "PRESENT", "ABSENT", "HALF_DAY", "LEAVE", "WEEKLY_OFF"].map((st) => (
+              {["ALL", "PRESENT", "ABSENT", "LEAVE", "WEEKLY_OFF"].map((st) => (
                 <button
                   key={st}
                   onClick={() => setHistoryStatusFilter(st)}
@@ -1524,7 +1499,7 @@ export default function AttendancePage() {
                   </CardContent>
                 </Card>
 
-                <div className="md:col-span-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="md:col-span-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                   <Card className="border-emerald-200 shadow-sm bg-emerald-50/40">
                     <CardContent className="p-3 text-center">
                       <span className="text-[10px] uppercase font-bold text-emerald-700 block">Present Days</span>
@@ -1538,14 +1513,6 @@ export default function AttendancePage() {
                       <span className="text-[10px] uppercase font-bold text-rose-700 block">Absent Days</span>
                       <span className="text-2xl font-bold font-serif text-rose-700">{absentCount}</span>
                       <span className="text-[10px] text-rose-600 block mt-0.5">Unexcused</span>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-amber-200 shadow-sm bg-amber-50/40">
-                    <CardContent className="p-3 text-center">
-                      <span className="text-[10px] uppercase font-bold text-amber-700 block">Half Days</span>
-                      <span className="text-2xl font-bold font-serif text-amber-700">{halfDayCount}</span>
-                      <span className="text-[10px] text-amber-600 block mt-0.5">4h Shifts</span>
                     </CardContent>
                   </Card>
 
@@ -1713,24 +1680,23 @@ export default function AttendancePage() {
                   setEditForm((prev) => ({
                     ...prev,
                     status: newStatus,
-                    workingHours: newStatus === "PRESENT" ? 8 : newStatus === "HALF_DAY" ? 4 : 0,
+                    workingHours: newStatus === "PRESENT" ? 8 : 0,
                     overtimeHours: newStatus === "PRESENT" ? prev.overtimeHours : 0,
-                    checkInTime: newStatus === "PRESENT" || newStatus === "HALF_DAY" ? prev.checkInTime || "09:00 AM" : "",
-                    checkOutTime: newStatus === "PRESENT" ? prev.checkOutTime || "06:00 PM" : newStatus === "HALF_DAY" ? "01:00 PM" : "",
+                    checkInTime: newStatus === "PRESENT" ? prev.checkInTime || "09:00 AM" : "",
+                    checkOutTime: newStatus === "PRESENT" ? prev.checkOutTime || "06:00 PM" : "",
                   }));
                 }}
                 className="w-full h-8 text-xs border border-[#E8DDD8] rounded-md px-2 bg-white text-[#59283A]"
               >
                 <option value="PRESENT">PRESENT (Full Duty)</option>
                 <option value="ABSENT">ABSENT (Unexcused)</option>
-                <option value="HALF_DAY">HALF DAY (Half Shift - 4 Hours)</option>
                 <option value="LEAVE">LEAVE (Approved Leave / Casual / Medical)</option>
                 <option value="WEEKLY_OFF">WEEKLY OFF (Scheduled Rest)</option>
               </select>
             </div>
 
             {/* Check-in & Check-out Timings */}
-            {(editForm.status === "PRESENT" || editForm.status === "HALF_DAY") && (
+            {editForm.status === "PRESENT" && (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
@@ -1869,7 +1835,6 @@ export default function AttendancePage() {
               >
                 <option value="PRESENT">PRESENT (Standard 8h Shift)</option>
                 <option value="ABSENT">ABSENT</option>
-                <option value="HALF_DAY">HALF DAY (4h Shift)</option>
                 <option value="LEAVE">LEAVE</option>
                 <option value="WEEKLY_OFF">WEEKLY OFF</option>
               </select>
