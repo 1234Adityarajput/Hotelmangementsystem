@@ -1613,7 +1613,7 @@ export default function RoomsPage() {
                   type="number"
                   required
                   min="0"
-                  step="50"
+                  step="any"
                   value={roomForm.pricePerNight}
                   onChange={(e) =>
                     setRoomForm({ ...roomForm, pricePerNight: Number(e.target.value) })
@@ -1690,7 +1690,7 @@ export default function RoomsPage() {
                 type="number"
                 required
                 min="0"
-                step="50"
+                step="any"
                 value={newPrice}
                 onChange={(e) => setNewPrice(Number(e.target.value))}
                 className="h-9 text-sm font-mono border-[#E8DDD8]"
@@ -1938,7 +1938,7 @@ export default function RoomsPage() {
                 <Input
                   type="number"
                   min="0"
-                  step="100"
+                  step="any"
                   value={typeForm.defaultPricePerNight}
                   onChange={(e) =>
                     setTypeForm({ ...typeForm, defaultPricePerNight: Number(e.target.value) })

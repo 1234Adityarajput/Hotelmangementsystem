@@ -1162,7 +1162,7 @@ export default function StaffPage() {
                   <Input
                     type="number"
                     min="0"
-                    step="500"
+                    step="any"
                     required
                     value={formData.monthlySalary}
                     onChange={(e) => setFormData({ ...formData, monthlySalary: Number(e.target.value) })}
@@ -1405,7 +1405,7 @@ export default function StaffPage() {
                   <Input
                     type="number"
                     min="0"
-                    step="500"
+                    step="any"
                     required
                     value={formData.monthlySalary}
                     onChange={(e) => setFormData({ ...formData, monthlySalary: Number(e.target.value) })}

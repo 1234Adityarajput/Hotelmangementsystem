@@ -283,11 +283,21 @@ export default function PayrollPage() {
   const handleDisburseSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRecord) return;
+    const amount = Number(disburseForm.paymentAmount);
+    if (!amount || amount <= 0) {
+      toast.error("Please enter a valid payment amount greater than 0");
+      return;
+    }
+    const balance = Number(selectedRecord.balanceAmount || 0);
+    if (amount > balance + 0.05) {
+      toast.error(`Payment amount (₹${amount}) cannot exceed outstanding balance (₹${balance})`);
+      return;
+    }
     try {
       setSubmitting(true);
       await payrollService.recordSalaryPayment({
         salaryRecordId: selectedRecord.id,
-        paymentAmount: Number(disburseForm.paymentAmount),
+        paymentAmount: amount,
         paymentMethod: disburseForm.paymentMethod,
         paymentDate: disburseForm.paymentDate,
         transactionReference: disburseForm.transactionReference,
@@ -1354,7 +1364,7 @@ export default function PayrollPage() {
                 <Input
                   type="number"
                   min="0"
-                  step="100"
+                  step="any"
                   value={genForm.deductions}
                   onChange={(e) => setGenForm({ ...genForm, deductions: Number(e.target.value) })}
                   className="h-8 text-xs font-mono border-[#E8DDD8]"
@@ -1366,7 +1376,7 @@ export default function PayrollPage() {
                 <Input
                   type="number"
                   min="0"
-                  step="100"
+                  step="any"
                   value={genForm.advanceDeductions}
                   onChange={(e) => setGenForm({ ...genForm, advanceDeductions: Number(e.target.value) })}
                   className="h-8 text-xs font-mono border-[#E8DDD8]"
@@ -1543,13 +1553,13 @@ export default function PayrollPage() {
                 <label className="font-semibold text-[#59283A]">Payment Amount (₹) *</label>
                 <Input
                   type="number"
-                  min="1"
-                  max={Number(selectedRecord?.balanceAmount || 1)}
-                  step="100"
+                  min="0.01"
+                  step="any"
                   required
-                  value={disburseForm.paymentAmount}
+                  value={disburseForm.paymentAmount || ""}
                   onChange={(e) => setDisburseForm({ ...disburseForm, paymentAmount: Number(e.target.value) })}
                   className="h-8 text-xs font-mono font-bold border-[#E8DDD8]"
+                  placeholder="Enter payment amount"
                 />
               </div>
 

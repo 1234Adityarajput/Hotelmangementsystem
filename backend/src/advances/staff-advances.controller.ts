@@ -17,7 +17,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Staff Advances')
 @ApiBearerAuth('JWT-auth')
-@Roles('OWNER')
+@Roles('OWNER', 'MANAGER')
 @Controller('advances')
 export class StaffAdvancesController {
   constructor(private readonly advancesService: StaffAdvancesService) {}

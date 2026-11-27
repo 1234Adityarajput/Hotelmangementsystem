@@ -905,7 +905,7 @@ export default function BookingsPage() {
                 <Input
                   type="number"
                   min="0"
-                  step="100"
+                  step="any"
                   value={bookingForm.advanceAmount}
                   onChange={(e) => setBookingForm({ ...bookingForm, advanceAmount: Number(e.target.value) })}
                   className="h-8 text-xs font-mono"

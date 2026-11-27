@@ -752,11 +752,12 @@ export default function AdvancesPage() {
                 <Input
                   type="number"
                   min="1"
-                  step="100"
+                  step="any"
                   required
-                  value={issueForm.amount}
+                  value={issueForm.amount || ""}
                   onChange={(e) => setIssueForm({ ...issueForm, amount: Number(e.target.value) })}
                   className="h-8 text-xs font-mono"
+                  placeholder="Enter advance amount"
                 />
               </div>
 
@@ -841,12 +842,12 @@ export default function AdvancesPage() {
               <Input
                 type="number"
                 min="1"
-                max={Number(selectedAdvance?.balanceAmount || 1)}
-                step="50"
+                step="any"
                 required
-                value={repayForm.amount}
+                value={repayForm.amount || ""}
                 onChange={(e) => setRepayForm({ ...repayForm, amount: Number(e.target.value) })}
                 className="h-8 text-xs font-mono font-bold"
+                placeholder="Enter repayment amount"
               />
             </div>
 

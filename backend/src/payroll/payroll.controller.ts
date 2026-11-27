@@ -17,7 +17,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Payroll & Salary')
 @ApiBearerAuth('JWT-auth')
-@Roles('OWNER')
+@Roles('OWNER', 'MANAGER')
 @Controller('payroll')
 export class PayrollController {
   constructor(private readonly payrollService: PayrollService) {}
