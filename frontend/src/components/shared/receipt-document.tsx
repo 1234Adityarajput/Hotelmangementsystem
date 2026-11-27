@@ -205,6 +205,7 @@ export function ReceiptDocument({
                   src={config.logoUrl || "/radha-krishna-logo.jpg"}
                   alt={config.hotelName}
                   fill
+                  unoptimized
                   className="object-cover"
                 />
               </div>
@@ -276,6 +277,7 @@ export function ReceiptDocument({
                 src={config.logoUrl || "/radha-krishna-logo.jpg"}
                 alt={config.hotelName}
                 fill
+                unoptimized
                 className="object-cover"
               />
             </div>
@@ -322,6 +324,7 @@ export function ReceiptDocument({
                   src={config.logoUrl || "/radha-krishna-logo.jpg"}
                   alt={config.hotelName}
                   fill
+                  unoptimized
                   className="object-cover"
                 />
               </div>

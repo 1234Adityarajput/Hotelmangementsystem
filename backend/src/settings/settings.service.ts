@@ -134,6 +134,7 @@ export class SettingsService {
         if (hotelSetting.email) defaults.email = hotelSetting.email;
         if (hotelSetting.defaultCheckInTime) defaults.checkInTime = hotelSetting.defaultCheckInTime;
         if (hotelSetting.defaultCheckOutTime) defaults.checkOutTime = hotelSetting.defaultCheckOutTime;
+        if (hotelSetting.logoFileReference) defaults.logoUrl = hotelSetting.logoFileReference;
       }
     } catch (err: any) {
       this.logger.debug(`Could not read hotelSetting for defaults: ${err.message}`);
@@ -166,6 +167,7 @@ export class SettingsService {
           email: updated.email,
           defaultCheckInTime: updated.checkInTime,
           defaultCheckOutTime: updated.checkOutTime,
+          logoFileReference: updated.logoUrl,
         },
         create: {
           id: 'default',
@@ -177,6 +179,7 @@ export class SettingsService {
           timezone: 'Asia/Kolkata',
           defaultCheckInTime: updated.checkInTime,
           defaultCheckOutTime: updated.checkOutTime,
+          logoFileReference: updated.logoUrl,
           taxEnabled: true,
           defaultTaxPercentage: 12.0,
           defaultSalaryDays: 30,

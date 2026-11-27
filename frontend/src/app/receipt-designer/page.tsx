@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/providers/auth-provider";
 import { ReceiptDesignConfig } from "@/types";
 import { settingsService, defaultReceiptDesign } from "@/services/settings.service";
@@ -25,8 +25,12 @@ import {
   Type,
   Eye,
   Lock,
+  Upload,
+  Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
+import { compressImage, readFileAsDataUrl } from "@/services/upload.service";
 
 // Predefined Luxury Color Palettes
 const COLOR_PRESETS = [
@@ -221,6 +225,8 @@ export default function ReceiptDesignerPage() {
   const [activeTab, setActiveTab] = useState<"THEME" | "HOTEL" | "TITLES" | "TOGGLES" | "POLICIES">("THEME");
   const [previewDocType, setPreviewDocType] = useState<"FOLIO" | "INVOICE">("FOLIO");
   const [previewBillingMode, setPreviewBillingMode] = useState<"WITH_GST" | "WITHOUT_GST">("WITH_GST");
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchDesign() {
@@ -253,6 +259,59 @@ export default function ReceiptDesignerPage() {
       accentColor: accent,
     }));
     toast.info("Applied color palette to receipt theme");
+  };
+
+  const handleLogoFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file (PNG, JPG, SVG, WebP)");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File is too large. Please select an image under 10MB.");
+      return;
+    }
+
+    try {
+      setUploadingLogo(true);
+      let dataUrl: string;
+      if (file.type === "image/svg+xml") {
+        dataUrl = await readFileAsDataUrl(file);
+      } else {
+        // High quality crisp compression for receipt letterhead emblems (~100-300KB)
+        dataUrl = await compressImage(file, 800, 0.9);
+      }
+
+      setConfig((prev) => ({
+        ...prev,
+        logoUrl: dataUrl,
+        showLogo: true,
+      }));
+
+      toast.success("Logo uploaded successfully! Preview updated.", {
+        description: "Click 'Save & Publish Design' or 'Save Now' to persist.",
+      });
+    } catch (err: any) {
+      console.error("Logo upload failed:", err);
+      toast.error("Failed to process image: " + (err.message || "Unknown error"));
+    } finally {
+      setUploadingLogo(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleResetLogoToDefault = () => {
+    setConfig((prev) => ({
+      ...prev,
+      logoUrl: "/radha-krishna-logo.jpg",
+      showLogo: true,
+    }));
+    toast.info("Logo reset to default Radha Krishna emblem");
   };
 
   const handleReset = () => {
@@ -722,12 +781,17 @@ export default function ReceiptDesignerPage() {
                 </div>
               </div>
 
-              {/* Logo Settings */}
-              <div className="pt-3 border-t border-[#E8DDD8] space-y-2">
+              {/* Logo Settings & Image Uploader */}
+              <div className="pt-3 border-t border-[#E8DDD8] space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-[#59283A]">
-                    Display Logo on Document
-                  </span>
+                  <div>
+                    <span className="text-xs font-semibold text-[#59283A] block">
+                      Display Logo on Document
+                    </span>
+                    <span className="text-[11px] text-[#82747A] block">
+                      Include hotel crest / emblem on official receipts and invoices
+                    </span>
+                  </div>
                   <input
                     type="checkbox"
                     checked={config.showLogo}
@@ -735,15 +799,109 @@ export default function ReceiptDesignerPage() {
                     className="w-4 h-4 rounded text-[#59283A] cursor-pointer"
                   />
                 </div>
+
                 {config.showLogo && (
-                  <div className="space-y-1">
-                    <label className="text-[11px] text-[#82747A]">Logo Image URL / Path</label>
-                    <Input
-                      value={config.logoUrl}
-                      onChange={(e) => handleUpdate("logoUrl", e.target.value)}
-                      placeholder="/radha-krishna-logo.jpg"
-                      className="h-8 text-xs font-mono"
+                  <div className="space-y-3 bg-[#FDFBF9] p-3.5 rounded-xl border border-[#E8DDD8]">
+                    {/* Hidden Native File Input */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                      onChange={handleLogoFileUpload}
+                      className="hidden"
                     />
+
+                    {/* Logo Preview & Information Card */}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-14 h-14 rounded-xl overflow-hidden border-2 shadow-sm flex-shrink-0 relative flex items-center justify-center bg-white"
+                        style={{
+                          borderColor: config.accentColor || "#C4A06A",
+                          backgroundColor: config.themeColor || "#59283A",
+                        }}
+                      >
+                        {config.logoUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={config.logoUrl}
+                            alt="Hotel Logo Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <ImageIcon className="w-6 h-6 text-slate-400" />
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#59283A] truncate">
+                            {config.logoUrl?.startsWith("data:")
+                              ? "Custom Uploaded Logo"
+                              : config.logoUrl === "/radha-krishna-logo.jpg"
+                              ? "Default Royal Palace Crest"
+                              : "Custom Logo Path / URL"}
+                          </span>
+                          {config.logoUrl?.startsWith("data:") && (
+                            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-medium px-1.5 py-0.5 rounded">
+                              Uploaded
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-[#82747A] mt-0.5">
+                          PNG, JPG, SVG, WebP supported (max 10MB)
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Upload button & Reset button */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={uploadingLogo}
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-[#59283A] hover:bg-[#431D2B] text-white text-xs font-semibold h-8 px-3 shadow-sm flex items-center gap-1.5"
+                      >
+                        {uploadingLogo ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>Optimizing & Uploading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5 text-[#C4A06A]" />
+                            <span>Upload Image from Device</span>
+                          </>
+                        )}
+                      </Button>
+
+                      {config.logoUrl !== "/radha-krishna-logo.jpg" && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleResetLogoToDefault}
+                          className="text-xs border-[#E8DDD8] text-[#82747A] hover:text-[#59283A] hover:bg-white h-8 px-2.5"
+                          title="Reset to default Radha Krishna emblem"
+                        >
+                          <RotateCcw className="w-3 h-3 mr-1" />
+                          Default Logo
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Fallback Text Input */}
+                    <div className="space-y-1 pt-2 border-t border-[#E8DDD8]/70">
+                      <label className="text-[11px] text-[#82747A] block">
+                        Or specify Image URL / Local Path
+                      </label>
+                      <Input
+                        value={config.logoUrl}
+                        onChange={(e) => handleUpdate("logoUrl", e.target.value)}
+                        placeholder="/radha-krishna-logo.jpg"
+                        className="h-8 text-xs font-mono bg-white"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
