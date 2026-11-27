@@ -520,37 +520,61 @@ export default function AdminDashboardPage() {
                     Daily cash flow receipts and payment transaction volumes
                   </CardDescription>
                 </div>
-                <Badge variant="gold">7-Day Trend</Badge>
+                <Badge
+                  variant={isManager ? "outline" : "gold"}
+                  className={isManager ? "border-[#C4A06A] text-[#8B6A3D] bg-[#F5F0EA]" : ""}
+                >
+                  {isManager ? "Owner Confidential" : "7-Day Trend"}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="pt-4">
-              <div className="space-y-3">
-                {analytics?.dailyRevenue?.map((d) => {
-                  const maxDaily = Math.max(...(analytics?.dailyRevenue?.map((x) => x.revenue) || [1]), 1000);
-                  const pct = Math.round((d.revenue / maxDaily) * 100);
-                  return (
-                    <div key={d.date} className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-[#59283A] w-24">
-                          {d.day}, {d.date}
-                        </span>
-                        <span className="text-[11px] text-[#82747A]">
-                          {d.transactions} {d.transactions === 1 ? "txn" : "txns"}
-                        </span>
-                        <span className="font-bold text-[#59283A] font-mono">
-                          ₹{d.revenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                        </span>
-                      </div>
-                      <div className="w-full bg-[#E8DDD8] h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-[#C4A06A] h-full rounded-full transition-all duration-500"
-                          style={{ width: `${Math.max(pct, d.revenue > 0 ? 5 : 0)}%` }}
-                        />
-                      </div>
+              {isManager ? (
+                <div className="py-12 px-4 text-center flex flex-col items-center justify-center space-y-3 bg-[#F5F0EA]/40 rounded-xl border border-dashed border-[#C4A06A]/40 my-1">
+                  <div className="w-12 h-12 rounded-full bg-[#59283A]/10 flex items-center justify-center text-[#59283A]">
+                    <ShieldCheck className="w-6 h-6 text-[#C4A06A]" />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="font-serif text-2xl font-bold tracking-widest text-[#59283A]">
+                      ••••••••••••
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-[#A97832]">
+                      Owner Confidential
+                    </div>
+                    <p className="text-[11px] text-[#82747A] max-w-sm mt-1">
+                      Daily cash flow receipts and payment transaction volumes are confidential to Executive Hotel Owner.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {analytics?.dailyRevenue?.map((d) => {
+                    const maxDaily = Math.max(...(analytics?.dailyRevenue?.map((x) => x.revenue) || [1]), 1000);
+                    const pct = Math.round((d.revenue / maxDaily) * 100);
+                    return (
+                      <div key={d.date} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-[#59283A] w-24">
+                            {d.day}, {d.date}
+                          </span>
+                          <span className="text-[11px] text-[#82747A]">
+                            {d.transactions} {d.transactions === 1 ? "txn" : "txns"}
+                          </span>
+                          <span className="font-bold text-[#59283A] font-mono">
+                            ₹{d.revenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="w-full bg-[#E8DDD8] h-2 rounded-full overflow-hidden">
+                          <div
+                            className="bg-[#C4A06A] h-full rounded-full transition-all duration-500"
+                            style={{ width: `${Math.max(pct, d.revenue > 0 ? 5 : 0)}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -947,7 +971,7 @@ export default function AdminDashboardPage() {
                       <th className="px-5 py-3 font-semibold">Room</th>
                       <th className="px-5 py-3 font-semibold">Dates</th>
                       <th className="px-5 py-3 font-semibold">Status</th>
-                      <th className="px-5 py-3 font-semibold text-right">Total</th>
+                      {!isManager && <th className="px-5 py-3 font-semibold text-right">Total</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E8DDD8]">
@@ -983,9 +1007,11 @@ export default function AdminDashboardPage() {
                             {b.bookingStatus}
                           </Badge>
                         </td>
-                        <td className="px-5 py-3.5 text-right font-bold text-[#59283A]">
-                          ₹{b.totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                        </td>
+                        {!isManager && (
+                          <td className="px-5 py-3.5 text-right font-bold text-[#59283A]">
+                            ₹{b.totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
