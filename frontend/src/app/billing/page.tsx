@@ -717,6 +717,17 @@ export default function AutomaticBillingPage() {
         }
       }
 
+      // Automatically generate/update invoice in database with the exact tax rate (0 for Without GST)!
+      try {
+        await billingService.generateInvoice({
+          bookingId: paymentForm.bookingId,
+          taxPercentage: taxToUse,
+          invoiceDate: paymentForm.paymentDate || new Date().toISOString().split("T")[0],
+        });
+      } catch (e) {
+        console.warn("Auto-invoice sync on payment:", e);
+      }
+
       toast.success(`Payment of ₹${paymentForm.amount} recorded successfully (${paymentBillingMode === "WITHOUT_GST" ? "Without GST Receipt" : "With GST Tax Invoice"})!`);
       setPaymentModalOpen(false);
       await fetchData();
@@ -1021,7 +1032,9 @@ export default function AutomaticBillingPage() {
           ) : (
             <div className="space-y-3">
               {folios.map((folio) => {
-                const cardTaxRate = folioTaxRates[folio.bookingId] !== undefined ? folioTaxRates[folio.bookingId] : Number(folio.taxPercentage || 12);
+                const cardTaxRate = folioTaxRates[folio.bookingId] !== undefined
+                  ? folioTaxRates[folio.bookingId]
+                  : (folio.taxPercentage !== undefined ? Number(folio.taxPercentage) : 12);
                 const cardTaxable = Math.max(0, Math.round((Number(folio.subtotal) - Number(folio.discountAmount || 0)) * 100) / 100);
                 const cardTaxAmount = Math.round(cardTaxable * (cardTaxRate / 100) * 100) / 100;
                 const cardFinalBill = Math.round((cardTaxable + cardTaxAmount) * 100) / 100;
@@ -1666,7 +1679,7 @@ export default function AutomaticBillingPage() {
       <Dialog open={dossierModalOpen} onOpenChange={setDossierModalOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-[#E8DDD8] p-6 sm:p-8">
           {selectedFolio && (() => {
-            const liveTaxRate = Number(currentFolioTaxRate !== undefined ? currentFolioTaxRate : (selectedFolio.taxPercentage || 12));
+            const liveTaxRate = Number(currentFolioTaxRate !== undefined ? currentFolioTaxRate : (selectedFolio.taxPercentage !== undefined ? Number(selectedFolio.taxPercentage) : 12));
             const liveTaxable = Math.max(0, Math.round((Number(selectedFolio.subtotal) - Number(selectedFolio.discountAmount || 0)) * 100) / 100);
             const liveTaxAmount = Math.round(liveTaxable * (liveTaxRate / 100) * 100) / 100;
             const liveFinalBill = Math.round((liveTaxable + liveTaxAmount) * 100) / 100;

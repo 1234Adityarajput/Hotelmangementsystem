@@ -199,13 +199,24 @@ export class CheckInCheckOutService {
       : 12.0;
 
     const existingInvoice = booking.invoices[0] || null;
-    const taxPercentage = existingInvoice !== null
-      ? Number(existingInvoice.taxPercentage)
-      : defaultTax;
-
     const discountType = existingInvoice ? (existingInvoice.discountType as any) : null;
     const discountValue = existingInvoice ? Number(existingInvoice.discountValue) : 0.0;
     const discountAmount = existingInvoice ? Number(existingInvoice.discountAmount) : 0.0;
+
+    const totalPaidAlready = Math.round(
+      booking.payments.reduce((acc, p) => acc + Number(p.amount), 0) * 100
+    ) / 100;
+
+    let taxPercentage = defaultTax;
+    if (existingInvoice !== null) {
+      taxPercentage = Number(existingInvoice.taxPercentage);
+    } else if (
+      totalPaidAlready >= Math.max(0, subtotal - discountAmount) - 0.5 &&
+      totalPaidAlready < Math.max(0, subtotal - discountAmount) + Math.max(0, subtotal - discountAmount) * 0.05
+    ) {
+      // Guest settled exact subtotal amount without GST -> auto-apply 0% tax!
+      taxPercentage = 0;
+    }
 
     const taxableAmount = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
     const taxAmount = Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
@@ -406,16 +417,26 @@ export class CheckInCheckOutService {
     const existingInvoice = booking.invoices[0] || null;
     const settings = await this.prisma.hotelSetting.findUnique({ where: { id: 'default' } });
     const defaultTax = settings?.defaultTaxPercentage ? Number(settings.defaultTaxPercentage) : 12.0;
-    const taxPercentage = existingInvoice !== null
-      ? Number(existingInvoice.taxPercentage)
-      : (dto?.taxPercentage !== undefined ? Number(dto.taxPercentage) : defaultTax);
+
+    const existingPaid = booking.payments.reduce((acc, p) => acc + Number(p.amount), 0);
+
+    let taxPercentage = defaultTax;
+    if (existingInvoice !== null) {
+      taxPercentage = Number(existingInvoice.taxPercentage);
+    } else if (dto?.taxPercentage !== undefined) {
+      taxPercentage = Number(dto.taxPercentage);
+    } else if (
+      existingPaid >= Math.max(0, subtotal - discountAmount) - 0.5 &&
+      existingPaid < Math.max(0, subtotal - discountAmount) + Math.max(0, subtotal - discountAmount) * 0.05
+    ) {
+      taxPercentage = 0;
+    }
     const taxAmount = Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
 
     // 4. Total Bill Amount
     const totalAmount = Math.round((taxableAmount + taxAmount) * 100) / 100;
 
     // 5. Payments
-    const existingPaid = booking.payments.reduce((acc, p) => acc + Number(p.amount), 0);
     const finalPaymentAmount = dto?.paidAmount !== undefined ? Number(dto.paidAmount) : Math.max(0, totalAmount - existingPaid);
     const totalPaid = Math.min(totalAmount, Math.round((existingPaid + finalPaymentAmount) * 100) / 100);
     const balanceAmount = Math.round((totalAmount - totalPaid) * 100) / 100;

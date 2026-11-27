@@ -2168,7 +2168,9 @@ export default function StaysPage() {
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#32765B] bg-[#E7F1E9] px-2 py-0.5 rounded">
-                  Official Digital Receipt • Stay Settled
+                  {Number(receiptData?.folio?.tax || receiptData?.invoice?.taxAmount || 0) > 0
+                    ? "Official GST Tax Invoice • Stay Settled"
+                    : "Official Guest Stay Receipt (Non-GST) • Stay Settled"}
                 </span>
                 <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1">
                   {receiptData?.invoice?.invoiceNumber || "Digital Checkout Dossier"}
@@ -2283,12 +2285,7 @@ export default function StaysPage() {
                           ₹{Number(receiptData.folio?.tax || receiptData.invoice?.taxAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </td>
                       </tr>
-                    ) : (
-                      <tr>
-                        <td className="px-3 py-2 text-slate-500">Taxes (Non-GST Billing)</td>
-                        <td className="px-3 py-2 text-right font-mono text-slate-500">₹0.00</td>
-                      </tr>
-                    )}
+                    ) : null}
                     <tr className="font-bold bg-[#F5F0EA]/60 text-[#59283A]">
                       <td className="px-3 py-2.5">Total Bill Amount</td>
                       <td className="px-3 py-2.5 text-right font-mono text-sm">

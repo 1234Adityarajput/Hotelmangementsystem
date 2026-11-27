@@ -380,9 +380,6 @@ export class BillingService {
     // Existing active invoice if available
     const existingInvoice = booking.invoices[0] || null;
 
-    const taxPercentage = customTaxPercentage !== undefined
-      ? Number(customTaxPercentage)
-      : (existingInvoice ? Number(existingInvoice.taxPercentage) : defaultTax);
     const discountType = existingInvoice ? (existingInvoice.discountType as any) : null;
     const discountValue = existingInvoice ? Number(existingInvoice.discountValue) : 0;
 
@@ -393,6 +390,23 @@ export class BillingService {
       discountAmount = Math.min(discountValue, subtotal);
     }
     discountAmount = Math.round(discountAmount * 100) / 100;
+
+    const totalPaidSoFar = Math.round(
+      booking.payments.reduce((s, p) => s + Number(p.amount), 0) * 100
+    ) / 100;
+
+    let taxPercentage = defaultTax;
+    if (customTaxPercentage !== undefined) {
+      taxPercentage = Number(customTaxPercentage);
+    } else if (existingInvoice !== null) {
+      taxPercentage = Number(existingInvoice.taxPercentage);
+    } else if (
+      totalPaidSoFar >= Math.max(0, subtotal - discountAmount) - 0.5 &&
+      totalPaidSoFar < Math.max(0, subtotal - discountAmount) + Math.max(0, subtotal - discountAmount) * 0.05
+    ) {
+      // Guest settled exact subtotal amount without GST -> auto-apply 0% tax!
+      taxPercentage = 0;
+    }
 
     const taxableAmount = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
     const taxAmount = Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
@@ -670,12 +684,6 @@ export class BillingService {
       },
     });
 
-    if (existingActiveInvoice) {
-      throw new ConflictException(
-        `Active invoice ${existingActiveInvoice.invoiceNumber} already exists for this booking.`,
-      );
-    }
-
     // Default Hotel Setting for Tax
     const settings = await this.prisma.hotelSetting.findUnique({ where: { id: 'default' } });
     const defaultTax = settings?.defaultTaxPercentage ? Number(settings.defaultTaxPercentage) : 12.0;
@@ -726,6 +734,36 @@ export class BillingService {
       invoiceStatus = 'PAID';
     } else if (totalPaid > 0) {
       invoiceStatus = 'PARTIALLY_PAID';
+    }
+
+    if (existingActiveInvoice) {
+      const updated = await this.prisma.invoice.update({
+        where: { id: existingActiveInvoice.id },
+        data: {
+          taxPercentage,
+          taxAmount,
+          totalAmount,
+          totalPaid,
+          balanceAmount,
+          invoiceStatus,
+          roomCharges,
+          additionalCharges: roundedAdditional,
+          subtotal,
+          discountType: dto.discountType || null,
+          discountValue: discountVal,
+          discountAmount,
+        },
+        include: {
+          booking: {
+            include: {
+              primaryGuest: true,
+              room: true,
+            },
+          },
+        },
+      });
+
+      return updated;
     }
 
     const invoiceDate = dto.invoiceDate ? new Date(dto.invoiceDate) : new Date();
