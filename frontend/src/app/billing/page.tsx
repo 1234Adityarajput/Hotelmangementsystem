@@ -1156,26 +1156,62 @@ export default function AutomaticBillingPage() {
                               </span>
                             </div>
                           )}
-                          <div className="flex items-center gap-1.5 bg-[#F5F0EA] px-2 py-0.5 rounded border border-[#E8DDD8]">
-                            <span className="text-[#8E7079]">GST Tax:</span>
+                          <div className="flex items-center gap-1.5 bg-[#F5F0EA] px-2 py-1 rounded-lg border border-[#E8DDD8] flex-wrap sm:flex-nowrap">
+                            <span className="text-[#8E7079] font-medium">GST Tax:</span>
+                            {/* Preset Dropdown */}
                             <select
-                              value={cardTaxRate}
+                              value={[0, 5, 12, 18, 28].includes(cardTaxRate) ? cardTaxRate : "manual"}
                               onChange={(e) => {
-                                const newRate = Number(e.target.value);
-                                setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: newRate }));
+                                if (e.target.value !== "manual") {
+                                  const newRate = Number(e.target.value);
+                                  setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: newRate }));
+                                }
                               }}
                               className="text-[11px] font-bold bg-white border border-[#E8DDD8] rounded px-1.5 py-0.5 text-[#59283A] focus:outline-none focus:border-[#59283A] cursor-pointer"
-                              title="Change GST Tax Rate for this Stay"
+                              title="Select standard GST slab"
                             >
                               <option value={0}>0% GST</option>
                               <option value={5}>5% GST</option>
                               <option value={12}>12% GST</option>
                               <option value={18}>18% GST</option>
                               <option value={28}>28% GST</option>
+                              <option value="manual">Manual...</option>
                             </select>
-                            <span className="font-mono text-[#82747A] font-semibold">
-                              +₹{cardTaxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </span>
+
+                            {/* Manual Fill % Input */}
+                            <div className="flex items-center bg-white border border-[#E8DDD8] rounded px-1.5 py-0.5 focus-within:border-[#59283A] shadow-2xs" title="Manually type GST %">
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.5"
+                                value={cardTaxRate}
+                                onChange={(e) => {
+                                  const val = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+                                  setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: val }));
+                                }}
+                                placeholder="%"
+                                className="w-12 h-5 text-[11px] font-mono font-bold text-center text-[#59283A] focus:outline-none"
+                              />
+                              <span className="text-[10px] font-bold text-[#59283A] pr-0.5">%</span>
+                            </div>
+
+                            {/* Manual Fill ₹ Amount Input */}
+                            <div className="flex items-center bg-white border border-[#E8DDD8] rounded px-1.5 py-0.5 focus-within:border-[#59283A] shadow-2xs" title="Or manually type direct GST amount in ₹">
+                              <span className="text-[10px] text-[#82747A] font-semibold">+₹</span>
+                              <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={cardTaxAmount}
+                                onChange={(e) => {
+                                  const amt = Math.max(0, Number(e.target.value) || 0);
+                                  const pct = cardTaxable > 0 ? Math.round((amt / cardTaxable) * 100 * 100) / 100 : 0;
+                                  setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: pct }));
+                                }}
+                                className="w-16 h-5 text-[11px] font-mono font-bold text-right text-[#59283A] focus:outline-none"
+                              />
+                            </div>
                           </div>
                           <div>
                             <span className="text-[#82747A] font-semibold">Final Bill: </span>
@@ -1880,9 +1916,25 @@ export default function AutomaticBillingPage() {
 
                       <div className="flex justify-between items-center pt-1.5 border-t border-[#F0E6E1] text-[#82747A] text-[11px]">
                         <span>Calculated GST Tax ({liveTaxRate}%):</span>
-                        <span className="font-mono font-semibold text-[#59283A]">
-                          +₹{liveTaxAmount.toFixed(2)}
-                        </span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-[#82747A] font-semibold">+₹</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={liveTaxAmount}
+                            onChange={(e) => {
+                              const amt = Math.max(0, Number(e.target.value) || 0);
+                              const pct = liveTaxable > 0 ? Math.round((amt / liveTaxable) * 100 * 100) / 100 : 0;
+                              setCurrentFolioTaxRate(pct);
+                              if (selectedFolio) {
+                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: pct }));
+                              }
+                            }}
+                            className="w-20 h-6 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A]"
+                            title="Or manually type GST tax amount in ₹"
+                          />
+                        </div>
                       </div>
                     </div>
 
