@@ -1137,12 +1137,11 @@ export default function StaffPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#59283A]">Designation *</label>
+                  <label className="font-semibold text-[#59283A]">Designation</label>
                   <Input
-                    required
                     value={formData.designation}
                     onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
-                    placeholder="e.g. Front Desk Executive / Head Chef"
+                    placeholder="e.g. Front Desk Executive / Head Chef (Optional)"
                     className="h-8 text-xs border-[#E8DDD8]"
                   />
                 </div>
@@ -1384,11 +1383,11 @@ export default function StaffPage() {
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-[#59283A]">Designation *</label>
+                  <label className="font-semibold text-[#59283A]">Designation</label>
                   <Input
-                    required
                     value={formData.designation}
                     onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                    placeholder="e.g. Front Desk Executive / Head Chef (Optional)"
                     className="h-8 text-xs border-[#E8DDD8]"
                   />
                 </div>

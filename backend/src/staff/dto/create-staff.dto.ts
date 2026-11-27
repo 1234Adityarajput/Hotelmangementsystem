@@ -51,10 +51,10 @@ export class CreateStaffDto {
   @IsString()
   emergencyContact?: string;
 
-  @ApiProperty({ example: 'Front Desk Executive', description: 'Job designation' })
+  @ApiPropertyOptional({ example: 'Front Desk Executive', description: 'Job designation (optional)' })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty({ message: 'Designation is required' })
-  designation: string;
+  designation?: string;
 
   @ApiProperty({ example: 'Front Office', description: 'Department (Front Office, Housekeeping, Maintenance, F&B, Security)' })
   @IsString()
