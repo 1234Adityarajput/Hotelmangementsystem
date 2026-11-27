@@ -1185,12 +1185,18 @@ export default function AutomaticBillingPage() {
                                 min="0"
                                 max="100"
                                 step="0.5"
-                                value={cardTaxRate}
+                                value={cardTaxRate === 0 ? "" : cardTaxRate}
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const val = Math.max(0, Math.min(100, Number(e.target.value) || 0));
-                                  setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: val }));
+                                  const raw = e.target.value;
+                                  if (raw === "") {
+                                    setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: 0 }));
+                                  } else {
+                                    const val = Math.max(0, Math.min(100, Number(raw)));
+                                    setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: val }));
+                                  }
                                 }}
-                                placeholder="%"
+                                placeholder="0"
                                 className="w-12 h-5 text-[11px] font-mono font-bold text-center text-[#59283A] focus:outline-none"
                               />
                               <span className="text-[10px] font-bold text-[#59283A] pr-0.5">%</span>
@@ -1203,12 +1209,19 @@ export default function AutomaticBillingPage() {
                                 type="number"
                                 min="0"
                                 step="1"
-                                value={cardTaxAmount}
+                                value={cardTaxAmount === 0 ? "" : cardTaxAmount}
+                                onFocus={(e) => e.target.select()}
                                 onChange={(e) => {
-                                  const amt = Math.max(0, Number(e.target.value) || 0);
-                                  const pct = cardTaxable > 0 ? Math.round((amt / cardTaxable) * 100 * 100) / 100 : 0;
-                                  setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: pct }));
+                                  const raw = e.target.value;
+                                  if (raw === "") {
+                                    setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: 0 }));
+                                  } else {
+                                    const amt = Math.max(0, Number(raw));
+                                    const pct = cardTaxable > 0 ? Math.round((amt / cardTaxable) * 100 * 100) / 100 : 0;
+                                    setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: pct }));
+                                  }
                                 }}
+                                placeholder="0"
                                 className="w-16 h-5 text-[11px] font-mono font-bold text-right text-[#59283A] focus:outline-none"
                               />
                             </div>
@@ -1876,14 +1889,24 @@ export default function AutomaticBillingPage() {
                             min="0"
                             max="100"
                             step="0.5"
-                            value={currentFolioTaxRate}
+                            value={currentFolioTaxRate === 0 ? "" : currentFolioTaxRate}
+                            onFocus={(e) => e.target.select()}
                             onChange={(e) => {
-                              const val = Math.max(0, Math.min(100, Number(e.target.value) || 0));
-                              setCurrentFolioTaxRate(val);
-                              if (selectedFolio) {
-                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: val }));
+                              const raw = e.target.value;
+                              if (raw === "") {
+                                setCurrentFolioTaxRate(0);
+                                if (selectedFolio) {
+                                  setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: 0 }));
+                                }
+                              } else {
+                                const val = Math.max(0, Math.min(100, Number(raw)));
+                                setCurrentFolioTaxRate(val);
+                                if (selectedFolio) {
+                                  setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: val }));
+                                }
                               }
                             }}
+                            placeholder="0"
                             className="w-16 h-7 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A]"
                           />
                           <span className="text-xs font-bold text-[#59283A]">%</span>
@@ -1922,15 +1945,25 @@ export default function AutomaticBillingPage() {
                             type="number"
                             min="0"
                             step="1"
-                            value={liveTaxAmount}
+                            value={liveTaxAmount === 0 ? "" : liveTaxAmount}
+                            onFocus={(e) => e.target.select()}
                             onChange={(e) => {
-                              const amt = Math.max(0, Number(e.target.value) || 0);
-                              const pct = liveTaxable > 0 ? Math.round((amt / liveTaxable) * 100 * 100) / 100 : 0;
-                              setCurrentFolioTaxRate(pct);
-                              if (selectedFolio) {
-                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: pct }));
+                              const raw = e.target.value;
+                              if (raw === "") {
+                                setCurrentFolioTaxRate(0);
+                                if (selectedFolio) {
+                                  setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: 0 }));
+                                }
+                              } else {
+                                const amt = Math.max(0, Number(raw));
+                                const pct = liveTaxable > 0 ? Math.round((amt / liveTaxable) * 100 * 100) / 100 : 0;
+                                setCurrentFolioTaxRate(pct);
+                                if (selectedFolio) {
+                                  setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: pct }));
+                                }
                               }
                             }}
+                            placeholder="0.00"
                             className="w-20 h-6 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A]"
                             title="Or manually type GST tax amount in ₹"
                           />
