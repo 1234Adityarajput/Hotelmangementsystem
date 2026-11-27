@@ -561,6 +561,75 @@ export default function StaysPage() {
     }
   };
 
+  // Automatic Date & Nights Calculation Helpers for Walk-In Check-In
+  const calculateNightsFromDates = (checkInStr: string, checkOutStr: string): number => {
+    if (!checkInStr || !checkOutStr) return 1;
+    const inDate = new Date(checkInStr + "T00:00:00");
+    const outDate = new Date(checkOutStr + "T00:00:00");
+    const diffMs = outDate.getTime() - inDate.getTime();
+    const nights = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    return nights > 0 ? nights : 1;
+  };
+
+  const addDaysToDateString = (dateStr: string, days: number): string => {
+    if (!dateStr) return new Date().toISOString().split("T")[0];
+    const d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + Math.max(1, days));
+    return d.toISOString().split("T")[0];
+  };
+
+  const handleWalkInCheckInDateChange = (newCheckIn: string) => {
+    if (!newCheckIn) return;
+    const currentOut = walkInForm.expectedCheckOutDate;
+    if (!currentOut || currentOut <= newCheckIn) {
+      const nights = walkInForm.numberOfNights || 1;
+      const newOut = addDaysToDateString(newCheckIn, nights);
+      setWalkInForm((prev) => ({
+        ...prev,
+        checkInDate: newCheckIn,
+        expectedCheckOutDate: newOut,
+      }));
+    } else {
+      const nights = calculateNightsFromDates(newCheckIn, currentOut);
+      setWalkInForm((prev) => ({
+        ...prev,
+        checkInDate: newCheckIn,
+        numberOfNights: nights,
+      }));
+    }
+  };
+
+  const handleWalkInCheckOutDateChange = (newCheckOut: string) => {
+    if (!newCheckOut) return;
+    const currentIn = walkInForm.checkInDate;
+    if (newCheckOut <= currentIn) {
+      const newOut = addDaysToDateString(currentIn, 1);
+      setWalkInForm((prev) => ({
+        ...prev,
+        expectedCheckOutDate: newOut,
+        numberOfNights: 1,
+      }));
+      toast.info("Check-out date must be after check-in date. Adjusted to 1 night.");
+    } else {
+      const nights = calculateNightsFromDates(currentIn, newCheckOut);
+      setWalkInForm((prev) => ({
+        ...prev,
+        expectedCheckOutDate: newCheckOut,
+        numberOfNights: nights,
+      }));
+    }
+  };
+
+  const handleWalkInNightsChange = (newNights: number) => {
+    const nights = Math.max(1, isNaN(newNights) ? 1 : newNights);
+    const newOut = addDaysToDateString(walkInForm.checkInDate, nights);
+    setWalkInForm((prev) => ({
+      ...prev,
+      numberOfNights: nights,
+      expectedCheckOutDate: newOut,
+    }));
+  };
+
   const handleConfirmWalkIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!walkInForm.roomId) {
@@ -2511,7 +2580,7 @@ export default function StaysPage() {
                   type="date"
                   required
                   value={walkInForm.checkInDate}
-                  onChange={(e) => setWalkInForm({ ...walkInForm, checkInDate: e.target.value })}
+                  onChange={(e) => handleWalkInCheckInDateChange(e.target.value)}
                   className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
@@ -2532,9 +2601,7 @@ export default function StaysPage() {
                   type="date"
                   required
                   value={walkInForm.expectedCheckOutDate}
-                  onChange={(e) =>
-                    setWalkInForm({ ...walkInForm, expectedCheckOutDate: e.target.value })
-                  }
+                  onChange={(e) => handleWalkInCheckOutDateChange(e.target.value)}
                   className="h-8 text-xs border-[#E8DDD8]"
                 />
               </div>
@@ -2554,15 +2621,18 @@ export default function StaysPage() {
             {/* Nights & Room Rate */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-semibold text-[#59283A]">Number of Nights</label>
+                <div className="flex items-center justify-between">
+                  <label className="font-semibold text-[#59283A]">Number of Nights</label>
+                  <span className="text-[10px] text-[#2E5E44] bg-[#E7F1E9] px-1.5 py-0.5 rounded font-medium">
+                    ✓ Auto-calculated
+                  </span>
+                </div>
                 <Input
                   type="number"
                   min="1"
                   value={walkInForm.numberOfNights}
-                  onChange={(e) =>
-                    setWalkInForm({ ...walkInForm, numberOfNights: Number(e.target.value) })
-                  }
-                  className="h-8 text-xs border-[#E8DDD8]"
+                  onChange={(e) => handleWalkInNightsChange(Number(e.target.value))}
+                  className="h-8 text-xs border-[#E8DDD8] font-bold bg-[#F5F0EA]/40 text-[#59283A]"
                 />
               </div>
 
