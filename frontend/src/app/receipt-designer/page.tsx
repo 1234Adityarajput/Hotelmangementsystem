@@ -1232,7 +1232,7 @@ export default function ReceiptDesignerPage() {
           </div>
 
           {/* Unified Document Component in Live Preview Mode */}
-          <div className="overflow-hidden border border-[#E8DDD8] rounded-2xl shadow-xl bg-slate-100 p-2 sm:p-4">
+          <div className="overflow-hidden border border-[#E8DDD8] rounded-2xl shadow-xl bg-slate-100 p-2 sm:p-4 print:p-0 print:m-0 print:border-none print:shadow-none print:bg-white print:overflow-visible">
             <ReceiptDocument
               config={config}
               type={previewDocType}

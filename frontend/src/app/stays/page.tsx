@@ -2192,7 +2192,7 @@ export default function StaysPage() {
           </DialogHeader>
 
           {receiptData && (
-            <div className="space-y-4 pt-2 text-xs">
+            <div className="space-y-4 pt-2 text-xs receipt-document-container print:p-0 print:m-0">
               {/* Hotel & Guest dossier */}
               <div className="p-4 rounded-xl bg-[#F5F0EA] border border-[#E8DDD8] space-y-2">
                 <div className="flex justify-between border-b border-[#E8DDD8] pb-2">
@@ -2306,7 +2306,7 @@ export default function StaysPage() {
                 </table>
               </div>
 
-              <DialogFooter className="pt-2">
+              <DialogFooter className="pt-2 print:hidden">
                 <Button
                   size="sm"
                   onClick={() => setReceiptModalOpen(false)}

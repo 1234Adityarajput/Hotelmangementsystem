@@ -121,7 +121,7 @@ nextjs-portal,
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm 10mm 10mm 10mm;
+    margin: 6mm 8mm 8mm 8mm;
   }
 
   html,
@@ -151,6 +151,38 @@ nextjs-portal,
   [data-radix-focus-guard],
   [data-state="closed"] {
     display: none !important;
+  }
+
+  /* When ANY modal dialog is open (in Billing, Invoices, Stays),
+     COMPLETELY HIDE the background app shell, main content, and dashboard elements
+     so ONLY the modal receipt / folio prints starting directly on Page 1! */
+  body.dialog-open .app-shell-root,
+  body.dialog-open main,
+  body.dialog-open #main-content,
+  body:has([role="dialog"]) .app-shell-root,
+  body:has([role="dialog"]) main,
+  body:has([role="dialog"]) #main-content,
+  body:has([data-radix-dialog-content]) .app-shell-root,
+  body:has([data-radix-dialog-content]) main,
+  body:has([data-radix-dialog-content]) #main-content {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure Radix Portal takes full natural document flow when printing */
+  [data-radix-portal] {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
   }
 
   /* Unconstrain Radix Dialog for printing: remove fixed position, centering transforms, max-height, and scrolling */
