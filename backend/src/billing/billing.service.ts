@@ -262,7 +262,10 @@ export class BillingService {
   // ============================================================================
   // LIVE AUTOMATIC BILLING & PAYMENT CALCULATION ENGINE
   // ============================================================================
-  async getLiveBillingFolio(bookingId: string): Promise<BillingComponentBreakdown> {
+  async getLiveBillingFolio(
+    bookingId: string,
+    customTaxPercentage?: number,
+  ): Promise<BillingComponentBreakdown> {
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
@@ -354,7 +357,9 @@ export class BillingService {
     // Existing active invoice if available
     const existingInvoice = booking.invoices[0] || null;
 
-    const taxPercentage = existingInvoice ? Number(existingInvoice.taxPercentage) : defaultTax;
+    const taxPercentage = customTaxPercentage !== undefined
+      ? Number(customTaxPercentage)
+      : (existingInvoice ? Number(existingInvoice.taxPercentage) : defaultTax);
     const discountType = existingInvoice ? (existingInvoice.discountType as any) : null;
     const discountValue = existingInvoice ? Number(existingInvoice.discountValue) : 0;
 

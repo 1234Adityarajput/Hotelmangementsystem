@@ -25,8 +25,12 @@ export class InvoicesController {
 
   @Get('live/:bookingId')
   @ApiOperation({ summary: 'Get live real-time automatic billing calculation and breakdown for a guest booking' })
-  async getLiveBillingFolio(@Param('bookingId') bookingId: string) {
-    return this.billingService.getLiveBillingFolio(bookingId);
+  async getLiveBillingFolio(
+    @Param('bookingId') bookingId: string,
+    @Query('taxPercentage') taxPercentage?: string,
+  ) {
+    const tax = taxPercentage !== undefined ? Number(taxPercentage) : undefined;
+    return this.billingService.getLiveBillingFolio(bookingId, tax);
   }
 
   @Post('quick-post-charge')

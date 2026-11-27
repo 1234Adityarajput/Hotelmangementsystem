@@ -84,6 +84,8 @@ export default function AutomaticBillingPage() {
   // Modals state
   const [selectedFolio, setSelectedFolio] = useState<BillingComponentBreakdown | null>(null);
   const [dossierModalOpen, setDossierModalOpen] = useState(false);
+  const [folioTaxRates, setFolioTaxRates] = useState<Record<string, number>>({});
+  const [currentFolioTaxRate, setCurrentFolioTaxRate] = useState<number>(12);
 
   // Quick Charge Modal
   const [chargeModalOpen, setChargeModalOpen] = useState(false);
@@ -541,11 +543,31 @@ export default function AutomaticBillingPage() {
     fetchData();
   }, [search]);
 
+  // Live KPI recalculation when GST rates are customized on active folios
+  const liveKpis = useMemo(() => {
+    let extraTaxDiff = 0;
+    folios.forEach((f) => {
+      if (folioTaxRates[f.bookingId] !== undefined) {
+        const customRate = folioTaxRates[f.bookingId];
+        const taxable = Math.max(0, Math.round((f.subtotal - f.discountAmount) * 100) / 100);
+        const newTax = Math.round(taxable * (customRate / 100) * 100) / 100;
+        extraTaxDiff += (newTax - f.taxAmount);
+      }
+    });
+
+    return {
+      ...kpis,
+      totalRemainingBalance: Math.max(0, Math.round((kpis.totalRemainingBalance + extraTaxDiff) * 100) / 100),
+    };
+  }, [kpis, folios, folioTaxRates]);
+
   // Open Folio Dossier
   const handleOpenDossier = async (bookingId: string) => {
     try {
-      const folio = await billingService.getLiveBillingFolio(bookingId);
+      const activeTax = folioTaxRates[bookingId];
+      const folio = await billingService.getLiveBillingFolio(bookingId, activeTax);
       setSelectedFolio(folio);
+      setCurrentFolioTaxRate(activeTax !== undefined ? activeTax : (folio.taxPercentage !== undefined ? Number(folio.taxPercentage) : 12));
       setDossierModalOpen(true);
     } catch (err) {
       toast.error("Error loading stay folio dossier");
@@ -685,18 +707,23 @@ export default function AutomaticBillingPage() {
   };
 
   // Generate / Settle Invoice from Folio
-  const handleGenerateInvoice = async (bookingId: string) => {
+  const handleGenerateInvoice = async (bookingId: string, taxRateToUse?: number) => {
     try {
+      const activeTax = taxRateToUse !== undefined
+        ? taxRateToUse
+        : (folioTaxRates[bookingId] !== undefined ? folioTaxRates[bookingId] : 12.0);
+
       const inv = await billingService.generateInvoice({
         bookingId,
-        taxPercentage: 12.0,
+        taxPercentage: activeTax,
         invoiceDate: new Date().toISOString().split("T")[0],
       });
-      toast.success(`GST Invoice ${inv.invoiceNumber} generated and archived!`);
+      toast.success(`GST Invoice ${inv.invoiceNumber} (${activeTax}% GST) generated and archived!`);
       await fetchData();
       if (selectedFolio && selectedFolio.bookingId === bookingId) {
-        const updated = await billingService.getLiveBillingFolio(bookingId);
+        const updated = await billingService.getLiveBillingFolio(bookingId, activeTax);
         setSelectedFolio(updated);
+        setCurrentFolioTaxRate(activeTax);
       }
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Invoice already exists or could not be generated.");
@@ -862,7 +889,7 @@ export default function AutomaticBillingPage() {
               <AlertCircle className="w-3.5 h-3.5 text-[#B54C44]" />
             </div>
             <div className="text-xl font-bold font-mono text-[#B54C44]">
-              ₹{kpis.totalRemainingBalance.toLocaleString("en-IN")}
+              ₹{liveKpis.totalRemainingBalance.toLocaleString("en-IN")}
             </div>
             <p className="text-[10px] text-[#8E7079] mt-0.5">Unsettled live balances</p>
           </Card>
@@ -956,199 +983,233 @@ export default function AutomaticBillingPage() {
             </Card>
           ) : (
             <div className="space-y-3">
-              {folios.map((folio) => (
-                <Card
-                  key={folio.bookingId}
-                  className="border-[#E8DDD8] bg-white shadow-sm hover:border-[#C4A06A] transition-colors overflow-hidden"
-                >
-                  <div className="p-4 sm:p-5">
-                    {/* Top Row: Guest & Room Info */}
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-[#E8DDD8]">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#F5F0EA] text-[#59283A] flex items-center justify-center font-bold text-sm font-mono border border-[#E8DDD8]">
-                          {folio.roomNumber}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-sm text-[#59283A]">
-                              {folio.guestName}
-                            </span>
-                            <span className="text-[11px] font-mono text-[#8E7079]">
-                              ({folio.bookingNumber})
-                            </span>
-                            {folio.isFullySettled ? (
-                              <Badge className="bg-[#E7F1E9] text-[#32765B] border-[#C5DFD0] text-[10px] font-semibold">
-                                Fully Settled
-                              </Badge>
-                            ) : (
-                              <Badge className="bg-[#F8E8E5] text-[#B54C44] border-[#F2D1CB] text-[10px] font-semibold">
-                                Due ₹{folio.remainingBalance.toLocaleString("en-IN")}
-                              </Badge>
-                            )}
+              {folios.map((folio) => {
+                const cardTaxRate = folioTaxRates[folio.bookingId] !== undefined ? folioTaxRates[folio.bookingId] : Number(folio.taxPercentage || 12);
+                const cardTaxable = Math.max(0, Math.round((Number(folio.subtotal) - Number(folio.discountAmount || 0)) * 100) / 100);
+                const cardTaxAmount = Math.round(cardTaxable * (cardTaxRate / 100) * 100) / 100;
+                const cardFinalBill = Math.round((cardTaxable + cardTaxAmount) * 100) / 100;
+                const cardPaid = Number(folio.payments.totalPaymentsReceived || 0);
+                const cardBalance = Math.round((cardFinalBill - cardPaid) * 100) / 100;
+                const isCardFullySettled = cardBalance <= 0;
+
+                const cardUpdatedFolio: BillingComponentBreakdown = {
+                  ...folio,
+                  taxPercentage: cardTaxRate,
+                  taxAmount: cardTaxAmount,
+                  finalBill: cardFinalBill,
+                  remainingBalance: cardBalance,
+                  isFullySettled: isCardFullySettled,
+                };
+
+                return (
+                  <Card
+                    key={folio.bookingId}
+                    className="border-[#E8DDD8] bg-white shadow-sm hover:border-[#C4A06A] transition-colors overflow-hidden"
+                  >
+                    <div className="p-4 sm:p-5">
+                      {/* Top Row: Guest & Room Info */}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-[#E8DDD8]">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-[#F5F0EA] text-[#59283A] flex items-center justify-center font-bold text-sm font-mono border border-[#E8DDD8]">
+                            {folio.roomNumber}
                           </div>
-                          <div className="text-[11px] text-[#82747A] flex items-center gap-3 mt-0.5">
-                            <span>{folio.roomType}</span>
-                            <span>•</span>
-                            <span>{folio.guestMobile}</span>
-                            <span>•</span>
-                            <span>{folio.numberOfNights} Nights ({folio.checkInDate} to {folio.expectedCheckOutDate})</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Quick Action Buttons */}
-                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenChargeModal(folio)}
-                          className="h-8 text-[11px] border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#59283A]"
-                        >
-                          <Plus className="w-3 h-3 mr-1" />
-                          Post Item
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenPaymentModal(folio)}
-                          className="h-8 text-[11px] border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#32765B]"
-                        >
-                          <CreditCard className="w-3 h-3 mr-1" />
-                          Record Pay
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          onClick={() => handleOpenDossier(folio.bookingId)}
-                          className="h-8 text-[11px] bg-[#59283A] hover:bg-[#472130] text-white"
-                        >
-                          <Eye className="w-3 h-3 mr-1" />
-                          View Folio
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleConfirmDelete({
-                            id: folio.bookingId,
-                            invoiceNumber: `FOLIO-${folio.bookingNumber}`,
-                            guestName: folio.guestName,
-                            roomNumber: folio.roomNumber,
-                            amount: folio.finalBill,
-                            type: "FOLIO",
-                          })}
-                          className="h-8 px-2 text-[#B54C44] hover:bg-[#F8E8E5] hover:text-[#963730]"
-                          title="Delete / Cancel Stay Folio"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Middle Row: The Exact 6 Billing Components Breakdown */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-3 bg-[#F5F0EA]/60 -mx-4 sm:-mx-5 px-4 sm:px-5 border-b border-[#E8DDD8] text-[11px]">
-                      <div>
-                        <span className="text-[#8E7079] block text-[10px]">Room Charges</span>
-                        <span className="font-mono font-semibold text-[#59283A]">
-                          ₹{folio.roomCharges.toLocaleString("en-IN")}
-                        </span>
-                        <span className="text-[9px] text-[#82747A] block">
-                          ₹{folio.roomRatePerNight} × {folio.numberOfNights}n
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="text-[#8E7079] block text-[10px]">Food & Beverage</span>
-                        <span className="font-mono font-semibold text-[#59283A]">
-                          ₹{folio.foodAndBeverageCharges.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="text-[#8E7079] block text-[10px]">Laundry</span>
-                        <span className="font-mono font-semibold text-[#59283A]">
-                          ₹{folio.laundryCharges.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="text-[#8E7079] block text-[10px]">Room Service</span>
-                        <span className="font-mono font-semibold text-[#59283A]">
-                          ₹{folio.roomServiceCharges.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="text-[#8E7079] block text-[10px]">Extra Bed & Linen</span>
-                        <span className="font-mono font-semibold text-[#59283A]">
-                          ₹{folio.extraBedCharges.toLocaleString("en-IN")}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="text-[#8E7079] block text-[10px]">Services & Sundries</span>
-                        <span className="font-mono font-semibold text-[#59283A]">
-                          ₹{(folio.otherServicesCharges + folio.additionalItemCharges).toLocaleString("en-IN")}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Bottom Row: Totals, Payments and Remaining Balance Formula */}
-                    <div className="pt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
-                      <div className="flex items-center gap-4 flex-wrap text-[11px]">
-                        <div>
-                          <span className="text-[#8E7079]">Subtotal: </span>
-                          <span className="font-mono font-semibold text-[#59283A]">
-                            ₹{folio.subtotal.toLocaleString("en-IN")}
-                          </span>
-                        </div>
-                        {folio.discountAmount > 0 && (
                           <div>
-                            <span className="text-[#8E7079]">Discount: </span>
-                            <span className="font-mono text-[#32765B]">
-                              -₹{folio.discountAmount.toLocaleString("en-IN")}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-sm text-[#59283A]">
+                                {folio.guestName}
+                              </span>
+                              <span className="text-[11px] font-mono text-[#8E7079]">
+                                ({folio.bookingNumber})
+                              </span>
+                              {isCardFullySettled ? (
+                                <Badge className="bg-[#E7F1E9] text-[#32765B] border-[#C5DFD0] text-[10px] font-semibold">
+                                  Fully Settled
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-[#F8E8E5] text-[#B54C44] border-[#F2D1CB] text-[10px] font-semibold">
+                                  Due ₹{cardBalance.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-[#82747A] flex items-center gap-3 mt-0.5">
+                              <span>{folio.roomType}</span>
+                              <span>•</span>
+                              <span>{folio.guestMobile}</span>
+                              <span>•</span>
+                              <span>{folio.numberOfNights} Nights ({folio.checkInDate} to {folio.expectedCheckOutDate})</span>
+                            </div>
                           </div>
-                        )}
+                        </div>
+
+                        {/* Quick Action Buttons */}
+                        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleOpenChargeModal(cardUpdatedFolio)}
+                            className="h-8 text-[11px] border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#59283A]"
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            Post Item
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleOpenPaymentModal(cardUpdatedFolio)}
+                            className="h-8 text-[11px] border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#32765B]"
+                          >
+                            <CreditCard className="w-3 h-3 mr-1" />
+                            Record Pay
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            onClick={() => handleOpenDossier(folio.bookingId)}
+                            className="h-8 text-[11px] bg-[#59283A] hover:bg-[#472130] text-white"
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            View Folio
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleConfirmDelete({
+                              id: folio.bookingId,
+                              invoiceNumber: `FOLIO-${folio.bookingNumber}`,
+                              guestName: folio.guestName,
+                              roomNumber: folio.roomNumber,
+                              amount: cardFinalBill,
+                              type: "FOLIO",
+                            })}
+                            className="h-8 px-2 text-[#B54C44] hover:bg-[#F8E8E5] hover:text-[#963730]"
+                            title="Delete / Cancel Stay Folio"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Middle Row: The Exact 6 Billing Components Breakdown */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 py-3 bg-[#F5F0EA]/60 -mx-4 sm:-mx-5 px-4 sm:px-5 border-b border-[#E8DDD8] text-[11px]">
                         <div>
-                          <span className="text-[#8E7079]">Taxes ({folio.taxPercentage}%): </span>
-                          <span className="font-mono text-[#82747A]">
-                            +₹{folio.taxAmount.toLocaleString("en-IN")}
+                          <span className="text-[#8E7079] block text-[10px]">Room Charges</span>
+                          <span className="font-mono font-semibold text-[#59283A]">
+                            ₹{folio.roomCharges.toLocaleString("en-IN")}
+                          </span>
+                          <span className="text-[9px] text-[#82747A] block">
+                            ₹{folio.roomRatePerNight} × {folio.numberOfNights}n
                           </span>
                         </div>
+
                         <div>
-                          <span className="text-[#82747A] font-semibold">Final Bill: </span>
-                          <span className="font-mono font-bold text-[#59283A] text-sm">
-                            ₹{folio.finalBill.toLocaleString("en-IN")}
+                          <span className="text-[#8E7079] block text-[10px]">Food & Beverage</span>
+                          <span className="font-mono font-semibold text-[#59283A]">
+                            ₹{folio.foodAndBeverageCharges.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[#8E7079] block text-[10px]">Laundry</span>
+                          <span className="font-mono font-semibold text-[#59283A]">
+                            ₹{folio.laundryCharges.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[#8E7079] block text-[10px]">Room Service</span>
+                          <span className="font-mono font-semibold text-[#59283A]">
+                            ₹{folio.roomServiceCharges.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[#8E7079] block text-[10px]">Extra Bed & Linen</span>
+                          <span className="font-mono font-semibold text-[#59283A]">
+                            ₹{folio.extraBedCharges.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[#8E7079] block text-[10px]">Services & Sundries</span>
+                          <span className="font-mono font-semibold text-[#59283A]">
+                            ₹{(folio.otherServicesCharges + folio.additionalItemCharges).toLocaleString("en-IN")}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <div className="text-right text-[11px]">
-                          <span className="text-[#8E7079]">Paid so far: </span>
-                          <span className="font-mono font-semibold text-[#32765B]">
-                            ₹{folio.payments.totalPaymentsReceived.toLocaleString("en-IN")}
-                          </span>
-                          <div className="text-[9px] text-[#8E7079]">
-                            Adv: ₹{folio.payments.advancePayments} • Part: ₹{folio.payments.partialPayments} • Fin: ₹{folio.payments.finalPayments}
+                      {/* Bottom Row: Totals, Payments and Remaining Balance Formula */}
+                      <div className="pt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-4 flex-wrap text-[11px]">
+                          <div>
+                            <span className="text-[#8E7079]">Subtotal: </span>
+                            <span className="font-mono font-semibold text-[#59283A]">
+                              ₹{folio.subtotal.toLocaleString("en-IN")}
+                            </span>
+                          </div>
+                          {folio.discountAmount > 0 && (
+                            <div>
+                              <span className="text-[#8E7079]">Discount: </span>
+                              <span className="font-mono text-[#32765B]">
+                                -₹{folio.discountAmount.toLocaleString("en-IN")}
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1.5 bg-[#F5F0EA] px-2 py-0.5 rounded border border-[#E8DDD8]">
+                            <span className="text-[#8E7079]">GST Tax:</span>
+                            <select
+                              value={cardTaxRate}
+                              onChange={(e) => {
+                                const newRate = Number(e.target.value);
+                                setFolioTaxRates((prev) => ({ ...prev, [folio.bookingId]: newRate }));
+                              }}
+                              className="text-[11px] font-bold bg-white border border-[#E8DDD8] rounded px-1.5 py-0.5 text-[#59283A] focus:outline-none focus:border-[#59283A] cursor-pointer"
+                              title="Change GST Tax Rate for this Stay"
+                            >
+                              <option value={0}>0% GST</option>
+                              <option value={5}>5% GST</option>
+                              <option value={12}>12% GST</option>
+                              <option value={18}>18% GST</option>
+                              <option value={28}>28% GST</option>
+                            </select>
+                            <span className="font-mono text-[#82747A] font-semibold">
+                              +₹{cardTaxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[#82747A] font-semibold">Final Bill: </span>
+                            <span className="font-mono font-bold text-[#59283A] text-sm">
+                              ₹{cardFinalBill.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
                           </div>
                         </div>
 
-                        <div className="pl-3 border-l border-[#E8DDD8] text-right">
-                          <span className="text-[10px] text-[#8E7079] block uppercase tracking-wider font-semibold">
-                            Balance Due
-                          </span>
-                          <span className={`font-mono text-base font-bold ${folio.remainingBalance > 0 ? "text-[#B54C44]" : "text-[#32765B]"}`}>
-                            ₹{Math.max(0, folio.remainingBalance).toLocaleString("en-IN")}
-                          </span>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right text-[11px]">
+                            <span className="text-[#8E7079]">Paid so far: </span>
+                            <span className="font-mono font-semibold text-[#32765B]">
+                              ₹{folio.payments.totalPaymentsReceived.toLocaleString("en-IN")}
+                            </span>
+                            <div className="text-[9px] text-[#8E7079]">
+                              Adv: ₹{folio.payments.advancePayments} • Part: ₹{folio.payments.partialPayments} • Fin: ₹{folio.payments.finalPayments}
+                            </div>
+                          </div>
+
+                          <div className="pl-3 border-l border-[#E8DDD8] text-right">
+                            <span className="text-[10px] text-[#8E7079] block uppercase tracking-wider font-semibold">
+                              Balance Due
+                            </span>
+                            <span className={`font-mono text-base font-bold ${cardBalance > 0 ? "text-[#B54C44]" : "text-[#32765B]"}`}>
+                              ₹{Math.max(0, cardBalance).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>
@@ -1520,76 +1581,94 @@ export default function AutomaticBillingPage() {
       {/* ========================================================================= */}
       <Dialog open={dossierModalOpen} onOpenChange={setDossierModalOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-[#E8DDD8] p-6 sm:p-8">
-          {selectedFolio && (
-            <div className="space-y-6 printable-folio">
-              {/* Hotel Luxury Letterhead */}
-              <div className="border-b-2 border-[#59283A] pb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#C4A06A] shadow-md relative flex-shrink-0 bg-[#59283A]">
-                    <Image
-                      src="/radha-krishna-logo.jpg"
-                      alt="Hotel Radha Palace"
-                      fill
-                      className="object-cover"
-                    />
+          {selectedFolio && (() => {
+            const liveTaxRate = Number(currentFolioTaxRate !== undefined ? currentFolioTaxRate : (selectedFolio.taxPercentage || 12));
+            const liveTaxable = Math.max(0, Math.round((Number(selectedFolio.subtotal) - Number(selectedFolio.discountAmount || 0)) * 100) / 100);
+            const liveTaxAmount = Math.round(liveTaxable * (liveTaxRate / 100) * 100) / 100;
+            const liveFinalBill = Math.round((liveTaxable + liveTaxAmount) * 100) / 100;
+            const livePaid = Number(selectedFolio.payments.totalPaymentsReceived || 0);
+            const liveRemainingBalance = Math.round((liveFinalBill - livePaid) * 100) / 100;
+            const isLiveFullySettled = liveRemainingBalance <= 0;
+
+            const liveUpdatedFolio: BillingComponentBreakdown = {
+              ...selectedFolio,
+              taxPercentage: liveTaxRate,
+              taxAmount: liveTaxAmount,
+              finalBill: liveFinalBill,
+              remainingBalance: liveRemainingBalance,
+              isFullySettled: isLiveFullySettled,
+            };
+
+            return (
+              <div className="space-y-6 printable-folio">
+                {/* Hotel Luxury Letterhead */}
+                <div className="border-b-2 border-[#59283A] pb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#C4A06A] shadow-md relative flex-shrink-0 bg-[#59283A]">
+                      <Image
+                        src="/radha-krishna-logo.jpg"
+                        alt="Hotel Radha Palace"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h2 className="font-serif text-2xl font-bold tracking-tight text-[#59283A]">
+                        Hotel Radha Palace
+                      </h2>
+                      <p className="text-xs text-[#82747A] mt-0.5">
+                        Boutique Luxury Hospitality Management • Official Stay Folio
+                      </p>
+                      <p className="text-[11px] text-[#8E7079] mt-0.5">
+                        GSTIN: 07AAAAA0000A1Z5 • 108 Heritage Boulevard, New Delhi, India
+                      </p>
+                    </div>
+                  </div>
+                  <div className="sm:text-right">
+                    <div className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
+                      Folio Reference
+                    </div>
+                    <div className="text-lg font-mono font-bold text-[#C4A06A]">
+                      {selectedFolio.bookingNumber}
+                    </div>
+                    <div className="text-[11px] text-[#8E7079] mt-0.5">
+                      Date: {new Date().toLocaleDateString("en-IN", { dateStyle: "long" })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Guest & Stay Profile */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-[#F5F0EA] border border-[#E8DDD8] text-xs">
+                  <div>
+                    <span className="text-[#8E7079] block text-[10px]">Guest Name</span>
+                    <span className="font-bold text-[#59283A]">{selectedFolio.guestName}</span>
+                    <span className="text-[10px] text-[#82747A] block">{selectedFolio.guestMobile}</span>
                   </div>
                   <div>
-                    <h2 className="font-serif text-2xl font-bold tracking-tight text-[#59283A]">
-                      Hotel Radha Palace
-                    </h2>
-                    <p className="text-xs text-[#82747A] mt-0.5">
-                      Boutique Luxury Hospitality Management • Official Stay Folio
-                    </p>
-                    <p className="text-[11px] text-[#8E7079] mt-0.5">
-                      GSTIN: 07AAAAA0000A1Z5 • 108 Heritage Boulevard, New Delhi, India
-                    </p>
+                    <span className="text-[#8E7079] block text-[10px]">Room Allocated</span>
+                    <span className="font-bold text-[#59283A]">Room {selectedFolio.roomNumber}</span>
+                    <span className="text-[10px] text-[#82747A] block">{selectedFolio.roomType}</span>
                   </div>
-                </div>
-                <div className="sm:text-right">
-                  <div className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
-                    Folio Reference
-                  </div>
-                  <div className="text-lg font-mono font-bold text-[#C4A06A]">
-                    {selectedFolio.bookingNumber}
-                  </div>
-                  <div className="text-[11px] text-[#8E7079] mt-0.5">
-                    Date: {new Date().toLocaleDateString("en-IN", { dateStyle: "long" })}
-                  </div>
-                </div>
-              </div>
-
-              {/* Guest & Stay Profile */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-[#F5F0EA] border border-[#E8DDD8] text-xs">
-                <div>
-                  <span className="text-[#8E7079] block text-[10px]">Guest Name</span>
-                  <span className="font-bold text-[#59283A]">{selectedFolio.guestName}</span>
-                  <span className="text-[10px] text-[#82747A] block">{selectedFolio.guestMobile}</span>
-                </div>
-                <div>
-                  <span className="text-[#8E7079] block text-[10px]">Room Allocated</span>
-                  <span className="font-bold text-[#59283A]">Room {selectedFolio.roomNumber}</span>
-                  <span className="text-[10px] text-[#82747A] block">{selectedFolio.roomType}</span>
-                </div>
-                <div>
-                  <span className="text-[#8E7079] block text-[10px]">Stay Duration</span>
-                  <span className="font-bold text-[#59283A]">{selectedFolio.numberOfNights} Nights</span>
-                  <span className="text-[10px] text-[#82747A] block">
-                    {selectedFolio.checkInDate} to {selectedFolio.expectedCheckOutDate}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[#8E7079] block text-[10px]">Folio Status</span>
-                  {selectedFolio.isFullySettled ? (
-                    <span className="font-bold text-[#32765B] flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Fully Settled
+                  <div>
+                    <span className="text-[#8E7079] block text-[10px]">Stay Duration</span>
+                    <span className="font-bold text-[#59283A]">{selectedFolio.numberOfNights} Nights</span>
+                    <span className="text-[10px] text-[#82747A] block">
+                      {selectedFolio.checkInDate} to {selectedFolio.expectedCheckOutDate}
                     </span>
-                  ) : (
-                    <span className="font-bold text-[#B54C44] flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" /> Balance Pending
-                    </span>
-                  )}
+                  </div>
+                  <div>
+                    <span className="text-[#8E7079] block text-[10px]">Folio Status</span>
+                    {isLiveFullySettled ? (
+                      <span className="font-bold text-[#32765B] flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Fully Settled
+                      </span>
+                    ) : (
+                      <span className="font-bold text-[#B54C44] flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" /> Due: ₹{liveRemainingBalance.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
 
               {/* Component 1: Room Charges */}
               <div className="space-y-2">
@@ -1726,28 +1805,90 @@ export default function AutomaticBillingPage() {
                 </div>
 
                 {/* Right: Tax, Final Bill & Balance Box */}
-                <div className="bg-[#F5F0EA]/50 p-4 rounded-xl border border-[#E8DDD8] space-y-2 text-xs flex flex-col justify-between">
-                  <div className="space-y-1.5">
-                    <div className="font-bold text-[#59283A] text-xs uppercase tracking-wider pb-1 border-b border-[#E8DDD8]">
-                      Final Bill Calculation
+                <div className="bg-[#F5F0EA]/50 p-4 rounded-xl border border-[#E8DDD8] space-y-3 text-xs flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-[#E8DDD8]">
+                      <span className="font-bold text-[#59283A] text-xs uppercase tracking-wider">
+                        Final Bill Calculation
+                      </span>
+                      <span className="text-[10px] font-medium text-[#32765B] bg-[#E7F1E9] px-2 py-0.5 rounded-full border border-[#C5DFD0]">
+                        Live Recalculation
+                      </span>
                     </div>
+
                     <div className="flex justify-between text-[#82747A]">
                       <span>Subtotal:</span>
                       <span className="font-mono">₹{selectedFolio.subtotal.toFixed(2)}</span>
                     </div>
+
                     {selectedFolio.discountAmount > 0 && (
                       <div className="flex justify-between text-[#32765B]">
                         <span>Discount:</span>
                         <span className="font-mono">-₹{selectedFolio.discountAmount.toFixed(2)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-[#82747A]">
-                      <span>Applicable Taxes ({selectedFolio.taxPercentage}% GST):</span>
-                      <span className="font-mono">+₹{selectedFolio.taxAmount.toFixed(2)}</span>
+
+                    {/* Interactive GST Configurator */}
+                    <div className="bg-white p-2.5 rounded-lg border border-[#E8DDD8] space-y-2 my-1">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-semibold text-[#59283A] flex items-center gap-1">
+                          <span>Applicable GST Tax Rate:</span>
+                        </label>
+                        <div className="flex items-center gap-1">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.5"
+                            value={currentFolioTaxRate}
+                            onChange={(e) => {
+                              const val = Math.max(0, Math.min(100, Number(e.target.value) || 0));
+                              setCurrentFolioTaxRate(val);
+                              if (selectedFolio) {
+                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: val }));
+                              }
+                            }}
+                            className="w-16 h-7 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A]"
+                          />
+                          <span className="text-xs font-bold text-[#59283A]">%</span>
+                        </div>
+                      </div>
+
+                      {/* Quick preset buttons */}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] text-[#8E7079]">Presets:</span>
+                        {[0, 5, 12, 18, 28].map((rate) => (
+                          <button
+                            key={rate}
+                            type="button"
+                            onClick={() => {
+                              setCurrentFolioTaxRate(rate);
+                              if (selectedFolio) {
+                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: rate }));
+                              }
+                            }}
+                            className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${
+                              Number(currentFolioTaxRate) === rate
+                                ? "bg-[#59283A] text-white shadow-xs"
+                                : "bg-[#F5F0EA] text-[#8E7079] hover:bg-[#E8DDD8] hover:text-[#59283A]"
+                            }`}
+                          >
+                            {rate}%
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="flex justify-between items-center pt-1.5 border-t border-[#F0E6E1] text-[#82747A] text-[11px]">
+                        <span>Calculated GST Tax ({liveTaxRate}%):</span>
+                        <span className="font-mono font-semibold text-[#59283A]">
+                          +₹{liveTaxAmount.toFixed(2)}
+                        </span>
+                      </div>
                     </div>
+
                     <div className="pt-2 border-t border-[#E8DDD8] flex justify-between text-base font-bold text-[#59283A]">
                       <span>Final Bill:</span>
-                      <span className="font-mono">₹{selectedFolio.finalBill.toFixed(2)}</span>
+                      <span className="font-mono">₹{liveFinalBill.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -1755,17 +1896,17 @@ export default function AutomaticBillingPage() {
                     <div className="flex justify-between text-xs text-[#32765B]">
                       <span>Total Payments Received:</span>
                       <span className="font-mono font-bold">
-                        -₹{selectedFolio.payments.totalPaymentsReceived.toFixed(2)}
+                        -₹{livePaid.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm font-bold text-[#59283A]">
                       <span>Remaining Balance:</span>
                       <span
                         className={`font-mono text-lg ${
-                          selectedFolio.remainingBalance > 0 ? "text-[#B54C44]" : "text-[#32765B]"
+                          liveRemainingBalance > 0 ? "text-[#B54C44]" : "text-[#32765B]"
                         }`}
                       >
-                        ₹{Math.max(0, selectedFolio.remainingBalance).toFixed(2)}
+                        ₹{Math.max(0, liveRemainingBalance).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -1833,7 +1974,7 @@ export default function AutomaticBillingPage() {
                   <Button
                     onClick={() => {
                       setDossierModalOpen(false);
-                      handleOpenPaymentModal(selectedFolio);
+                      handleOpenPaymentModal(liveUpdatedFolio);
                     }}
                     className="bg-[#32765B] hover:bg-[#286049] text-white text-xs h-9"
                   >
@@ -1843,17 +1984,18 @@ export default function AutomaticBillingPage() {
 
                   {!selectedFolio.existingInvoice && (
                     <Button
-                      onClick={() => handleGenerateInvoice(selectedFolio.bookingId)}
+                      onClick={() => handleGenerateInvoice(selectedFolio.bookingId, liveTaxRate)}
                       className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9"
                     >
                       <Receipt className="w-3.5 h-3.5 mr-1.5" />
-                      Generate Invoice
+                      Generate Invoice ({liveTaxRate}% GST)
                     </Button>
                   )}
                 </div>
               </div>
             </div>
-          )}
+          );
+        })()}
         </DialogContent>
       </Dialog>
 

@@ -36,8 +36,10 @@ export const billingService = {
     return res.data.data;
   },
 
-  async getLiveBillingFolio(bookingId: string): Promise<BillingComponentBreakdown> {
-    const res = await apiClient.get<ApiResponse<BillingComponentBreakdown>>(`/invoices/live/${bookingId}`);
+  async getLiveBillingFolio(bookingId: string, taxPercentage?: number): Promise<BillingComponentBreakdown> {
+    const res = await apiClient.get<ApiResponse<BillingComponentBreakdown>>(`/invoices/live/${bookingId}`, {
+      params: { taxPercentage },
+    });
     return res.data.data;
   },
 
