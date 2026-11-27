@@ -606,12 +606,24 @@ export default function GuestsPage() {
       return;
     }
 
+    // Strict validation for companions / co-guests
+    if (formData.additionalGuests && formData.additionalGuests.length > 0) {
+      for (let i = 0; i < formData.additionalGuests.length; i++) {
+        const comp = formData.additionalGuests[i];
+        if (!comp.fullName || !comp.fullName.trim()) {
+          toast.error(`Companion #${i + 1} Full Name is required. Please fill companion details.`);
+          return;
+        }
+      }
+    }
+
     try {
       setSubmitting(true);
+      const partySize = 1 + (formData.additionalGuests?.length || 0);
       const createdGuest = await guestsService.create({
         ...formData,
         dateOfBirth: formData.dateOfBirth ? formData.dateOfBirth : undefined,
-        numberOfGuests: Number(formData.numberOfGuests) || 1,
+        numberOfGuests: partySize,
       });
       toast.success("Guest registered with complete profile and identity records", {
         action: createdGuest?.mobileNumber
@@ -643,12 +655,29 @@ export default function GuestsPage() {
     e.preventDefault();
     if (!selectedGuest) return;
 
+    if (!formData.fullName.trim() || !formData.mobileNumber.trim()) {
+      toast.error("Guest Full Name and Mobile Number are required");
+      return;
+    }
+
+    // Strict validation for companions / co-guests
+    if (formData.additionalGuests && formData.additionalGuests.length > 0) {
+      for (let i = 0; i < formData.additionalGuests.length; i++) {
+        const comp = formData.additionalGuests[i];
+        if (!comp.fullName || !comp.fullName.trim()) {
+          toast.error(`Companion #${i + 1} Full Name is required. Please fill companion details.`);
+          return;
+        }
+      }
+    }
+
     try {
       setSubmitting(true);
+      const partySize = 1 + (formData.additionalGuests?.length || 0);
       await guestsService.update(selectedGuest.id, {
         ...formData,
         dateOfBirth: formData.dateOfBirth ? formData.dateOfBirth : undefined,
-        numberOfGuests: Number(formData.numberOfGuests) || 1,
+        numberOfGuests: partySize,
       });
       toast.success("Guest profile and companion details updated");
       setEditModalOpen(false);
@@ -662,22 +691,22 @@ export default function GuestsPage() {
 
   // Co-guest in-form helpers
   const handleAddCompanionToForm = () => {
-    const nextParty = (formData.additionalGuests.length + 1) + 1;
+    const updated = [
+      ...formData.additionalGuests,
+      {
+        fullName: "",
+        age: undefined,
+        gender: "FEMALE" as const,
+        relationship: "Spouse",
+        idProofType: "AADHAAR",
+        idProofNumber: "",
+        documentFileReference: "",
+      },
+    ];
     setFormData({
       ...formData,
-      numberOfGuests: Math.max(formData.numberOfGuests, nextParty),
-      additionalGuests: [
-        ...formData.additionalGuests,
-        {
-          fullName: "",
-          age: undefined,
-          gender: "FEMALE",
-          relationship: "Spouse",
-          idProofType: "AADHAAR",
-          idProofNumber: "",
-          documentFileReference: "",
-        },
-      ],
+      numberOfGuests: 1 + updated.length,
+      additionalGuests: updated,
     });
   };
 
@@ -685,7 +714,7 @@ export default function GuestsPage() {
     const updated = formData.additionalGuests.filter((_, idx) => idx !== index);
     setFormData({
       ...formData,
-      numberOfGuests: Math.max(1, updated.length + 1),
+      numberOfGuests: 1 + updated.length,
       additionalGuests: updated,
     });
   };
@@ -895,7 +924,11 @@ export default function GuestsPage() {
             <div>
               <p className="text-[10px] uppercase font-bold text-[#8E7079] tracking-wider">Co-Guests / Companions</p>
               <h3 className="text-xl font-serif font-bold text-[#627D91]">
-                {guests.reduce((acc, g) => acc + (g.additionalGuests?.length || 0), 0)}
+                {guests.reduce((acc, g) => {
+                  const directCompanions = g.additionalGuests?.length || 0;
+                  const partyCompanions = (g.numberOfGuests && g.numberOfGuests > 1) ? g.numberOfGuests - 1 : 0;
+                  return acc + Math.max(directCompanions, partyCompanions);
+                }, 0)}
               </h3>
             </div>
           </CardContent>
@@ -985,6 +1018,7 @@ export default function GuestsPage() {
                     const docNumberDisplay = g.idProofNumber || primaryDoc?.documentNumber;
                     const docRefDisplay = g.idProofDocument || primaryDoc?.documentFileReference;
                     const partyCount = g.numberOfGuests || (g.additionalGuests ? 1 + g.additionalGuests.length : 1);
+                    const companionCount = Math.max(g.additionalGuests?.length || 0, partyCount > 1 ? partyCount - 1 : 0);
 
                     return (
                       <tr key={g.id} className="hover:bg-[#F5F0EA]/60 transition-colors">
@@ -1114,9 +1148,9 @@ export default function GuestsPage() {
                               <Users className="w-3 h-3 text-[#C4A06A]" />
                               {partyCount} {partyCount === 1 ? "Guest" : "Guests"}
                             </span>
-                            {g.additionalGuests && g.additionalGuests.length > 0 && (
-                              <span className="text-[10px] text-[#82747A] mt-0.5">
-                                +{g.additionalGuests.length} companion{g.additionalGuests.length > 1 ? "s" : ""}
+                            {companionCount > 0 && (
+                              <span className="text-[10px] text-[#82747A] mt-0.5 font-medium">
+                                +{companionCount} companion{companionCount > 1 ? "s" : ""}
                               </span>
                             )}
                           </div>
@@ -1447,12 +1481,12 @@ export default function GuestsPage() {
               </div>
             </div>
 
-            {/* 8. Number of Guests & 9. Additional Guest Information (Companions) */}
+            {/* 8. Accompanying Co-Guests / Companions */}
             <div className="space-y-3">
               <div className="flex items-center justify-between border-b border-[#E8DDD8] pb-1.5">
                 <h4 className="text-xs font-bold text-[#59283A] uppercase tracking-wider flex items-center gap-2">
                   <Users className="w-3.5 h-3.5 text-[#C4A06A]" />
-                  <span>8. Number of Guests & 9. Additional Guest Information</span>
+                  <span>8. Accompanying Co-Guests / Companions (साथी अतिथि)</span>
                 </h4>
                 <Button
                   type="button"
@@ -1466,40 +1500,42 @@ export default function GuestsPage() {
                 </Button>
               </div>
 
-              {/* 8. Total Number of Guests */}
+              {/* Accompanying Guests Counter (Default 0) */}
               <div className="flex items-center gap-4 bg-[#F5F0EA] p-3 rounded-lg border border-[#E8DDD8]">
                 <div className="text-xs font-semibold text-[#59283A] flex-1">
-                  Total Guests in Party (Primary Guest + Accompanying Guests):
+                  <span>Accompanying Co-Guests / Companions:</span>
+                  <span className="block text-[10px] text-[#82747A] font-normal mt-0.5">
+                    {formData.additionalGuests.length === 0
+                      ? "0 Companions selected (Primary Guest only • Party size: 1)"
+                      : `${formData.additionalGuests.length} Companion${formData.additionalGuests.length > 1 ? "s" : ""} added • Total party size: ${1 + formData.additionalGuests.length} Guests`}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-7 w-7 p-0 border-[#E8DDD8] bg-white"
-                    onClick={() =>
-                      setFormData({
-                        ...formData,
-                        numberOfGuests: Math.max(1, (formData.numberOfGuests || 1) - 1),
-                      })
-                    }
+                    className="h-7 w-7 p-0 border-[#E8DDD8] bg-white font-bold"
+                    onClick={() => {
+                      if (formData.additionalGuests.length > 0) {
+                        handleRemoveCompanionFromForm(formData.additionalGuests.length - 1);
+                      }
+                    }}
+                    disabled={formData.additionalGuests.length === 0}
+                    title="Remove companion"
                   >
                     -
                   </Button>
-                  <span className="font-bold text-sm text-[#59283A] w-8 text-center">
-                    {formData.numberOfGuests || 1}
+                  <span className="font-bold text-sm text-[#59283A] w-8 text-center font-mono">
+                    {formData.additionalGuests.length}
                   </span>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-7 w-7 p-0 border-[#E8DDD8] bg-white"
-                    onClick={() =>
-                      setFormData({
-                        ...formData,
-                        numberOfGuests: (formData.numberOfGuests || 1) + 1,
-                      })
-                    }
+                    className="h-7 w-7 p-0 border-[#E8DDD8] bg-white font-bold"
+                    onClick={handleAddCompanionToForm}
+                    title="Add companion"
                   >
                     +
                   </Button>
@@ -1510,7 +1546,7 @@ export default function GuestsPage() {
               <div className="space-y-3">
                 {formData.additionalGuests.length === 0 ? (
                   <div className="text-center py-4 bg-white border border-dashed border-[#E8DDD8] rounded-xl text-xs text-[#82747A]">
-                    No additional companions added yet. Click &quot;Add Companion&quot; to register family members or co-travelers.
+                    No additional companions added yet. Click &quot;+&quot; or &quot;Add Companion&quot; to register family members or co-travelers.
                   </div>
                 ) : (
                   formData.additionalGuests.map((comp, idx) => (
@@ -1523,7 +1559,7 @@ export default function GuestsPage() {
                           <span className="w-5 h-5 rounded-full bg-[#F5F0EA] text-[#59283A] flex items-center justify-center text-[10px]">
                             {idx + 1}
                           </span>
-                          Companion Details
+                          Companion #{idx + 1} Details
                         </span>
                         <Button
                           type="button"
@@ -1539,13 +1575,17 @@ export default function GuestsPage() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
                         <div className="sm:col-span-2 space-y-1">
-                          <label className="text-[11px] font-semibold text-[#82747A]">Companion Full Name *</label>
+                          <label className="text-[11px] font-semibold text-[#82747A]">
+                            Companion Full Name <span className="text-rose-600 font-bold">*</span>
+                          </label>
                           <Input
                             required
                             value={comp.fullName}
                             onChange={(e) => handleCompanionFieldChange(idx, "fullName", e.target.value)}
-                            placeholder="e.g. Suman Patel"
-                            className="h-7 text-xs border-[#E8DDD8]"
+                            placeholder="e.g. Suman Patel (Required)"
+                            className={`h-7 text-xs border-[#E8DDD8] ${
+                              !comp.fullName.trim() ? "border-rose-400 bg-rose-50/20" : ""
+                            }`}
                           />
                         </div>
 
