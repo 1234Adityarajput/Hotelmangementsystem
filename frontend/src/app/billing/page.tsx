@@ -1677,7 +1677,7 @@ export default function AutomaticBillingPage() {
       {/* MODAL 1: LIVE STAY FOLIO DOSSIER & PRINTABLE BILL */}
       {/* ========================================================================= */}
       <Dialog open={dossierModalOpen} onOpenChange={setDossierModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-[#E8DDD8] p-6 sm:p-8">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-[#E8DDD8] p-6 sm:p-8 print:p-0 print:m-0 print:max-h-none print:overflow-visible print:border-none print:shadow-none print:w-full">
           {selectedFolio && (() => {
             const liveTaxRate = Number(currentFolioTaxRate !== undefined ? currentFolioTaxRate : (selectedFolio.taxPercentage !== undefined ? Number(selectedFolio.taxPercentage) : 12));
             const liveTaxable = Math.max(0, Math.round((Number(selectedFolio.subtotal) - Number(selectedFolio.discountAmount || 0)) * 100) / 100);
@@ -1697,9 +1697,9 @@ export default function AutomaticBillingPage() {
             };
 
             return (
-              <div className="space-y-4 printable-folio">
+              <div className="space-y-4 print:space-y-0 printable-folio">
                 {/* Live Billing Mode Switcher & Tax Configurator Bar */}
-                <div className="bg-[#F5F0EA] p-3 rounded-xl border border-[#E8DDD8] space-y-2.5 text-xs non-printable">
+                <div className="bg-[#F5F0EA] p-3 rounded-xl border border-[#E8DDD8] space-y-2.5 text-xs non-printable print:hidden">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
                     {/* 2-Option Billing Mode Switcher */}
                     <div className="flex items-center gap-2">
@@ -1841,7 +1841,7 @@ export default function AutomaticBillingPage() {
                 />
 
                 {/* Modal Footer with Actions */}
-                <div className="pt-4 border-t border-[#E8DDD8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 non-printable">
+                <div className="pt-4 border-t border-[#E8DDD8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 non-printable print:hidden">
                   <Button
                     variant="outline"
                     onClick={() => window.print()}

@@ -2163,8 +2163,8 @@ export default function StaysPage() {
       {/* DIGITAL STAY DOSSIER & RECEIPT MODAL                                      */}
       {/* ========================================================================= */}
       <Dialog open={receiptModalOpen} onOpenChange={setReceiptModalOpen}>
-        <DialogContent className="max-w-xl bg-white border-[#E8DDD8] shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="border-b border-[#E8DDD8] pb-3 text-center sm:text-left">
+        <DialogContent className="max-w-xl bg-white border-[#E8DDD8] shadow-2xl p-6 max-h-[90vh] overflow-y-auto print:max-h-none print:overflow-visible print:border-none print:shadow-none print:p-0 print:m-0 print:w-full">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3 text-center sm:text-left print:hidden">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#32765B] bg-[#E7F1E9] px-2 py-0.5 rounded">
@@ -2183,7 +2183,7 @@ export default function StaysPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => window.print()}
-                className="h-8 text-xs border-[#C4A06A] text-[#59283A]"
+                className="h-8 text-xs border-[#C4A06A] text-[#59283A] print:hidden"
               >
                 <Printer className="w-3.5 h-3.5 mr-1 text-[#C4A06A]" />
                 Print Folio

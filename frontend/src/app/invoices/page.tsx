@@ -931,11 +931,11 @@ export default function InvoicesPage() {
 
       {/* View Printable Invoice Modal */}
       <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
-        <DialogContent className="max-w-4xl bg-white max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogContent className="max-w-4xl bg-white max-h-[90vh] overflow-y-auto p-4 sm:p-6 print:p-0 print:m-0 print:max-h-none print:overflow-visible print:border-none print:shadow-none print:w-full">
           {selectedInvoice && (
-            <div className="space-y-4">
+            <div className="space-y-4 print:space-y-0">
               {/* Designer Quick Link for Owner & Status Indicator */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#F5F0EA] p-2.5 rounded-xl border border-[#E8DDD8] non-printable text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#F5F0EA] p-2.5 rounded-xl border border-[#E8DDD8] non-printable print:hidden text-xs">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[#82747A]">
                     Template: <strong>{receiptDesign.hotelName}</strong>
@@ -979,7 +979,7 @@ export default function InvoicesPage() {
 
               {/* Settlement Footer Actions */}
               {Number(selectedInvoice.balanceAmount) > 0 && (
-                <div className="pt-3 border-t border-[#E8DDD8] flex items-center justify-end non-printable">
+                <div className="pt-3 border-t border-[#E8DDD8] flex items-center justify-end non-printable print:hidden">
                   <Button
                     size="sm"
                     onClick={() => {

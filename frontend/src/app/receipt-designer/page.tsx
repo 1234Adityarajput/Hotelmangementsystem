@@ -368,7 +368,7 @@ export default function ReceiptDesignerPage() {
   return (
     <div className="space-y-6 pb-12 max-w-[1600px] mx-auto">
       {/* Top Header & Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E8DDD8] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E8DDD8] pb-5 print:hidden">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-[#59283A] text-[#C4A06A] flex items-center justify-center shadow-md">
@@ -419,11 +419,11 @@ export default function ReceiptDesignerPage() {
       </div>
 
       {/* Main Studio Grid: Left Control Panel (5 cols) | Right Live Preview (7 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start print:block">
         {/* ========================================================================= */}
         {/* LEFT COLUMN: DESIGN CONTROLS & STUDIO PANEL                               */}
         {/* ========================================================================= */}
-        <div className="lg:col-span-5 space-y-4">
+        <div className="lg:col-span-5 space-y-4 print:hidden">
           {/* Navigation Sub-Tabs */}
           <div className="flex flex-wrap gap-1.5 p-1 bg-[#F5F0EA] rounded-xl border border-[#E8DDD8]">
             <button
@@ -1166,9 +1166,9 @@ export default function ReceiptDesignerPage() {
         {/* ========================================================================= */}
         {/* RIGHT COLUMN: LIVE INTERACTIVE DOCUMENT PREVIEW                           */}
         {/* ========================================================================= */}
-        <div className="lg:col-span-7 sticky top-6 space-y-3">
+        <div className="lg:col-span-7 sticky top-6 space-y-3 print:col-span-12 print:static print:w-full print:p-0">
           {/* Preview Document Switcher & Info */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm print:hidden">
             <div className="flex items-center gap-1.5">
               <Eye className="w-4 h-4 text-[#C4A06A]" />
               <span className="text-xs font-bold text-[#59283A]">Live Visual Preview:</span>

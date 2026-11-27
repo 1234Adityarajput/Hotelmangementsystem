@@ -114,3 +114,102 @@ nextjs-portal,
 [data-nextjs-dev-indicator] {
   display: none !important;
 }
+
+/* ==========================================================================
+   PRINT STYLES FOR CRISP, CLEAN A4 BILLS & RECEIPTS
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm 10mm 10mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #1e293b !important;
+    font-size: 11pt !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide app navigation, sidebar, header, non-printable toolbars, backdrops, close buttons */
+  aside,
+  nav,
+  header,
+  footer,
+  .non-printable,
+  .print\:hidden,
+  [data-radix-dialog-overlay],
+  button:not(.allow-print),
+  [data-radix-focus-guard],
+  [data-state="closed"] {
+    display: none !important;
+  }
+
+  /* Unconstrain Radix Dialog for printing: remove fixed position, centering transforms, max-height, and scrolling */
+  [role="dialog"],
+  [data-radix-dialog-content],
+  div[data-state="open"][role="dialog"] {
+    position: static !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    border-radius: 0 !important;
+    display: block !important;
+  }
+
+  /* Reset layout app-shell constraints when printing */
+  .overflow-hidden,
+  .overflow-y-auto,
+  main {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  /* Receipt document root container */
+  .receipt-document-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Prevent page break inside rows, summary cards, and signatures */
+  table, tr, td, th {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .avoid-break,
+  .guest-profile-grid,
+  .totals-summary-box,
+  .signatory-section {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

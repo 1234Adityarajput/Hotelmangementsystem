@@ -163,7 +163,7 @@ export function ReceiptDocument({
 
   return (
     <div
-      className={`relative bg-white text-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border print:border-none print:shadow-none print:p-0 ${
+      className={`receipt-document-container relative bg-white text-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border print:border-none print:shadow-none print:p-0 print:m-0 print:w-full ${
         config.showBorderAccent ? "border-t-8" : "border-[#E8DDD8]"
       } ${className}`}
       style={{
@@ -189,7 +189,7 @@ export function ReceiptDocument({
       {/* ========================================================================= */}
       {config.headerStyle === "MODERN_SPLIT" && (
         <div
-          className="pb-6 mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b-2"
+          className="pb-6 mb-6 print:pb-3 print:mb-3 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 print:flex-row print:justify-between print:items-start border-b-2"
           style={{ borderColor: config.themeColor }}
         >
           <div className="flex items-start gap-4">
@@ -264,7 +264,7 @@ export function ReceiptDocument({
       )}
 
       {config.headerStyle === "CLASSIC_CENTERED" && (
-        <div className="text-center pb-6 mb-6 border-b-2" style={{ borderColor: config.themeColor }}>
+        <div className="text-center pb-6 mb-6 print:pb-3 print:mb-3 border-b-2" style={{ borderColor: config.themeColor }}>
           {config.showLogo && (
             <div
               className="w-16 h-16 rounded-xl overflow-hidden shadow-md mx-auto mb-2 relative border-2"
@@ -313,7 +313,7 @@ export function ReceiptDocument({
       )}
 
       {config.headerStyle === "MINIMAL_EXECUTIVE" && (
-        <div className="pb-5 mb-5 border-b border-slate-300 flex items-center justify-between">
+        <div className="pb-5 mb-5 print:pb-3 print:mb-3 border-b border-slate-300 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {config.showLogo && (
               <div
@@ -352,7 +352,7 @@ export function ReceiptDocument({
       {/* ========================================================================= */}
       {/* 2. GUEST & STAY PROFILE GRID                                              */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 print:grid-cols-4 gap-3 print:gap-2 p-4 print:p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs mb-6 print:mb-3 guest-profile-grid avoid-break">
         <div>
           <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">
             Guest Details
@@ -426,7 +426,7 @@ export function ReceiptDocument({
       {/* ========================================================================= */}
       {/* 3. CHARGES & TARIFF BREAKDOWN TABLE                                       */}
       {/* ========================================================================= */}
-      <div className="space-y-4 mb-6">
+      <div className="space-y-4 print:space-y-2 mb-6 print:mb-3 avoid-break">
         <div className="border border-slate-200 rounded-xl overflow-hidden">
           <table className="w-full text-xs text-left">
             <thead>
@@ -526,7 +526,7 @@ export function ReceiptDocument({
       {/* ========================================================================= */}
       {/* 4. TOTALS & TAX BREAKDOWN SECTION                                         */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-6 print:gap-4 mb-6 print:mb-3 totals-summary-box avoid-break">
         {/* Left Box: Component Breakdown Summary / Stay Particulars */}
         <div className="space-y-3">
           {/* Component Summary (Folio) */}
@@ -647,7 +647,7 @@ export function ReceiptDocument({
       {/* ========================================================================= */}
       {/* 5. AUTHORIZED SIGNATORY & TERMS & CONDITIONS                               */}
       {/* ========================================================================= */}
-      <div className="pt-4 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+      <div className="pt-4 print:pt-2 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-6 print:gap-4 text-xs signatory-section avoid-break">
         {/* Left: Terms & Conditions */}
         <div className="space-y-1">
           <span className="font-bold text-[10px] uppercase text-slate-500 tracking-wider block">
@@ -675,7 +675,7 @@ export function ReceiptDocument({
         {/* Right: Authorized Signatory Block */}
         {config.showSignatory && (
           <div className="flex flex-col justify-end items-end sm:items-end text-right">
-            <div className="w-48 text-center pt-8">
+            <div className="w-48 text-center pt-8 print:pt-4">
               <div
                 className="w-full border-b border-dashed mb-1.5"
                 style={{ borderColor: config.themeColor }}
@@ -696,7 +696,7 @@ export function ReceiptDocument({
 
       {/* Thank you note */}
       {config.thankYouMessage && (
-        <div className="mt-6 pt-3 border-t border-slate-100 text-center text-xs italic text-slate-500 font-serif">
+        <div className="mt-6 print:mt-2 pt-3 print:pt-1.5 border-t border-slate-100 text-center text-xs italic text-slate-500 font-serif avoid-break">
           &ldquo;{config.thankYouMessage}&rdquo;
         </div>
       )}
