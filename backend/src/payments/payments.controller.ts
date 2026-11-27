@@ -7,7 +7,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Payments Management')
 @ApiBearerAuth('JWT-auth')
-@Roles('OWNER')
+@Roles('OWNER', 'MANAGER')
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}

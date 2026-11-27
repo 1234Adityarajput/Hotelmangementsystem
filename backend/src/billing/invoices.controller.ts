@@ -4,9 +4,11 @@ import { BillingService } from './billing.service';
 import { GenerateInvoiceDto } from './dto/generate-invoice.dto';
 import { QueryInvoiceDto } from './dto/query-invoice.dto';
 import { QuickPostChargeDto } from './dto/quick-post-charge.dto';
+import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Invoices & Billing')
 @ApiBearerAuth('JWT-auth')
+@Roles('OWNER', 'MANAGER')
 @Controller('invoices')
 export class InvoicesController {
   constructor(private readonly billingService: BillingService) {}
