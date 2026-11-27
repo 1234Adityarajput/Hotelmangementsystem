@@ -36,13 +36,17 @@ import {
   ChevronRight,
   AlertTriangle,
   Loader2,
+  Palette,
 } from "lucide-react";
+import Link from "next/link";
 import ExcelJS from "exceljs";
 import { useAuth } from "@/providers/auth-provider";
 import { billingService } from "@/services/billing.service";
 import { paymentsService } from "@/services/payments.service";
 import { itemsService } from "@/services/items.service";
-import { BillingComponentBreakdown, Item, ItemCategory, Invoice, Payment } from "@/types";
+import { settingsService, defaultReceiptDesign } from "@/services/settings.service";
+import { ReceiptDocument } from "@/components/shared/receipt-document";
+import { BillingComponentBreakdown, Item, ItemCategory, Invoice, Payment, ReceiptDesignConfig } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,6 +90,7 @@ export default function AutomaticBillingPage() {
   const [dossierModalOpen, setDossierModalOpen] = useState(false);
   const [folioTaxRates, setFolioTaxRates] = useState<Record<string, number>>({});
   const [currentFolioTaxRate, setCurrentFolioTaxRate] = useState<number>(12);
+  const [receiptDesign, setReceiptDesign] = useState<ReceiptDesignConfig>(defaultReceiptDesign);
 
   // Quick Charge Modal
   const [chargeModalOpen, setChargeModalOpen] = useState(false);
@@ -165,7 +170,7 @@ export default function AutomaticBillingPage() {
         try {
           const updated = await billingService.getLiveBillingFolio(selectedFolio.bookingId);
           setSelectedFolio(updated);
-        } catch (_) {}
+        } catch (_) { }
       }
       if (historyModalOpen) {
         fetchHistory(historyMonth, historyYear);
@@ -506,7 +511,7 @@ export default function AutomaticBillingPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [folioRes, catItems, catList, invRes, payRes] = await Promise.all([
+      const [folioRes, catItems, catList, invRes, payRes, designRes] = await Promise.all([
         billingService.getActiveFolios(search || undefined).catch((e) => {
           console.warn("Active folios fetch error:", e);
           return { folios: [], kpis: null };
@@ -515,7 +520,12 @@ export default function AutomaticBillingPage() {
         itemsService.findAllCategories().catch(() => []),
         billingService.findAll({ limit: 50 }).catch(() => ({ items: [], total: 0 })),
         paymentsService.findAll({ limit: 50 }).catch(() => ({ items: [], total: 0 })),
+        settingsService.getReceiptDesign().catch(() => defaultReceiptDesign),
       ]);
+
+      if (designRes) {
+        setReceiptDesign(designRes);
+      }
 
       setFolios(folioRes?.folios || []);
       setKpis(
@@ -763,6 +773,19 @@ export default function AutomaticBillingPage() {
             <span>Billing History</span>
           </Button>
 
+          {!isManager && (
+            <Link href="/receipt-designer">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 px-3.5 text-xs font-semibold border-[#C4A06A] text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1.5 shadow-xs transition-all"
+              >
+                <Palette className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Customize Receipt</span>
+              </Button>
+            </Link>
+          )}
+
           <Button
             variant="outline"
             size="sm"
@@ -900,11 +923,10 @@ export default function AutomaticBillingPage() {
       <div className="flex border-b border-[#E8DDD8] gap-4 text-xs font-medium">
         <button
           onClick={() => setActiveTab("folios")}
-          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
-            activeTab === "folios"
+          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${activeTab === "folios"
               ? "border-[#59283A] text-[#59283A] font-semibold"
               : "border-transparent text-[#82747A] hover:text-[#59283A]"
-          }`}
+            }`}
         >
           <Receipt className="w-3.5 h-3.5" />
           <span>Active Guest Folios ({folios.length})</span>
@@ -912,11 +934,10 @@ export default function AutomaticBillingPage() {
 
         <button
           onClick={() => setActiveTab("components")}
-          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
-            activeTab === "components"
+          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${activeTab === "components"
               ? "border-[#59283A] text-[#59283A] font-semibold"
               : "border-transparent text-[#82747A] hover:text-[#59283A]"
-          }`}
+            }`}
         >
           <UtensilsCrossed className="w-3.5 h-3.5" />
           <span>Billing Components Matrix ({catalogItems.length} items)</span>
@@ -924,11 +945,10 @@ export default function AutomaticBillingPage() {
 
         <button
           onClick={() => setActiveTab("invoices")}
-          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
-            activeTab === "invoices"
+          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${activeTab === "invoices"
               ? "border-[#59283A] text-[#59283A] font-semibold"
               : "border-transparent text-[#82747A] hover:text-[#59283A]"
-          }`}
+            }`}
         >
           <FileText className="w-3.5 h-3.5" />
           <span>Invoices Archive ({invoices.length})</span>
@@ -936,11 +956,10 @@ export default function AutomaticBillingPage() {
 
         <button
           onClick={() => setActiveTab("payments")}
-          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
-            activeTab === "payments"
+          className={`pb-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${activeTab === "payments"
               ? "border-[#59283A] text-[#59283A] font-semibold"
               : "border-transparent text-[#82747A] hover:text-[#59283A]"
-          }`}
+            }`}
         >
           <CreditCard className="w-3.5 h-3.5" />
           <span>Payments Ledger ({payments.length})</span>
@@ -1485,13 +1504,12 @@ export default function AutomaticBillingPage() {
                         </td>
                         <td className="px-4 py-3">
                           <Badge
-                            className={`text-[10px] ${
-                              inv.invoiceStatus === "PAID"
+                            className={`text-[10px] ${inv.invoiceStatus === "PAID"
                                 ? "bg-[#E7F1E9] text-[#32765B] border-[#C5DFD0]"
                                 : inv.invoiceStatus === "PARTIALLY_PAID"
-                                ? "bg-[#F6EDDC] text-[#A97832] border-[#E8D9BD]"
-                                : "bg-[#F8E8E5] text-[#B54C44] border-[#F2D1CB]"
-                            }`}
+                                  ? "bg-[#F6EDDC] text-[#A97832] border-[#E8D9BD]"
+                                  : "bg-[#F8E8E5] text-[#B54C44] border-[#F2D1CB]"
+                              }`}
                           >
                             {inv.invoiceStatus}
                           </Badge>
@@ -1590,13 +1608,12 @@ export default function AutomaticBillingPage() {
                         </td>
                         <td className="px-4 py-3">
                           <Badge
-                            className={`text-[10px] font-medium ${
-                              p.paymentType === "ADVANCE"
+                            className={`text-[10px] font-medium ${p.paymentType === "ADVANCE"
                                 ? "bg-[#E9EFF3] text-[#627D91] border-[#CCD9E2]"
                                 : p.paymentType === "PARTIAL"
-                                ? "bg-[#F6EDDC] text-[#A97832] border-[#E8D9BD]"
-                                : "bg-[#E7F1E9] text-[#32765B] border-[#C5DFD0]"
-                            }`}
+                                  ? "bg-[#F6EDDC] text-[#A97832] border-[#E8D9BD]"
+                                  : "bg-[#E7F1E9] text-[#32765B] border-[#C5DFD0]"
+                              }`}
                           >
                             {p.paymentType}
                           </Badge>
@@ -1649,438 +1666,139 @@ export default function AutomaticBillingPage() {
             };
 
             return (
-              <div className="space-y-6 printable-folio">
-                {/* Hotel Luxury Letterhead */}
-                <div className="border-b-2 border-[#59283A] pb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#C4A06A] shadow-md relative flex-shrink-0 bg-[#59283A]">
-                      <Image
-                        src="/radha-krishna-logo.jpg"
-                        alt="Hotel Radha Palace"
-                        fill
-                        className="object-cover"
+              <div className="space-y-4 printable-folio">
+                {/* Live GST Tax Configurator Bar & Designer Shortcut */}
+                <div className="bg-[#F5F0EA] p-3 rounded-xl border border-[#E8DDD8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs non-printable">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-[#59283A] text-xs">GST Tax Rate:</span>
+                    <div className="flex items-center gap-1">
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.5"
+                        value={currentFolioTaxRate === 0 ? "" : currentFolioTaxRate}
+                        onFocus={(e) => e.target.select()}
+                        onChange={(e) => {
+                          const raw = e.target.value;
+                          if (raw === "") {
+                            setCurrentFolioTaxRate(0);
+                            if (selectedFolio) {
+                              setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: 0 }));
+                            }
+                          } else {
+                            const val = Math.max(0, Math.min(100, Number(raw)));
+                            setCurrentFolioTaxRate(val);
+                            if (selectedFolio) {
+                              setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: val }));
+                            }
+                          }
+                        }}
+                        placeholder="0"
+                        className="w-16 h-7 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A] bg-white"
                       />
-                    </div>
-                    <div>
-                      <h2 className="font-serif text-2xl font-bold tracking-tight text-[#59283A]">
-                        Hotel Radha Palace
-                      </h2>
-                      <p className="text-xs text-[#82747A] mt-0.5">
-                        Boutique Luxury Hospitality Management • Official Stay Folio
-                      </p>
-                      <p className="text-[11px] text-[#8E7079] mt-0.5">
-                        GSTIN: 07AAAAA0000A1Z5 • 108 Heritage Boulevard, New Delhi, India
-                      </p>
-                    </div>
-                  </div>
-                  <div className="sm:text-right">
-                    <div className="text-xs font-semibold text-[#82747A] uppercase tracking-wider">
-                      Folio Reference
-                    </div>
-                    <div className="text-lg font-mono font-bold text-[#C4A06A]">
-                      {selectedFolio.bookingNumber}
-                    </div>
-                    <div className="text-[11px] text-[#8E7079] mt-0.5">
-                      Date: {new Date().toLocaleDateString("en-IN", { dateStyle: "long" })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Guest & Stay Profile */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-[#F5F0EA] border border-[#E8DDD8] text-xs">
-                  <div>
-                    <span className="text-[#8E7079] block text-[10px]">Guest Name</span>
-                    <span className="font-bold text-[#59283A]">{selectedFolio.guestName}</span>
-                    <span className="text-[10px] text-[#82747A] block">{selectedFolio.guestMobile}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#8E7079] block text-[10px]">Room Allocated</span>
-                    <span className="font-bold text-[#59283A]">Room {selectedFolio.roomNumber}</span>
-                    <span className="text-[10px] text-[#82747A] block">{selectedFolio.roomType}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#8E7079] block text-[10px]">Stay Duration</span>
-                    <span className="font-bold text-[#59283A]">{selectedFolio.numberOfNights} Nights</span>
-                    <span className="text-[10px] text-[#82747A] block">
-                      {selectedFolio.checkInDate} to {selectedFolio.expectedCheckOutDate}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[#8E7079] block text-[10px]">Folio Status</span>
-                    {isLiveFullySettled ? (
-                      <span className="font-bold text-[#32765B] flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Fully Settled
-                      </span>
-                    ) : (
-                      <span className="font-bold text-[#B54C44] flex items-center gap-1">
-                        <AlertCircle className="w-3.5 h-3.5" /> Due: ₹{liveRemainingBalance.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-              {/* Component 1: Room Charges */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#59283A] flex items-center gap-1.5">
-                    <Bed className="w-3.5 h-3.5 text-[#C4A06A]" />
-                    <span>Component 1: Room Stay Charges</span>
-                  </h4>
-                  <span className="font-mono text-xs font-bold text-[#59283A]">
-                    ₹{selectedFolio.roomCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="bg-white border border-[#E8DDD8] rounded-lg p-3 text-xs flex justify-between items-center">
-                  <div>
-                    <span className="font-medium text-[#59283A]">
-                      {selectedFolio.roomType} — Room {selectedFolio.roomNumber}
-                    </span>
-                    <span className="text-[11px] text-[#82747A] block">
-                      Daily Room Tariff: ₹{selectedFolio.roomRatePerNight} × {selectedFolio.numberOfNights} Nights
-                    </span>
-                  </div>
-                  <span className="font-mono font-semibold">
-                    ₹{selectedFolio.roomCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-              </div>
-
-              {/* Component 2: Additional Services & Items Ledger */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#59283A] flex items-center gap-1.5">
-                    <UtensilsCrossed className="w-3.5 h-3.5 text-[#C4A06A]" />
-                    <span>Component 2: Additional Items & Services ({selectedFolio.itemizedCharges.length})</span>
-                  </h4>
-                  <span className="font-mono text-xs font-bold text-[#59283A]">
-                    ₹{selectedFolio.totalAdditionalCharges.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-
-                {selectedFolio.itemizedCharges.length === 0 ? (
-                  <div className="p-4 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8] text-xs text-[#8E7079] text-center">
-                    No additional room service, food, laundry, or extra bed charges posted yet.
-                  </div>
-                ) : (
-                  <div className="border border-[#E8DDD8] rounded-lg overflow-hidden">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-[#F5F0EA] text-[#82747A] text-[10px] uppercase font-semibold">
-                        <tr>
-                          <th className="px-3 py-2">Item / Service Description</th>
-                          <th className="px-3 py-2">Category</th>
-                          <th className="px-3 py-2">Date & Time</th>
-                          <th className="px-3 py-2 text-right">Price</th>
-                          <th className="px-3 py-2 text-center">Qty</th>
-                          <th className="px-3 py-2 text-right">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#E8DDD8]">
-                        {selectedFolio.itemizedCharges.map((item) => (
-                          <tr key={item.id} className="hover:bg-[#F5F0EA]/50">
-                            <td className="px-3 py-2 font-medium text-[#59283A]">
-                              {item.name}
-                              {item.notes && <span className="text-[10px] text-[#8E7079] block">{item.notes}</span>}
-                            </td>
-                            <td className="px-3 py-2">
-                              <Badge variant="outline" className="text-[9px] border-[#E8DDD8] text-[#82747A]">
-                                {item.billingComponent}
-                              </Badge>
-                            </td>
-                            <td className="px-3 py-2 text-[#82747A] font-mono text-[10px]">
-                              {item.date} {item.time && `• ${item.time}`}
-                            </td>
-                            <td className="px-3 py-2 font-mono text-right">
-                              ₹{item.unitPrice.toFixed(2)}
-                            </td>
-                            <td className="px-3 py-2 font-mono text-center">{item.quantity}</td>
-                            <td className="px-3 py-2 font-mono font-semibold text-right text-[#59283A]">
-                              ₹{item.totalAmount.toFixed(2)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-
-              {/* Exact Formula Breakdown Box */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Left: Component Breakdown Summary */}
-                <div className="bg-[#F5F0EA] p-4 rounded-xl border border-[#E8DDD8] space-y-2 text-xs">
-                  <div className="font-bold text-[#59283A] text-xs uppercase tracking-wider pb-1 border-b border-[#E8DDD8]">
-                    Component Breakdown Summary
-                  </div>
-                  <div className="flex justify-between text-[#82747A]">
-                    <span>• Room Charges:</span>
-                    <span className="font-mono font-semibold text-[#59283A]">
-                      ₹{selectedFolio.roomCharges.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-[#82747A]">
-                    <span>• Food & Beverage Charges:</span>
-                    <span className="font-mono text-[#59283A]">
-                      ₹{selectedFolio.foodAndBeverageCharges.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-[#82747A]">
-                    <span>• Laundry Charges:</span>
-                    <span className="font-mono text-[#59283A]">
-                      ₹{selectedFolio.laundryCharges.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-[#82747A]">
-                    <span>• Room Service Charges:</span>
-                    <span className="font-mono text-[#59283A]">
-                      ₹{selectedFolio.roomServiceCharges.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-[#82747A]">
-                    <span>• Extra Bed Charges:</span>
-                    <span className="font-mono text-[#59283A]">
-                      ₹{selectedFolio.extraBedCharges.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-[#82747A]">
-                    <span>• Other Hotel Services & Sundries:</span>
-                    <span className="font-mono text-[#59283A]">
-                      ₹{(selectedFolio.otherServicesCharges + selectedFolio.additionalItemCharges).toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="pt-2 border-t border-[#E8DDD8] flex justify-between font-bold text-[#59283A]">
-                    <span>Subtotal:</span>
-                    <span className="font-mono">₹{selectedFolio.subtotal.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Right: Tax, Final Bill & Balance Box */}
-                <div className="bg-[#F5F0EA]/50 p-4 rounded-xl border border-[#E8DDD8] space-y-3 text-xs flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-[#E8DDD8]">
-                      <span className="font-bold text-[#59283A] text-xs uppercase tracking-wider">
-                        Final Bill Calculation
-                      </span>
-                      <span className="text-[10px] font-medium text-[#32765B] bg-[#E7F1E9] px-2 py-0.5 rounded-full border border-[#C5DFD0]">
-                        Live Recalculation
-                      </span>
+                      <span className="text-xs font-bold text-[#59283A]">%</span>
                     </div>
 
-                    <div className="flex justify-between text-[#82747A]">
-                      <span>Subtotal:</span>
-                      <span className="font-mono">₹{selectedFolio.subtotal.toFixed(2)}</span>
-                    </div>
-
-                    {selectedFolio.discountAmount > 0 && (
-                      <div className="flex justify-between text-[#32765B]">
-                        <span>Discount:</span>
-                        <span className="font-mono">-₹{selectedFolio.discountAmount.toFixed(2)}</span>
-                      </div>
-                    )}
-
-                    {/* Interactive GST Configurator */}
-                    <div className="bg-white p-2.5 rounded-lg border border-[#E8DDD8] space-y-2 my-1">
-                      <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-semibold text-[#59283A] flex items-center gap-1">
-                          <span>Applicable GST Tax Rate:</span>
-                        </label>
-                        <div className="flex items-center gap-1">
-                          <Input
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="0.5"
-                            value={currentFolioTaxRate === 0 ? "" : currentFolioTaxRate}
-                            onFocus={(e) => e.target.select()}
-                            onChange={(e) => {
-                              const raw = e.target.value;
-                              if (raw === "") {
-                                setCurrentFolioTaxRate(0);
-                                if (selectedFolio) {
-                                  setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: 0 }));
-                                }
-                              } else {
-                                const val = Math.max(0, Math.min(100, Number(raw)));
-                                setCurrentFolioTaxRate(val);
-                                if (selectedFolio) {
-                                  setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: val }));
-                                }
-                              }
-                            }}
-                            placeholder="0"
-                            className="w-16 h-7 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A]"
-                          />
-                          <span className="text-xs font-bold text-[#59283A]">%</span>
-                        </div>
-                      </div>
-
-                      {/* Quick preset buttons */}
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] text-[#8E7079]">Presets:</span>
-                        {[0, 5, 12, 18, 28].map((rate) => (
-                          <button
-                            key={rate}
-                            type="button"
-                            onClick={() => {
-                              setCurrentFolioTaxRate(rate);
-                              if (selectedFolio) {
-                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: rate }));
-                              }
-                            }}
-                            className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${
-                              Number(currentFolioTaxRate) === rate
-                                ? "bg-[#59283A] text-white shadow-xs"
-                                : "bg-[#F5F0EA] text-[#8E7079] hover:bg-[#E8DDD8] hover:text-[#59283A]"
+                    <div className="flex items-center gap-1">
+                      {[0, 5, 12, 18, 28].map((rate) => (
+                        <button
+                          key={rate}
+                          type="button"
+                          onClick={() => {
+                            setCurrentFolioTaxRate(rate);
+                            if (selectedFolio) {
+                              setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: rate }));
+                            }
+                          }}
+                          className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${Number(currentFolioTaxRate) === rate
+                              ? "bg-[#59283A] text-white shadow-xs"
+                              : "bg-white text-[#8E7079] hover:bg-[#E8DDD8] hover:text-[#59283A] border border-[#E8DDD8]"
                             }`}
-                          >
-                            {rate}%
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="flex justify-between items-center pt-1.5 border-t border-[#F0E6E1] text-[#82747A] text-[11px]">
-                        <span>Calculated GST Tax ({liveTaxRate}%):</span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-[10px] text-[#82747A] font-semibold">+₹</span>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="1"
-                            value={liveTaxAmount === 0 ? "" : liveTaxAmount}
-                            onFocus={(e) => e.target.select()}
-                            onChange={(e) => {
-                              const raw = e.target.value;
-                              if (raw === "") {
-                                setCurrentFolioTaxRate(0);
-                                if (selectedFolio) {
-                                  setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: 0 }));
-                                }
-                              } else {
-                                const amt = Math.max(0, Number(raw));
-                                const pct = liveTaxable > 0 ? Math.round((amt / liveTaxable) * 100 * 100) / 100 : 0;
-                                setCurrentFolioTaxRate(pct);
-                                if (selectedFolio) {
-                                  setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: pct }));
-                                }
-                              }
-                            }}
-                            placeholder="0.00"
-                            className="w-20 h-6 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A]"
-                            title="Or manually type GST tax amount in ₹"
-                          />
-                        </div>
-                      </div>
+                        >
+                          {rate}%
+                        </button>
+                      ))}
                     </div>
 
-                    <div className="pt-2 border-t border-[#E8DDD8] flex justify-between text-base font-bold text-[#59283A]">
-                      <span>Final Bill:</span>
-                      <span className="font-mono">₹{liveFinalBill.toFixed(2)}</span>
-                    </div>
+                    <span className="text-[11px] text-[#82747A] font-mono ml-1">
+                      Tax: ₹{liveTaxAmount.toFixed(2)} | Final Bill: ₹{liveFinalBill.toFixed(2)}
+                    </span>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t-2 border-[#59283A] space-y-1">
-                    <div className="flex justify-between text-xs text-[#32765B]">
-                      <span>Total Payments Received:</span>
-                      <span className="font-mono font-bold">
-                        -₹{livePaid.toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm font-bold text-[#59283A]">
-                      <span>Remaining Balance:</span>
-                      <span
-                        className={`font-mono text-lg ${
-                          liveRemainingBalance > 0 ? "text-[#B54C44]" : "text-[#32765B]"
-                        }`}
+                  {!isManager && (
+                    <Link href="/receipt-designer">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-2.5 text-[11px] font-semibold border-[#C4A06A] text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1 shadow-xs"
                       >
-                        ₹{Math.max(0, liveRemainingBalance).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Timeline */}
-              {selectedFolio.payments.paymentList.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#59283A] flex items-center gap-1.5">
-                    <CreditCard className="w-3.5 h-3.5 text-[#32765B]" />
-                    <span>Payments Received Timeline</span>
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    {selectedFolio.payments.paymentList.map((p) => (
-                      <div
-                        key={p.id}
-                        className="p-2.5 rounded-lg border border-[#E8DDD8] bg-white text-xs space-y-1"
-                      >
-                        <div className="flex items-center justify-between">
-                          <Badge className="bg-[#E7F1E9] text-[#32765B] border-[#C5DFD0] text-[9px]">
-                            {p.type}
-                          </Badge>
-                          <span className="font-mono font-bold text-[#32765B]">
-                            ₹{p.amount.toFixed(2)}
-                          </span>
-                        </div>
-                        <div className="text-[10px] text-[#82747A] flex justify-between">
-                          <span>Via {p.method}</span>
-                          <span className="font-mono">{p.date}</span>
-                        </div>
-                        <div className="text-[9px] font-mono text-[#8E7079] truncate">
-                          {p.reference}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Modal Footer with Actions */}
-              <div className="pt-4 border-t border-[#E8DDD8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 non-printable">
-                <Button
-                  variant="outline"
-                  onClick={() => window.print()}
-                  className="border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#59283A] text-xs h-9"
-                >
-                  <Printer className="w-3.5 h-3.5 mr-1.5" />
-                  Print Stay Folio Bill
-                </Button>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setDossierModalOpen(false);
-                      handleOpenChargeModal(selectedFolio);
-                    }}
-                    className="border-[#E8DDD8] text-xs h-9"
-                  >
-                    <Plus className="w-3.5 h-3.5 mr-1.5" />
-                    Add Charge
-                  </Button>
-
-                  <Button
-                    onClick={() => {
-                      setDossierModalOpen(false);
-                      handleOpenPaymentModal(liveUpdatedFolio);
-                    }}
-                    className="bg-[#32765B] hover:bg-[#286049] text-white text-xs h-9"
-                  >
-                    <CreditCard className="w-3.5 h-3.5 mr-1.5" />
-                    Record Settlement
-                  </Button>
-
-                  {!selectedFolio.existingInvoice && (
-                    <Button
-                      onClick={() => handleGenerateInvoice(selectedFolio.bookingId, liveTaxRate)}
-                      className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9"
-                    >
-                      <Receipt className="w-3.5 h-3.5 mr-1.5" />
-                      Generate Invoice ({liveTaxRate}% GST)
-                    </Button>
+                        <Palette className="w-3 h-3 text-[#C4A06A]" />
+                        <span>Receipt Designer</span>
+                      </Button>
+                    </Link>
                   )}
                 </div>
+
+                {/* Unified Custom Receipt Document Component */}
+                <ReceiptDocument
+                  config={receiptDesign}
+                  type="FOLIO"
+                  folioData={liveUpdatedFolio}
+                  onPrint={() => window.print()}
+                  hidePrintButton={true}
+                />
+
+                {/* Modal Footer with Actions */}
+                <div className="pt-4 border-t border-[#E8DDD8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 non-printable">
+                  <Button
+                    variant="outline"
+                    onClick={() => window.print()}
+                    className="border-[#E8DDD8] hover:bg-[#F5F0EA] text-[#59283A] text-xs h-9"
+                  >
+                    <Printer className="w-3.5 h-3.5 mr-1.5" />
+                    Print Stay Folio Bill
+                  </Button>
+
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setDossierModalOpen(false);
+                        handleOpenChargeModal(selectedFolio);
+                      }}
+                      className="border-[#E8DDD8] text-xs h-9"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1.5" />
+                      Add Charge
+                    </Button>
+
+                    <Button
+                      onClick={() => {
+                        setDossierModalOpen(false);
+                        handleOpenPaymentModal(liveUpdatedFolio);
+                      }}
+                      className="bg-[#32765B] hover:bg-[#286049] text-white text-xs h-9"
+                    >
+                      <CreditCard className="w-3.5 h-3.5 mr-1.5" />
+                      Record Settlement
+                    </Button>
+
+                    {!selectedFolio.existingInvoice && (
+                      <Button
+                        onClick={() => handleGenerateInvoice(selectedFolio.bookingId, liveTaxRate)}
+                        className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-9"
+                      >
+                        <Receipt className="w-3.5 h-3.5 mr-1.5" />
+                        Generate Invoice ({liveTaxRate}% GST)
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
@@ -2291,11 +2009,10 @@ export default function AutomaticBillingPage() {
                         paymentType: tier.id as any,
                       })
                     }
-                    className={`py-2 px-1 text-center rounded-lg border text-[11px] font-semibold transition-colors ${
-                      paymentForm.paymentType === tier.id
+                    className={`py-2 px-1 text-center rounded-lg border text-[11px] font-semibold transition-colors ${paymentForm.paymentType === tier.id
                         ? "bg-[#59283A] text-white border-[#59283A]"
                         : "bg-white text-[#82747A] border-[#E8DDD8] hover:bg-[#F5F0EA]"
-                    }`}
+                      }`}
                   >
                     {tier.label}
                   </button>
@@ -2601,19 +2318,17 @@ export default function AutomaticBillingPage() {
                 {filteredHistoryItems.map((item: any, idx: number) => (
                   <div
                     key={item.id || idx}
-                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
-                      item.isDeleted
+                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${item.isDeleted
                         ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
                         : "border-[#E8DDD8] hover:border-[#C4A06A]"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start sm:items-center gap-3">
                       <div
-                        className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
-                          item.isDeleted
+                        className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${item.isDeleted
                             ? "bg-[#F8E8E5] text-[#B54C44]"
                             : "bg-[#E7F1E9] text-[#32765B]"
-                        }`}
+                          }`}
                       >
                         {item.isDeleted ? <Trash2 className="w-4 h-4" /> : <Receipt className="w-4 h-4" />}
                       </div>
@@ -2639,13 +2354,12 @@ export default function AutomaticBillingPage() {
                           ) : (
                             <Badge
                               variant="outline"
-                              className={`text-[9px] font-semibold ${
-                                item.invoiceStatus === "PAID" || item.invoiceStatus === "SETTLED"
+                              className={`text-[9px] font-semibold ${item.invoiceStatus === "PAID" || item.invoiceStatus === "SETTLED"
                                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                                   : item.invoiceStatus === "PARTIALLY_PAID"
-                                  ? "bg-amber-50 text-amber-700 border-amber-200"
-                                  : "bg-rose-50 text-rose-700 border-rose-200"
-                              }`}
+                                    ? "bg-amber-50 text-amber-700 border-amber-200"
+                                    : "bg-rose-50 text-rose-700 border-rose-200"
+                                }`}
                             >
                               {item.invoiceStatus || "ACTIVE"}
                             </Badge>

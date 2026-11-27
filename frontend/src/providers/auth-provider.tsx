@@ -40,6 +40,7 @@ const RESTRICTED_MANAGER_PATHS = [
   "/audit-logs",
   "/settings",
   "/setup",
+  "/receipt-designer",
 ];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

@@ -25,12 +25,17 @@ import {
   ChevronRight,
   AlertTriangle,
   Loader2,
+  Palette,
 } from "lucide-react";
+import Link from "next/link";
 import ExcelJS from "exceljs";
+import { useAuth } from "@/providers/auth-provider";
 import { billingService } from "@/services/billing.service";
 import { bookingsService } from "@/services/bookings.service";
 import { paymentsService } from "@/services/payments.service";
-import { Invoice, Booking } from "@/types";
+import { settingsService, defaultReceiptDesign } from "@/services/settings.service";
+import { ReceiptDocument } from "@/components/shared/receipt-document";
+import { Invoice, Booking, ReceiptDesignConfig } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +51,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function InvoicesPage() {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const initialBookingId = searchParams.get("bookingId");
 
@@ -56,6 +62,7 @@ export default function InvoicesPage() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [receiptDesign, setReceiptDesign] = useState<ReceiptDesignConfig>(defaultReceiptDesign);
 
   // Generate Invoice Modal
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
@@ -390,6 +397,9 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     fetchInvoices();
+    settingsService.getReceiptDesign().then((res) => {
+      if (res) setReceiptDesign(res);
+    }).catch(() => {});
   }, [page, statusFilter, search]);
 
   useEffect(() => {
@@ -515,6 +525,17 @@ export default function InvoicesPage() {
             <History className="w-3.5 h-3.5 text-[#C4A06A]" />
             <span>Invoice History</span>
           </Button>
+
+          {user?.role === "OWNER" && (
+            <Link
+              href="/receipt-designer"
+              className="border border-[#C4A06A] bg-white hover:bg-[#F5F0EA] text-[#59283A] flex items-center gap-1.5 shadow-xs text-xs px-3 h-9 rounded-md font-semibold transition-colors"
+              title="Customize Receipt & Invoice Design"
+            >
+              <Palette className="w-3.5 h-3.5 text-[#C4A06A]" />
+              <span>Customize Invoice</span>
+            </Link>
+          )}
 
           <Button
             variant="outline"
@@ -789,143 +810,41 @@ export default function InvoicesPage() {
 
       {/* View Printable Invoice Modal */}
       <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
-        <DialogContent className="max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl bg-white max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           {selectedInvoice && (
-            <div className="space-y-6 pt-2 text-xs">
-              {/* Hotel Header */}
-              <div className="flex items-start justify-between pb-4 border-b border-[#E8DDD8]">
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-[#C4A06A] shadow-md relative flex-shrink-0 bg-[#59283A]">
-                    <Image
-                      src="/radha-krishna-logo.jpg"
-                      alt="Hotel Radha Palace"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-base text-[#59283A]">Hotel Radha Palace</h3>
-                    <p className="text-[11px] text-[#82747A]">100 Beach Road, Civil Lines • GSTIN: 27AAAAA0000A1Z5</p>
-                  </div>
+            <div className="space-y-4">
+              {/* Designer Quick Link for Owner */}
+              {user?.role === "OWNER" && (
+                <div className="flex justify-between items-center bg-[#F5F0EA] p-2.5 rounded-xl border border-[#E8DDD8] non-printable text-xs">
+                  <span className="text-[#82747A]">
+                    Using customized template for <strong>{receiptDesign.hotelName}</strong> ({receiptDesign.invoiceTitle})
+                  </span>
+                  <Link href="/receipt-designer">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2.5 text-[11px] font-semibold border-[#C4A06A] text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1 shadow-xs"
+                    >
+                      <Palette className="w-3 h-3 text-[#C4A06A]" />
+                      <span>Receipt Designer</span>
+                    </Button>
+                  </Link>
                 </div>
-                <div className="text-right">
-                  <Badge variant="outline" className="text-xs font-bold font-mono bg-[#F5F0EA]">
-                    {selectedInvoice.invoiceNumber}
-                  </Badge>
-                  <p className="text-[11px] text-[#82747A] mt-1">
-                    Date: {new Date(selectedInvoice.invoiceDate).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
+              )}
 
-              {/* Guest & Stay Details */}
-              <div className="grid grid-cols-2 gap-4 p-3 bg-[#F5F0EA] rounded-xl">
-                <div>
-                  <span className="text-[#8E7079] block text-[10px] uppercase font-semibold">Billed To</span>
-                  <span className="font-bold text-[#59283A]">{selectedInvoice.booking?.primaryGuest?.fullName}</span>
-                  <span className="text-[11px] text-[#82747A] block font-mono">
-                    {selectedInvoice.booking?.primaryGuest?.mobileNumber}
-                  </span>
-                  <span className="text-[11px] text-[#82747A] block">
-                    {selectedInvoice.booking?.primaryGuest?.city}, {selectedInvoice.booking?.primaryGuest?.country}
-                  </span>
-                </div>
-                <div className="text-right sm:text-left">
-                  <span className="text-[#8E7079] block text-[10px] uppercase font-semibold">Stay Information</span>
-                  <span className="font-bold text-[#59283A]">
-                    Room {selectedInvoice.booking?.room?.roomNumber} ({selectedInvoice.booking?.room?.roomType?.name})
-                  </span>
-                  <span className="text-[11px] text-[#82747A] block">
-                    Duration: {selectedInvoice.booking?.numberOfNights} Nights
-                  </span>
-                  <span className="text-[11px] text-[#82747A] block">
-                    Booking Ref: {selectedInvoice.booking?.bookingNumber}
-                  </span>
-                </div>
-              </div>
+              {/* Custom Unified Receipt Document */}
+              <ReceiptDocument
+                config={receiptDesign}
+                type="INVOICE"
+                invoiceData={selectedInvoice}
+                onPrint={() => window.print()}
+                hidePrintButton={false}
+              />
 
-              {/* Line Items Breakdown */}
-              <div className="space-y-2">
-                <span className="text-xs font-bold text-[#59283A] uppercase tracking-wider block">Charges Breakdown</span>
-                <table className="w-full text-xs">
-                  <thead className="bg-slate-100 text-[#7A4652]">
-                    <tr>
-                      <th className="py-2 px-3 text-left">Description</th>
-                      <th className="py-2 px-3 text-center">Qty / Nights</th>
-                      <th className="py-2 px-3 text-right">Rate</th>
-                      <th className="py-2 px-3 text-right">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E8DDD8]">
-                    <tr>
-                      <td className="py-2.5 px-3 font-medium text-[#59283A]">
-                        Room Accommodation (Room {selectedInvoice.booking?.room?.roomNumber})
-                      </td>
-                      <td className="py-2.5 px-3 text-center text-[#82747A]">
-                        {selectedInvoice.booking?.numberOfNights} Nights
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-mono text-[#82747A]">
-                        ₹{Number(selectedInvoice.booking?.roomRatePerNight)}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-mono font-bold text-[#59283A]">
-                        ₹{Number(selectedInvoice.roomCharges).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                      </td>
-                    </tr>
-                    {selectedInvoice.booking?.bookingItems?.map((item: any) => (
-                      <tr key={item.id}>
-                        <td className="py-2.5 px-3 text-[#7A4652]">
-                          {item.itemNameSnapshot}
-                        </td>
-                        <td className="py-2.5 px-3 text-center text-[#82747A]">
-                          {item.quantity}
-                        </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-[#82747A]">
-                          ₹{Number(item.unitPrice)}
-                        </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-[#59283A]">
-                          ₹{Number(item.totalAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Total Calculation Grid */}
-              <div className="p-4 bg-[#F5F0EA] rounded-xl space-y-1.5 font-mono text-xs max-w-sm ml-auto">
-                <div className="flex justify-between text-[#82747A]">
-                  <span>Subtotal:</span>
-                  <span>₹{Number(selectedInvoice.subtotal).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-                </div>
-                {Number(selectedInvoice.discountAmount) > 0 && (
-                  <div className="flex justify-between text-emerald-600">
-                    <span>Discount:</span>
-                    <span>-₹{Number(selectedInvoice.discountAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-[#82747A]">
-                  <span>GST Tax ({Number(selectedInvoice.taxPercentage)}%):</span>
-                  <span>₹{Number(selectedInvoice.taxAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-                </div>
-                <div className="flex justify-between font-bold text-sm text-[#59283A] pt-2 border-t border-[#E8DDD8]">
-                  <span>Total Amount:</span>
-                  <span>₹{Number(selectedInvoice.totalAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-                </div>
-                <div className="flex justify-between text-emerald-700 font-semibold">
-                  <span>Total Paid / Advance:</span>
-                  <span>₹{Number(selectedInvoice.totalPaid).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-                </div>
-                <div className="flex justify-between font-bold text-sm text-rose-600 pt-1 border-t border-[#E8DDD8]">
-                  <span>Balance Due:</span>
-                  <span>₹{Number(selectedInvoice.balanceAmount).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-                </div>
-              </div>
-
-              <DialogFooter className="pt-3 border-t border-[#E8DDD8] flex items-center justify-between">
-                <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs">
-                  <Printer className="w-3.5 h-3.5 mr-1" /> Print Bill
-                </Button>
-                {Number(selectedInvoice.balanceAmount) > 0 && (
+              {/* Settlement Footer Actions */}
+              {Number(selectedInvoice.balanceAmount) > 0 && (
+                <div className="pt-3 border-t border-[#E8DDD8] flex items-center justify-end non-printable">
                   <Button
                     size="sm"
                     onClick={() => {
@@ -934,10 +853,10 @@ export default function InvoicesPage() {
                     }}
                     className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs"
                   >
-                    <CreditCard className="w-3.5 h-3.5 mr-1" /> Settle Balance Due
+                    <CreditCard className="w-3.5 h-3.5 mr-1.5" /> Settle Balance Due (₹{Number(selectedInvoice.balanceAmount).toFixed(2)})
                   </Button>
-                )}
-              </DialogFooter>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>

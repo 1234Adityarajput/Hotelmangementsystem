@@ -31,6 +31,7 @@ import {
   Menu,
   X,
   Sparkles,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
@@ -117,6 +118,12 @@ export function Sidebar({
           href: "/invoices",
           icon: Receipt,
           active: pathname.startsWith("/invoices"),
+        },
+        {
+          name: "Receipt Designer",
+          href: "/receipt-designer",
+          icon: Palette,
+          active: pathname.startsWith("/receipt-designer"),
         },
         {
           name: "Payments",

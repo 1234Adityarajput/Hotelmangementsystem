@@ -29,6 +29,20 @@ export class SettingsController {
     return this.settingsService.getSystemHealth();
   }
 
+  @Get('receipt-design')
+  @Roles('OWNER', 'MANAGER')
+  @ApiOperation({ summary: 'Get current receipt and invoice custom design template configuration' })
+  async getReceiptDesign() {
+    return this.settingsService.getReceiptDesign();
+  }
+
+  @Patch('receipt-design')
+  @Roles('OWNER')
+  @ApiOperation({ summary: 'Update receipt and invoice custom design template (Owner Only)' })
+  async updateReceiptDesign(@Body() dto: any) {
+    return this.settingsService.updateReceiptDesign(dto);
+  }
+
   @Get('backup')
   @ApiOperation({ summary: 'Generate and download full on-demand database snapshot backup' })
   async createDatabaseBackup() {

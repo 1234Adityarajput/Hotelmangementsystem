@@ -631,6 +631,58 @@ export interface Expense {
 // ============================================================================
 // MODULE 18: HOTEL SETTINGS TYPES
 // ============================================================================
+export interface ReceiptDesignConfig {
+  hotelName: string;
+  tagline: string;
+  logoUrl: string;
+  showLogo: boolean;
+  address: string;
+  phone: string;
+  email: string;
+  website: string;
+  gstin: string;
+  panNumber: string;
+  fssaiNumber: string;
+  state: string;
+  stateCode: string;
+
+  // Visual Theme & Typography
+  themeColor: string;
+  accentColor: string;
+  headerStyle: 'MODERN_SPLIT' | 'CLASSIC_CENTERED' | 'MINIMAL_EXECUTIVE';
+  fontFamily: 'SERIF' | 'SANS' | 'MONO';
+  showBorderAccent: boolean;
+  watermarkText: string;
+
+  // Document Titles
+  folioTitle: string;
+  invoiceTitle: string;
+  receiptNumberPrefix: string;
+
+  // Feature Toggles
+  showGstBreakdown: boolean;
+  showItemizedServices: boolean;
+  showPaymentHistory: boolean;
+  showCheckInOutTimings: boolean;
+  checkInTime: string;
+  checkOutTime: string;
+
+  // Digital Payment & UPI QR
+  showUpiQrCode: boolean;
+  upiId: string;
+  bankAccountDetails: string;
+
+  // Signatory & Stamp
+  showSignatory: boolean;
+  signatoryTitle: string;
+  signatoryDepartment: string;
+
+  // Terms & Conditions
+  termsAndConditions: string;
+  thankYouMessage: string;
+  customNotes: string;
+}
+
 export interface HotelSetting {
   id: string;
   isSingleton: boolean;
