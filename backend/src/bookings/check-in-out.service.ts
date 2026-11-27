@@ -192,15 +192,28 @@ export class CheckInCheckOutService {
     // 5. Subtotal
     const subtotal = Math.round((roomCharges + additionalItemCharges + serviceCharges) * 100) / 100;
 
-    // 6. Tax calculation (12% standard GST or from hotel setting)
+    // 6. Tax calculation (From existing invoice if generated during automatic billing, or hotel setting)
     const settings = await this.prisma.hotelSetting.findUnique({ where: { id: 'default' } });
-    const taxPercentage = settings?.defaultTaxPercentage
+    const defaultTax = settings?.defaultTaxPercentage
       ? Number(settings.defaultTaxPercentage)
       : 12.0;
-    const taxAmount = Math.round(subtotal * (taxPercentage / 100) * 100) / 100;
+
+    const existingInvoice = booking.invoices[0] || null;
+    const taxPercentage = existingInvoice !== null
+      ? Number(existingInvoice.taxPercentage)
+      : defaultTax;
+
+    const discountType = existingInvoice ? (existingInvoice.discountType as any) : null;
+    const discountValue = existingInvoice ? Number(existingInvoice.discountValue) : 0.0;
+    const discountAmount = existingInvoice ? Number(existingInvoice.discountAmount) : 0.0;
+
+    const taxableAmount = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
+    const taxAmount = Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
 
     // 7. Total Bill Amount
-    const totalBillAmount = Math.round((subtotal + taxAmount) * 100) / 100;
+    const totalBillAmount = existingInvoice
+      ? Number(existingInvoice.totalAmount)
+      : Math.round((taxableAmount + taxAmount) * 100) / 100;
 
     // 8. Advance Payment
     const advancePayments = booking.payments.filter((p) => p.paymentType === 'ADVANCE');
@@ -390,9 +403,12 @@ export class CheckInCheckOutService {
     const taxableAmount = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
 
     // 3. Tax
+    const existingInvoice = booking.invoices[0] || null;
     const settings = await this.prisma.hotelSetting.findUnique({ where: { id: 'default' } });
     const defaultTax = settings?.defaultTaxPercentage ? Number(settings.defaultTaxPercentage) : 12.0;
-    const taxPercentage = dto?.taxPercentage !== undefined ? Number(dto.taxPercentage) : defaultTax;
+    const taxPercentage = existingInvoice !== null
+      ? Number(existingInvoice.taxPercentage)
+      : (dto?.taxPercentage !== undefined ? Number(dto.taxPercentage) : defaultTax);
     const taxAmount = Math.round(taxableAmount * (taxPercentage / 100) * 100) / 100;
 
     // 4. Total Bill Amount
@@ -405,8 +421,6 @@ export class CheckInCheckOutService {
     const balanceAmount = Math.round((totalAmount - totalPaid) * 100) / 100;
 
     return this.prisma.$transaction(async (tx) => {
-      const invoiceNumber = await this.generateInvoiceNumber(tx);
-
       // 1. Record Final / Remaining Payment if settlement amount provided
       let finalPayment: any = null;
       if (finalPaymentAmount > 0) {
@@ -424,28 +438,43 @@ export class CheckInCheckOutService {
         });
       }
 
-      // 2. Create Digital Invoice
+      // 2. Create or Update Digital Invoice
       const invoiceStatus = balanceAmount <= 0 ? 'PAID' : totalPaid > 0 ? 'PARTIALLY_PAID' : 'FINALIZED';
-      const invoice = await tx.invoice.create({
-        data: {
-          invoiceNumber,
-          bookingId: id,
-          invoiceStatus,
-          roomCharges,
-          additionalCharges,
-          subtotal,
-          discountType: dto?.discountType || null,
-          discountValue: discountVal,
-          discountAmount,
-          taxPercentage,
-          taxAmount,
-          totalAmount,
-          totalPaid,
-          balanceAmount,
-          invoiceDate: now,
-          finalizedAt: now,
-        },
-      });
+      let invoice: any = null;
+
+      if (existingInvoice) {
+        invoice = await tx.invoice.update({
+          where: { id: existingInvoice.id },
+          data: {
+            invoiceStatus,
+            totalPaid,
+            balanceAmount,
+            finalizedAt: now,
+          },
+        });
+      } else {
+        const invoiceNumber = await this.generateInvoiceNumber(tx);
+        invoice = await tx.invoice.create({
+          data: {
+            invoiceNumber,
+            bookingId: id,
+            invoiceStatus,
+            roomCharges,
+            additionalCharges,
+            subtotal,
+            discountType: dto?.discountType || null,
+            discountValue: discountVal,
+            discountAmount,
+            taxPercentage,
+            taxAmount,
+            totalAmount,
+            totalPaid,
+            balanceAmount,
+            invoiceDate: now,
+            finalizedAt: now,
+          },
+        });
+      }
 
       // Link payments to invoice
       await tx.payment.updateMany({

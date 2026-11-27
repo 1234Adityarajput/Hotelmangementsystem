@@ -804,7 +804,14 @@ export default function StaysPage() {
       setCheckOutModalOpen(true);
       const summary = await bookingsService.getCheckoutSummary(booking.id);
       setCheckoutSummary(summary);
-      setTaxPercentage(summary.taxPercentage !== undefined ? Number(summary.taxPercentage) : 12);
+      const fetchedTaxRate = summary.existingInvoice
+        ? Number(summary.existingInvoice.taxPercentage)
+        : (summary.taxPercentage !== undefined ? Number(summary.taxPercentage) : 12);
+      setTaxPercentage(fetchedTaxRate);
+      if (summary.existingInvoice?.discountType) {
+        setDiscountType(summary.existingInvoice.discountType as any);
+        setDiscountValue(Number(summary.existingInvoice.discountValue || 0));
+      }
       setSettlementAmount(summary.remainingPayment || 0);
     } catch (err) {
       toast.error("Failed to load live check-out folio");
@@ -1998,50 +2005,27 @@ export default function StaysPage() {
                     </div>
                   </div>
 
-                  {/* Tax / GST - User configurable & dynamic */}
+                  {/* Tax / GST - Locked to Automatic Billing / Folio Rate */}
                   <div className="flex justify-between items-center text-xs pt-1">
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-2">
                       <span className="text-[#82747A] font-semibold">Tax / GST:</span>
-                      <div className="flex items-center gap-1">
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="any"
-                          value={taxPercentage}
-                          onChange={(e) => {
-                            const val = e.target.value === "" ? 0 : Number(e.target.value);
-                            setTaxPercentage(val);
-                            setIsManualSettlement(false);
-                          }}
-                          className="h-7 w-16 text-xs font-mono text-right border-[#E8DDD8] bg-white px-1.5 focus:border-[#59283A]"
-                          placeholder="12"
-                        />
-                        <span className="text-xs font-bold text-[#82747A]">%</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {[0, 5, 12, 18, 28].map((rate) => (
-                          <button
-                            key={rate}
-                            type="button"
-                            onClick={() => {
-                              setTaxPercentage(rate);
-                              setIsManualSettlement(false);
-                            }}
-                            className={cn(
-                              "px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all border",
-                              Number(taxPercentage) === rate
-                                ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
-                                : "bg-white text-[#82747A] border-[#E8DDD8] hover:border-[#59283A] hover:text-[#59283A]"
-                            )}
-                          >
-                            {rate}%
-                          </button>
-                        ))}
-                      </div>
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded text-[11px] font-bold border",
+                          Number(taxPercentage) === 0
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                            : "bg-[#F5F0EA] text-[#59283A] border-[#E8DDD8]"
+                        )}
+                      >
+                        {Number(taxPercentage) === 0
+                          ? "0% (Non-GST Billing)"
+                          : `${taxPercentage}% GST (${checkoutSummary?.existingInvoice ? "From Billing Invoice" : "Standard"})`}
+                      </span>
                     </div>
-                    <span className="font-mono font-semibold text-[#59283A] w-24 text-right">
-                      +₹{computedTax.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    <span className="font-mono text-xs font-semibold text-[#59283A] w-28 text-right">
+                      {Number(taxPercentage) === 0
+                        ? "₹0.00"
+                        : `+₹${computedTax.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`}
                     </span>
                   </div>
 
@@ -2290,12 +2274,21 @@ export default function StaysPage() {
                         </td>
                       </tr>
                     ) : null}
-                    <tr>
-                      <td className="px-3 py-2">Applicable Taxes (GST)</td>
-                      <td className="px-3 py-2 text-right font-mono">
-                        ₹{Number(receiptData.folio?.tax || receiptData.invoice?.taxAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                      </td>
-                    </tr>
+                    {Number(receiptData.folio?.tax || receiptData.invoice?.taxAmount || 0) > 0 ? (
+                      <tr>
+                        <td className="px-3 py-2">
+                          Applicable Taxes (GST {receiptData.invoice?.taxPercentage ? `${receiptData.invoice.taxPercentage}%` : ""})
+                        </td>
+                        <td className="px-3 py-2 text-right font-mono">
+                          ₹{Number(receiptData.folio?.tax || receiptData.invoice?.taxAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr>
+                        <td className="px-3 py-2 text-slate-500">Taxes (Non-GST Billing)</td>
+                        <td className="px-3 py-2 text-right font-mono text-slate-500">₹0.00</td>
+                      </tr>
+                    )}
                     <tr className="font-bold bg-[#F5F0EA]/60 text-[#59283A]">
                       <td className="px-3 py-2.5">Total Bill Amount</td>
                       <td className="px-3 py-2.5 text-right font-mono text-sm">
