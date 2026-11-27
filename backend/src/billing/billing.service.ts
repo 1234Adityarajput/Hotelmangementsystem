@@ -88,13 +88,36 @@ export interface BillingComponentBreakdown {
 export class BillingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async generateInvoiceNumber(): Promise<string> {
+  private async generateInvoiceNumber(tx?: any): Promise<string> {
+    const client = tx || this.prisma;
     const today = new Date();
     const prefix = `INV-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`;
-    const count = await this.prisma.invoice.count({
+
+    const existingInvoices = await client.invoice.findMany({
       where: { invoiceNumber: { startsWith: prefix } },
+      select: { invoiceNumber: true },
     });
-    return `${prefix}-${String(count + 1).padStart(4, '0')}`;
+
+    const usedNumbers = new Set(existingInvoices.map((inv: any) => inv.invoiceNumber));
+
+    let maxSeq = 0;
+    for (const inv of existingInvoices) {
+      const parts = inv.invoiceNumber.split('-');
+      const seqStr = parts[parts.length - 1];
+      const seq = parseInt(seqStr, 10);
+      if (!isNaN(seq) && seq > maxSeq) {
+        maxSeq = seq;
+      }
+    }
+
+    let candidateSeq = maxSeq + 1;
+    let candidate = `${prefix}-${String(candidateSeq).padStart(4, '0')}`;
+    while (usedNumbers.has(candidate)) {
+      candidateSeq++;
+      candidate = `${prefix}-${String(candidateSeq).padStart(4, '0')}`;
+    }
+
+    return candidate;
   }
 
   // Helper: Classify any item/service into exact billing component
@@ -705,63 +728,76 @@ export class BillingService {
       invoiceStatus = 'PARTIALLY_PAID';
     }
 
-    const invoiceNumber = await this.generateInvoiceNumber();
     const invoiceDate = dto.invoiceDate ? new Date(dto.invoiceDate) : new Date();
 
-    const invoice = await this.prisma.$transaction(async (tx) => {
-      const created = await tx.invoice.create({
-        data: {
-          invoiceNumber,
-          bookingId: dto.bookingId,
-          invoiceStatus,
-          roomCharges,
-          additionalCharges: roundedAdditional,
-          subtotal,
-          discountType: dto.discountType || null,
-          discountValue: discountVal,
-          discountAmount,
-          taxPercentage,
-          taxAmount,
-          totalAmount,
-          totalPaid,
-          balanceAmount,
-          invoiceDate,
-          finalizedAt: new Date(),
-        },
-        include: {
-          booking: {
-            include: {
-              primaryGuest: true,
-              room: true,
+    let invoice: any;
+    let attempts = 0;
+    while (attempts < 3) {
+      try {
+        attempts++;
+        invoice = await this.prisma.$transaction(async (tx) => {
+          const invoiceNumber = await this.generateInvoiceNumber(tx);
+          const created = await tx.invoice.create({
+            data: {
+              invoiceNumber,
+              bookingId: dto.bookingId,
+              invoiceStatus,
+              roomCharges,
+              additionalCharges: roundedAdditional,
+              subtotal,
+              discountType: dto.discountType || null,
+              discountValue: discountVal,
+              discountAmount,
+              taxPercentage,
+              taxAmount,
+              totalAmount,
+              totalPaid,
+              balanceAmount,
+              invoiceDate,
+              finalizedAt: new Date(),
             },
-          },
-        },
-      });
+            include: {
+              booking: {
+                include: {
+                  primaryGuest: true,
+                  room: true,
+                },
+              },
+            },
+          });
 
-      // Link existing unlinked payments for this booking to this invoice
-      await tx.payment.updateMany({
-        where: {
-          bookingId: dto.bookingId,
-          invoiceId: null,
-        },
-        data: {
-          invoiceId: created.id,
-        },
-      });
+          // Link existing unlinked payments for this booking to this invoice
+          await tx.payment.updateMany({
+            where: {
+              bookingId: dto.bookingId,
+              invoiceId: null,
+            },
+            data: {
+              invoiceId: created.id,
+            },
+          });
 
-      // Audit Log
-      await tx.auditLog.create({
-        data: {
-          entityType: 'INVOICE',
-          entityId: created.id,
-          action: 'FINALIZE',
-          newValues: created as any,
-          description: `Generated invoice ${created.invoiceNumber} for booking ${booking.bookingNumber} (Total: ₹${totalAmount}, Balance: ₹${balanceAmount})`,
-        },
-      });
+          // Audit Log
+          await tx.auditLog.create({
+            data: {
+              entityType: 'INVOICE',
+              entityId: created.id,
+              action: 'FINALIZE',
+              newValues: created as any,
+              description: `Generated invoice ${created.invoiceNumber} for booking ${booking.bookingNumber} (Total: ₹${totalAmount}, Balance: ₹${balanceAmount})`,
+            },
+          });
 
-      return created;
-    });
+          return created;
+        });
+        break;
+      } catch (err: any) {
+        if (err.code === 'P2002' && attempts < 3) {
+          continue;
+        }
+        throw err;
+      }
+    }
 
     return invoice;
   }

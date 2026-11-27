@@ -8,13 +8,36 @@ import { QueryBookingDto } from './dto/query-booking.dto';
 export class BookingsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async generateBookingNumber(): Promise<string> {
+  private async generateBookingNumber(tx?: any): Promise<string> {
+    const client = tx || this.prisma;
     const today = new Date();
     const prefix = `BKG-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`;
-    const count = await this.prisma.booking.count({
+
+    const existingBookings = await client.booking.findMany({
       where: { bookingNumber: { startsWith: prefix } },
+      select: { bookingNumber: true },
     });
-    return `${prefix}-${String(count + 1).padStart(4, '0')}`;
+
+    const usedNumbers = new Set(existingBookings.map((b: any) => b.bookingNumber));
+
+    let maxSeq = 0;
+    for (const b of existingBookings) {
+      const parts = b.bookingNumber.split('-');
+      const seqStr = parts[parts.length - 1];
+      const seq = parseInt(seqStr, 10);
+      if (!isNaN(seq) && seq > maxSeq) {
+        maxSeq = seq;
+      }
+    }
+
+    let candidateSeq = maxSeq + 1;
+    let candidate = `${prefix}-${String(candidateSeq).padStart(4, '0')}`;
+    while (usedNumbers.has(candidate)) {
+      candidateSeq++;
+      candidate = `${prefix}-${String(candidateSeq).padStart(4, '0')}`;
+    }
+
+    return candidate;
   }
 
   async findAll(query: QueryBookingDto) {

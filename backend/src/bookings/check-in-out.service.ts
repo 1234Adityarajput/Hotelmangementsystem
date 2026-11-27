@@ -13,13 +13,36 @@ import { PerformCheckOutDto } from './dto/check-out.dto';
 export class CheckInCheckOutService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async generateInvoiceNumber(): Promise<string> {
+  private async generateInvoiceNumber(tx?: any): Promise<string> {
+    const client = tx || this.prisma;
     const today = new Date();
     const prefix = `INV-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`;
-    const count = await this.prisma.invoice.count({
+
+    const existingInvoices = await client.invoice.findMany({
       where: { invoiceNumber: { startsWith: prefix } },
+      select: { invoiceNumber: true },
     });
-    return `${prefix}-${String(count + 1).padStart(4, '0')}`;
+
+    const usedNumbers = new Set(existingInvoices.map((inv: any) => inv.invoiceNumber));
+
+    let maxSeq = 0;
+    for (const inv of existingInvoices) {
+      const parts = inv.invoiceNumber.split('-');
+      const seqStr = parts[parts.length - 1];
+      const seq = parseInt(seqStr, 10);
+      if (!isNaN(seq) && seq > maxSeq) {
+        maxSeq = seq;
+      }
+    }
+
+    let candidateSeq = maxSeq + 1;
+    let candidate = `${prefix}-${String(candidateSeq).padStart(4, '0')}`;
+    while (usedNumbers.has(candidate)) {
+      candidateSeq++;
+      candidate = `${prefix}-${String(candidateSeq).padStart(4, '0')}`;
+    }
+
+    return candidate;
   }
 
   async getTodayCheckIns() {
@@ -381,9 +404,9 @@ export class CheckInCheckOutService {
     const totalPaid = Math.min(totalAmount, Math.round((existingPaid + finalPaymentAmount) * 100) / 100);
     const balanceAmount = Math.round((totalAmount - totalPaid) * 100) / 100;
 
-    const invoiceNumber = await this.generateInvoiceNumber();
-
     return this.prisma.$transaction(async (tx) => {
+      const invoiceNumber = await this.generateInvoiceNumber(tx);
+
       // 1. Record Final / Remaining Payment if settlement amount provided
       let finalPayment: any = null;
       if (finalPaymentAmount > 0) {

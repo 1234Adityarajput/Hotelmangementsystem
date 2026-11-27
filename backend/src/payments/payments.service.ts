@@ -7,13 +7,36 @@ import { QueryPaymentDto } from './dto/query-payment.dto';
 export class PaymentsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private async generatePaymentReference(): Promise<string> {
+  private async generatePaymentReference(tx?: any): Promise<string> {
+    const client = tx || this.prisma;
     const today = new Date();
     const prefix = `PAY-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}`;
-    const count = await this.prisma.payment.count({
+
+    const existingPayments = await client.payment.findMany({
       where: { paymentReference: { startsWith: prefix } },
+      select: { paymentReference: true },
     });
-    return `${prefix}-${String(count + 1).padStart(5, '0')}`;
+
+    const usedRefs = new Set(existingPayments.map((p: any) => p.paymentReference));
+
+    let maxSeq = 0;
+    for (const p of existingPayments) {
+      const parts = p.paymentReference.split('-');
+      const seqStr = parts[parts.length - 1];
+      const seq = parseInt(seqStr, 10);
+      if (!isNaN(seq) && seq > maxSeq) {
+        maxSeq = seq;
+      }
+    }
+
+    let candidateSeq = maxSeq + 1;
+    let candidate = `${prefix}-${String(candidateSeq).padStart(5, '0')}`;
+    while (usedRefs.has(candidate)) {
+      candidateSeq++;
+      candidate = `${prefix}-${String(candidateSeq).padStart(5, '0')}`;
+    }
+
+    return candidate;
   }
 
   async findAll(query: QueryPaymentDto) {
