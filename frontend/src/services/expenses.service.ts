@@ -106,6 +106,11 @@ export const expensesService = {
     return res.data.data;
   },
 
+  async deleteCategory(id: string): Promise<{ message: string }> {
+    const res = await apiClient.delete<ApiResponse<any>>(`/expenses/categories/${id}`);
+    return res.data.data;
+  },
+
   async getHistory(params?: { month?: number; year?: number }): Promise<MonthlyExpenseHistoryResponse> {
     const res = await apiClient.get<ApiResponse<MonthlyExpenseHistoryResponse>>("/expenses/history", { params });
     return res.data.data;

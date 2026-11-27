@@ -50,6 +50,12 @@ export class ExpensesController {
     return this.expensesService.createCategory(dto);
   }
 
+  @Delete('categories/:id')
+  @ApiOperation({ summary: 'Delete an expense category' })
+  async deleteCategory(@Param('id') id: string) {
+    return this.expensesService.deleteCategory(id);
+  }
+
   @Get()
   @ApiOperation({ summary: 'List operational expenses with category and date filters' })
   async findAll(@Query() query: QueryExpenseDto) {

@@ -124,6 +124,8 @@ export default function ExpensesPage() {
   // Category Form
   const [catName, setCatName] = useState("");
   const [catDesc, setCatDesc] = useState("");
+  const [catSearch, setCatSearch] = useState("");
+  const [deletingCatId, setDeletingCatId] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -243,7 +245,6 @@ export default function ExpensesPage() {
       setSubmitting(true);
       await expensesService.createCategory({ name: catName.trim(), description: catDesc.trim() || undefined });
       toast.success(`Category "${catName}" created successfully!`);
-      setCategoryModalOpen(false);
       setCatName("");
       setCatDesc("");
       fetchData();
@@ -253,6 +254,33 @@ export default function ExpensesPage() {
       setSubmitting(false);
     }
   };
+
+  const handleDeleteCategory = async (cat: ExpenseCategory) => {
+    const isLinked = cat._count?.expenses && cat._count.expenses > 0;
+    const confirmMessage = isLinked
+      ? `Are you sure you want to delete category "${cat.name}"?\nIt has ${cat._count?.expenses} linked expense record(s). These records will be safely preserved and moved to General/Miscellaneous.`
+      : `Are you sure you want to delete category "${cat.name}"?`;
+
+    if (!confirm(confirmMessage)) return;
+
+    try {
+      setDeletingCatId(cat.id);
+      await expensesService.deleteCategory(cat.id);
+      toast.success(`Category "${cat.name}" deleted successfully!`);
+      await fetchData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to delete category");
+    } finally {
+      setDeletingCatId(null);
+    }
+  };
+
+  const filteredCategories = categories.filter(
+    (c) =>
+      !catSearch.trim() ||
+      c.name.toLowerCase().includes(catSearch.toLowerCase()) ||
+      (c.description && c.description.toLowerCase().includes(catSearch.toLowerCase()))
+  );
 
   const handleUpdateExpense = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1319,51 +1347,186 @@ export default function ExpensesPage() {
 
       {/* 
       =======================================================================
-      MODAL 4: CREATE EXPENSE CATEGORY
+      MODAL 4: MANAGE & DELETE EXPENSE CATEGORIES
       =======================================================================
       */}
       <Dialog open={categoryModalOpen} onOpenChange={setCategoryModalOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E8DDD8] shadow-2xl p-6">
-          <DialogHeader className="border-b border-[#E8DDD8] pb-3">
-            <DialogTitle className="text-xl font-serif font-bold text-[#59283A]">
-              Create Expense Category
-            </DialogTitle>
-            <DialogDescription className="text-xs text-[#82747A]">
-              Add a new budget head for categorizing hotel operating expenses.
-            </DialogDescription>
+        <DialogContent className="max-w-lg bg-white border-[#E8DDD8] shadow-2xl p-6 max-h-[90vh] flex flex-col">
+          <DialogHeader className="border-b border-[#E8DDD8] pb-3 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#59283A] text-[#C4A06A] flex items-center justify-center shadow-sm">
+                <Tag className="w-4 h-4" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-serif font-bold text-[#59283A]">
+                  Manage Expense Categories
+                </DialogTitle>
+                <DialogDescription className="text-xs text-[#82747A]">
+                  Add new budget heads or search and remove existing categories.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
 
-          <form onSubmit={handleCreateCategory} className="space-y-3.5 pt-2 text-xs">
-            <div className="space-y-1">
-              <label className="font-semibold text-[#59283A]">Category Name *</label>
-              <Input
-                required
-                value={catName}
-                onChange={(e) => setCatName(e.target.value)}
-                placeholder="e.g. Laundry Chemicals, Generator Diesel, Signage..."
-                className="h-8 text-xs border-[#E8DDD8]"
-              />
-            </div>
+          <div className="overflow-y-auto flex-1 pr-1 space-y-5 pt-3 text-xs">
+            {/* Top Section: Create Category Form */}
+            <form onSubmit={handleCreateCategory} className="p-3.5 bg-[#FDFBF9] rounded-xl border border-[#E8DDD8] space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#59283A] flex items-center gap-1.5 text-xs">
+                  <Plus className="w-3.5 h-3.5 text-[#C4A06A]" />
+                  <span>Add New Category</span>
+                </span>
+                <span className="text-[10px] text-[#82747A]">Operating Budget Head</span>
+              </div>
 
-            <div className="space-y-1">
-              <label className="font-semibold text-[#59283A]">Description</label>
-              <Input
-                value={catDesc}
-                onChange={(e) => setCatDesc(e.target.value)}
-                placeholder="Brief description of expenditures under this category..."
-                className="h-8 text-xs border-[#E8DDD8]"
-              />
-            </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="space-y-1">
+                  <label className="font-semibold text-[#59283A] text-[11px]">Category Name *</label>
+                  <Input
+                    required
+                    value={catName}
+                    onChange={(e) => setCatName(e.target.value)}
+                    placeholder="e.g. Generator Diesel"
+                    className="h-8 text-xs border-[#E8DDD8] bg-white"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-semibold text-[#59283A] text-[11px]">Description (Optional)</label>
+                  <Input
+                    value={catDesc}
+                    onChange={(e) => setCatDesc(e.target.value)}
+                    placeholder="Brief description..."
+                    className="h-8 text-xs border-[#E8DDD8] bg-white"
+                  />
+                </div>
+              </div>
 
-            <DialogFooter className="pt-3 border-t border-[#E8DDD8]">
-              <Button type="button" variant="outline" size="sm" onClick={() => setCategoryModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" size="sm" disabled={submitting} className="bg-[#59283A] hover:bg-[#472130] text-white">
-                {submitting ? "Creating..." : "Create Category"}
-              </Button>
-            </DialogFooter>
-          </form>
+              <div className="flex justify-end pt-1">
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={submitting}
+                  className="bg-[#59283A] hover:bg-[#472130] text-white text-xs h-7 px-3 flex items-center gap-1 font-semibold"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span>Creating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-3 h-3 text-[#C4A06A]" />
+                      <span>Create Category</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+
+            {/* Bottom Section: Search & Delete Categories */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-[#59283A] text-xs">Existing Categories</span>
+                  <Badge variant="outline" className="border-[#C4A06A] text-[#8B6A3D] text-[10px] py-0 px-1.5 h-4">
+                    {categories.length}
+                  </Badge>
+                </div>
+                <span className="text-[11px] text-[#82747A]">Search to select &amp; delete</span>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-[#82747A] absolute left-2.5 top-2.5" />
+                <Input
+                  value={catSearch}
+                  onChange={(e) => setCatSearch(e.target.value)}
+                  placeholder="Search categories by name or description..."
+                  className="h-8 pl-8 pr-7 text-xs border-[#E8DDD8] bg-white"
+                />
+                {catSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setCatSearch("")}
+                    className="absolute right-2 top-2 text-[#82747A] hover:text-[#59283A]"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Categories Scrollable List */}
+              <div className="max-h-56 overflow-y-auto space-y-1.5 pr-0.5">
+                {filteredCategories.length === 0 ? (
+                  <div className="text-center py-6 text-xs text-[#82747A] bg-[#F5F0EA]/40 rounded-xl border border-dashed border-[#E8DDD8]">
+                    No expense categories found matching &quot;{catSearch}&quot;.
+                  </div>
+                ) : (
+                  filteredCategories.map((c) => (
+                    <div
+                      key={c.id}
+                      className="p-2.5 bg-[#FDFBF9] hover:bg-[#F5F0EA]/70 transition-all rounded-lg border border-[#E8DDD8] flex items-center justify-between gap-3 group"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-7 h-7 rounded-md bg-[#59283A]/10 text-[#59283A] flex items-center justify-center font-bold text-xs flex-shrink-0">
+                          {c.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-xs text-[#59283A] truncate">
+                              {c.name}
+                            </span>
+                            {c._count?.expenses !== undefined && (
+                              <span className="text-[10px] font-mono text-[#82747A] bg-white px-1.5 py-0.2 rounded border border-[#E8DDD8] flex-shrink-0">
+                                {c._count.expenses} {c._count.expenses === 1 ? "expense" : "expenses"}
+                              </span>
+                            )}
+                          </div>
+                          {c.description && (
+                            <p className="text-[11px] text-[#82747A] truncate mt-0.5">
+                              {c.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        disabled={deletingCatId === c.id}
+                        onClick={() => handleDeleteCategory(c)}
+                        className="h-7 px-2 text-rose-600 hover:text-white hover:bg-rose-600 border border-transparent hover:border-rose-600 text-xs flex items-center gap-1 transition-all flex-shrink-0"
+                        title={`Delete ${c.name}`}
+                      >
+                        {deletingCatId === c.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5" />
+                        )}
+                        <span>Delete</span>
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="pt-3 border-t border-[#E8DDD8] flex-shrink-0 mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setCategoryModalOpen(false);
+                setCatSearch("");
+              }}
+              className="text-xs border-[#E8DDD8] text-[#59283A]"
+            >
+              Close
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

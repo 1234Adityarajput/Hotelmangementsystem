@@ -60,6 +60,74 @@ export class ExpensesService {
     });
   }
 
+  async deleteCategory(id: string) {
+    const category = await this.prisma.expenseCategory.findUnique({
+      where: { id },
+      include: {
+        _count: { select: { expenses: true } },
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException(`Expense category with ID ${id} not found`);
+    }
+
+    const linkedCount = category._count?.expenses || 0;
+
+    // If there are expenses linked to this category, safely reassign them to a fallback category
+    if (linkedCount > 0) {
+      let fallback = await this.prisma.expenseCategory.findFirst({
+        where: {
+          id: { not: id },
+          name: { in: ['Miscellaneous Expenses', 'General Operations', 'Other Expenses'] },
+        },
+      });
+
+      if (!fallback) {
+        fallback = await this.prisma.expenseCategory.findFirst({
+          where: { id: { not: id } },
+        });
+      }
+
+      if (fallback) {
+        await this.prisma.expense.updateMany({
+          where: { expenseCategoryId: id },
+          data: { expenseCategoryId: fallback.id },
+        });
+      } else {
+        throw new BadRequestException('Cannot delete the only existing expense category while active expenses exist.');
+      }
+    }
+
+    await this.prisma.expenseCategory.delete({
+      where: { id },
+    });
+
+    try {
+      await this.prisma.auditLog.create({
+        data: {
+          entityType: 'EXPENSE_CATEGORY',
+          entityId: id,
+          action: 'DELETE',
+          previousValues: {
+            name: category.name,
+            description: category.description,
+            linkedExpensesCount: linkedCount,
+          },
+          description: `Deleted expense category "${category.name}"${linkedCount > 0 ? ` (${linkedCount} linked expenses reassigned to fallback category)` : ''}.`,
+        },
+      });
+    } catch {
+      // Non-blocking audit log
+    }
+
+    return {
+      message: `Expense category "${category.name}" deleted successfully`,
+      deletedCategoryId: id,
+      reassignedExpensesCount: linkedCount,
+    };
+  }
+
   // Expenses
   async create(dto: CreateExpenseDto) {
     const category = await this.prisma.expenseCategory.findUnique({
