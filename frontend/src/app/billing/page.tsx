@@ -1113,15 +1113,15 @@ export default function AutomaticBillingPage() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleConfirmDelete({
-                              id: folio.bookingId,
-                              invoiceNumber: `FOLIO-${folio.bookingNumber}`,
+                              id: folio.existingInvoice?.id || folio.bookingId,
+                              invoiceNumber: folio.existingInvoice?.invoiceNumber || `FOLIO-${folio.bookingNumber}`,
                               guestName: folio.guestName,
                               roomNumber: folio.roomNumber,
                               amount: cardFinalBill,
-                              type: "FOLIO",
+                              type: folio.existingInvoice ? "INVOICE" : "FOLIO",
                             })}
                             className="h-8 px-2 text-[#B54C44] hover:bg-[#F8E8E5] hover:text-[#963730]"
-                            title="Delete / Cancel Stay Folio"
+                            title={folio.existingInvoice ? `Delete Invoice ${folio.existingInvoice.invoiceNumber}` : "Delete / Clear Stay Folio Charges"}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>

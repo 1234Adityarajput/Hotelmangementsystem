@@ -1021,7 +1021,8 @@ export class BillingService {
   }
 
   async remove(id: string) {
-    const invoice = await this.prisma.invoice.findUnique({
+    // 1. Check if id is an Invoice ID
+    let invoice = await this.prisma.invoice.findUnique({
       where: { id },
       include: {
         booking: {
@@ -1033,6 +1034,23 @@ export class BillingService {
         payments: true,
       },
     });
+
+    // 2. If not found, check if id is a bookingId that has an invoice
+    if (!invoice) {
+      invoice = await this.prisma.invoice.findFirst({
+        where: { bookingId: id },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          booking: {
+            include: {
+              primaryGuest: true,
+              room: true,
+            },
+          },
+          payments: true,
+        },
+      });
+    }
 
     if (invoice) {
       // 1. Audit log snapshot for permanent invoice history
@@ -1055,12 +1073,12 @@ export class BillingService {
 
       // 2. Unlink payments from invoice
       await this.prisma.payment.updateMany({
-        where: { invoiceId: id },
+        where: { invoiceId: invoice.id },
         data: { invoiceId: null },
       });
 
       // 3. Delete invoice
-      await this.prisma.invoice.delete({ where: { id } });
+      await this.prisma.invoice.delete({ where: { id: invoice.id } });
 
       return {
         success: true,
@@ -1108,6 +1126,42 @@ export class BillingService {
         success: true,
         message: `Service charge for "${name}" (₹${item.totalAmount}) deleted and folio updated.`,
         itemName: name,
+      };
+    }
+
+    // Check if it's a Booking where user wants to clear folio item charges
+    const booking = await this.prisma.booking.findUnique({
+      where: { id },
+      include: {
+        primaryGuest: true,
+        room: true,
+        bookingItems: true,
+      },
+    });
+
+    if (booking) {
+      if (booking.bookingItems.length > 0) {
+        await this.prisma.auditLog.create({
+          data: {
+            entityType: 'FOLIO',
+            entityId: booking.id,
+            action: 'DELETE',
+            previousValues: {
+              bookingNumber: booking.bookingNumber,
+              guestName: booking.primaryGuest?.fullName,
+              roomNumber: booking.room?.roomNumber,
+              deletedItems: booking.bookingItems,
+              deletedAt: new Date().toISOString(),
+            } as any,
+            description: `Cleared ${booking.bookingItems.length} folio item charges for booking ${booking.bookingNumber}. Preserved in history.`,
+          },
+        });
+        await this.prisma.bookingItem.deleteMany({ where: { bookingId: id } });
+      }
+
+      return {
+        success: true,
+        message: `Folio charges for ${booking.bookingNumber} (${booking.primaryGuest?.fullName || 'Guest'}) cleared and archived in history.`,
       };
     }
 
