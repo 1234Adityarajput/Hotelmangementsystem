@@ -17,7 +17,6 @@ import {
   Building2,
   FileText,
   Sliders,
-  QrCode,
   ShieldCheck,
   CheckCircle2,
   FileCheck2,
@@ -219,7 +218,7 @@ export default function ReceiptDesignerPage() {
   const [config, setConfig] = useState<ReceiptDesignConfig>(defaultReceiptDesign);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<"THEME" | "HOTEL" | "TITLES" | "TOGGLES" | "PAYMENTS" | "POLICIES">("THEME");
+  const [activeTab, setActiveTab] = useState<"THEME" | "HOTEL" | "TITLES" | "TOGGLES" | "POLICIES">("THEME");
   const [previewDocType, setPreviewDocType] = useState<"FOLIO" | "INVOICE">("FOLIO");
 
   useEffect(() => {
@@ -410,17 +409,6 @@ export default function ReceiptDesignerPage() {
             >
               <Sliders className="w-3.5 h-3.5" />
               <span>Sections</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("PAYMENTS")}
-              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
-                activeTab === "PAYMENTS"
-                  ? "bg-white text-[#59283A] shadow-sm"
-                  : "text-[#82747A] hover:text-[#59283A]"
-              }`}
-            >
-              <QrCode className="w-3.5 h-3.5" />
-              <span>UPI & QR</span>
             </button>
             <button
               onClick={() => setActiveTab("POLICIES")}
@@ -944,63 +932,7 @@ export default function ReceiptDesignerPage() {
             </div>
           )}
 
-          {/* Tab 5: UPI QR & Digital Payments */}
-          {activeTab === "PAYMENTS" && (
-            <div className="bg-white rounded-xl border border-[#E8DDD8] p-5 space-y-4 shadow-sm">
-              <h3 className="text-sm font-bold text-[#59283A] flex items-center gap-2">
-                <QrCode className="w-4 h-4 text-[#C4A06A]" />
-                <span>UPI QR Code & Digital Settlement</span>
-              </h3>
-
-              <div className="flex items-center justify-between pb-2 border-b border-[#E8DDD8]">
-                <div>
-                  <span className="text-xs font-semibold text-[#59283A] block">
-                    Show UPI QR Code Box on Receipt
-                  </span>
-                  <span className="text-[11px] text-[#82747A] block">
-                    Enables guests to scan and pay directly from GPay, PhonePe, or Paytm
-                  </span>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={config.showUpiQrCode}
-                  onChange={(e) => handleUpdate("showUpiQrCode", e.target.checked)}
-                  className="w-4 h-4 rounded text-[#59283A] cursor-pointer"
-                />
-              </div>
-
-              {config.showUpiQrCode && (
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#59283A]">
-                      UPI Virtual Payment Address (VPA) *
-                    </label>
-                    <Input
-                      value={config.upiId}
-                      onChange={(e) => handleUpdate("upiId", e.target.value)}
-                      placeholder="hotelradhapalace@upi"
-                      className="h-8 text-xs font-mono"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#59283A]">
-                      Bank Account & IFSC Wire Details
-                    </label>
-                    <textarea
-                      value={config.bankAccountDetails}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleUpdate("bankAccountDetails", e.target.value)}
-                      placeholder="HDFC Bank | A/C: 50200012345678 | IFSC: HDFC0001234"
-                      className="w-full text-xs font-mono rounded-md border border-[#E8DDD8] p-2 bg-white focus:outline-none focus:border-[#59283A] resize-none"
-                      rows={2}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Tab 6: Policies, Terms & Thank You Note */}
+          {/* Tab 5: Policies, Terms & Thank You Note */}
           {activeTab === "POLICIES" && (
             <div className="bg-white rounded-xl border border-[#E8DDD8] p-5 space-y-4 shadow-sm">
               <h3 className="text-sm font-bold text-[#59283A] flex items-center gap-2">

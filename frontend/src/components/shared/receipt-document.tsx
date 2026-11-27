@@ -8,7 +8,6 @@ import {
   UtensilsCrossed,
   CheckCircle2,
   AlertCircle,
-  QrCode,
   Printer,
   Building2,
   Calendar,
@@ -501,51 +500,54 @@ export function ReceiptDocument({
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. TOTALS, TAX BREAKDOWN & UPI / SIGNATORY SECTION                         */}
+      {/* 4. TOTALS & TAX BREAKDOWN SECTION                                         */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {/* Left Box: UPI QR Code / Bank Details or Component Breakdown */}
+        {/* Left Box: Component Breakdown Summary / Stay Particulars */}
         <div className="space-y-3">
-          {config.showUpiQrCode && (
-            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-xs flex items-center gap-3">
-              <div className="w-16 h-16 rounded-lg bg-white border border-slate-300 flex items-center justify-center p-1.5 flex-shrink-0 shadow-sm">
-                <QrCode className="w-full h-full text-slate-800" />
-              </div>
-              <div className="min-w-0">
-                <span className="font-bold text-slate-800 text-[11px] block uppercase tracking-wide">
-                  Instant Digital Settlement (UPI)
-                </span>
-                <span className="text-[10px] text-slate-600 font-mono block mt-0.5 font-semibold">
-                  UPI ID: {config.upiId || "hotelradhapalace@upi"}
-                </span>
-                {config.bankAccountDetails && (
-                  <span className="text-[10px] text-slate-500 font-mono block mt-0.5 truncate">
-                    {config.bankAccountDetails}
-                  </span>
-                )}
-                <span className="text-[9px] text-slate-400 block mt-0.5">
-                  Scan via GPay, PhonePe, Paytm, or any BHIM UPI App
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Component Summary (Folio only) */}
+          {/* Component Summary (Folio) */}
           {isFolio && folioData && (
-            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs space-y-1">
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs space-y-1.5">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block border-b pb-1">
-                Charges Summary
+                Charges Breakdown Summary
               </span>
               <div className="flex justify-between text-slate-600 text-[11px]">
-                <span>Room Charges:</span>
-                <span className="font-mono">₹{folioData.roomCharges.toFixed(2)}</span>
+                <span>Room Tariff Charges:</span>
+                <span className="font-mono font-semibold text-slate-800">
+                  ₹{folioData.roomCharges.toFixed(2)}
+                </span>
               </div>
               {folioData.totalAdditionalCharges > 0 && (
                 <div className="flex justify-between text-slate-600 text-[11px]">
                   <span>Items & Additional Services:</span>
-                  <span className="font-mono">₹{folioData.totalAdditionalCharges.toFixed(2)}</span>
+                  <span className="font-mono font-semibold text-slate-800">
+                    ₹{folioData.totalAdditionalCharges.toFixed(2)}
+                  </span>
                 </div>
               )}
+              <div className="flex justify-between text-slate-500 text-[10px] pt-1 border-t border-slate-200">
+                <span>Total Stay Duration:</span>
+                <span className="font-mono">{numberOfNights} Nights</span>
+              </div>
+            </div>
+          )}
+
+          {/* Stay Particulars (Invoice) */}
+          {!isFolio && (
+            <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 text-xs space-y-1.5">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block border-b pb-1">
+                Billing Particulars
+              </span>
+              <div className="flex justify-between text-slate-600 text-[11px]">
+                <span>Room Tariff Charges:</span>
+                <span className="font-mono font-semibold text-slate-800">
+                  ₹{roomCharges.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between text-slate-500 text-[10px] pt-1 border-t border-slate-200">
+                <span>Duration / Stay:</span>
+                <span className="font-mono">{numberOfNights} Nights ({checkInDate} to {checkOutDate})</span>
+              </div>
             </div>
           )}
         </div>

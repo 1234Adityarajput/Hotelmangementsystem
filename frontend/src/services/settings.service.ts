@@ -34,9 +34,9 @@ export const defaultReceiptDesign: ReceiptDesignConfig = {
   checkInTime: '12:00 PM',
   checkOutTime: '11:00 AM',
 
-  showUpiQrCode: true,
-  upiId: 'hotelradhapalace@upi',
-  bankAccountDetails: 'HDFC Bank | A/C: 50200012345678 | IFSC: HDFC0001234',
+  showUpiQrCode: false,
+  upiId: '',
+  bankAccountDetails: '',
 
   showSignatory: true,
   signatoryTitle: 'Authorized Signatory',
