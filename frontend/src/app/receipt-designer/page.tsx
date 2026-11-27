@@ -220,6 +220,7 @@ export default function ReceiptDesignerPage() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"THEME" | "HOTEL" | "TITLES" | "TOGGLES" | "POLICIES">("THEME");
   const [previewDocType, setPreviewDocType] = useState<"FOLIO" | "INVOICE">("FOLIO");
+  const [previewBillingMode, setPreviewBillingMode] = useState<"WITH_GST" | "WITHOUT_GST">("WITH_GST");
 
   useEffect(() => {
     async function fetchDesign() {
@@ -1009,37 +1010,66 @@ export default function ReceiptDesignerPage() {
         {/* ========================================================================= */}
         <div className="lg:col-span-7 sticky top-6 space-y-3">
           {/* Preview Document Switcher & Info */}
-          <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-3 rounded-xl border border-[#E8DDD8] shadow-sm">
             <div className="flex items-center gap-1.5">
               <Eye className="w-4 h-4 text-[#C4A06A]" />
               <span className="text-xs font-bold text-[#59283A]">Live Visual Preview:</span>
             </div>
 
-            <div className="flex items-center gap-1.5 p-1 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8]">
-              <button
-                type="button"
-                onClick={() => setPreviewDocType("FOLIO")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
-                  previewDocType === "FOLIO"
-                    ? "bg-[#59283A] text-white shadow-sm"
-                    : "text-[#82747A] hover:text-[#59283A]"
-                }`}
-              >
-                <FileCheck2 className="w-3.5 h-3.5" />
-                <span>Automatic Billing Folio</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setPreviewDocType("INVOICE")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
-                  previewDocType === "INVOICE"
-                    ? "bg-[#59283A] text-white shadow-sm"
-                    : "text-[#82747A] hover:text-[#59283A]"
-                }`}
-              >
-                <Receipt className="w-3.5 h-3.5" />
-                <span>Official Tax Invoice</span>
-              </button>
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Folio vs Invoice */}
+              <div className="flex items-center gap-1 p-1 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8]">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDocType("FOLIO")}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
+                    previewDocType === "FOLIO"
+                      ? "bg-[#59283A] text-white shadow-sm"
+                      : "text-[#82747A] hover:text-[#59283A]"
+                  }`}
+                >
+                  <FileCheck2 className="w-3.5 h-3.5" />
+                  <span>Stay Folio</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDocType("INVOICE")}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
+                    previewDocType === "INVOICE"
+                      ? "bg-[#59283A] text-white shadow-sm"
+                      : "text-[#82747A] hover:text-[#59283A]"
+                  }`}
+                >
+                  <Receipt className="w-3.5 h-3.5" />
+                  <span>Invoice</span>
+                </button>
+              </div>
+
+              {/* With GST vs Without GST */}
+              <div className="flex items-center gap-1 p-1 bg-[#F5F0EA] rounded-lg border border-[#E8DDD8]">
+                <button
+                  type="button"
+                  onClick={() => setPreviewBillingMode("WITH_GST")}
+                  className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
+                    previewBillingMode === "WITH_GST"
+                      ? "bg-[#59283A] text-white shadow-sm"
+                      : "text-[#82747A] hover:text-[#59283A]"
+                  }`}
+                >
+                  <span>🧾 With GST</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewBillingMode("WITHOUT_GST")}
+                  className={`flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
+                    previewBillingMode === "WITHOUT_GST"
+                      ? "bg-[#32765B] text-white shadow-sm"
+                      : "text-[#82747A] hover:text-[#59283A]"
+                  }`}
+                >
+                  <span>📄 Without GST</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1050,6 +1080,7 @@ export default function ReceiptDesignerPage() {
               type={previewDocType}
               folioData={previewDocType === "FOLIO" ? (SAMPLE_FOLIO_DATA as any) : null}
               invoiceData={previewDocType === "INVOICE" ? SAMPLE_INVOICE_DATA : null}
+              billingMode={previewBillingMode}
               hidePrintButton={false}
               onPrint={() => window.print()}
             />

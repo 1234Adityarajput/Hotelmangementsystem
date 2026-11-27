@@ -21,6 +21,7 @@ export interface ReceiptDocumentProps {
   type: "FOLIO" | "INVOICE";
   folioData?: BillingComponentBreakdown | null;
   invoiceData?: any | null;
+  billingMode?: "WITH_GST" | "WITHOUT_GST";
   onPrint?: () => void;
   hidePrintButton?: boolean;
   className?: string;
@@ -31,6 +32,7 @@ export function ReceiptDocument({
   type,
   folioData,
   invoiceData,
+  billingMode,
   onPrint,
   hidePrintButton = false,
   className = "",
@@ -100,17 +102,29 @@ export function ReceiptDocument({
     ? folioData?.discountAmount || 0
     : Number(invoiceData?.discountAmount || 0);
 
-  const taxPercentage = isFolio
+  // Raw tax percentage
+  const rawTaxPercentage = isFolio
     ? Number(folioData?.taxPercentage !== undefined ? folioData.taxPercentage : 12)
     : Number(invoiceData?.taxPercentage !== undefined ? invoiceData.taxPercentage : 12);
 
-  const taxAmount = isFolio
+  // Determine if this receipt is in Non-GST mode
+  const isNonGst =
+    billingMode === "WITHOUT_GST" ||
+    (billingMode !== "WITH_GST" && rawTaxPercentage === 0);
+
+  const taxPercentage = isNonGst ? 0 : rawTaxPercentage;
+
+  const taxAmount = isNonGst
+    ? 0
+    : isFolio
     ? folioData?.taxAmount !== undefined
       ? folioData.taxAmount
       : Math.round((subtotal - discountAmount) * (taxPercentage / 100) * 100) / 100
     : Number(invoiceData?.taxAmount || 0);
 
-  const totalAmount = isFolio
+  const totalAmount = isNonGst
+    ? Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100)
+    : isFolio
     ? folioData?.finalBill || Math.round((subtotal - discountAmount + taxAmount) * 100) / 100
     : Number(invoiceData?.totalAmount || 0);
 
@@ -119,7 +133,7 @@ export function ReceiptDocument({
     : Number(invoiceData?.totalPaid || 0);
 
   const balanceAmount = isFolio
-    ? folioData?.remainingBalance !== undefined
+    ? folioData?.remainingBalance !== undefined && !isNonGst
       ? folioData.remainingBalance
       : Math.max(0, Math.round((totalAmount - totalPaid) * 100) / 100)
     : Number(invoiceData?.balanceAmount || 0);
@@ -138,7 +152,14 @@ export function ReceiptDocument({
       ? "font-mono"
       : "font-sans";
 
-  const docTitle = isFolio ? config.folioTitle : config.invoiceTitle;
+  // Document Title: In Non-GST mode, omit "TAX INVOICE" / "GST"
+  const docTitle = isNonGst
+    ? isFolio
+      ? "OFFICIAL GUEST STAY FOLIO & RECEIPT"
+      : "GUEST STAY BILL & RECEIPT"
+    : isFolio
+    ? config.folioTitle
+    : config.invoiceTitle;
 
   return (
     <div
@@ -206,8 +227,8 @@ export function ReceiptDocument({
               <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-slate-500 mt-1 font-mono">
                 {config.phone && <span>Tel: {config.phone}</span>}
                 {config.email && <span>Email: {config.email}</span>}
-                {config.gstin && <span>GSTIN: {config.gstin}</span>}
-                {config.panNumber && <span>PAN: {config.panNumber}</span>}
+                {!isNonGst && config.gstin && <span>GSTIN: {config.gstin}</span>}
+                {!isNonGst && config.panNumber && <span>PAN: {config.panNumber}</span>}
                 {config.state && <span>State: {config.state} ({config.stateCode})</span>}
               </div>
             </div>
@@ -272,8 +293,8 @@ export function ReceiptDocument({
           <div className="flex flex-wrap justify-center gap-x-3 gap-y-0.5 text-[10px] text-slate-500 mt-1 font-mono">
             {config.phone && <span>Tel: {config.phone}</span>}
             {config.email && <span>Email: {config.email}</span>}
-            {config.gstin && <span>GSTIN: {config.gstin}</span>}
-            {config.panNumber && <span>PAN: {config.panNumber}</span>}
+            {!isNonGst && config.gstin && <span>GSTIN: {config.gstin}</span>}
+            {!isNonGst && config.panNumber && <span>PAN: {config.panNumber}</span>}
           </div>
 
           <div
@@ -310,7 +331,7 @@ export function ReceiptDocument({
                 {config.hotelName}
               </h1>
               <p className="text-[10px] text-slate-500">
-                GSTIN: {config.gstin} • {config.phone}
+                {!isNonGst && config.gstin ? `GSTIN: ${config.gstin} • ` : ""}{config.phone}
               </p>
             </div>
           </div>
@@ -568,27 +589,29 @@ export function ReceiptDocument({
             </div>
           )}
 
-          {/* GST Breakdown: CGST + SGST split if enabled */}
-          {config.showGstBreakdown ? (
-            <div className="py-2 border-y border-dashed border-slate-300 space-y-1">
-              <div className="flex justify-between text-slate-500 text-[11px]">
-                <span>CGST ({halfTaxRate}%):</span>
-                <span>₹{halfTaxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+          {/* GST Breakdown: CGST + SGST split if enabled (Only shown in With-GST mode) */}
+          {!isNonGst && (
+            config.showGstBreakdown ? (
+              <div className="py-2 border-y border-dashed border-slate-300 space-y-1">
+                <div className="flex justify-between text-slate-500 text-[11px]">
+                  <span>CGST ({halfTaxRate}%):</span>
+                  <span>₹{halfTaxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between text-slate-500 text-[11px]">
+                  <span>SGST ({halfTaxRate}%):</span>
+                  <span>₹{halfTaxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between text-slate-700 font-semibold text-xs pt-0.5">
+                  <span>Total GST ({taxPercentage}%):</span>
+                  <span>₹{taxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                </div>
               </div>
-              <div className="flex justify-between text-slate-500 text-[11px]">
-                <span>SGST ({halfTaxRate}%):</span>
-                <span>₹{halfTaxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-              </div>
-              <div className="flex justify-between text-slate-700 font-semibold text-xs pt-0.5">
-                <span>Total GST ({taxPercentage}%):</span>
+            ) : (
+              <div className="flex justify-between text-slate-600">
+                <span>GST Tax ({taxPercentage}%):</span>
                 <span>₹{taxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
               </div>
-            </div>
-          ) : (
-            <div className="flex justify-between text-slate-600">
-              <span>GST Tax ({taxPercentage}%):</span>
-              <span>₹{taxAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-            </div>
+            )
           )}
 
           {/* Final Payable Bill */}
@@ -628,7 +651,16 @@ export function ReceiptDocument({
             Terms & Conditions & Hotel Policies
           </span>
           <div className="text-[10px] text-slate-500 leading-relaxed whitespace-pre-line font-sans">
-            {config.termsAndConditions}
+            {isNonGst
+              ? config.termsAndConditions
+                  .split("\n")
+                  .filter(
+                    (line) =>
+                      !line.toLowerCase().includes("gst") &&
+                      !line.toLowerCase().includes("goods & services tax")
+                  )
+                  .join("\n")
+              : config.termsAndConditions}
           </div>
           {config.customNotes && (
             <p className="text-[9px] text-slate-400 italic mt-1 font-sans">

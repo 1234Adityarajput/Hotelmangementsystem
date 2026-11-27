@@ -66,6 +66,7 @@ export default function InvoicesPage() {
 
   // Generate Invoice Modal
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
+  const [generateBillingMode, setGenerateBillingMode] = useState<"WITH_GST" | "WITHOUT_GST">("WITH_GST");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [generateForm, setGenerateForm] = useState({
     bookingId: initialBookingId || "",
@@ -436,14 +437,19 @@ export default function InvoicesPage() {
 
     try {
       setSubmitting(true);
+      const taxRate = generateBillingMode === "WITHOUT_GST" ? 0 : Number(generateForm.taxPercentage);
       const inv = await billingService.generateInvoice({
         bookingId: generateForm.bookingId,
         discountType: generateForm.discountType !== "NONE" ? generateForm.discountType : undefined,
         discountValue: generateForm.discountValue ? Number(generateForm.discountValue) : undefined,
-        taxPercentage: Number(generateForm.taxPercentage),
+        taxPercentage: taxRate,
         invoiceDate: generateForm.invoiceDate,
       });
-      toast.success(`Invoice ${inv.invoiceNumber} generated successfully`);
+      toast.success(
+        taxRate === 0
+          ? `Non-GST Bill ${inv.invoiceNumber} (Without GST) generated successfully`
+          : `GST Invoice ${inv.invoiceNumber} (${taxRate}% GST) generated successfully`
+      );
       setGenerateModalOpen(false);
       fetchInvoices();
       handleViewInvoice(inv.id);
@@ -771,18 +777,133 @@ export default function InvoicesPage() {
               )}
             </div>
 
+            {/* Billing Mode (With GST vs Without GST) */}
+            <div className="space-y-1.5 p-3 rounded-xl border bg-[#FDFBF9] border-[#E8DDD8]">
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-[#59283A] text-xs flex items-center gap-1.5">
+                  <Receipt className="w-3.5 h-3.5 text-[#C4A06A]" />
+                  <span>Invoice Billing Type *</span>
+                </label>
+                <span
+                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    generateBillingMode === "WITH_GST"
+                      ? "bg-[#59283A]/10 text-[#59283A]"
+                      : "bg-emerald-100 text-emerald-800"
+                  }`}
+                >
+                  {generateBillingMode === "WITH_GST" ? "GST Tax Invoice" : "Non-GST Bill"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGenerateBillingMode("WITH_GST");
+                    setGenerateForm((prev) => ({
+                      ...prev,
+                      taxPercentage: prev.taxPercentage === 0 ? 12 : prev.taxPercentage,
+                    }));
+                  }}
+                  className={`py-2 px-3 text-left rounded-lg border text-xs font-semibold flex flex-col gap-1 transition-all ${
+                    generateBillingMode === "WITH_GST"
+                      ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
+                      : "bg-white text-[#59283A] border-[#E8DDD8] hover:bg-[#F5F0EA]"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Receipt className="w-3.5 h-3.5" />
+                    <span className="font-bold">Billing With GST</span>
+                  </div>
+                  <span
+                    className={`text-[10px] ${
+                      generateBillingMode === "WITH_GST" ? "text-amber-200" : "text-[#82747A]"
+                    }`}
+                  >
+                    Standard GST bill with GSTIN & tax split
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGenerateBillingMode("WITHOUT_GST");
+                    setGenerateForm((prev) => ({
+                      ...prev,
+                      taxPercentage: 0,
+                    }));
+                  }}
+                  className={`py-2 px-3 text-left rounded-lg border text-xs font-semibold flex flex-col gap-1 transition-all ${
+                    generateBillingMode === "WITHOUT_GST"
+                      ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
+                      : "bg-white text-[#59283A] border-[#E8DDD8] hover:bg-[#F5F0EA]"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5" />
+                    <span className="font-bold">Billing Without GST</span>
+                  </div>
+                  <span
+                    className={`text-[10px] ${
+                      generateBillingMode === "WITHOUT_GST" ? "text-emerald-200" : "text-[#82747A]"
+                    }`}
+                  >
+                    Non-GST bill (0% tax, no GSTIN)
+                  </span>
+                </button>
+              </div>
+
+              {generateBillingMode === "WITHOUT_GST" ? (
+                <div className="pt-1 text-[10px] text-[#32765B] bg-[#E7F1E9] p-2 rounded-md border border-[#C5DFD0] flex items-center gap-1.5 font-medium leading-tight">
+                  <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span>Bill receipt will NOT mention GST, CGST/SGST, or Hotel GSTIN. 0% tax applied.</span>
+                </div>
+              ) : (
+                <div className="pt-1 text-[10px] text-[#82747A] bg-white p-2 rounded-md border border-[#E8DDD8] flex items-center gap-1.5 leading-tight">
+                  <AlertCircle className="w-3.5 h-3.5 text-[#C4A06A] flex-shrink-0" />
+                  <span>Includes full GST calculation, CGST/SGST breakdown, and official GSTIN on bill.</span>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="font-semibold text-[#7A4652]">GST Tax %</label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.5"
-                  value={generateForm.taxPercentage}
-                  onChange={(e) => setGenerateForm({ ...generateForm, taxPercentage: Number(e.target.value) })}
-                  className="h-8 text-xs font-mono"
-                />
+                <label className="font-semibold text-[#7A4652]">
+                  {generateBillingMode === "WITHOUT_GST" ? "Tax (Non-GST)" : "GST Tax %"}
+                </label>
+                {generateBillingMode === "WITHOUT_GST" ? (
+                  <div className="h-8 px-2.5 rounded-md border border-[#E8DDD8] bg-slate-50 flex items-center text-xs font-mono font-bold text-slate-500">
+                    0.0% (No GST)
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={generateForm.taxPercentage}
+                      onChange={(e) => setGenerateForm({ ...generateForm, taxPercentage: Number(e.target.value) })}
+                      className="h-8 text-xs font-mono"
+                    />
+                    <div className="flex items-center gap-1">
+                      {[5, 12, 18, 28].map((rate) => (
+                        <button
+                          key={rate}
+                          type="button"
+                          onClick={() => setGenerateForm({ ...generateForm, taxPercentage: rate })}
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border ${
+                            Number(generateForm.taxPercentage) === rate
+                              ? "bg-[#59283A] text-white border-[#59283A]"
+                              : "bg-white text-[#59283A] border-[#E8DDD8] hover:bg-[#F5F0EA]"
+                          }`}
+                        >
+                          {rate}%
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -801,7 +922,7 @@ export default function InvoicesPage() {
                 Cancel
               </Button>
               <Button type="submit" size="sm" disabled={submitting} className="bg-[#59283A] hover:bg-[#472130] text-white">
-                {submitting ? "Calculating..." : "Generate Final Bill"}
+                {submitting ? "Calculating..." : generateBillingMode === "WITHOUT_GST" ? "Generate Non-GST Bill" : "Generate GST Tax Invoice"}
               </Button>
             </DialogFooter>
           </form>
@@ -813,12 +934,25 @@ export default function InvoicesPage() {
         <DialogContent className="max-w-4xl bg-white max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           {selectedInvoice && (
             <div className="space-y-4">
-              {/* Designer Quick Link for Owner */}
-              {user?.role === "OWNER" && (
-                <div className="flex justify-between items-center bg-[#F5F0EA] p-2.5 rounded-xl border border-[#E8DDD8] non-printable text-xs">
+              {/* Designer Quick Link for Owner & Status Indicator */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#F5F0EA] p-2.5 rounded-xl border border-[#E8DDD8] non-printable text-xs">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[#82747A]">
-                    Using customized template for <strong>{receiptDesign.hotelName}</strong> ({receiptDesign.invoiceTitle})
+                    Template: <strong>{receiptDesign.hotelName}</strong>
                   </span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      Number(selectedInvoice.taxPercentage) === 0
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                        : "bg-[#59283A]/10 text-[#59283A] border border-[#59283A]/30"
+                    }`}
+                  >
+                    {Number(selectedInvoice.taxPercentage) === 0
+                      ? "Non-GST Bill (Without GST)"
+                      : `GST Tax Invoice (${selectedInvoice.taxPercentage}% GST)`}
+                  </span>
+                </div>
+                {user?.role === "OWNER" && (
                   <Link href="/receipt-designer">
                     <Button
                       type="button"
@@ -830,14 +964,15 @@ export default function InvoicesPage() {
                       <span>Receipt Designer</span>
                     </Button>
                   </Link>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Custom Unified Receipt Document */}
               <ReceiptDocument
                 config={receiptDesign}
                 type="INVOICE"
                 invoiceData={selectedInvoice}
+                billingMode={Number(selectedInvoice.taxPercentage) === 0 ? "WITHOUT_GST" : "WITH_GST"}
                 onPrint={() => window.print()}
                 hidePrintButton={false}
               />

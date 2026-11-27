@@ -90,6 +90,8 @@ export default function AutomaticBillingPage() {
   const [dossierModalOpen, setDossierModalOpen] = useState(false);
   const [folioTaxRates, setFolioTaxRates] = useState<Record<string, number>>({});
   const [currentFolioTaxRate, setCurrentFolioTaxRate] = useState<number>(12);
+  const [billingMode, setBillingMode] = useState<"WITH_GST" | "WITHOUT_GST">("WITH_GST");
+  const [paymentBillingMode, setPaymentBillingMode] = useState<"WITH_GST" | "WITHOUT_GST">("WITH_GST");
   const [receiptDesign, setReceiptDesign] = useState<ReceiptDesignConfig>(defaultReceiptDesign);
 
   // Quick Charge Modal
@@ -572,12 +574,14 @@ export default function AutomaticBillingPage() {
   }, [kpis, folios, folioTaxRates]);
 
   // Open Folio Dossier
-  const handleOpenDossier = async (bookingId: string) => {
+  const handleOpenDossier = async (bookingId: string, overrideTaxRate?: number) => {
     try {
-      const activeTax = folioTaxRates[bookingId];
+      const activeTax = overrideTaxRate !== undefined ? overrideTaxRate : folioTaxRates[bookingId];
       const folio = await billingService.getLiveBillingFolio(bookingId, activeTax);
       setSelectedFolio(folio);
-      setCurrentFolioTaxRate(activeTax !== undefined ? activeTax : (folio.taxPercentage !== undefined ? Number(folio.taxPercentage) : 12));
+      const taxRate = activeTax !== undefined ? activeTax : (folio.taxPercentage !== undefined ? Number(folio.taxPercentage) : 12);
+      setCurrentFolioTaxRate(taxRate);
+      setBillingMode(taxRate === 0 ? "WITHOUT_GST" : "WITH_GST");
       setDossierModalOpen(true);
     } catch (err) {
       toast.error("Error loading stay folio dossier");
@@ -700,15 +704,25 @@ export default function AutomaticBillingPage() {
         notes: paymentForm.notes || undefined,
       });
 
-      toast.success(`Payment of ₹${paymentForm.amount} recorded successfully!`);
+      const taxToUse = paymentBillingMode === "WITHOUT_GST" ? 0 : (folioTaxRates[paymentForm.bookingId] !== undefined ? folioTaxRates[paymentForm.bookingId] : 12);
+
+      if (paymentBillingMode === "WITHOUT_GST") {
+        setBillingMode("WITHOUT_GST");
+        setCurrentFolioTaxRate(0);
+        setFolioTaxRates((prev) => ({ ...prev, [paymentForm.bookingId]: 0 }));
+      } else {
+        setBillingMode("WITH_GST");
+        if (currentFolioTaxRate === 0) {
+          setCurrentFolioTaxRate(12);
+        }
+      }
+
+      toast.success(`Payment of ₹${paymentForm.amount} recorded successfully (${paymentBillingMode === "WITHOUT_GST" ? "Without GST Receipt" : "With GST Tax Invoice"})!`);
       setPaymentModalOpen(false);
       await fetchData();
 
-      // If dossier modal is open, refresh it
-      if (selectedFolio && selectedFolio.bookingId === paymentForm.bookingId) {
-        const updated = await billingService.getLiveBillingFolio(paymentForm.bookingId);
-        setSelectedFolio(updated);
-      }
+      // Automatically open the generated stay folio receipt so owner/manager can view & print immediately
+      await handleOpenDossier(paymentForm.bookingId, taxToUse);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to record payment");
     } finally {
@@ -721,14 +735,18 @@ export default function AutomaticBillingPage() {
     try {
       const activeTax = taxRateToUse !== undefined
         ? taxRateToUse
-        : (folioTaxRates[bookingId] !== undefined ? folioTaxRates[bookingId] : 12.0);
+        : (billingMode === "WITHOUT_GST" ? 0 : (folioTaxRates[bookingId] !== undefined ? folioTaxRates[bookingId] : 12.0));
 
       const inv = await billingService.generateInvoice({
         bookingId,
         taxPercentage: activeTax,
         invoiceDate: new Date().toISOString().split("T")[0],
       });
-      toast.success(`GST Invoice ${inv.invoiceNumber} (${activeTax}% GST) generated and archived!`);
+      toast.success(
+        activeTax === 0
+          ? `Non-GST Bill ${inv.invoiceNumber} (Without GST) generated successfully!`
+          : `GST Invoice ${inv.invoiceNumber} (${activeTax}% GST) generated and archived!`
+      );
       await fetchData();
       if (selectedFolio && selectedFolio.bookingId === bookingId) {
         const updated = await billingService.getLiveBillingFolio(bookingId, activeTax);
@@ -1667,77 +1685,135 @@ export default function AutomaticBillingPage() {
 
             return (
               <div className="space-y-4 printable-folio">
-                {/* Live GST Tax Configurator Bar & Designer Shortcut */}
-                <div className="bg-[#F5F0EA] p-3 rounded-xl border border-[#E8DDD8] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs non-printable">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-[#59283A] text-xs">GST Tax Rate:</span>
-                    <div className="flex items-center gap-1">
-                      <Input
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.5"
-                        value={currentFolioTaxRate === 0 ? "" : currentFolioTaxRate}
-                        onFocus={(e) => e.target.select()}
-                        onChange={(e) => {
-                          const raw = e.target.value;
-                          if (raw === "") {
-                            setCurrentFolioTaxRate(0);
-                            if (selectedFolio) {
-                              setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: 0 }));
-                            }
-                          } else {
-                            const val = Math.max(0, Math.min(100, Number(raw)));
-                            setCurrentFolioTaxRate(val);
-                            if (selectedFolio) {
-                              setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: val }));
-                            }
-                          }
-                        }}
-                        placeholder="0"
-                        className="w-16 h-7 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A] bg-white"
-                      />
-                      <span className="text-xs font-bold text-[#59283A]">%</span>
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      {[0, 5, 12, 18, 28].map((rate) => (
+                {/* Live Billing Mode Switcher & Tax Configurator Bar */}
+                <div className="bg-[#F5F0EA] p-3 rounded-xl border border-[#E8DDD8] space-y-2.5 text-xs non-printable">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                    {/* 2-Option Billing Mode Switcher */}
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#59283A] text-xs">Billing Type:</span>
+                      <div className="inline-flex rounded-lg border border-[#E8DDD8] bg-white p-0.5 shadow-xs">
                         <button
-                          key={rate}
                           type="button"
                           onClick={() => {
-                            setCurrentFolioTaxRate(rate);
-                            if (selectedFolio) {
-                              setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: rate }));
-                            }
+                            setBillingMode("WITH_GST");
+                            const restoredRate = folioTaxRates[selectedFolio.bookingId] && folioTaxRates[selectedFolio.bookingId] > 0
+                              ? folioTaxRates[selectedFolio.bookingId]
+                              : 12;
+                            setCurrentFolioTaxRate(restoredRate);
+                            setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: restoredRate }));
                           }}
-                          className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${Number(currentFolioTaxRate) === rate
+                          className={`px-3 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 ${
+                            billingMode === "WITH_GST" && currentFolioTaxRate > 0
                               ? "bg-[#59283A] text-white shadow-xs"
-                              : "bg-white text-[#8E7079] hover:bg-[#E8DDD8] hover:text-[#59283A] border border-[#E8DDD8]"
-                            }`}
+                              : "text-[#82747A] hover:text-[#59283A]"
+                          }`}
                         >
-                          {rate}%
+                          <Receipt className="w-3.5 h-3.5" />
+                          <span>Billing With GST</span>
                         </button>
-                      ))}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBillingMode("WITHOUT_GST");
+                            setCurrentFolioTaxRate(0);
+                            setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: 0 }));
+                          }}
+                          className={`px-3 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 ${
+                            billingMode === "WITHOUT_GST" || currentFolioTaxRate === 0
+                              ? "bg-[#59283A] text-white shadow-xs"
+                              : "text-[#82747A] hover:text-[#59283A]"
+                          }`}
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Billing Without GST</span>
+                        </button>
+                      </div>
                     </div>
 
-                    <span className="text-[11px] text-[#82747A] font-mono ml-1">
-                      Tax: ₹{liveTaxAmount.toFixed(2)} | Final Bill: ₹{liveFinalBill.toFixed(2)}
-                    </span>
+                    {!isManager && (
+                      <Link href="/receipt-designer">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-7 px-2.5 text-[11px] font-semibold border-[#C4A06A] text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1 shadow-xs"
+                        >
+                          <Palette className="w-3 h-3 text-[#C4A06A]" />
+                          <span>Receipt Designer</span>
+                        </Button>
+                      </Link>
+                    )}
                   </div>
 
-                  {!isManager && (
-                    <Link href="/receipt-designer">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-7 px-2.5 text-[11px] font-semibold border-[#C4A06A] text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1 shadow-xs"
-                      >
-                        <Palette className="w-3 h-3 text-[#C4A06A]" />
-                        <span>Receipt Designer</span>
-                      </Button>
-                    </Link>
+                  {/* Sub-bar based on Billing Type */}
+                  {(billingMode === "WITH_GST" && currentFolioTaxRate > 0) ? (
+                    <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[#E8DDD8]/70">
+                      <span className="font-semibold text-[#59283A] text-[11px]">GST Rate:</span>
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.5"
+                          value={currentFolioTaxRate === 0 ? "" : currentFolioTaxRate}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => {
+                            const raw = e.target.value;
+                            if (raw === "") {
+                              setCurrentFolioTaxRate(0);
+                              if (selectedFolio) {
+                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: 0 }));
+                              }
+                            } else {
+                              const val = Math.max(0, Math.min(100, Number(raw)));
+                              setCurrentFolioTaxRate(val);
+                              if (selectedFolio) {
+                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: val }));
+                              }
+                            }
+                          }}
+                          placeholder="0"
+                          className="w-16 h-7 text-xs font-mono font-bold text-right border-[#E8DDD8] focus:border-[#59283A] bg-white"
+                        />
+                        <span className="text-xs font-bold text-[#59283A]">%</span>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        {[5, 12, 18, 28].map((rate) => (
+                          <button
+                            key={rate}
+                            type="button"
+                            onClick={() => {
+                              setCurrentFolioTaxRate(rate);
+                              if (selectedFolio) {
+                                setFolioTaxRates((prev) => ({ ...prev, [selectedFolio.bookingId]: rate }));
+                              }
+                            }}
+                            className={`px-2 py-0.5 rounded text-[10px] font-semibold transition-all ${
+                              Number(currentFolioTaxRate) === rate
+                                ? "bg-[#59283A] text-white shadow-xs"
+                                : "bg-white text-[#8E7079] hover:bg-[#E8DDD8] hover:text-[#59283A] border border-[#E8DDD8]"
+                            }`}
+                          >
+                            {rate}%
+                          </button>
+                        ))}
+                      </div>
+
+                      <span className="text-[11px] text-[#82747A] font-mono ml-auto">
+                        GST: ₹{liveTaxAmount.toFixed(2)} • Final Bill: ₹{liveFinalBill.toFixed(2)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between text-[11px] text-[#32765B] bg-[#E7F1E9] px-3 py-1.5 rounded-lg border border-[#C5DFD0]">
+                      <span className="flex items-center gap-1.5 font-medium">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Non-GST Billing Active: No GST tax, CGST/SGST breakdown, or GSTIN will be mentioned on this receipt.</span>
+                      </span>
+                      <span className="font-mono font-bold text-slate-800">
+                        Final Bill: ₹{liveFinalBill.toFixed(2)}
+                      </span>
+                    </div>
                   )}
                 </div>
 
@@ -1746,6 +1822,7 @@ export default function AutomaticBillingPage() {
                   config={receiptDesign}
                   type="FOLIO"
                   folioData={liveUpdatedFolio}
+                  billingMode={billingMode === "WITHOUT_GST" || liveTaxRate === 0 ? "WITHOUT_GST" : "WITH_GST"}
                   onPrint={() => window.print()}
                   hidePrintButton={true}
                 />
@@ -1973,11 +2050,29 @@ export default function AutomaticBillingPage() {
                 onChange={(e) => {
                   const bId = e.target.value;
                   const f = folios.find((item) => item.bookingId === bId);
-                  setPaymentForm({
-                    ...paymentForm,
-                    bookingId: bId,
-                    amount: f ? Math.max(0, f.remainingBalance) : paymentForm.amount,
-                  });
+                  if (f) {
+                    const dueAmt =
+                      paymentBillingMode === "WITHOUT_GST"
+                        ? Math.max(
+                            0,
+                            Math.round(
+                              (Math.max(0, f.subtotal - (f.discountAmount || 0)) -
+                                f.payments.totalPaymentsReceived) *
+                                100
+                            ) / 100
+                          )
+                        : Math.max(0, f.remainingBalance);
+                    setPaymentForm({
+                      ...paymentForm,
+                      bookingId: bId,
+                      amount: dueAmt,
+                    });
+                  } else {
+                    setPaymentForm({
+                      ...paymentForm,
+                      bookingId: bId,
+                    });
+                  }
                 }}
                 className="w-full h-9 rounded-md border border-[#E8DDD8] bg-white px-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#C4A06A]"
                 required
@@ -1989,6 +2084,109 @@ export default function AutomaticBillingPage() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* 2-Option Billing Receipt Mode (With GST vs Without GST) */}
+            <div className="space-y-1.5 p-3 rounded-xl border bg-[#FDFBF9] border-[#E8DDD8]">
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-[#59283A] text-xs flex items-center gap-1.5">
+                  <Receipt className="w-3.5 h-3.5 text-[#C4A06A]" />
+                  <span>Billing Receipt Type *</span>
+                </label>
+                <span
+                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                    paymentBillingMode === "WITH_GST"
+                      ? "bg-[#59283A]/10 text-[#59283A]"
+                      : "bg-emerald-100 text-emerald-800"
+                  }`}
+                >
+                  {paymentBillingMode === "WITH_GST" ? "GST Tax Invoice" : "Non-GST Receipt"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentBillingMode("WITH_GST");
+                    const f = folios.find((item) => item.bookingId === paymentForm.bookingId);
+                    if (f) {
+                      setPaymentForm((prev) => ({
+                        ...prev,
+                        amount: Math.max(0, f.remainingBalance),
+                      }));
+                    }
+                  }}
+                  className={`py-2 px-3 text-left rounded-lg border text-xs font-semibold flex flex-col gap-1 transition-all ${
+                    paymentBillingMode === "WITH_GST"
+                      ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
+                      : "bg-white text-[#59283A] border-[#E8DDD8] hover:bg-[#F5F0EA]"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <Receipt className="w-3.5 h-3.5" />
+                    <span className="font-bold">Billing With GST</span>
+                  </div>
+                  <span
+                    className={`text-[10px] ${
+                      paymentBillingMode === "WITH_GST" ? "text-amber-200" : "text-[#82747A]"
+                    }`}
+                  >
+                    Standard GST bill with GSTIN & tax split
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentBillingMode("WITHOUT_GST");
+                    const f = folios.find((item) => item.bookingId === paymentForm.bookingId);
+                    if (f) {
+                      const nonGstTotal = Math.max(0, f.subtotal - (f.discountAmount || 0));
+                      const nonGstBal = Math.max(
+                        0,
+                        Math.round((nonGstTotal - f.payments.totalPaymentsReceived) * 100) / 100
+                      );
+                      setPaymentForm((prev) => ({
+                        ...prev,
+                        amount: nonGstBal,
+                      }));
+                    }
+                  }}
+                  className={`py-2 px-3 text-left rounded-lg border text-xs font-semibold flex flex-col gap-1 transition-all ${
+                    paymentBillingMode === "WITHOUT_GST"
+                      ? "bg-[#59283A] text-white border-[#59283A] shadow-xs"
+                      : "bg-white text-[#59283A] border-[#E8DDD8] hover:bg-[#F5F0EA]"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5" />
+                    <span className="font-bold">Billing Without GST</span>
+                  </div>
+                  <span
+                    className={`text-[10px] ${
+                      paymentBillingMode === "WITHOUT_GST" ? "text-emerald-200" : "text-[#82747A]"
+                    }`}
+                  >
+                    Non-GST receipt (0% tax, no GSTIN)
+                  </span>
+                </button>
+              </div>
+
+              {/* Status explanation */}
+              <div className="pt-1 text-[10px]">
+                {paymentBillingMode === "WITHOUT_GST" ? (
+                  <p className="text-[#32765B] bg-[#E7F1E9] p-2 rounded-md border border-[#C5DFD0] flex items-center gap-1.5 font-medium leading-tight">
+                    <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>Receipt will NOT mention GST, CGST/SGST, or Hotel GSTIN. 0% tax applied.</span>
+                  </p>
+                ) : (
+                  <p className="text-[#82747A] bg-white p-2 rounded-md border border-[#E8DDD8] flex items-center gap-1.5 leading-tight">
+                    <AlertCircle className="w-3.5 h-3.5 text-[#C4A06A] flex-shrink-0" />
+                    <span>Includes full GST calculation, CGST/SGST breakdown, and official GSTIN on receipt.</span>
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Payment Tier (Advance, Partial, Final) */}
