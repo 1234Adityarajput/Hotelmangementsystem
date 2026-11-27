@@ -153,7 +153,7 @@ const REGISTERS = [
     group: "Services & Workforce",
     badge: "Muster Roll",
     icon: Clock,
-    desc: "Daily muster roll: attendance date, staff member, department, attendance status (Present, Absent, Half Day, Leave, Weekly Off), in/out time, and overtime.",
+    desc: "Daily muster roll: attendance date, staff member, department, attendance status (Present, Absent, Leave, Weekly Off), in/out time, and overtime.",
   },
   {
     id: "salaries",

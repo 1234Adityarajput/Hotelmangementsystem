@@ -792,15 +792,17 @@ export default function AttendancePage() {
         {/* Status Legend */}
         <div className="hidden lg:flex items-center gap-2 text-[11px] text-[#82747A]">
           <span className="font-semibold text-[#59283A]">Legend:</span>
-          {Object.entries(STATUS_CONFIG).map(([k, cfg]) => (
-            <span key={k} className="flex items-center gap-1">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: cfg.color }}
-              />
-              <span>{cfg.label}</span>
-            </span>
-          ))}
+          {Object.entries(STATUS_CONFIG)
+            .filter(([k]) => k !== "HALF_DAY")
+            .map(([k, cfg]) => (
+              <span key={k} className="flex items-center gap-1">
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: cfg.color }}
+                />
+                <span>{cfg.label}</span>
+              </span>
+            ))}
         </div>
       </div>
 
@@ -975,7 +977,7 @@ export default function AttendancePage() {
                         <th className="px-4 py-3">Employee</th>
                         <th className="px-4 py-3">Role & Dept</th>
                         <th className="px-4 py-3">Status</th>
-                        <th className="px-4 py-3">Quick Actions (P / A / HD / L / WO)</th>
+                        <th className="px-4 py-3">Quick Actions (P / A / L / WO)</th>
                         <th className="px-4 py-3">Working Hours</th>
                         <th className="px-4 py-3">Shift Timings</th>
                         <th className="px-4 py-3">Notes</th>
@@ -1448,7 +1450,6 @@ export default function AttendancePage() {
 
             const presentCount = staffHistory.filter((h) => h.attendanceStatus === "PRESENT").length;
             const absentCount = staffHistory.filter((h) => h.attendanceStatus === "ABSENT").length;
-            const halfDayCount = staffHistory.filter((h) => h.attendanceStatus === "HALF_DAY").length;
             const leaveCount = staffHistory.filter((h) => h.attendanceStatus === "LEAVE").length;
             const totalHours = staffHistory.reduce((sum, h) => sum + Number(h.workingHours || 0), 0);
             const totalOT = staffHistory.reduce((sum, h) => sum + Number(h.overtimeHours || 0), 0);
