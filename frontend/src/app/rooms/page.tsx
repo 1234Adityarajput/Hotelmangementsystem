@@ -1102,58 +1102,56 @@ export default function RoomsPage() {
 
                         <CardContent className="p-2.5 space-y-2 flex-1 flex flex-col justify-between">
                           <div className="space-y-1.5">
-                            {/* Room Header: Number, Floor & Status Badge with Blinker */}
-                            <div className="flex items-start justify-between gap-1">
-                              <div className="min-w-0">
-                                <span className="text-sm sm:text-base font-serif font-bold text-[#59283A] block leading-tight truncate">
-                                  Room {r.roomNumber}
-                                </span>
-                                <span className="text-[10px] font-mono text-[#82747A] block leading-tight">
-                                  Fl {r.floor} • Cap: {r.roomType?.capacity || 2}
-                                </span>
-                              </div>
-
-                              {/* Live Status Badge with Blinker */}
-                              <Badge
-                                variant="outline"
-                                className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 flex items-center gap-1.5 shrink-0 shadow-xs ${
-                                  isAvailable
-                                    ? "bg-emerald-50 text-emerald-700 border-emerald-300"
-                                    : isOccupied
-                                    ? "bg-rose-50 text-rose-700 border-rose-300"
-                                    : "bg-amber-50 text-amber-700 border-amber-300"
-                                }`}
-                              >
-                                {/* Blinker Indicator Dot */}
-                                <span className="relative flex h-2 w-2 shrink-0">
-                                  <span
-                                    className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                                      isAvailable
-                                        ? "bg-emerald-400"
-                                        : isOccupied
-                                        ? "bg-rose-400"
-                                        : "bg-amber-400"
-                                    }`}
-                                  />
-                                  <span
-                                    className={`relative inline-flex rounded-full h-2 w-2 ${
-                                      isAvailable
-                                        ? "bg-emerald-500 shadow-[0_0_6px_#10B981]"
-                                        : isOccupied
-                                        ? "bg-rose-500 shadow-[0_0_6px_#F43F5E]"
-                                        : "bg-amber-500 shadow-[0_0_6px_#F59E0B]"
-                                    }`}
-                                  />
-                                </span>
-                                <span className="text-[9px]">
-                                  {isAvailable
-                                    ? "Available"
-                                    : isOccupied
-                                    ? "Occupied"
-                                    : "Maintain"}
-                                </span>
-                              </Badge>
+                            {/* Room Header: Number & Floor in full */}
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-sm sm:text-base font-serif font-bold text-[#59283A] whitespace-nowrap leading-tight">
+                                Room {r.roomNumber}
+                              </span>
+                              <span className="text-[10px] font-mono text-[#82747A] whitespace-nowrap">
+                                Fl {r.floor} • Cap: {r.roomType?.capacity || 2}
+                              </span>
                             </div>
+
+                            {/* Live Status Badge with Blinker - Full Dedicated Row */}
+                            <Badge
+                              variant="outline"
+                              className={`text-[9px] font-bold uppercase tracking-wider py-0.5 px-2 flex items-center justify-center gap-1.5 w-full shadow-xs ${
+                                isAvailable
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                  : isOccupied
+                                  ? "bg-rose-50 text-rose-700 border-rose-300"
+                                  : "bg-amber-50 text-amber-700 border-amber-300"
+                              }`}
+                            >
+                              {/* Blinker Indicator Dot */}
+                              <span className="relative flex h-2 w-2 shrink-0">
+                                <span
+                                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                                    isAvailable
+                                      ? "bg-emerald-400"
+                                      : isOccupied
+                                      ? "bg-rose-400"
+                                      : "bg-amber-400"
+                                  }`}
+                                />
+                                <span
+                                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                                    isAvailable
+                                      ? "bg-emerald-500 shadow-[0_0_6px_#10B981]"
+                                      : isOccupied
+                                      ? "bg-rose-500 shadow-[0_0_6px_#F43F5E]"
+                                      : "bg-amber-500 shadow-[0_0_6px_#F59E0B]"
+                                  }`}
+                                />
+                              </span>
+                              <span className="whitespace-nowrap">
+                                {isAvailable
+                                  ? "Available"
+                                  : isOccupied
+                                  ? "Occupied"
+                                  : "Maintenance"}
+                              </span>
+                            </Badge>
 
                             {/* Room Category & Description */}
                             <div className="space-y-1">
