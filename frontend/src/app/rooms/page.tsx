@@ -1100,14 +1100,14 @@ export default function RoomsPage() {
                           }`}
                         />
 
-                        <CardContent className="p-2.5 space-y-2 flex-1 flex flex-col justify-between">
+                        <CardContent className="p-2 space-y-1.5 flex-1 flex flex-col justify-between">
                           <div className="space-y-1.5">
                             {/* Room Header: Number & Floor in full */}
                             <div className="flex items-center justify-between gap-1">
-                              <span className="text-sm sm:text-base font-serif font-bold text-[#59283A] whitespace-nowrap leading-tight">
+                              <span className="text-xs font-bold text-[#59283A] whitespace-nowrap leading-tight">
                                 Room {r.roomNumber}
                               </span>
-                              <span className="text-[10px] font-mono text-[#82747A] whitespace-nowrap">
+                              <span className="text-[10px] text-[#82747A] whitespace-nowrap">
                                 Fl {r.floor} • Cap: {r.roomType?.capacity || 2}
                               </span>
                             </div>
