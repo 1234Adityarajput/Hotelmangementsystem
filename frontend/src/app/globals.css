@@ -193,6 +193,21 @@ nextjs-portal,
     padding: 0 !important;
   }
 
+  /* When a receipt document is being printed, hide any background dialog/modal (like History/Archive)
+     so that ONLY the receipt document modal prints! */
+  body:has(.receipt-document-container) [role="dialog"]:not(:has(.receipt-document-container)),
+  body:has(.receipt-document-container) [data-radix-dialog-content]:not(:has(.receipt-document-container)),
+  body:has(.receipt-document-container) [data-radix-portal]:not(:has(.receipt-document-container)),
+  body:has(.receipt-document-container) .history-modal-content {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   /* Ensure Radix Portal takes full natural document flow when printing */
   [data-radix-portal] {
     position: static !important;

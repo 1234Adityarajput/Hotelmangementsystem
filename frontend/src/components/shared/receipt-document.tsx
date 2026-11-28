@@ -161,6 +161,13 @@ export function ReceiptDocument({
     ? config.folioTitle
     : config.invoiceTitle;
 
+  // Logo Display & URL Fallback
+  const showLogo = config.showLogo !== false;
+  const logoUrl =
+    config.logoUrl && config.logoUrl.trim().length > 0
+      ? config.logoUrl
+      : "/radha-krishna-logo.jpg";
+
   return (
     <div
       className={`receipt-document-container relative bg-white text-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border print:border-none print:shadow-none print:p-0 print:m-0 print:w-full ${
@@ -193,7 +200,7 @@ export function ReceiptDocument({
           style={{ borderColor: config.themeColor }}
         >
           <div className="flex items-start gap-4">
-            {config.showLogo && (
+            {showLogo && (
               <div
                 className="w-16 h-16 rounded-xl overflow-hidden shadow-md relative flex-shrink-0 border-2"
                 style={{
@@ -201,12 +208,11 @@ export function ReceiptDocument({
                   backgroundColor: config.themeColor,
                 }}
               >
-                <Image
-                  src={config.logoUrl || "/radha-krishna-logo.jpg"}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoUrl}
                   alt={config.hotelName}
-                  fill
-                  unoptimized
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
             )}
@@ -265,7 +271,7 @@ export function ReceiptDocument({
 
       {config.headerStyle === "CLASSIC_CENTERED" && (
         <div className="text-center pb-6 mb-6 print:pb-3 print:mb-3 border-b-2" style={{ borderColor: config.themeColor }}>
-          {config.showLogo && (
+          {showLogo && (
             <div
               className="w-16 h-16 rounded-xl overflow-hidden shadow-md mx-auto mb-2 relative border-2"
               style={{
@@ -273,12 +279,11 @@ export function ReceiptDocument({
                 backgroundColor: config.themeColor,
               }}
             >
-              <Image
-                src={config.logoUrl || "/radha-krishna-logo.jpg"}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={logoUrl}
                 alt={config.hotelName}
-                fill
-                unoptimized
-                className="object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
           )}
@@ -315,17 +320,16 @@ export function ReceiptDocument({
       {config.headerStyle === "MINIMAL_EXECUTIVE" && (
         <div className="pb-5 mb-5 print:pb-3 print:mb-3 border-b border-slate-300 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {config.showLogo && (
+            {showLogo && (
               <div
                 className="w-12 h-12 rounded-lg overflow-hidden relative border"
                 style={{ borderColor: config.themeColor }}
               >
-                <Image
-                  src={config.logoUrl || "/radha-krishna-logo.jpg"}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoUrl}
                   alt={config.hotelName}
-                  fill
-                  unoptimized
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
             )}

@@ -2383,18 +2383,20 @@ export default function AutomaticBillingPage() {
       {/* MODAL 5: FULL MONTH BILLING HISTORY & ARCHIVE MODAL                       */}
       {/* ========================================================================= */}
       <Dialog open={historyModalOpen} onOpenChange={setHistoryModalOpen}>
-        <DialogContent className="max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0">
-          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0">
+        <DialogContent className={`max-w-5xl bg-white max-h-[92vh] overflow-hidden flex flex-col border-[#E8DDD8] shadow-2xl p-0 history-modal-content ${
+          dossierModalOpen ? "print:hidden" : "print:max-h-none print:overflow-visible print:border-none print:shadow-none print:w-full print:p-0 print:m-0"
+        }`}>
+          <DialogHeader className="p-5 border-b border-[#E8DDD8] bg-[#F5F0EA]/40 flex-shrink-0 print:p-3 print:bg-white print:border-b-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-[#59283A] text-[#C4A06A] px-2 py-0.5 rounded print:text-[#59283A] print:bg-transparent print:p-0">
                     Hotel Radha Palace Archive
                   </span>
                   <span className="text-xs text-[#82747A]">• Full Month Billing Activity &amp; Invoices</span>
                 </div>
                 <DialogTitle className="text-xl font-serif font-bold text-[#59283A] mt-1 flex items-center gap-2">
-                  <History className="w-5 h-5 text-[#C4A06A]" />
+                  <History className="w-5 h-5 text-[#C4A06A] print:hidden" />
                   <span>Billing History &amp; Monthly Records</span>
                 </DialogTitle>
                 <DialogDescription className="text-xs text-[#82747A]">
@@ -2402,28 +2404,41 @@ export default function AutomaticBillingPage() {
                 </DialogDescription>
               </div>
 
-              {/* Month Selector Controls */}
-              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs">
+              {/* Month Selector Controls & Print Button */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-[#E8DDD8] shadow-xs print:border-none print:shadow-none">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handlePrevMonth}
+                    className="h-8 w-8 p-0 text-[#59283A] print:hidden"
+                    title="Previous Month"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center print:text-sm print:font-extrabold">
+                    {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleNextMonth}
+                    className="h-8 w-8 p-0 text-[#59283A] print:hidden"
+                    title="Next Month"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={handlePrevMonth}
-                  className="h-8 w-8 p-0 text-[#59283A]"
-                  title="Previous Month"
+                  onClick={() => window.print()}
+                  className="h-8 text-xs font-semibold border-[#C4A06A] text-[#59283A] bg-white hover:bg-[#F5F0EA] flex items-center gap-1.5 shadow-xs print:hidden"
+                  title="Print complete monthly billing history records"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <span className="text-xs font-bold text-[#59283A] px-2 font-serif min-w-[130px] text-center">
-                  {historyData?.monthName || `${MONTH_NAMES[historyMonth - 1]} ${historyYear}`}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleNextMonth}
-                  className="h-8 w-8 p-0 text-[#59283A]"
-                  title="Next Month"
-                >
-                  <ChevronRight className="w-4 h-4" />
+                  <Printer className="w-3.5 h-3.5 text-[#C4A06A]" />
+                  <span>Print History</span>
                 </Button>
               </div>
             </div>
@@ -2463,7 +2478,7 @@ export default function AutomaticBillingPage() {
           </DialogHeader>
 
           {/* Search & Filter Toolbar inside History */}
-          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+          <div className="p-3 border-b border-[#E8DDD8] bg-white flex flex-wrap items-center justify-between gap-2 flex-shrink-0 print:hidden">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8E7079]" />
               <Input
@@ -2515,7 +2530,7 @@ export default function AutomaticBillingPage() {
           </div>
 
           {/* History Records Table */}
-          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20">
+          <div className="flex-1 overflow-y-auto p-4 bg-[#F5F0EA]/20 print:p-0 print:bg-white print:overflow-visible print:max-h-none">
             {historyLoading ? (
               <div className="py-12 flex flex-col items-center justify-center">
                 <LoadingSpinner size="md" text="Loading billing history records..." />
@@ -2529,7 +2544,7 @@ export default function AutomaticBillingPage() {
                 {filteredHistoryItems.map((item: any, idx: number) => (
                   <div
                     key={item.id || idx}
-                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${item.isDeleted
+                    className={`p-3.5 rounded-xl border bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all print:p-2.5 print:my-1.5 print:break-inside-avoid ${item.isDeleted
                         ? "border-[#B54C44]/30 bg-[#F8E8E5]/20 hover:border-[#B54C44]"
                         : "border-[#E8DDD8] hover:border-[#C4A06A]"
                       }`}
@@ -2607,7 +2622,7 @@ export default function AutomaticBillingPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 self-end sm:self-center">
+                    <div className="flex items-center gap-2 self-end sm:self-center print:hidden">
                       {item.bookingId && (
                         <Button
                           size="sm"
@@ -2626,19 +2641,36 @@ export default function AutomaticBillingPage() {
             )}
           </div>
 
-          <DialogFooter className="p-3 border-t border-[#E8DDD8] bg-white flex items-center justify-between flex-shrink-0">
+          <DialogFooter className="p-3 border-t border-[#E8DDD8] bg-white flex items-center justify-between flex-shrink-0 print:hidden">
             <span className="text-[11px] text-[#82747A]">
               Showing {filteredHistoryItems.length} of {historyData?.totalCount || 0} billing records for {historyData?.monthName || "selected month"}.
             </span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setHistoryModalOpen(false)}
-              className="text-xs border-[#E8DDD8] text-[#59283A]"
-            >
-              Close Archive
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => window.print()}
+                className="text-xs border-[#C4A06A] text-[#59283A] hover:bg-[#F5F0EA] flex items-center gap-1.5"
+                title="Print complete monthly billing records"
+              >
+                <Printer className="w-3.5 h-3.5 text-[#C4A06A]" />
+                <span>Print Billing History</span>
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setHistoryModalOpen(false)}
+                className="text-xs border-[#E8DDD8] text-[#59283A]"
+              >
+                Close Archive
+              </Button>
+            </div>
           </DialogFooter>
+
+          {/* Clean printable footer banner for printed reports */}
+          <div className="hidden print:block pt-3 border-t border-slate-300 text-[10px] text-slate-500 text-center">
+            Hotel Radha Palace • Total Billing Records: {filteredHistoryItems.length} • Generated on {new Date().toLocaleString("en-IN")}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
