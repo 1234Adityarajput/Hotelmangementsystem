@@ -218,87 +218,87 @@ export function Sidebar({
   const filteredNavGroups = !isManager
     ? navGroups
     : [
-        {
-          title: "OVERVIEW",
-          items: [
-            {
-              name: "Dashboard",
-              href: "/",
-              icon: LayoutDashboard,
-              active: pathname === "/",
-            },
-          ],
-        },
-        {
-          title: "FRONT OFFICE",
-          items: [
-            {
-              name: "Guests",
-              href: "/guests",
-              icon: Users,
-              active: pathname.startsWith("/guests"),
-            },
-            {
-              name: "Rooms",
-              href: "/rooms",
-              icon: BedDouble,
-              active: pathname.startsWith("/rooms"),
-            },
-            {
-              name: "Bookings",
-              href: "/bookings",
-              icon: CalendarDays,
-              active: pathname.startsWith("/bookings"),
-            },
-            {
-              name: "Stays",
-              href: "/stays",
-              icon: DoorOpen,
-              active: pathname.startsWith("/stays"),
-            },
-          ],
-        },
-        {
-          title: "OPERATIONS",
-          items: [
-            {
-              name: "Automatic Billing",
-              href: "/billing",
-              icon: Calculator,
-              active: pathname.startsWith("/billing"),
-            },
-            {
-              name: "Items & Services",
-              href: "/items",
-              icon: UtensilsCrossed,
-              active: pathname.startsWith("/items"),
-            },
-            {
-              name: "Invoices",
-              href: "/invoices",
-              icon: Receipt,
-              active: pathname.startsWith("/invoices"),
-            },
-          ],
-        },
-        {
-          title: "WORKFORCE",
-          items: [
-            {
-              name: "Staff",
-              href: "/staff",
-              icon: UserCheck,
-              active: pathname.startsWith("/staff"),
-            },
-            {
-              name: "Attendance",
-              href: "/attendance",
-              icon: CalendarCheck2,
-              active: pathname.startsWith("/attendance"),
-            },
-          ],
-        },
-      ];
+      {
+        title: "OVERVIEW",
+        items: [
+          {
+            name: "Dashboard",
+            href: "/",
+            icon: LayoutDashboard,
+            active: pathname === "/",
+          },
+        ],
+      },
+      {
+        title: "FRONT OFFICE",
+        items: [
+          {
+            name: "Guests",
+            href: "/guests",
+            icon: Users,
+            active: pathname.startsWith("/guests"),
+          },
+          {
+            name: "Rooms",
+            href: "/rooms",
+            icon: BedDouble,
+            active: pathname.startsWith("/rooms"),
+          },
+          {
+            name: "Bookings",
+            href: "/bookings",
+            icon: CalendarDays,
+            active: pathname.startsWith("/bookings"),
+          },
+          {
+            name: "Stays",
+            href: "/stays",
+            icon: DoorOpen,
+            active: pathname.startsWith("/stays"),
+          },
+        ],
+      },
+      {
+        title: "OPERATIONS",
+        items: [
+          {
+            name: "Automatic Billing",
+            href: "/billing",
+            icon: Calculator,
+            active: pathname.startsWith("/billing"),
+          },
+          {
+            name: "Items & Services",
+            href: "/items",
+            icon: UtensilsCrossed,
+            active: pathname.startsWith("/items"),
+          },
+          {
+            name: "Invoices",
+            href: "/invoices",
+            icon: Receipt,
+            active: pathname.startsWith("/invoices"),
+          },
+        ],
+      },
+      {
+        title: "WORKFORCE",
+        items: [
+          {
+            name: "Staff",
+            href: "/staff",
+            icon: UserCheck,
+            active: pathname.startsWith("/staff"),
+          },
+          {
+            name: "Attendance",
+            href: "/attendance",
+            icon: CalendarCheck2,
+            active: pathname.startsWith("/attendance"),
+          },
+        ],
+      },
+    ];
 
   const sidebarContent = (
     <div className="flex flex-col h-full min-h-0 bg-[#59283A] text-white select-none">
