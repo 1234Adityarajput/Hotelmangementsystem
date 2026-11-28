@@ -657,7 +657,7 @@ export default function RoomsPage() {
   const displayRooms = availableRoomsResult !== null ? availableRoomsResult : rooms;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="space-y-6 max-w-[1700px] w-full mx-auto pb-12">
       {/* Editorial Luxury Page Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-[#E8DDD8]">
         <div>
@@ -761,15 +761,18 @@ export default function RoomsPage() {
         {/* Occupied Rooms */}
         <Card
           onClick={() => setStatusFilter("OCCUPIED")}
-          className="bg-white border-[#E8DDD8] shadow-sm cursor-pointer hover:border-[#627D91] transition-colors"
+          className="bg-white border-[#E8DDD8] shadow-sm cursor-pointer hover:border-rose-400 transition-colors"
         >
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#E9EFF3] flex items-center justify-center text-[#627D91]">
-              <UserCheck className="w-5 h-5 text-[#627D91]" />
+            <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
+              <UserCheck className="w-5 h-5 text-rose-600" />
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold text-[#627D91] tracking-wider">Occupied</p>
-              <h3 className="text-xl font-serif font-bold text-[#59283A]">{occupiedRoomsCount}</h3>
+              <p className="text-[10px] uppercase font-bold text-rose-600 tracking-wider flex items-center gap-1">
+                <span>Occupied</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+              </p>
+              <h3 className="text-xl font-serif font-bold text-rose-700">{occupiedRoomsCount}</h3>
             </div>
           </CardContent>
         </Card>
@@ -777,17 +780,18 @@ export default function RoomsPage() {
         {/* Under Maintenance */}
         <Card
           onClick={() => setStatusFilter("MAINTENANCE")}
-          className="bg-white border-[#E8DDD8] shadow-sm cursor-pointer hover:border-[#A97832] transition-colors"
+          className="bg-white border-[#E8DDD8] shadow-sm cursor-pointer hover:border-amber-400 transition-colors"
         >
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F6EDDC] flex items-center justify-center text-[#A97832]">
-              <Wrench className="w-5 h-5 text-[#A97832]" />
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+              <Wrench className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold text-[#A97832] tracking-wider">
-                Under Maintenance
+              <p className="text-[10px] uppercase font-bold text-amber-600 tracking-wider flex items-center gap-1">
+                <span>Under Maintenance</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
               </p>
-              <h3 className="text-xl font-serif font-bold text-[#A97832]">{maintenanceRoomsCount}</h3>
+              <h3 className="text-xl font-serif font-bold text-amber-700">{maintenanceRoomsCount}</h3>
             </div>
           </CardContent>
         </Card>
@@ -1068,7 +1072,7 @@ export default function RoomsPage() {
                   </Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-8 gap-2.5">
                   {displayRooms.map((r) => {
                     const isAvailable = r.roomStatus === "AVAILABLE";
                     const isOccupied = r.roomStatus === "OCCUPIED";
@@ -1077,141 +1081,168 @@ export default function RoomsPage() {
                     return (
                       <Card
                         key={r.id}
-                        className={`border bg-white transition-all hover:shadow-md relative overflow-hidden ${
+                        className={`border bg-white transition-all hover:shadow-md relative overflow-hidden flex flex-col justify-between rounded-xl ${
                           isAvailable
-                            ? "border-[#32765B]/30 hover:border-[#32765B]"
+                            ? "border-emerald-200/90 hover:border-emerald-500 hover:shadow-emerald-500/10"
                             : isOccupied
-                            ? "border-[#627D91]/30 hover:border-[#627D91]"
-                            : "border-[#A97832]/30 hover:border-[#A97832]"
+                            ? "border-rose-200/90 hover:border-rose-500 hover:shadow-rose-500/10"
+                            : "border-amber-200/90 hover:border-amber-500 hover:shadow-amber-500/10"
                         }`}
                       >
                         {/* Top Status Accent Bar */}
                         <div
-                          className={`h-1.5 w-full ${
+                          className={`h-1 w-full ${
                             isAvailable
-                              ? "bg-[#32765B]"
+                              ? "bg-emerald-500"
                               : isOccupied
-                              ? "bg-[#627D91]"
-                              : "bg-[#A97832]"
+                              ? "bg-rose-500"
+                              : "bg-amber-500"
                           }`}
                         />
 
-                        <CardContent className="p-4 space-y-3">
-                          {/* Room Header: Number, Floor & Status Badge */}
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xl font-serif font-bold text-[#59283A]">
+                        <CardContent className="p-2.5 space-y-2 flex-1 flex flex-col justify-between">
+                          <div className="space-y-1.5">
+                            {/* Room Header: Number, Floor & Status Badge with Blinker */}
+                            <div className="flex items-start justify-between gap-1">
+                              <div className="min-w-0">
+                                <span className="text-sm sm:text-base font-serif font-bold text-[#59283A] block leading-tight truncate">
                                   Room {r.roomNumber}
                                 </span>
-                              </div>
-                              <span className="text-[11px] font-mono text-[#82747A] block">
-                                Floor {r.floor} • Cap: {r.roomType?.capacity || 2}
-                              </span>
-                            </div>
-
-                            <Badge
-                              variant="outline"
-                              className={`text-[10px] font-bold uppercase tracking-wider ${
-                                isAvailable
-                                  ? "bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30"
-                                  : isOccupied
-                                  ? "bg-[#E9EFF3] text-[#627D91] border-[#627D91]/30"
-                                  : "bg-[#F6EDDC] text-[#A97832] border-[#A97832]/30"
-                              }`}
-                            >
-                              {isAvailable
-                                ? "Available"
-                                : isOccupied
-                                ? "Occupied"
-                                : "Under Maintenance"}
-                            </Badge>
-                          </div>
-
-                          {/* Room Type & Description */}
-                          <div className="space-y-1.5 text-xs">
-                            <div className="flex justify-between items-center text-[#82747A]">
-                              <span className="text-[#8E7079] text-[11px] uppercase font-semibold">
-                                Category:
-                              </span>
-                              <span className="font-semibold text-[#59283A]">{r.roomType?.name}</span>
-                            </div>
-
-                            {/* Room Description */}
-                            <div className="text-[11px] text-[#82747A] bg-[#F5F0EA] p-2 rounded-lg border border-[#E8DDD8]/60 min-h-[42px] line-clamp-2">
-                              {r.description || (
-                                <span className="italic text-[#8E7079]">
-                                  {r.roomType?.description || "Standard room with premium hospitality amenities."}
+                                <span className="text-[10px] font-mono text-[#82747A] block leading-tight">
+                                  Fl {r.floor} • Cap: {r.roomType?.capacity || 2}
                                 </span>
+                              </div>
+
+                              {/* Live Status Badge with Blinker */}
+                              <Badge
+                                variant="outline"
+                                className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 flex items-center gap-1.5 shrink-0 shadow-xs ${
+                                  isAvailable
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                                    : isOccupied
+                                    ? "bg-rose-50 text-rose-700 border-rose-300"
+                                    : "bg-amber-50 text-amber-700 border-amber-300"
+                                }`}
+                              >
+                                {/* Blinker Indicator Dot */}
+                                <span className="relative flex h-2 w-2 shrink-0">
+                                  <span
+                                    className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                                      isAvailable
+                                        ? "bg-emerald-400"
+                                        : isOccupied
+                                        ? "bg-rose-400"
+                                        : "bg-amber-400"
+                                    }`}
+                                  />
+                                  <span
+                                    className={`relative inline-flex rounded-full h-2 w-2 ${
+                                      isAvailable
+                                        ? "bg-emerald-500 shadow-[0_0_6px_#10B981]"
+                                        : isOccupied
+                                        ? "bg-rose-500 shadow-[0_0_6px_#F43F5E]"
+                                        : "bg-amber-500 shadow-[0_0_6px_#F59E0B]"
+                                    }`}
+                                  />
+                                </span>
+                                <span className="text-[9px]">
+                                  {isAvailable
+                                    ? "Available"
+                                    : isOccupied
+                                    ? "Occupied"
+                                    : "Maintain"}
+                                </span>
+                              </Badge>
+                            </div>
+
+                            {/* Room Category & Description */}
+                            <div className="space-y-1">
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-[#8E7079] uppercase font-semibold text-[9px]">
+                                  Type:
+                                </span>
+                                <span
+                                  className="font-semibold text-[#59283A] text-[10px] truncate max-w-[95px]"
+                                  title={r.roomType?.name}
+                                >
+                                  {r.roomType?.name}
+                                </span>
+                              </div>
+
+                              {/* Room Description (Compact single line with tooltip) */}
+                              <div
+                                className="text-[10px] text-[#82747A] bg-[#F5F0EA]/70 px-1.5 py-0.5 rounded border border-[#E8DDD8]/60 truncate"
+                                title={r.description || r.roomType?.description || "Comfortable guest room"}
+                              >
+                                {r.description || (
+                                  <span className="italic text-[#8E7079]">
+                                    {r.roomType?.description || "Comfortable room"}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Price Per Night with Quick Update */}
+                              <div className="flex justify-between items-center pt-0.5">
+                                <span className="text-[#8E7079] text-[9px] uppercase font-semibold">
+                                  Rate:
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  <span className="font-mono font-bold text-xs text-[#59283A]">
+                                    ₹{Number(r.pricePerNight).toLocaleString("en-IN")}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenQuickPrice(r)}
+                                    className="text-[#C4A06A] hover:text-[#59283A] p-0.5 rounded hover:bg-[#F5F0EA]"
+                                    title="Update Price"
+                                  >
+                                    <Edit2 className="w-2.5 h-2.5" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Active Occupant Details if Occupied */}
+                              {r.currentBooking && (
+                                <div className="p-1.5 bg-rose-50/80 rounded border border-rose-200/70 text-[10px] text-[#59283A] space-y-0.5">
+                                  <div className="flex items-center justify-between font-semibold truncate">
+                                    <span className="truncate text-[10px]">
+                                      {r.currentBooking.primaryGuest?.fullName}
+                                    </span>
+                                  </div>
+                                  <div className="text-[9px] text-[#82747A] font-mono truncate">
+                                    {r.currentBooking.primaryGuest?.mobileNumber}
+                                  </div>
+                                </div>
                               )}
                             </div>
-
-                            {/* Price Per Night with Quick Update Action */}
-                            <div className="flex justify-between items-center pt-1">
-                              <span className="text-[#8E7079] text-[11px] uppercase font-semibold">
-                                Price Per Night:
-                              </span>
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-mono font-bold text-sm text-[#59283A]">
-                                  ₹{Number(r.pricePerNight).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenQuickPrice(r)}
-                                  className="text-[#C4A06A] hover:text-[#59283A] p-0.5"
-                                  title="Update Price"
-                                >
-                                  <Edit2 className="w-3 h-3" />
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Active Occupant Details if Occupied */}
-                            {r.currentBooking && (
-                              <div className="p-2 bg-[#E9EFF3]/60 rounded-lg border border-[#627D91]/20 text-[11px] text-[#59283A] mt-1 space-y-0.5">
-                                <div className="flex items-center justify-between font-semibold">
-                                  <span className="truncate">
-                                    {r.currentBooking.primaryGuest?.fullName}
-                                  </span>
-                                  <Badge variant="outline" className="text-[9px] bg-white">
-                                    {r.currentBooking.bookingStatus}
-                                  </Badge>
-                                </div>
-                                <div className="text-[10px] text-[#82747A] font-mono">
-                                  {r.currentBooking.primaryGuest?.mobileNumber}
-                                </div>
-                              </div>
-                            )}
                           </div>
 
-                          {/* Action Buttons Footer */}
-                          <div className="pt-2 border-t border-[#E8DDD8] flex items-center justify-between gap-1.5">
+                          {/* Action Buttons Footer: Compact mini buttons with tooltips */}
+                          <div className="pt-1.5 border-t border-[#E8DDD8] flex items-center justify-between gap-1">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenDetails(r.id)}
-                              className="h-7 text-[11px] px-2 text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA] border-[#E8DDD8]"
+                              className="h-6 w-6 p-0 text-[#82747A] hover:text-[#59283A] hover:bg-[#F5F0EA] border-[#E8DDD8] rounded"
                               title="View Room Dossier"
                             >
-                              <Eye className="w-3 h-3 mr-1 text-[#C4A06A]" />
-                              Dossier
+                              <Eye className="w-3 h-3 text-[#C4A06A]" />
                             </Button>
 
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenEditRoom(r)}
-                              className="h-7 text-[11px] px-2 text-[#7A4652] hover:bg-[#F5F0EA] border-[#E8DDD8]"
+                              className="h-6 w-6 p-0 text-[#7A4652] hover:bg-[#F5F0EA] border-[#E8DDD8] rounded"
                               title="Edit Room Details"
                             >
-                              <Edit2 className="w-3 h-3 mr-1" />
-                              Edit
+                              <Edit2 className="w-3 h-3" />
                             </Button>
 
                             {/* Quick Status Toggle Button */}
                             {!isOccupied && (
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
                                 onClick={() =>
                                   handleQuickStatusChange(
@@ -1224,22 +1255,16 @@ export default function RoomsPage() {
                                     ? "Mark as Under Maintenance"
                                     : "Mark as Available"
                                 }
-                                className={`h-7 px-2 text-[11px] ${
+                                className={`h-6 w-6 p-0 border-[#E8DDD8] rounded ${
                                   isAvailable
-                                    ? "text-[#A97832] hover:bg-[#F6EDDC]"
-                                    : "text-[#32765B] hover:bg-[#E7F1E9]"
+                                    ? "text-amber-600 hover:bg-amber-50"
+                                    : "text-emerald-600 hover:bg-emerald-50"
                                 }`}
                               >
                                 {isAvailable ? (
-                                  <>
-                                    <Wrench className="w-3 h-3 mr-1" />
-                                    <span>Maintain</span>
-                                  </>
+                                  <Wrench className="w-3 h-3 text-amber-600" />
                                 ) : (
-                                  <>
-                                    <CheckCircle2 className="w-3 h-3 mr-1 text-[#32765B]" />
-                                    <span>Ready</span>
-                                  </>
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                                 )}
                               </Button>
                             )}
@@ -1250,9 +1275,9 @@ export default function RoomsPage() {
                               onClick={() => handleConfirmDelete(r)}
                               disabled={isOccupied}
                               title={isOccupied ? "Cannot delete occupied room" : "Delete Room from Inventory"}
-                              className="h-7 px-2 text-[#8E7079] hover:text-[#B54C44] hover:bg-[#F8E8E5] disabled:opacity-40"
+                              className="h-6 w-6 p-0 text-[#8E7079] hover:text-[#B54C44] hover:bg-rose-50 disabled:opacity-30 rounded"
                             >
-                              <Trash2 className="w-3.5 h-3.5 text-[#B54C44]" />
+                              <Trash2 className="w-3 h-3 text-[#B54C44]" />
                             </Button>
                           </div>
                         </CardContent>
@@ -1352,19 +1377,41 @@ export default function RoomsPage() {
                               <td className="px-4 py-3.5">
                                 <Badge
                                   variant="outline"
-                                  className={`text-[10px] font-bold uppercase tracking-wider ${
+                                  className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 w-fit ${
                                     isAvailable
-                                      ? "bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30"
+                                      ? "bg-emerald-50 text-emerald-700 border-emerald-300"
                                       : isOccupied
-                                      ? "bg-[#E9EFF3] text-[#627D91] border-[#627D91]/30"
-                                      : "bg-[#F6EDDC] text-[#A97832] border-[#A97832]/30"
+                                      ? "bg-rose-50 text-rose-700 border-rose-300"
+                                      : "bg-amber-50 text-amber-700 border-amber-300"
                                   }`}
                                 >
-                                  {isAvailable
-                                    ? "Available"
-                                    : isOccupied
-                                    ? "Occupied"
-                                    : "Under Maintenance"}
+                                  <span className="relative flex h-2 w-2 shrink-0">
+                                    <span
+                                      className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                                        isAvailable
+                                          ? "bg-emerald-400"
+                                          : isOccupied
+                                          ? "bg-rose-400"
+                                          : "bg-amber-400"
+                                      }`}
+                                    />
+                                    <span
+                                      className={`relative inline-flex rounded-full h-2 w-2 ${
+                                        isAvailable
+                                          ? "bg-emerald-500 shadow-[0_0_6px_#10B981]"
+                                          : isOccupied
+                                          ? "bg-rose-500 shadow-[0_0_6px_#F43F5E]"
+                                          : "bg-amber-500 shadow-[0_0_6px_#F59E0B]"
+                                      }`}
+                                    />
+                                  </span>
+                                  <span>
+                                    {isAvailable
+                                      ? "Available"
+                                      : isOccupied
+                                      ? "Occupied"
+                                      : "Under Maintenance"}
+                                  </span>
                                 </Badge>
                               </td>
 
@@ -1741,19 +1788,41 @@ export default function RoomsPage() {
 
               <Badge
                 variant="outline"
-                className={`text-[10px] font-bold uppercase tracking-wider ${
+                className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${
                   selectedRoomDetails?.roomStatus === "AVAILABLE"
-                    ? "bg-[#E7F1E9] text-[#32765B] border-[#32765B]/30"
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-300"
                     : selectedRoomDetails?.roomStatus === "OCCUPIED"
-                    ? "bg-[#E9EFF3] text-[#627D91] border-[#627D91]/30"
-                    : "bg-[#F6EDDC] text-[#A97832] border-[#A97832]/30"
+                    ? "bg-rose-50 text-rose-700 border-rose-300"
+                    : "bg-amber-50 text-amber-700 border-amber-300"
                 }`}
               >
-                {selectedRoomDetails?.roomStatus === "AVAILABLE"
-                  ? "Available"
-                  : selectedRoomDetails?.roomStatus === "OCCUPIED"
-                  ? "Occupied"
-                  : "Under Maintenance"}
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span
+                    className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                      selectedRoomDetails?.roomStatus === "AVAILABLE"
+                        ? "bg-emerald-400"
+                        : selectedRoomDetails?.roomStatus === "OCCUPIED"
+                        ? "bg-rose-400"
+                        : "bg-amber-400"
+                    }`}
+                  />
+                  <span
+                    className={`relative inline-flex rounded-full h-2 w-2 ${
+                      selectedRoomDetails?.roomStatus === "AVAILABLE"
+                        ? "bg-emerald-500 shadow-[0_0_6px_#10B981]"
+                        : selectedRoomDetails?.roomStatus === "OCCUPIED"
+                        ? "bg-rose-500 shadow-[0_0_6px_#F43F5E]"
+                        : "bg-amber-500 shadow-[0_0_6px_#F59E0B]"
+                    }`}
+                  />
+                </span>
+                <span>
+                  {selectedRoomDetails?.roomStatus === "AVAILABLE"
+                    ? "Available"
+                    : selectedRoomDetails?.roomStatus === "OCCUPIED"
+                    ? "Occupied"
+                    : "Under Maintenance"}
+                </span>
               </Badge>
             </div>
           </DialogHeader>
