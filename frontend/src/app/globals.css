@@ -102,6 +102,25 @@
   background: #C4A06A;
 }
 
+/* Sidebar Gold Luxury Scrollbar */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #C4A06A rgba(71, 33, 48, 0.6);
+}
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: rgba(71, 33, 48, 0.4);
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: #C4A06A;
+  border-radius: 4px;
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #dfb87c;
+}
+
 /* Selection Highlight */
 ::selection {
   background: #59283A;

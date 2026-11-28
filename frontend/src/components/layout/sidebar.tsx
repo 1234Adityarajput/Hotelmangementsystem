@@ -301,7 +301,7 @@ export function Sidebar({
       ];
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#59283A] text-white select-none">
+    <div className="flex flex-col h-full min-h-0 bg-[#59283A] text-white select-none">
       {/* Brand Header */}
       <div className={cn(
         "h-24 flex items-center border-b border-[#472130] bg-[#472130]/70 flex-shrink-0 transition-all px-4",
@@ -372,7 +372,7 @@ export function Sidebar({
       )}
 
       {/* Navigation Groups */}
-      <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
+      <nav className="flex-1 min-h-0 px-3 py-4 space-y-4 overflow-y-auto sidebar-scrollbar">
         {filteredNavGroups.map((group) => (
           <div key={group.title} className="space-y-1">
             {!collapsed && (
@@ -437,7 +437,7 @@ export function Sidebar({
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "hidden lg:flex flex-col flex-shrink-0 border-r border-[#472130] shadow-2xl transition-all duration-300 z-30",
+          "hidden lg:flex flex-col flex-shrink-0 h-full min-h-0 border-r border-[#472130] shadow-2xl transition-all duration-300 z-30",
           collapsed ? "w-20" : "w-64"
         )}
       >
@@ -451,7 +451,7 @@ export function Sidebar({
             className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={onMobileClose}
           />
-          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] shadow-2xl z-50 animate-in slide-in-from-left duration-200">
+          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] h-full min-h-0 shadow-2xl z-50 animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>
         </div>

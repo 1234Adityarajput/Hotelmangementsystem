@@ -29,7 +29,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="app-shell-root flex h-screen w-screen overflow-hidden bg-[#F5F0EA] font-sans antialiased text-[#352630] print:h-auto print:w-full print:overflow-visible print:bg-white">
-      <div className="print:hidden">
+      <div className="print:hidden h-full flex flex-col flex-shrink-0">
         <Sidebar
           mobileOpen={mobileOpen}
           onMobileClose={() => setMobileOpen(false)}
